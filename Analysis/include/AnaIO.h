@@ -1,24 +1,7 @@
 #ifndef _ANAIO_H_
 #define _ANAIO_H_
 
-#include "stdio.h"
-#include "TAxis.h"
-#include "TCanvas.h"
-#include "TColor.h"
-#include "TFile.h"
-#include "TGraph.h"
-#include "TGraphErrors.h"
-#include "TLegend.h"
-#include "TLine.h"
-#include "TList.h"
-#include "TLorentzVector.h"
-#include "TSystem.h"
-#include "TTree.h"
-#include "TH1D.h"
-#include <iostream>      //std::cout
-#include <algorithm>    // std::sort
-#include <vector>       // std::vector
-using namespace std;
+#include "PlotUtils.h"
 
 namespace AnaIO
 {
@@ -42,9 +25,9 @@ namespace AnaIO
   } // End of GetInputTree
   
   // Initialise reco histograms
-  void IniRecHist(TList * lout)
+  void IniRecHist(TList * lout, const TString tag)
   {
-    hevent = new TH1D("hevent", "", 1000, 0, 1000); lout->Add(hevent);
+    hevent = new TH1D("hevent_"+tag, "", 10000, 0, 100000); lout->Add(hevent);
   }// End of IniRecHist
 
 } // End of namespace
