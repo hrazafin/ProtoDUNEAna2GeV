@@ -1,12 +1,18 @@
 #include "include/AnaIO.h"
 #include "src/PlotUtils.cxx"
+#include "src/AnaUtils.cxx"
+#include "src/AnaCut.cxx"
 
-void anaRec(const TString finName, TList *lout, const TString tag)
+void anaRec(const TString finName, TList *lout, const TString tag, const int nEntryToStop)
 {
   //_____________________________________________________ basic settings _____________________________________________________ 
   cout << "Input file:" << endl;
   gSystem->Exec(Form("readlink -f %s", finName.Data()));
   cout << endl;
+  // Control MC or data sample
+  bool kMC = true;
+  if(!finName.Contains("_mc_"))  kMC = false;
+  
   // Open the input file
   TFile * fin = new TFile(finName);
   if(!fin->IsOpen()){
@@ -16,27 +22,43 @@ void anaRec(const TString finName, TList *lout, const TString tag)
   else cout << "fin is open!" << endl;
 
   // Get the TTree from input file
-  TTree  * tree = AnaIO::GetInputTree(fin, "pionana/beamana");
+  TTree  * tree = AnaIO::GetInputTree(fin, "pionana/beamana", tag);
   // Initialise reco histograms
-  AnaIO::IniRecHist(lout,tag);
+  AnaIO::IniHist(lout, tag, kMC);
 
+  AnaUtils anaUtils;
+  AnaCut anaCut;
   // Initialise entry
   int ientry = 0;
   // Loop over TTree
   while(tree->GetEntry(ientry)){
-    AnaIO::hevent->Fill(AnaIO::event); 
+    AnaIO::hEvent->Fill(AnaIO::event); 
     // Break 
-    if(ientry>=100){
-      cout << "Breaking after " << ientry << endl;
+    if(nEntryToStop > 0 && ientry>=nEntryToStop){
+      cout << "Break the loop after " << nEntryToStop << " entries!" << endl;
       break;
     }
     // update ientry after each loop
     ientry++;
+
+    //====================== Extract truth information (MC only)======================//
+    if(kMC){
+      // Get true beam particle type from it's pdg code
+      int TruthBeamType = anaUtils.GetParticleType(AnaIO::true_beam_PDG);
+      // Fill the TruthBeamType histogram
+      AnaIO::hTruthBeamType->Fill(TruthBeamType); 
+      // Set signal using truth info
+      anaUtils.SetFullSignal(); 
+    }
+    //====================== Do cuts (both MC and data) ======================//
+
+    anaCut.CutBeamAllInOne(kMC);
+    
   } // End of while loop
 
 } // End of anaRec
 
-int main()
+int main(int argc, char * argv[])
 {
   // Initialise the input file name
   const TString mcfinName = "input/protoDUNE_mc_reco_flattree.root";
@@ -47,8 +69,12 @@ int main()
   mclout = new TList;
   datalout = new TList;
   // Run reco loop for both mc and data
-  anaRec(mcfinName,mclout,"mc");
-  anaRec(datafinName,datalout,"data");
+  int nEntryToStop = -1; // Default is looping over all entries
+  // Get the input break entries
+  if(argc!=1) nEntryToStop = atoi(argv[1]);
+  anaRec(mcfinName,mclout,"mc", nEntryToStop);
+  anaRec(datafinName,datalout,"data", nEntryToStop);
+  
   // Declare output root file
   TFile * fout = new TFile("output/outana.root","recreate");
   // Create mc subdirectory
@@ -66,6 +92,7 @@ int main()
   // Save the info
   fout->Save();
   fout->Close();
+  
   // Draw all histograms in mclout and datalout
   PlotUtils PlotUtils;
   PlotUtils.DrawHist(mclout,"output");
