@@ -20,6 +20,11 @@ namespace AnaIO
   Double_t        reco_beam_endX;
   Double_t        reco_beam_endY;
   Double_t        reco_beam_endZ;
+  Double_t        reco_beam_trackEndDirX;
+  Double_t        reco_beam_trackEndDirY;
+  Double_t        reco_beam_trackEndDirZ;
+  Double_t        reco_beam_interactingEnergy;
+ 
   // Declare histograms
   TH1I * hEvent = 0x0;
   TH1I * hCutBeamIDPass = 0x0;
@@ -27,6 +32,9 @@ namespace AnaIO
   TH1I * hCutBeamPosPass = 0x0;
   TH1I * hCutBeamEndZPass = 0x0;
   TH1D * hCutBeamEndZ = 0x0; 
+  TH2D * hRecBeamTheta = 0x0;
+  TH2D * hRecBeamMomentum = 0x0;
+
   //====================== Reco (Data only)======================//
   // Declare variables
   Double_t        beam_inst_X;
@@ -50,6 +58,9 @@ namespace AnaIO
   Double_t        true_beam_endX;
   Double_t        true_beam_endY;
   Double_t        true_beam_endZ;
+  double          true_beam_endPx = -999;
+  double          true_beam_endPy = -999;
+  double          true_beam_endPz = -999;
 
   vector<double> *true_beam_daughter_startPx = 0x0;
   vector<double> *true_beam_daughter_startPy = 0x0;
@@ -69,6 +80,9 @@ namespace AnaIO
   TH1D * hTruthLeadingProtonP = 0x0;
   TH1D * hTruthSubLeadingProtonP = 0x0;
   TH1D * hTruthGammaMaxE = 0x0;
+  // Resolution histograms need to use truth info
+  TH2D * hBeamThetaRes = 0x0;
+  TH2D * hBeamMomentumRes = 0x0;
 
   // Get input tree
   TTree * GetInputTree(TFile * fin, const TString tname, const TString tag)
@@ -94,6 +108,10 @@ namespace AnaIO
     tree->SetBranchAddress("reco_beam_endX", &reco_beam_endX);
     tree->SetBranchAddress("reco_beam_endY", &reco_beam_endY);
     tree->SetBranchAddress("reco_beam_endZ", &reco_beam_endZ);
+    tree->SetBranchAddress("reco_beam_trackEndDirX", &reco_beam_trackEndDirX);
+    tree->SetBranchAddress("reco_beam_trackEndDirY", &reco_beam_trackEndDirY);
+    tree->SetBranchAddress("reco_beam_trackEndDirZ", &reco_beam_trackEndDirZ);
+    tree->SetBranchAddress("reco_beam_interactingEnergy", &reco_beam_interactingEnergy);
 
     //====================== Reco (Data only)======================//
     tree->SetBranchAddress("beam_inst_PDG_candidates", &beam_inst_PDG_candidates);
@@ -116,6 +134,9 @@ namespace AnaIO
     tree->SetBranchAddress("true_beam_endX", &true_beam_endX);
     tree->SetBranchAddress("true_beam_endY", &true_beam_endY);
     tree->SetBranchAddress("true_beam_endZ", &true_beam_endZ);
+    tree->SetBranchAddress("true_beam_endPx", &true_beam_endPx);
+    tree->SetBranchAddress("true_beam_endPy", &true_beam_endPy);
+    tree->SetBranchAddress("true_beam_endPz", &true_beam_endPz);
 
     tree->SetBranchAddress("true_beam_daughter_startPx", &true_beam_daughter_startPx);
     tree->SetBranchAddress("true_beam_daughter_startPy", &true_beam_daughter_startPy);
@@ -146,6 +167,11 @@ namespace AnaIO
     lout->Add(hCutBeamEndZPass); 
     hCutBeamEndZ = new TH1D("CutBeamEndZ_"+tag,"",50, 0, 500);
     lout->Add(hCutBeamEndZ);
+    hRecBeamTheta = new TH2D("RecBeamTheta_STK_"+tag,"", 80 , 0, 60, 3, -0.5, 2.5); 
+    lout->Add(hRecBeamTheta);
+    hRecBeamMomentum  = new TH2D("RecBeamMomentum_STK_"+tag,"", 50, 0, 2, 3, -0.5, 2.5); 
+    lout->Add(hRecBeamMomentum);
+
     //====================== Truth (MC only)======================//
     if(kMC){
       hTruthBeamType = new TH1I("TruthBeamType_"+tag,  "", 20, -0.5, 19.5); 
@@ -164,6 +190,11 @@ namespace AnaIO
       lout->Add(hTruthSubLeadingProtonP);
       hTruthGammaMaxE = new TH1D("TruthGammaMaxE_"+tag, "", 20, 0, 2);
       lout->Add(hTruthGammaMaxE);
+      hBeamThetaRes = new TH2D("BeamTheta_RES_"+tag,"", 80 , 0, 60, 25, -20, 30);
+      lout->Add(hBeamThetaRes);
+      hBeamMomentumRes  = new TH2D("BeamMomentum_RES_"+tag,"", 50, 0, 2, 20, -0.5, 0.5);
+      lout->Add(hBeamMomentumRes);
+
     }
   }// End of IniHist
 

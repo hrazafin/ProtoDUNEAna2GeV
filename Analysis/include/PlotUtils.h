@@ -50,6 +50,7 @@
 #include "TROOT.h"
 #include "TStopwatch.h"
 #include "TString.h"
+#include "TRegexp.h"
 #include "TStyle.h"
 #include "TSystem.h"
 #include "TSystemDirectory.h"
@@ -67,7 +68,14 @@ using namespace std;
 class PlotUtils
 {
   public:
-  void DrawHist(TList *lout, const TString outdir);
+  void FillHist(TH1 * hh,  double xx, const double yy);
+  void ProcessHist(TList *lout, const bool kMC);
+  void DrawHist(TList *lout, const double plotscale, TList * overlayList, const TString outdir);
+  THStack * ConvertToStack(const TH2D * hh);
+  TH1D * GetStackedSum(THStack *stk);
+  void ScaleStack(THStack *stk, const double scale);
+  int GetColor(const int col);
+  int * GetColorArray(const int minsize);
   void PadSetup(TPad *currentPad, const Double_t currentLeft=0.12, const Double_t currentTop=0.09, const Double_t currentRight=0.13, const Double_t currentBottom=0.14);
   void gStyleSetup();
   private:

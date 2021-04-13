@@ -3,7 +3,7 @@
 #include "src/AnaUtils.cxx"
 #include "src/AnaCut.cxx"
 
-void anaRec(const TString finName, TList *lout, const TString tag, const int nEntryToStop)
+int anaRec(const TString finName, TList *lout, const TString tag, const int nEntryToStop)
 {
   //_____________________________________________________ basic settings _____________________________________________________ 
   cout << "Input file:" << endl;
@@ -28,8 +28,9 @@ void anaRec(const TString finName, TList *lout, const TString tag, const int nEn
 
   AnaUtils anaUtils;
   AnaCut anaCut;
-  // Initialise entry
+  // Initialise entry and beam counter
   int ientry = 0;
+  int BeamCount = 0;
   // Loop over TTree
   while(tree->GetEntry(ientry)){
     AnaIO::hEvent->Fill(AnaIO::event); 
@@ -51,11 +52,13 @@ void anaRec(const TString finName, TList *lout, const TString tag, const int nEn
       anaUtils.SetFullSignal(); 
     }
     //====================== Do cuts (both MC and data) ======================//
-
-    anaCut.CutBeamAllInOne(kMC);
-    
+    // Do the beam cut
+    if(!anaCut.CutBeamAllInOne(kMC)) continue;
+    // Count beam after beam cut before other cuts
+    BeamCount++; 
+    anaUtils.FillBeamKinematics(kMC);
   } // End of while loop
-
+  return BeamCount;
 } // End of anaRec
 
 int main(int argc, char * argv[])
@@ -72,9 +75,13 @@ int main(int argc, char * argv[])
   int nEntryToStop = -1; // Default is looping over all entries
   // Get the input break entries
   if(argc!=1) nEntryToStop = atoi(argv[1]);
-  anaRec(mcfinName,mclout,"mc", nEntryToStop);
-  anaRec(datafinName,datalout,"data", nEntryToStop);
-  
+  double mcBeamCount = anaRec(mcfinName,mclout,"mc", nEntryToStop);
+  double dataBeamCount = anaRec(datafinName,datalout,"data", nEntryToStop);
+
+  PlotUtils plotUtils;
+  plotUtils.ProcessHist(mclout,true);
+  plotUtils.ProcessHist(datalout,false);  
+   
   // Declare output root file
   TFile * fout = new TFile("output/outana.root","recreate");
   // Create mc subdirectory
@@ -92,9 +99,13 @@ int main(int argc, char * argv[])
   // Save the info
   fout->Save();
   fout->Close();
-  
+ 
+  double plotScale = dataBeamCount/mcBeamCount; 
+  cout << "dataBeamCount: " << dataBeamCount << endl;
+  cout << "mcBeamCount: " << mcBeamCount << endl;
+  cout << "plotScale: " << plotScale << endl;
   // Draw all histograms in mclout and datalout
-  PlotUtils PlotUtils;
-  PlotUtils.DrawHist(mclout,"output");
-  PlotUtils.DrawHist(datalout,"output");
+  plotUtils.DrawHist(mclout,plotScale,datalout,"output");
+  //plotUtils.DrawHist(datalout,1,0x0,"output");
+
 }

@@ -20,6 +20,10 @@ class AnaUtils
     // Check if event is Signal/EvtBkg/BmBkg(beamBkg) using Truth info
     int GetFillEventType();
 
+    void FillBeamKinematics(const int kMC);
+    TVector3 GetTruthBeamFull();
+    TVector3 GetRecBeamFull();
+ 
     // Define particle types
     enum parType{
 
@@ -73,6 +77,7 @@ class AnaUtils
 
     bool GetgkSignal(){return gkSignal;}
   private:
+    PlotUtils plotUtils;
     bool Signal;
     int nProton;
     int nNeutron;

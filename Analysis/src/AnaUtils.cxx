@@ -229,3 +229,51 @@ bool AnaUtils::IsSignal(const int nProton, const int nPiZero, const int nPiPlus,
   if(nProton > 0 && nPiZero > 0 && nPiPlus == 0 && nParticleBkg == 0) tmpSig = true;
   return tmpSig;
 } 
+
+TVector3 AnaUtils::GetRecBeamFull(){
+
+  TVector3 beamdir;
+  // Set beam end direction
+  beamdir.SetXYZ(AnaIO::reco_beam_trackEndDirX, 
+                 AnaIO::reco_beam_trackEndDirY, 
+                 AnaIO::reco_beam_trackEndDirZ );
+
+  // Get the beam end kinetic energy
+  double ke = AnaIO::reco_beam_interactingEnergy/1E3;
+  if(ke<0) ke = 1E-10;
+  // Get pion mass since signal is pion beam
+  const double mpi = AnaFunctions::PionMass();
+  // Calculate pion beam end momentum
+  const double pionEndP = TMath::Sqrt(ke*ke+2*ke*mpi);
+  // Get momentum 3 vector
+  const TVector3 fullbeam = beamdir.Unit()*pionEndP;
+  return fullbeam;
+}
+
+TVector3 AnaUtils::GetTruthBeamFull()
+{
+  const TVector3 tmpbeam(AnaIO::true_beam_endPx,
+                         AnaIO::true_beam_endPy,
+                         AnaIO::true_beam_endPz );
+  return tmpbeam;
+}
+
+void AnaUtils::FillBeamKinematics(const int kMC)
+{
+  // Get event type
+  const int evtType = GetFillEventType();
+  
+  const TVector3 recBeamFull = GetRecBeamFull();
+  if(kMC){
+    const TVector3 truthBeamFull = GetTruthBeamFull();
+
+    const double beamthetaRes    = (recBeamFull.Theta()-truthBeamFull.Theta())*TMath::RadToDeg();//use absolute difference 
+    const double beammomentumRes = recBeamFull.Mag()/truthBeamFull.Mag()-1;
+
+    plotUtils.FillHist(AnaIO::hBeamThetaRes,    truthBeamFull.Theta()*TMath::RadToDeg(), beamthetaRes);
+    plotUtils.FillHist(AnaIO::hBeamMomentumRes, truthBeamFull.Mag(),                     beammomentumRes);
+  }
+
+  plotUtils.FillHist(AnaIO::hRecBeamTheta,    recBeamFull.Theta()*TMath::RadToDeg(), evtType);
+  plotUtils.FillHist(AnaIO::hRecBeamMomentum, recBeamFull.Mag(),                     evtType);
+}
