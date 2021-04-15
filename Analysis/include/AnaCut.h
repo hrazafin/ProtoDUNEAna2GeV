@@ -21,16 +21,28 @@ class AnaCut
                            const double beam_dirX, const double beam_dirY,   const double beam_dirZ, 
                            const double true_dirX,   const double true_dirY, const double true_dirZ,   
                            const double true_startX, const double true_startY, const double true_startZ);
-  // Beam position for data
-  bool Manual_beamPos_data(const int event,            const double data_startX,
-                         const double data_startY,   const double data_startZ,
-                         const double data_dirX,     const double data_dirY,
-                         const double data_dirZ,     const double beam_inst_X,
-                         const double beam_inst_Y,     const double beam_inst_dirX,
-                         const double beam_inst_dirY,  const double beam_inst_dirZ,
-                         const int beam_inst_nMomenta, const int beam_inst_nTracks);
- 
+    // Beam position for data
+    bool Manual_beamPos_data(const int event,            const double data_startX,
+                             const double data_startY,   const double data_startZ,
+                             const double data_dirX,     const double data_dirY,
+                             const double data_dirZ,     const double beam_inst_X,
+                             const double beam_inst_Y,     const double beam_inst_dirX,
+                             const double beam_inst_dirY,  const double beam_inst_dirZ,
+                             const int beam_inst_nMomenta, const int beam_inst_nTracks);
+    int GetTruthPDGFromID(const int inID, const vector<int> * idarray, const vector<int> * pdgarray);
+    int GetTruthParticleInfoFromRec(const int recidx);
+    bool CutTopology(const bool kMC);
+    void CountPFP(const bool kMC);
+    bool IsProton(const int ii, const int truthParticleType);
+    bool IsTrack(const int ii, const int truthParticleType);  
   private:
+    AnaUtils anaUtils;
+    PlotUtils plotUtils;
+    int nproton;
+    int npiplus;
+    int nshower;
+    int nmichel;
+
 };
 
 

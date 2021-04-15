@@ -84,12 +84,9 @@ void PlotUtils::DrawHist(TList *lout, const double plotscale, TList * overlayLis
     TH2 * h2d = 0x0;
     //TH1 * holay = dynamic_cast<TH1*> (overlayList->FindObject(name));
     TH1D *holay = (TH1D*)overlayList->FindObject(name);
-    cout << "tag: " << tag << endl;
-    if(holay) cout << "holay tag: " << tag << endl; 
     if(hh){
       h2d = dynamic_cast<TH2 *>(hh);
       if(tag.Contains("RES")) {
-        cout << "tag: " << tag << endl;
         h2d->Draw("colz");
       }
       else if(holay){
@@ -105,7 +102,6 @@ void PlotUtils::DrawHist(TList *lout, const double plotscale, TList * overlayLis
       }
     }
     else if (hstk) {
-      cout << "hstk!!" << endl;
       hstk->Draw("hist");
       holay = (TH1D*)overlayList->FindObject(name+"_sum");
       if(holay){
@@ -181,7 +177,6 @@ TH1D * PlotUtils::GetStackedSum(THStack *stk)
 {
   const TList * ll = stk->GetHists();
   const TString tag = stk->GetName();
-  cout << "GetStackedSum tag: " << tag << endl;
   TH1D * hout = (TH1D*)ll->At(0)->Clone(tag);
   hout->SetName(tag+"_sum");
   hout->SetTitle(tag);
@@ -215,10 +210,12 @@ int PlotUtils::GetColor(const int col)
 
 int * PlotUtils::GetColorArray(const int minsize)
 {
-  const int col[]={1005, 1009, 1002, kOrange, 1014, 1007, 1003, 1015,
-                   1008, 1004, 1006, 1010, 1012, 1013, 1011, kGreen+3,
-                   1008, 1009, 1002, 1011, 1014, 1007, 1003, 1015, 
-                   1005, 1008, 1009, 1002, 1011, 1014, 1007, 1003, 1015, 1005, 1008, 1009, 1002, 1011, 1014, 1007, 1003, 1015, 1005, 1008, 1009, 1002, 1011, 1014, 1007, 1003, 1015, 1005};
+  const int col[]={
+                   1005, 1009, 1002, kOrange,
+                   1014, 1007, 1003, 1015,
+                   1008, 1004, 1006, 1010,
+                   1012, 1013, 1011, kGreen+3,
+                   1008, 1009, 1002, 1011, 1014, 1007, 1003, 1015, 1005, 1008, 1009, 1002, 1011, 1014, 1007, 1003, 1015, 1005, 1008, 1009, 1002, 1011, 1014, 1007, 1003, 1015, 1005, 1008, 1009, 1002, 1011, 1014, 1007, 1003, 1015, 1005};
 
   const int nc = sizeof(col)/sizeof(int);
   if(nc<minsize){

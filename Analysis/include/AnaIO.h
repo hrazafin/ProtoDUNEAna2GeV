@@ -24,7 +24,12 @@ namespace AnaIO
   Double_t        reco_beam_trackEndDirY;
   Double_t        reco_beam_trackEndDirZ;
   Double_t        reco_beam_interactingEnergy;
- 
+
+  vector<int> *reco_daughter_PFP_ID = 0x0;
+  vector<int> *reco_daughter_PFP_nHits = 0x0; 
+  vector<double> *reco_daughter_PFP_trackScore_collection = 0x0;
+  vector<int> *reco_daughter_allTrack_ID = 0x0;
+
   // Declare histograms
   TH1I * hEvent = 0x0;
   TH1I * hCutBeamIDPass = 0x0;
@@ -34,6 +39,9 @@ namespace AnaIO
   TH1D * hCutBeamEndZ = 0x0; 
   TH2D * hRecBeamTheta = 0x0;
   TH2D * hRecBeamMomentum = 0x0;
+
+  TH2D * hCutTracknHits = 0x0;
+  TH2D * hCutTrackScore = 0x0;
 
   //====================== Reco (Data only)======================//
   // Declare variables
@@ -68,8 +76,16 @@ namespace AnaIO
   vector<double> *true_beam_daughter_startX = 0x0;
   vector<double> *true_beam_daughter_startY = 0x0;
   vector<double> *true_beam_daughter_startZ = 0x0;
-  
+
+  vector<int> *true_beam_daughter_ID = 0x0;  
   vector<int> *true_beam_daughter_PDG = 0x0;
+  vector<int> *true_beam_Pi0_decay_ID = 0x0;
+  vector<int> *true_beam_Pi0_decay_PDG = 0x0;
+  vector<int> *true_beam_grand_daughter_ID= 0x0;
+  vector<int> *true_beam_grand_daughter_PDG = 0x0;
+ 
+  vector<int> *reco_daughter_PFP_true_byHits_PDG = 0x0;
+  vector<int> *reco_daughter_PFP_true_byHits_ID = 0x0;
 
   // Declare histograms
   TH1I * hTruthBeamType = 0x0;
@@ -113,6 +129,11 @@ namespace AnaIO
     tree->SetBranchAddress("reco_beam_trackEndDirZ", &reco_beam_trackEndDirZ);
     tree->SetBranchAddress("reco_beam_interactingEnergy", &reco_beam_interactingEnergy);
 
+    tree->SetBranchAddress("reco_daughter_PFP_ID", &reco_daughter_PFP_ID);
+    tree->SetBranchAddress("reco_daughter_PFP_nHits", &reco_daughter_PFP_nHits);
+    tree->SetBranchAddress("reco_daughter_PFP_trackScore_collection", &reco_daughter_PFP_trackScore_collection);
+    tree->SetBranchAddress("reco_daughter_allTrack_ID", &reco_daughter_allTrack_ID);
+
     //====================== Reco (Data only)======================//
     tree->SetBranchAddress("beam_inst_PDG_candidates", &beam_inst_PDG_candidates);
     tree->SetBranchAddress("beam_inst_X", &beam_inst_X);
@@ -145,15 +166,28 @@ namespace AnaIO
     tree->SetBranchAddress("true_beam_daughter_startX", &true_beam_daughter_startX);
     tree->SetBranchAddress("true_beam_daughter_startY", &true_beam_daughter_startY);
     tree->SetBranchAddress("true_beam_daughter_startZ", &true_beam_daughter_startZ);
-    
+   
+    tree->SetBranchAddress("true_beam_daughter_ID", &true_beam_daughter_ID); 
     tree->SetBranchAddress("true_beam_daughter_PDG", &true_beam_daughter_PDG);
-    
+    tree->SetBranchAddress("true_beam_Pi0_decay_ID", &true_beam_Pi0_decay_ID);
+    tree->SetBranchAddress("true_beam_Pi0_decay_PDG", &true_beam_Pi0_decay_PDG);
+    tree->SetBranchAddress("true_beam_grand_daughter_ID", &true_beam_grand_daughter_ID);
+    tree->SetBranchAddress("true_beam_grand_daughter_PDG", &true_beam_grand_daughter_PDG);
+ 
+    tree->SetBranchAddress("reco_daughter_PFP_true_byHits_PDG", &reco_daughter_PFP_true_byHits_PDG);
+    tree->SetBranchAddress("reco_daughter_PFP_true_byHits_ID", &reco_daughter_PFP_true_byHits_ID);
+
     return tree;
   } // End of GetInputTree
   
   // Initialise histograms
   void IniHist(TList * lout, const TString tag, const bool kMC)
   {
+    // Binning 
+    const int nparType = 11;
+    const double parTypemin = 0.5;
+    const double parTypemax = 11.5;
+
     //====================== Reco (MC and Data)======================//
     hEvent = new TH1I("Event_"+tag, "", 10000, 0, 100000); 
     lout->Add(hEvent);
@@ -171,7 +205,11 @@ namespace AnaIO
     lout->Add(hRecBeamTheta);
     hRecBeamMomentum  = new TH2D("RecBeamMomentum_STK_"+tag,"", 50, 0, 2, 3, -0.5, 2.5); 
     lout->Add(hRecBeamMomentum);
-
+ 
+    hCutTracknHits = new TH2D("CutTracknHits_STK_"+tag,"", 50, 0, 500, nparType, parTypemin, parTypemax); 
+    lout->Add(hCutTracknHits);
+    hCutTrackScore = new TH2D("CutTrackScore_STK_"+tag,"", 50, 0, 1, nparType, parTypemin, parTypemax);
+    lout->Add(hCutTrackScore);
     //====================== Truth (MC only)======================//
     if(kMC){
       hTruthBeamType = new TH1I("TruthBeamType_"+tag,  "", 20, -0.5, 19.5); 

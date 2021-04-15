@@ -136,4 +136,184 @@ bool AnaCut::Manual_beamPos_data(const int event,            const double data_s
 
   return true;
 
-} 
+}
+
+int AnaCut::GetTruthPDGFromID(const int inID, const vector<int> * idarray, const vector<int> * pdgarray)
+{ 
+  int outpdg = -999;
+  for(unsigned int ii = 0; ii<idarray->size(); ii++){
+    if((*idarray)[ii] == inID ){
+      outpdg = (*pdgarray)[ii];
+    }
+  }
+  return outpdg;
+}
+
+int AnaCut::GetTruthParticleInfoFromRec(const int recidx)
+{
+  // Get true PDG of this reco particle at index recidx
+  const int directPDG = (*AnaIO::reco_daughter_PFP_true_byHits_PDG)[recidx];
+  // Get true ID array of this event
+  const vector<int> *trueIDarray = AnaIO::reco_daughter_PFP_true_byHits_ID;
+  // Get true ID of this reco particle
+  const int truthID = (*trueIDarray)[recidx];
+  // Initialize variables
+  bool isPrimary = false;  
+  int pdg = -999;
+  
+  //-------------- First search direct daughter ----------------// 
+  //(Loop over true beam daughther ID and PDG by function GetTruthPDGFromID) 
+  pdg = GetTruthPDGFromID(truthID, AnaIO::true_beam_daughter_ID, AnaIO::true_beam_daughter_PDG);
+
+  if(pdg!=-999){ //1. is direct daughter
+    // Not a proton, pion, electron, muon, photon or kaon
+    if(pdg!=2212 && TMath::Abs(pdg)!=211 && TMath::Abs(pdg)!=11 && TMath::Abs(pdg)!=13 && TMath::Abs(pdg)!=22 && TMath::Abs(pdg)!=321 && pdg<1000000000){
+      printf("GetTruthParticleInfoFromRec reconstructed truth daughter not proton or pion! %d %d\n", pdg, directPDG); exit(1);
+    } 
+    isPrimary = true;
+
+  }// End of is direct daughter
+
+  else{ // 1. not direct daughter
+    //-------------- Then search pi0 daughter -----------------// 
+    pdg = GetTruthPDGFromID(truthID, AnaIO::true_beam_Pi0_decay_ID, AnaIO::true_beam_Pi0_decay_PDG);
+    
+    if(pdg!=-999){//2. is pi0 daughter
+      // Not a photon or electron
+      if(pdg!=22 && TMath::Abs(pdg)!=11){
+      printf("GetTruthParticleInfoFromRec Pi0 decay not to gamma! %d %d\n", pdg, directPDG); exit(1);
+      }
+      //pi0 direct daughter also primary
+      isPrimary = true;
+    }
+    else{// 2. not pi0 daughter
+
+      //----------- Then search grand daugher (This will be secondary particle candidates)
+      pdg = GetTruthPDGFromID(truthID, AnaIO::true_beam_grand_daughter_ID, AnaIO::true_beam_grand_daughter_PDG);
+      if(pdg!=-999){
+      
+      }
+      else{
+        //--- lump great grand daughter here
+        if(TMath::Abs(directPDG)==11 || TMath::Abs(directPDG)==13 || TMath::Abs(directPDG)==22 || TMath::Abs(directPDG)==211 || directPDG==2212 || directPDG==2112 || directPDG==-1 || directPDG>1000000000){//when no true match found pdg = -1
+          pdg= directPDG;
+        }
+        else{
+          printf("AnaCut::GetTruthFromRec search not done! %d %d\n", recidx, directPDG); exit(1);
+        }
+      }
+    } // End of not pi0 daughter
+  } // End of not direct daughter
+  // The directPDG should be equal to the pdg we found
+  if(directPDG!=pdg){
+    printf("GetTruthFromRec inconsistent PDG %d %d\n", pdg, directPDG); exit(1);
+  }
+  // Default truthParticleType is others
+  int truthParticleType = anaUtils.gkOthers;
+  if(isPrimary){
+    if(pdg==2212){//proton
+      truthParticleType = anaUtils.gkProton;
+    }
+    else if(pdg==211){//pi+
+      truthParticleType = anaUtils.gkPiPlus;
+    }
+    else if(pdg==-211){//pi-
+      truthParticleType = anaUtils.gkPiMinus;
+    }
+    else if(pdg==22){//gamma
+      truthParticleType = anaUtils.gkGamma;
+    }
+  }
+  else{
+    if(pdg==2212){//proton
+      truthParticleType = anaUtils.gkSecondaryProton;
+    }
+    else if(pdg==211){//pi+
+      truthParticleType = anaUtils.gkSecondaryPiPlus;
+    }
+    else if(pdg==-211){//pi-
+      truthParticleType = anaUtils.gkSecondaryPiMinus;
+    }
+    else if(pdg==22){//gamma
+      truthParticleType = anaUtils.gkSecondaryGamma;
+    }
+    else if(TMath::Abs(pdg)==11){//e+/-
+      truthParticleType = anaUtils.gkSecondaryEplusEminus;
+    }
+    else if(TMath::Abs(pdg)==13){//mu+/-
+      truthParticleType = anaUtils.gkSecondaryMuon;
+    }
+  }
+
+  return truthParticleType;
+}
+
+
+
+bool AnaCut::CutTopology(const bool kMC)
+{
+  CountPFP(kMC);
+  return true;
+}
+
+void AnaCut::CountPFP(const bool kMC)
+{
+  // Get the size of reco final state particles
+  const int recsize = AnaIO::reco_daughter_PFP_ID->size();
+  // Initialize number of particles 
+  nproton = 0;
+  npiplus = 0;
+  nshower = 0;
+  nmichel = 0;
+  //int nPFP = 0;
+  // Loop over each reco FS particle
+  for(int ii=0; ii<recsize; ii++){
+    //int recParticleType = -999;
+    // Get the truth info for this reco particle
+    const int truthParticleType = kMC? GetTruthParticleInfoFromRec(ii) : anaUtils.gkOthers; 
+    if(IsProton(ii,truthParticleType)){
+      //recParticleType = anaUtils.gkProton;
+      nproton++;
+      
+    }
+  }
+}
+
+bool AnaCut::IsProton(const int ii, const int truthParticleType)
+{
+  // Proton candidate is a track like particle
+  if(!IsTrack(ii,truthParticleType)) return false; 
+ 
+  return true;
+}
+
+bool AnaCut::IsTrack(const int ii, const int truthParticleType)
+{
+  // Get the number of hits of this reco particle
+  const int nhits = (*AnaIO::reco_daughter_PFP_nHits)[ii];
+  // Get the track score
+  const double trackScore = (*AnaIO::reco_daughter_PFP_trackScore_collection)[ii];
+  // Fill Cut histograms for those two variables
+  plotUtils.FillHist(AnaIO::hCutTracknHits, nhits, truthParticleType);  
+  plotUtils.FillHist(AnaIO::hCutTrackScore, trackScore, truthParticleType);
+
+  // Check if this reco particle has forced track ID
+  if((*AnaIO::reco_daughter_allTrack_ID)[ii]==-1) return false;
+  // Cut on number of hits
+  if(nhits <= 40) return false;
+  // Cut on track score
+  if(trackScore <= 0.5) return false;
+  
+  return true;
+}
+/*
+bool AnaCut::PassProtonSubPID(const int ii, const double lastTME)
+{
+  const double Chi2NDF    = anaUtils.GetChi2NDF(ii);
+
+  if(Chi2NDF<50 || lastTME > 3.5){
+    return true;
+  }
+  return false;
+}
+*/

@@ -57,6 +57,7 @@ int anaRec(const TString finName, TList *lout, const TString tag, const int nEnt
     // Count beam after beam cut before other cuts
     BeamCount++; 
     anaUtils.FillBeamKinematics(kMC);
+    if(anaCut.CutTopology(kMC)){} 
   } // End of while loop
   return BeamCount;
 } // End of anaRec
@@ -99,7 +100,6 @@ int main(int argc, char * argv[])
   // Save the info
   fout->Save();
   fout->Close();
- 
   double plotScale = dataBeamCount/mcBeamCount; 
   cout << "dataBeamCount: " << dataBeamCount << endl;
   cout << "mcBeamCount: " << mcBeamCount << endl;
