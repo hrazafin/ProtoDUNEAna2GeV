@@ -265,29 +265,46 @@ void AnaCut::CountPFP(const bool kMC)
   npiplus = 0;
   nshower = 0;
   nmichel = 0;
-  //int nPFP = 0;
+  int nPFP = 0;
   // Loop over each reco FS particle
   for(int ii=0; ii<recsize; ii++){
-    //int recParticleType = -999;
     // Get the truth info for this reco particle
-    const int truthParticleType = kMC? GetTruthParticleInfoFromRec(ii) : anaUtils.gkOthers; 
-    if(IsProton(ii,truthParticleType)){
-      //recParticleType = anaUtils.gkProton;
+    truthParticleType = kMC? GetTruthParticleInfoFromRec(ii) : anaUtils.gkOthers; 
+    // Proton candidates selection
+    if(IsProton(ii)){
       nproton++;
-      
     }
+    // Piplus candidates selection
+    if(IsPiplus(ii)){
+      npiplus++;
+    }
+    // Shower candidates selection
+    if(IsShower(ii)){
+      nshower++;   
+    }
+    // Michel candidates selection
+    if(IsMichel(ii)){
+      nmichel++;
+    }
+    // Count total number of FS particles
+    nPFP++; 
   }
+  if(recsize!=nPFP) cout << "CountPFP not looping all FS particles!!" << endl;
+
+  printf("CountPFP PFP size %d nlooped %d nshower %d nmichel %d npiplus %d nproton %d\n", recsize, nPFP, nshower, nmichel, npiplus, nproton);
 }
 
-bool AnaCut::IsProton(const int ii, const int truthParticleType)
+bool AnaCut::IsProton(const int ii)
 {
-  // Proton candidate is a track like particle
-  if(!IsTrack(ii,truthParticleType)) return false; 
- 
+  // Proton candidate must be a track like particle
+  if(!IsTrack(ii)) return false; 
+  // Proton candidate must pass the folowing cuts 
+  if(!PassProtonSubPID(ii)) return false;
+
   return true;
 }
 
-bool AnaCut::IsTrack(const int ii, const int truthParticleType)
+bool AnaCut::IsTrack(const int ii)
 {
   // Get the number of hits of this reco particle
   const int nhits = (*AnaIO::reco_daughter_PFP_nHits)[ii];
@@ -306,14 +323,54 @@ bool AnaCut::IsTrack(const int ii, const int truthParticleType)
   
   return true;
 }
-/*
-bool AnaCut::PassProtonSubPID(const int ii, const double lastTME)
-{
-  const double Chi2NDF    = anaUtils.GetChi2NDF(ii);
 
-  if(Chi2NDF<50 || lastTME > 3.5){
+bool AnaCut::PassProtonSubPID(const int ii)
+{
+  // Get the Truncated mean dEdx backwards of this reco particle
+  const double lastTME = anaUtils.GetFSParticleTME(ii,false);
+  // Get the Chi2/NDF value
+  const double Chi2NDF = anaUtils.GetChi2NDF(ii);
+  // Fill Cut histograms for those two variables
+  plotUtils.FillHist(AnaIO::hCutlastTME, lastTME, truthParticleType);
+  plotUtils.FillHist(AnaIO::hCutChi2NDF, Chi2NDF, truthParticleType);
+  // Use these two variables for proton selections
+  if(Chi2NDF < 50 || lastTME > 3.5){
     return true;
   }
   return false;
 }
-*/
+
+bool AnaCut::IsPiplus(const int ii)
+{
+  // PiPlus candidate must be a track like particle  
+  if(!IsTrack(ii)) return false;
+  // Assume particle not pass ProtonSubPID is piplus 
+  if(PassProtonSubPID(ii)) return false;
+  
+  return true;  
+}
+
+bool AnaCut::IsShower(const int ii)
+{
+  // Get the em score and nhits of this particle
+  const double emScore = (*AnaIO::reco_daughter_PFP_emScore_collection)[ii];
+  const int nhits = (*AnaIO::reco_daughter_PFP_nHits)[ii];
+
+  if((*AnaIO::reco_daughter_allShower_ID)[ii]==-1) return false;
+  // Cut on number of hits
+  if(nhits <= 80) return false;
+  // Cut on em score
+  if(emScore <= 0.5) return false;
+  
+  return true; 
+}
+
+bool AnaCut::IsMichel(const int ii)
+{
+  // Get Michel score of this particle
+  const double michelScore = (*AnaIO::reco_daughter_PFP_michelScore_collection)[ii];
+  // Cut on Michel score
+  if(michelScore<=0.5) return false;
+
+  return true;
+}

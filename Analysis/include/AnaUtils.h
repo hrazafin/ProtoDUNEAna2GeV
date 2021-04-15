@@ -23,7 +23,12 @@ class AnaUtils
     void FillBeamKinematics(const int kMC);
     TVector3 GetTruthBeamFull();
     TVector3 GetRecBeamFull();
- 
+
+    vector<double> GetdEdxVector(const vector<double> &arraydEdx, const bool kForward);
+    double GetTruncatedMean(const vector<double> & dEdxVec, const unsigned int nsample0, const unsigned int nsample1, const double lowerFrac, const double upperFrac);
+    double GetFSParticleTME(const unsigned int ii, const bool kForward);
+    double GetChi2NDF(const int ii);
+    
     // Define particle types
     enum parType{
 

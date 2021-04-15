@@ -24,12 +24,19 @@ namespace AnaIO
   Double_t        reco_beam_trackEndDirY;
   Double_t        reco_beam_trackEndDirZ;
   Double_t        reco_beam_interactingEnergy;
+  vector<double>  *reco_beam_calibrated_dEdX = 0x0;
 
-  vector<int> *reco_daughter_PFP_ID = 0x0;
-  vector<int> *reco_daughter_PFP_nHits = 0x0; 
-  vector<double> *reco_daughter_PFP_trackScore_collection = 0x0;
-  vector<int> *reco_daughter_allTrack_ID = 0x0;
-
+  vector<int>             *reco_daughter_PFP_ID = 0x0;
+  vector<int>             *reco_daughter_PFP_nHits = 0x0; 
+  vector<double>          *reco_daughter_PFP_trackScore_collection = 0x0;
+  vector<double>          *reco_daughter_PFP_emScore_collection = 0x0;
+  vector<double>          *reco_daughter_PFP_michelScore_collection =0x0;
+  vector<int>             *reco_daughter_allTrack_ID = 0x0;
+  vector<vector<double> > *reco_daughter_allTrack_calibrated_dEdX_SCE = 0x0;
+  vector<double>          *reco_daughter_allTrack_Chi2_proton = 0x0;
+  vector<int>             *reco_daughter_allTrack_Chi2_ndof = 0x0;
+ 
+  vector<int>             *reco_daughter_allShower_ID = 0x0; 
   // Declare histograms
   TH1I * hEvent = 0x0;
   TH1I * hCutBeamIDPass = 0x0;
@@ -42,6 +49,8 @@ namespace AnaIO
 
   TH2D * hCutTracknHits = 0x0;
   TH2D * hCutTrackScore = 0x0;
+  TH2D * hCutlastTME = 0x0;
+  TH2D * hCutChi2NDF = 0x0;
 
   //====================== Reco (Data only)======================//
   // Declare variables
@@ -128,12 +137,19 @@ namespace AnaIO
     tree->SetBranchAddress("reco_beam_trackEndDirY", &reco_beam_trackEndDirY);
     tree->SetBranchAddress("reco_beam_trackEndDirZ", &reco_beam_trackEndDirZ);
     tree->SetBranchAddress("reco_beam_interactingEnergy", &reco_beam_interactingEnergy);
+    tree->SetBranchAddress("reco_beam_calibrated_dEdX", &reco_beam_calibrated_dEdX);
 
     tree->SetBranchAddress("reco_daughter_PFP_ID", &reco_daughter_PFP_ID);
     tree->SetBranchAddress("reco_daughter_PFP_nHits", &reco_daughter_PFP_nHits);
     tree->SetBranchAddress("reco_daughter_PFP_trackScore_collection", &reco_daughter_PFP_trackScore_collection);
+    tree->SetBranchAddress("reco_daughter_PFP_emScore_collection", &reco_daughter_PFP_emScore_collection);
+    tree->SetBranchAddress("reco_daughter_PFP_michelScore_collection", &reco_daughter_PFP_michelScore_collection);
     tree->SetBranchAddress("reco_daughter_allTrack_ID", &reco_daughter_allTrack_ID);
+    tree->SetBranchAddress("reco_daughter_allTrack_calibrated_dEdX_SCE", &reco_daughter_allTrack_calibrated_dEdX_SCE);
+    tree->SetBranchAddress("reco_daughter_allTrack_Chi2_proton", &reco_daughter_allTrack_Chi2_proton);
+    tree->SetBranchAddress("reco_daughter_allTrack_Chi2_ndof", &reco_daughter_allTrack_Chi2_ndof);
 
+    tree->SetBranchAddress("reco_daughter_allShower_ID", &reco_daughter_allShower_ID);
     //====================== Reco (Data only)======================//
     tree->SetBranchAddress("beam_inst_PDG_candidates", &beam_inst_PDG_candidates);
     tree->SetBranchAddress("beam_inst_X", &beam_inst_X);
@@ -210,6 +226,10 @@ namespace AnaIO
     lout->Add(hCutTracknHits);
     hCutTrackScore = new TH2D("CutTrackScore_STK_"+tag,"", 50, 0, 1, nparType, parTypemin, parTypemax);
     lout->Add(hCutTrackScore);
+    hCutlastTME = new TH2D("CutlastTME_STK_"+tag,"", 60, 0, 10, nparType, parTypemin, parTypemax); 
+    lout->Add(hCutlastTME);
+    hCutChi2NDF = new TH2D("CutChi2NDF_STK_"+tag,"", 30, 0, 500, nparType, parTypemin, parTypemax);   
+    lout->Add(hCutChi2NDF);
     //====================== Truth (MC only)======================//
     if(kMC){
       hTruthBeamType = new TH1I("TruthBeamType_"+tag,  "", 20, -0.5, 19.5); 

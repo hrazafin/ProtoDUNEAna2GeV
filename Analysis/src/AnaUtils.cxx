@@ -277,3 +277,74 @@ void AnaUtils::FillBeamKinematics(const int kMC)
   plotUtils.FillHist(AnaIO::hRecBeamTheta,    recBeamFull.Theta()*TMath::RadToDeg(), evtType);
   plotUtils.FillHist(AnaIO::hRecBeamMomentum, recBeamFull.Mag(),                     evtType);
 }
+
+vector<double> AnaUtils::GetdEdxVector(const vector<double> &arraydEdx, const bool kForward)
+{
+  // Get the size of this raw dEdx vector
+  const unsigned int ncls = arraydEdx.size();
+
+  vector<double> dEdxVec;
+  // Start from [2] because [0] and [1] in both start and last are weird
+  for(unsigned int kk=2; kk<ncls; kk++){
+    // Fill the vector start from beginning of arraydEdx
+    if(kForward) dEdxVec.push_back(arraydEdx[kk]);
+    // Fill it backwards
+    else{
+     const double endpe = arraydEdx[ncls-1-kk];
+     dEdxVec.push_back(endpe);
+    }
+  }
+  return dEdxVec;
+}
+
+double AnaUtils::GetTruncatedMean(const vector<double> & dEdxVec, const unsigned int nsample0, const unsigned int nsample1, const double lowerFrac, const double upperFrac)
+{
+  // Require nsample0 < nsample1 < dEdxVec size
+  if(nsample1>=dEdxVec.size() || nsample0>=nsample1) return -999;
+  
+  vector<double> dEdxVecTruncated;
+  // Get the truncated dEdx vector specified by nsample0 and nsample1
+  for(unsigned int ii=nsample0; ii<=nsample1; ii++){
+    dEdxVecTruncated.push_back(dEdxVec[ii]);
+  }
+  // Get the upper and lower bound  
+  const int iter0 = dEdxVecTruncated.size()*lowerFrac;
+  const int iter1 = dEdxVecTruncated.size()*upperFrac;
+  const int nterm = iter1-iter0;
+  if( nterm<=0 ) return -999;
+  // Sort this truncated dEdx vector 
+  std::sort(dEdxVecTruncated.begin(), dEdxVecTruncated.end());
+  double sum = 0.0;
+  // Calcuate the mean value dEdx specified by lowerFrac and upperFrac
+  for(int ii=iter0; ii< iter1; ii++){
+    sum += dEdxVecTruncated[ii];
+  }
+  return sum / (nterm+1E-10);
+}
+
+double AnaUtils::GetFSParticleTME(const unsigned int ii, const bool kForward)
+{
+  // Get the raw dEdx vector
+  const vector<double> recodEdxarray = (*AnaIO::reco_daughter_allTrack_calibrated_dEdX_SCE)[ii];
+  // Get the meaningful dEdx vector
+  vector<double> dEdxVec = GetdEdxVector(recodEdxarray,kForward);
+  // Get the size of dEdxVec 
+  const int ndEdx = dEdxVec.size();
+  double TME = -999;
+  
+  if(kForward) TME = GetTruncatedMean(dEdxVec, 2, 6, 0.4,  0.95); 
+  else TME  = GetTruncatedMean(dEdxVec, 2, ndEdx-8, 0.05, 0.6);
+
+  return TME;
+}
+
+double AnaUtils::GetChi2NDF(const int ii)
+{
+  const double chi2       = (*AnaIO::reco_daughter_allTrack_Chi2_proton)[ii];
+  const double ndof       = (*AnaIO::reco_daughter_allTrack_Chi2_ndof)[ii];
+
+  const double chnf = chi2/(ndof+1E-10);
+
+  return chnf;
+}
+

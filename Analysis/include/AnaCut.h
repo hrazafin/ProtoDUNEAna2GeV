@@ -33,8 +33,13 @@ class AnaCut
     int GetTruthParticleInfoFromRec(const int recidx);
     bool CutTopology(const bool kMC);
     void CountPFP(const bool kMC);
-    bool IsProton(const int ii, const int truthParticleType);
-    bool IsTrack(const int ii, const int truthParticleType);  
+    bool IsProton(const int ii);
+    bool IsTrack(const int ii);  
+    bool PassProtonSubPID(const int ii);
+    bool IsPiplus(const int ii);
+    bool IsShower(const int ii);
+    bool IsMichel(const int ii);
+  
   private:
     AnaUtils anaUtils;
     PlotUtils plotUtils;
@@ -42,7 +47,7 @@ class AnaCut
     int npiplus;
     int nshower;
     int nmichel;
-
+    int truthParticleType;
 };
 
 
