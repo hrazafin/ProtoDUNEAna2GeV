@@ -59,6 +59,11 @@ void PlotUtils::ProcessHist(TList *lout, const bool kMC)
           //lout->Add(snor);
         }
       }
+      if(tag.Contains("RES")){
+        TH2D * hnor = NormalHist(htmp, 5, true);
+        hnor->SetTitle(tag);
+        lout->Add(hnor);
+      }
     }
   } // End of for loop
 }
@@ -198,6 +203,67 @@ void PlotUtils::ScaleStack(THStack *stk, const double scale)
   }
 }
 
+TH2D * PlotUtils::NormalHist(const TH2D *hraw, const Double_t thres, const Bool_t kmax)
+{
+  TH2D *hh=(TH2D*)hraw->Clone(Form("%s_nor",hraw->GetName()));
+  hh->Scale(0);
+
+  const Int_t x0 = hh->GetXaxis()->GetFirst();
+  const Int_t x1 = hh->GetXaxis()->GetLast();
+  const Int_t y0 = hh->GetYaxis()->GetFirst();
+  const Int_t y1 = hh->GetYaxis()->GetLast();
+
+  Double_t hmax = -1e10;
+  Double_t hmin = 1e10;
+  Double_t nent = 0;
+  for(Int_t ix=x0; ix<=x1; ix++){
+
+    TH1D * sliceh = hraw->ProjectionY(Form("tmpnormalhist%sx%d", hh->GetName(), ix), ix, ix, "oe");
+    const Double_t tot = sliceh->GetEntries();
+
+    TH1D * pdfh=0x0;
+
+
+    if(tot>1E-12){
+      nent += tot;
+
+      Double_t imax = -999;
+
+      imax = sliceh->GetBinContent(sliceh->GetMaximumBin());
+
+      for(Int_t iy=y0; iy<=y1; iy++){
+        const Double_t cont = kmax ? sliceh->GetBinContent(iy)/imax : pdfh->GetBinContent(iy);
+        const Double_t ierr = kmax ? sliceh->GetBinError(iy)/imax   : pdfh->GetBinError(iy);
+        if(tot>thres && cont>0){
+          hh->SetBinContent(ix, iy, cont);
+          hh->SetBinError(ix,iy, ierr);
+          if(cont>hmax) hmax = cont;
+          if(cont<hmin) hmin = cont;
+        }
+      }
+    }
+    delete pdfh;
+    delete sliceh;
+  }
+
+  hh->SetEntries(nent);
+  hh->SetMinimum(0.99*hmin);
+  hh->SetMaximum(1.1*hmax);
+
+  TString xtit(hraw->GetXaxis()->GetTitle());
+  if(xtit.Contains("(")){
+    xtit=xtit(0, xtit.First('('));
+  }
+
+  TString ytit(hraw->GetYaxis()->GetTitle());
+  if(ytit.Contains("(")){
+    ytit=ytit(0, ytit.First('('));
+  }
+
+  hh->SetTitle(Form("f(%s|%s) %s", ytit.Data(), xtit.Data(), hraw->GetTitle()));
+
+  return hh; 
+}
 int PlotUtils::GetColor(const int col)
 {
   if(col>=1000){
@@ -240,8 +306,75 @@ void PlotUtils::PadSetup(TPad *currentPad, const Double_t currentLeft, const Dou
   currentPad->SetFillColor(0);
 }
 
+void PlotUtils::IniColorCB()
+{ 
+  static bool kset = false;
+  if(kset){
+    printf("style::IniColorCB arleady set\n");
+    return;
+  }
+  else{
+    printf("style::IniColorCB creating new color\n");
+  }
+  const int fgkColorBase = 1500;  
+  //http://www.somersault1824.com/tips-for-designing-scientific-figures-for-color-blind-readers/
+  Int_t id=fgkColorBase+1;
+  new TColor(id++, 0./255., 0./255., 0./255., "CB1_Black",1.0);
+  new TColor(id++, 0./255., 73./255., 73./255., "CB2_Forest",1.0);
+  new TColor(id++, 0./255., 146./255., 146./255., "CB3_Teal",1.0);
+  new TColor(id++, 255./255., 109./255., 182./255., "CB4_HotPink",1.0);
+  new TColor(id++, 255./255., 182./255., 119./255., "CB5_BabyPink",1.0);
+  new TColor(id++, 73./255., 0./255., 146./255., "CB6_Purple",1.0);
+  new TColor(id++, 0./255., 109./255., 219./255., "CB7_RoyalBlue",1.0);
+  new TColor(id++, 182./255., 109./255., 255./255., "CB8_Lilac",1.0);
+  new TColor(id++, 109./255., 182./255., 255./255., "CB9_BlueGrey",1.0);
+  new TColor(id++, 182./255., 219./255., 255./255., "CB10_SpaceWolves",1.0);
+  new TColor(id++, 146./255., 0./255., 0./255., "CB11_Maroon",1.0);
+  new TColor(id++, 146./255., 73./255., 0./255., "CB12_Tan",1.0);
+  new TColor(id++, 219./255., 209./255., 0./255., "CB13_Orange",1.0);
+  new TColor(id++, 36./255., 255./255., 36./255., "CB14_DayGleen",1.0);
+  new TColor(id++, 255./255., 255./255., 109./255., "CB15_SunFlower",1.0);
+  
+  kset = true;
+}
+
+void PlotUtils::SetColor()
+{
+  gStyle->SetHistFillColor(0);
+  //gStyle->SetFillColor(0);//it conflicts with color palette
+  gStyle->SetFrameFillColor(0);
+  gStyle->SetPadColor(0);
+  gStyle->SetCanvasColor(0);
+  gStyle->SetStatColor(0);
+  gStyle->SetTitleFillColor(0);
+
+  gStyle->SetPalette(56);//only 56 available
+
+  return;
+  //---
+
+  const Int_t nRGBs = 5;
+  const Int_t nCont = 100;
+  Double_t stops[nRGBs] = { 0.00, 0.34, 0.61, 0.84, 1.00 };
+  Double_t red[nRGBs]   = { 0.00, 0.00, 0.87, 1.00, 0.51 };
+  Double_t green[nRGBs] = { 0.00, 0.81, 1.00, 0.20, 0.00 };
+  Double_t blue[nRGBs]  = { 0.51, 1.00, 0.12, 0.00, 0.00 };
+  const Int_t cgc = TColor::CreateGradientColorTable(nRGBs, stops, red, green, blue, nCont);
+
+  const Int_t nc = nCont;
+  Int_t colors[nc];
+  gStyle->SetNumberContours(nc);
+  for(Int_t ii=0; ii<nc; ii++){
+    colors[ii]=cgc+ii;
+  }
+  gStyle->SetPalette(nc, colors);
+}
+
+
 void PlotUtils::gStyleSetup()
 {
+  IniColorCB();
+
   gStyle->SetOptTitle(1);
   gStyle->SetStatY(0.87);
   gStyle->SetStatH(0.12);
@@ -250,6 +383,21 @@ void PlotUtils::gStyleSetup()
   gStyle->SetStatColor(0);
   gStyle->SetStatStyle(0);
   gStyle->SetTitleX(0.55);
-}
 
+  gStyle->SetFrameBorderMode(0);
+  gStyle->SetFrameFillColor(0);
+  gStyle->SetCanvasBorderMode(0);
+  gStyle->SetPadBorderMode(0);
+  gStyle->SetPadColor(10);
+  gStyle->SetCanvasColor(10);
+  gStyle->SetTitleFillColor(10);
+  gStyle->SetTitleBorderSize(-1);
+  gStyle->SetStatColor(10);
+  gStyle->SetStatBorderSize(-1);
+  gStyle->SetLegendBorderSize(-1);
+  gStyle->SetPalette(1,0);
+
+  SetColor();
+  gROOT->ForceStyle();
+}
 

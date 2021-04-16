@@ -348,3 +348,75 @@ double AnaUtils::GetChi2NDF(const int ii)
   return chnf;
 }
 
+TVector3 AnaUtils::GetTruthMatchedTrackVectLab(const int ii)
+{
+  const TVector3 trackVectLab((*AnaIO::reco_daughter_PFP_true_byHits_startPx)[ii],
+                              (*AnaIO::reco_daughter_PFP_true_byHits_startPy)[ii],
+                              (*AnaIO::reco_daughter_PFP_true_byHits_startPz)[ii] );
+  return trackVectLab;
+}
+
+TVector3 AnaUtils::GetRecTrackVectLab(const int ii, const bool kProton)
+{ 
+  // MBR: momentum by range
+  const double trackMBR = kProton? (*AnaIO::reco_daughter_allTrack_momByRange_proton)[ii] : (*AnaIO::reco_daughter_allTrack_momByRange_muon)[ii]; 
+  TVector3 trackVectLab;
+  // Get this reco particle momentum vector in lab frame
+  trackVectLab.SetMagThetaPhi(trackMBR, (*AnaIO::reco_daughter_allTrack_Theta)[ii], (*AnaIO::reco_daughter_allTrack_Phi)[ii]);
+  
+  return trackVectLab;
+}
+
+TLorentzVector AnaUtils::GetMomentumRefBeam(const bool isTruth, const int trackIndex, const bool kProton)
+{
+  // Get true/reco beam momentum vector
+  const TVector3 tmpBeam = isTruth ? GetTruthBeamFull() : GetRecBeamFull();
+  // Get true/reco FS particle momentum vector
+  const TVector3 vecLab = isTruth ? GetTruthMatchedTrackVectLab(trackIndex) : GetRecTrackVectLab(trackIndex, kProton);
+  // Get theta angle reletive to the beam
+  const double thetaRefBeam = AnaFunctions::GetThetaRef(vecLab, tmpBeam.Unit());
+
+  TVector3 vectRefBeam;
+  vectRefBeam.SetMagThetaPhi(vecLab.Mag(), thetaRefBeam, 0);
+
+  TLorentzVector momentumRefBeam;
+  momentumRefBeam.SetVectM(vectRefBeam, kProton? AnaFunctions::ProtonMass() : AnaFunctions::PionMass() );
+
+  return momentumRefBeam;
+}
+
+void AnaUtils::FillFSParticleKinematics(const int trackIndex, const int truthParticleType, const int recParticleType)
+{
+  // ---------------- Fill proton kinematics ----------------//
+  if(recParticleType == gkProton){
+    // Get this reco particle momentum vector relative to beam
+    const TLorentzVector recMomRefBeam = GetMomentumRefBeam(false /*=>reco*/, trackIndex, true /*=>proton*/);
+    plotUtils.FillHist(AnaIO::hRecProtonMomentum,recMomRefBeam.P(), truthParticleType);
+    plotUtils.FillHist(AnaIO::hRecProtonTheta, recMomRefBeam.Theta()*TMath::RadToDeg(), truthParticleType); 
+    // Truth-matching
+    if(truthParticleType == gkProton){ // MC only (Data loop won't pass this)
+      // Get the truth-matched particle truth momentum vector relative to beam
+      const TLorentzVector truthMomRefBeam = GetMomentumRefBeam(true /*=>truth-matched*/, trackIndex, true /*=>proton*/);   
+      const double momentumRes = recMomRefBeam.P()/truthMomRefBeam.P()-1;
+      const double thetaRes    = (recMomRefBeam.Theta()-truthMomRefBeam.Theta())*TMath::RadToDeg();
+      plotUtils.FillHist(AnaIO::hProtonMomentumRes, truthMomRefBeam.P(), momentumRes);
+      plotUtils.FillHist(AnaIO::hProtonThetaRes, truthMomRefBeam.Theta()*TMath::RadToDeg(), thetaRes); 
+    }
+  }
+  // ---------------- Fill piplus kinematics ----------------//
+  if(recParticleType == gkPiPlus){
+    // Get this reco particle momentum vector relative to beam
+    const TLorentzVector recMomRefBeam = GetMomentumRefBeam(false /*=>reco*/, trackIndex, false/*=>piplus*/);
+    plotUtils.FillHist(AnaIO::hRecPiPlusMomentum,recMomRefBeam.P(), truthParticleType);
+    plotUtils.FillHist(AnaIO::hRecPiPlusTheta, recMomRefBeam.Theta()*TMath::RadToDeg(), truthParticleType);
+    // Truth-matching
+    if(truthParticleType == gkPiPlus){ // MC only (Data loop won't pass this)
+      // Get the truth-matched particle truth momentum vector relative to beam
+      const TLorentzVector truthMomRefBeam = GetMomentumRefBeam(true /*=>truth-matched*/, trackIndex, false /*=>piplus*/);
+      const double momentumRes = recMomRefBeam.P()/truthMomRefBeam.P()-1;
+      const double thetaRes    = (recMomRefBeam.Theta()-truthMomRefBeam.Theta())*TMath::RadToDeg();
+      plotUtils.FillHist(AnaIO::hPiPlusMomentumRes, truthMomRefBeam.P(), momentumRes);
+      plotUtils.FillHist(AnaIO::hPiPlusThetaRes, truthMomRefBeam.Theta()*TMath::RadToDeg(), thetaRes);
+    }  
+  }
+}

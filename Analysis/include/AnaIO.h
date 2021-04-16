@@ -35,6 +35,10 @@ namespace AnaIO
   vector<vector<double> > *reco_daughter_allTrack_calibrated_dEdX_SCE = 0x0;
   vector<double>          *reco_daughter_allTrack_Chi2_proton = 0x0;
   vector<int>             *reco_daughter_allTrack_Chi2_ndof = 0x0;
+  vector<double>          *reco_daughter_allTrack_momByRange_proton = 0x0;
+  vector<double>          *reco_daughter_allTrack_momByRange_muon = 0x0;
+  vector<double>          *reco_daughter_allTrack_Theta = 0x0;
+  vector<double>          *reco_daughter_allTrack_Phi = 0x0;
  
   vector<int>             *reco_daughter_allShower_ID = 0x0; 
   // Declare histograms
@@ -46,12 +50,17 @@ namespace AnaIO
   TH1D * hCutBeamEndZ = 0x0; 
   TH2D * hRecBeamTheta = 0x0;
   TH2D * hRecBeamMomentum = 0x0;
+  TH2D * hRecProtonTheta = 0x0;
+  TH2D * hRecProtonMomentum = 0x0;
+  TH2D * hRecPiPlusTheta = 0x0;
+  TH2D * hRecPiPlusMomentum = 0x0;
 
   TH2D * hCutTracknHits = 0x0;
   TH2D * hCutTrackScore = 0x0;
   TH2D * hCutlastTME = 0x0;
   TH2D * hCutChi2NDF = 0x0;
-
+  TH2D * hCutemScore = 0x0;
+  TH2D * hCutmichelScore = 0x0;
   //====================== Reco (Data only)======================//
   // Declare variables
   Double_t        beam_inst_X;
@@ -95,6 +104,9 @@ namespace AnaIO
  
   vector<int> *reco_daughter_PFP_true_byHits_PDG = 0x0;
   vector<int> *reco_daughter_PFP_true_byHits_ID = 0x0;
+  vector<double>  *reco_daughter_PFP_true_byHits_startPx = 0x0;
+  vector<double>  *reco_daughter_PFP_true_byHits_startPy = 0x0;
+  vector<double>  *reco_daughter_PFP_true_byHits_startPz = 0x0;
 
   // Declare histograms
   TH1I * hTruthBeamType = 0x0;
@@ -108,7 +120,11 @@ namespace AnaIO
   // Resolution histograms need to use truth info
   TH2D * hBeamThetaRes = 0x0;
   TH2D * hBeamMomentumRes = 0x0;
-
+  TH2D * hProtonThetaRes = 0x0;
+  TH2D * hProtonMomentumRes = 0x0;
+  TH2D * hPiPlusThetaRes = 0x0;
+  TH2D * hPiPlusMomentumRes = 0x0;
+ 
   // Get input tree
   TTree * GetInputTree(TFile * fin, const TString tname, const TString tag)
   {
@@ -148,6 +164,10 @@ namespace AnaIO
     tree->SetBranchAddress("reco_daughter_allTrack_calibrated_dEdX_SCE", &reco_daughter_allTrack_calibrated_dEdX_SCE);
     tree->SetBranchAddress("reco_daughter_allTrack_Chi2_proton", &reco_daughter_allTrack_Chi2_proton);
     tree->SetBranchAddress("reco_daughter_allTrack_Chi2_ndof", &reco_daughter_allTrack_Chi2_ndof);
+    tree->SetBranchAddress("reco_daughter_allTrack_momByRange_proton", &reco_daughter_allTrack_momByRange_proton);
+    tree->SetBranchAddress("reco_daughter_allTrack_momByRange_muon", &reco_daughter_allTrack_momByRange_muon);
+    tree->SetBranchAddress("reco_daughter_allTrack_Theta", &reco_daughter_allTrack_Theta);
+    tree->SetBranchAddress("reco_daughter_allTrack_Phi", &reco_daughter_allTrack_Phi);
 
     tree->SetBranchAddress("reco_daughter_allShower_ID", &reco_daughter_allShower_ID);
     //====================== Reco (Data only)======================//
@@ -192,6 +212,9 @@ namespace AnaIO
  
     tree->SetBranchAddress("reco_daughter_PFP_true_byHits_PDG", &reco_daughter_PFP_true_byHits_PDG);
     tree->SetBranchAddress("reco_daughter_PFP_true_byHits_ID", &reco_daughter_PFP_true_byHits_ID);
+    tree->SetBranchAddress("reco_daughter_PFP_true_byHits_startPx", &reco_daughter_PFP_true_byHits_startPx);
+    tree->SetBranchAddress("reco_daughter_PFP_true_byHits_startPy", &reco_daughter_PFP_true_byHits_startPy);
+    tree->SetBranchAddress("reco_daughter_PFP_true_byHits_startPz", &reco_daughter_PFP_true_byHits_startPz);
 
     return tree;
   } // End of GetInputTree
@@ -219,8 +242,16 @@ namespace AnaIO
     lout->Add(hCutBeamEndZ);
     hRecBeamTheta = new TH2D("RecBeamTheta_STK_"+tag,"", 80 , 0, 60, 3, -0.5, 2.5); 
     lout->Add(hRecBeamTheta);
-    hRecBeamMomentum  = new TH2D("RecBeamMomentum_STK_"+tag,"", 50, 0, 2, 3, -0.5, 2.5); 
+    hRecBeamMomentum = new TH2D("RecBeamMomentum_STK_"+tag,"", 50, 0, 2, 3, -0.5, 2.5); 
     lout->Add(hRecBeamMomentum);
+    hRecProtonTheta = new TH2D("RecProtonTheta_STK_"+tag,"",  20, 0, 180, nparType, parTypemin, parTypemax);
+    lout->Add(hRecProtonTheta);
+    hRecProtonMomentum = new TH2D("RecProtonMomentum_STK_"+tag,"",  20, 0, 1.2, nparType, parTypemin, parTypemax); 
+    lout->Add(hRecProtonMomentum);
+    hRecPiPlusTheta = new TH2D("RecPiPlusTheta_STK_"+tag,"", 15, 0, 180, nparType, parTypemin, parTypemax); 
+    lout->Add(hRecPiPlusTheta);
+    hRecPiPlusMomentum = new TH2D("RecPiPlusMomentum_STK_"+tag,"",  20, 0, 1.2, nparType, parTypemin, parTypemax); 
+    lout->Add(hRecPiPlusMomentum);
  
     hCutTracknHits = new TH2D("CutTracknHits_STK_"+tag,"", 50, 0, 500, nparType, parTypemin, parTypemax); 
     lout->Add(hCutTracknHits);
@@ -230,6 +261,11 @@ namespace AnaIO
     lout->Add(hCutlastTME);
     hCutChi2NDF = new TH2D("CutChi2NDF_STK_"+tag,"", 30, 0, 500, nparType, parTypemin, parTypemax);   
     lout->Add(hCutChi2NDF);
+    hCutemScore = new TH2D("CutemScore_STK_"+tag,"", 50, 0, 1, nparType, parTypemin, parTypemax); 
+    lout->Add(hCutemScore);
+    hCutmichelScore = new TH2D("CutmichelScore_STK_"+tag,"",50, 0, 1, nparType, parTypemin, parTypemax); 
+    lout->Add(hCutmichelScore);
+
     //====================== Truth (MC only)======================//
     if(kMC){
       hTruthBeamType = new TH1I("TruthBeamType_"+tag,  "", 20, -0.5, 19.5); 
@@ -252,7 +288,14 @@ namespace AnaIO
       lout->Add(hBeamThetaRes);
       hBeamMomentumRes  = new TH2D("BeamMomentum_RES_"+tag,"", 50, 0, 2, 20, -0.5, 0.5);
       lout->Add(hBeamMomentumRes);
-
+      hProtonThetaRes = new TH2D("ProtonTheta_RES_"+tag,"", 20, 0, 180, 25, -20, 30); 
+      lout->Add(hProtonThetaRes);
+      hProtonMomentumRes = new TH2D("ProtonMomentum_RES_"+tag,"",20, 0, 1.2, 20, -0.2, 0.2); 
+      lout->Add(hProtonMomentumRes);
+      hPiPlusThetaRes = new TH2D("PiPlusTheta_RES_"+tag,"", 15, 0, 180, 25, -20, 30); 
+      lout->Add(hPiPlusThetaRes);
+      hPiPlusMomentumRes = new TH2D("PiPlusMomentum_RES_"+tag,"", 20, 0, 1.2, 20, -0.2, 0.2); 
+      lout->Add(hPiPlusMomentumRes);
     }
   }// End of IniHist
 

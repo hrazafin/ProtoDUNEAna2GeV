@@ -48,6 +48,7 @@ class AnaCut
     int nshower;
     int nmichel;
     int truthParticleType;
+    int recParticleType;
 };
 
 

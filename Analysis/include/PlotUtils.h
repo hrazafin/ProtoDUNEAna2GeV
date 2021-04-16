@@ -74,6 +74,9 @@ class PlotUtils
   THStack * ConvertToStack(const TH2D * hh);
   TH1D * GetStackedSum(THStack *stk);
   void ScaleStack(THStack *stk, const double scale);
+  TH2D * NormalHist(const TH2D *hraw, const Double_t thres, const Bool_t kmax);
+  void IniColorCB();
+  void SetColor();
   int GetColor(const int col);
   int * GetColorArray(const int minsize);
   void PadSetup(TPad *currentPad, const Double_t currentLeft=0.12, const Double_t currentTop=0.09, const Double_t currentRight=0.13, const Double_t currentBottom=0.14);

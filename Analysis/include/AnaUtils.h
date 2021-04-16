@@ -28,7 +28,11 @@ class AnaUtils
     double GetTruncatedMean(const vector<double> & dEdxVec, const unsigned int nsample0, const unsigned int nsample1, const double lowerFrac, const double upperFrac);
     double GetFSParticleTME(const unsigned int ii, const bool kForward);
     double GetChi2NDF(const int ii);
-    
+ 
+    TVector3 GetTruthMatchedTrackVectLab(const int ii);
+    TVector3 GetRecTrackVectLab(const int ii, const bool kProton);
+    TLorentzVector GetMomentumRefBeam(const bool isTruth, const int trackIndex, const bool kProton);
+    void FillFSParticleKinematics(const int trackIndex, const int truthParticleType, const int recParticleType);      
     // Define particle types
     enum parType{
 

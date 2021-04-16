@@ -270,13 +270,20 @@ void AnaCut::CountPFP(const bool kMC)
   for(int ii=0; ii<recsize; ii++){
     // Get the truth info for this reco particle
     truthParticleType = kMC? GetTruthParticleInfoFromRec(ii) : anaUtils.gkOthers; 
+    recParticleType = -999;
     // Proton candidates selection
     if(IsProton(ii)){
       nproton++;
+      recParticleType = anaUtils.gkProton;
+      // Fill rec and truth-matching info
+      anaUtils.FillFSParticleKinematics(ii, truthParticleType, recParticleType);
     }
     // Piplus candidates selection
     if(IsPiplus(ii)){
       npiplus++;
+      recParticleType = anaUtils.gkPiPlus;
+      // Fill rec and truth-matching info
+      anaUtils.FillFSParticleKinematics(ii, truthParticleType, recParticleType);
     }
     // Shower candidates selection
     if(IsShower(ii)){
@@ -291,7 +298,7 @@ void AnaCut::CountPFP(const bool kMC)
   }
   if(recsize!=nPFP) cout << "CountPFP not looping all FS particles!!" << endl;
 
-  printf("CountPFP PFP size %d nlooped %d nshower %d nmichel %d npiplus %d nproton %d\n", recsize, nPFP, nshower, nmichel, npiplus, nproton);
+  //printf("CountPFP PFP size %d nlooped %d nshower %d nmichel %d npiplus %d nproton %d\n", recsize, nPFP, nshower, nmichel, npiplus, nproton);
 }
 
 bool AnaCut::IsProton(const int ii)
@@ -355,6 +362,8 @@ bool AnaCut::IsShower(const int ii)
   // Get the em score and nhits of this particle
   const double emScore = (*AnaIO::reco_daughter_PFP_emScore_collection)[ii];
   const int nhits = (*AnaIO::reco_daughter_PFP_nHits)[ii];
+  // Fill Cut histogram
+  plotUtils.FillHist(AnaIO::hCutemScore, emScore, truthParticleType);
 
   if((*AnaIO::reco_daughter_allShower_ID)[ii]==-1) return false;
   // Cut on number of hits
@@ -369,6 +378,7 @@ bool AnaCut::IsMichel(const int ii)
 {
   // Get Michel score of this particle
   const double michelScore = (*AnaIO::reco_daughter_PFP_michelScore_collection)[ii];
+  plotUtils.FillHist(AnaIO::hCutmichelScore, michelScore, truthParticleType);
   // Cut on Michel score
   if(michelScore<=0.5) return false;
 
