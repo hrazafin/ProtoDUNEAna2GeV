@@ -41,6 +41,14 @@ namespace AnaIO
   vector<double>          *reco_daughter_allTrack_Phi = 0x0;
  
   vector<int>             *reco_daughter_allShower_ID = 0x0; 
+  vector<double>          *reco_daughter_allShower_startX = 0x0;
+  vector<double>          *reco_daughter_allShower_startY = 0x0;
+  vector<double>          *reco_daughter_allShower_startZ = 0x0;
+  vector<double>          *reco_daughter_allShower_dirX=0x0;
+  vector<double>          *reco_daughter_allShower_dirY=0x0;
+  vector<double>          *reco_daughter_allShower_dirZ=0x0;
+  vector<double>          *reco_daughter_allShower_energy=0x0;
+
   // Declare histograms
   TH1I * hEvent = 0x0;
   TH1I * hCutBeamIDPass = 0x0;
@@ -54,6 +62,12 @@ namespace AnaIO
   TH2D * hRecProtonMomentum = 0x0;
   TH2D * hRecPiPlusTheta = 0x0;
   TH2D * hRecPiPlusMomentum = 0x0;
+  TH2D * hRecShowerEnergy = 0x0;
+  
+  TH2D * hRecPi0Nshower = 0x0;
+  TH2D * hRecShowerOpenAngle = 0x0;
+  TH2D * hRecPi0Mass = 0x0;
+  TH2D * hRecPi0ShowerSep = 0x0;
 
   TH2D * hCutTracknHits = 0x0;
   TH2D * hCutTrackScore = 0x0;
@@ -61,6 +75,9 @@ namespace AnaIO
   TH2D * hCutChi2NDF = 0x0;
   TH2D * hCutemScore = 0x0;
   TH2D * hCutmichelScore = 0x0;
+  TH2D * hCutShowerDist = 0x0;
+  TH2D * hCutShowerIP = 0x0;
+  
   //====================== Reco (Data only)======================//
   // Declare variables
   Double_t        beam_inst_X;
@@ -74,6 +91,7 @@ namespace AnaIO
   
   //====================== Truth (MC only)======================//
   // Declare variables
+  bool Signal = false;
   int true_beam_PDG = -999;
   Double_t        true_beam_startX;
   Double_t        true_beam_startY;
@@ -170,6 +188,14 @@ namespace AnaIO
     tree->SetBranchAddress("reco_daughter_allTrack_Phi", &reco_daughter_allTrack_Phi);
 
     tree->SetBranchAddress("reco_daughter_allShower_ID", &reco_daughter_allShower_ID);
+    tree->SetBranchAddress("reco_daughter_allShower_startX", &reco_daughter_allShower_startX);
+    tree->SetBranchAddress("reco_daughter_allShower_startY", &reco_daughter_allShower_startY);
+    tree->SetBranchAddress("reco_daughter_allShower_startZ", &reco_daughter_allShower_startZ);
+    tree->SetBranchAddress("reco_daughter_allShower_dirX", &reco_daughter_allShower_dirX);
+    tree->SetBranchAddress("reco_daughter_allShower_dirY", &reco_daughter_allShower_dirY);
+    tree->SetBranchAddress("reco_daughter_allShower_dirZ", &reco_daughter_allShower_dirZ);
+    tree->SetBranchAddress("reco_daughter_allShower_energy", &reco_daughter_allShower_energy);
+
     //====================== Reco (Data only)======================//
     tree->SetBranchAddress("beam_inst_PDG_candidates", &beam_inst_PDG_candidates);
     tree->SetBranchAddress("beam_inst_X", &beam_inst_X);
@@ -252,7 +278,18 @@ namespace AnaIO
     lout->Add(hRecPiPlusTheta);
     hRecPiPlusMomentum = new TH2D("RecPiPlusMomentum_STK_"+tag,"",  20, 0, 1.2, nparType, parTypemin, parTypemax); 
     lout->Add(hRecPiPlusMomentum);
- 
+    hRecShowerEnergy = new TH2D("RecShowerEnergy_STK_"+tag,"", 15, 0, 1, nparType, parTypemin, parTypemax); 
+    lout->Add(hRecShowerEnergy);
+
+    hRecPi0Nshower = new TH2D("RecPi0Nshower_STK_"+tag,"", 10, -0.5, 9.5, 3, -0.5, 2.5); 
+    lout->Add(hRecPi0Nshower);
+    hRecShowerOpenAngle = new TH2D("RecShowerOpenAngle_STK_"+tag,"", 20, 0, 180, 3, -0.5, 2.5); 
+    lout->Add(hRecShowerOpenAngle);
+    hRecPi0Mass = new TH2D("RecPi0Mass_STK_"+tag,"", 15, 0, 0.5, 3, -0.5, 2.5); 
+    lout->Add(hRecPi0Mass);
+    hRecPi0ShowerSep = new TH2D("RecPi0ShowerDist_STK_"+tag,"", 50, 0, 200, 3, -0.5, 2.5);
+    lout->Add(hRecPi0ShowerSep);
+    
     hCutTracknHits = new TH2D("CutTracknHits_STK_"+tag,"", 50, 0, 500, nparType, parTypemin, parTypemax); 
     lout->Add(hCutTracknHits);
     hCutTrackScore = new TH2D("CutTrackScore_STK_"+tag,"", 50, 0, 1, nparType, parTypemin, parTypemax);
@@ -265,6 +302,10 @@ namespace AnaIO
     lout->Add(hCutemScore);
     hCutmichelScore = new TH2D("CutmichelScore_STK_"+tag,"",50, 0, 1, nparType, parTypemin, parTypemax); 
     lout->Add(hCutmichelScore);
+    hCutShowerDist = new TH2D("CutShowerDist_STK_"+tag,"", 31, 0, 93, nparType, parTypemin, parTypemax); 
+    lout->Add(hCutShowerDist);
+    hCutShowerIP = new TH2D("CutShowerIP_STK_"+tag,"", 30, 0, 20, nparType, parTypemin, parTypemax); 
+    lout->Add(hCutShowerIP);
 
     //====================== Truth (MC only)======================//
     if(kMC){

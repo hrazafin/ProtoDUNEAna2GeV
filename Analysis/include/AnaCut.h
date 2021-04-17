@@ -39,16 +39,18 @@ class AnaCut
     bool IsPiplus(const int ii);
     bool IsShower(const int ii);
     bool IsMichel(const int ii);
-  
+    bool IsPiZeroShower(const int ii); 
   private:
     AnaUtils anaUtils;
     PlotUtils plotUtils;
     int nproton;
     int npiplus;
     int nshower;
+    int npi0shower;
     int nmichel;
     int truthParticleType;
     int recParticleType;
+    
 };
 
 

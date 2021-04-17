@@ -101,9 +101,6 @@ int main(int argc, char * argv[])
   fout->Save();
   fout->Close();
   double plotScale = dataBeamCount/mcBeamCount; 
-  cout << "dataBeamCount: " << dataBeamCount << endl;
-  cout << "mcBeamCount: " << mcBeamCount << endl;
-  cout << "plotScale: " << plotScale << endl;
   // Draw all histograms in mclout and datalout
   plotUtils.DrawHist(mclout,plotScale,datalout,"output");
   //plotUtils.DrawHist(datalout,1,0x0,"output");

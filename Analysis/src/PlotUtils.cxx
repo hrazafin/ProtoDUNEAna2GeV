@@ -113,6 +113,7 @@ void PlotUtils::DrawHist(TList *lout, const double plotscale, TList * overlayLis
       holay->Draw();//to generate statbox
       c1->Update(); 
       if(plotscale!=1) ScaleStack(hstk, plotscale); 
+      hstk->SetMaximum(holay->GetMaximum()*1.2);
       hstk->Draw("hist");
       holay->SetMarkerStyle(8);
       holay->SetMarkerSize(1);
@@ -182,7 +183,8 @@ TH1D * PlotUtils::GetStackedSum(THStack *stk)
 {
   const TList * ll = stk->GetHists();
   const TString tag = stk->GetName();
-  TH1D * hout = (TH1D*)ll->At(0)->Clone(tag);
+  TH1D * hout = 0x0;
+  hout = (TH1D*)ll->At(0)->Clone(tag);
   hout->SetName(tag+"_sum");
   hout->SetTitle(tag);
   hout->SetDirectory(0);
@@ -191,7 +193,7 @@ TH1D * PlotUtils::GetStackedSum(THStack *stk)
   }
 
   hout->SetEntries(hout->Integral(0,10000));
-
+ 
   return hout;
 }
 void PlotUtils::ScaleStack(THStack *stk, const double scale)
@@ -267,7 +269,7 @@ TH2D * PlotUtils::NormalHist(const TH2D *hraw, const Double_t thres, const Bool_
 int PlotUtils::GetColor(const int col)
 {
   if(col>=1000){
-    return col-1000;
+    return 1500+col-1000;
   }
   else{
     return col;

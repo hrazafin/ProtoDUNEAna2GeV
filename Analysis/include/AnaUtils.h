@@ -33,6 +33,10 @@ class AnaUtils
     TVector3 GetRecTrackVectLab(const int ii, const bool kProton);
     TLorentzVector GetMomentumRefBeam(const bool isTruth, const int trackIndex, const bool kProton);
     void FillFSParticleKinematics(const int trackIndex, const int truthParticleType, const int recParticleType);      
+    
+    TVector3 GetRecShowerDistVector(const int ii);
+    TLorentzVector GetRecShowerVectLab(const int ii);
+    TLorentzVector GetPiZero();
     // Define particle types
     enum parType{
 
@@ -84,15 +88,26 @@ class AnaUtils
       gkBmBkg
      };
 
-    bool GetgkSignal(){return gkSignal;}
+    void SavePiZeroShower(TLorentzVector shower, double showerE, TVector3 pos, int showerType)
+    {
+      showerArray.push_back(shower);
+      showerEarr.push_back(showerE);
+      showerTypeArray.push_back(showerType);
+      showerPos.push_back(pos);
+    }
+    void CleanShowerArray(){showerArray.clear();showerEarr.clear();showerPos.clear();showerTypeArray.clear();}
   private:
     PlotUtils plotUtils;
-    bool Signal;
     int nProton;
     int nNeutron;
     int nPiPlus;
     int nPiZero;
     int nGamma;
     int nParticleBkg;
+
+    vector<TLorentzVector> showerArray;
+    vector<int> showerTypeArray;
+    vector<double> showerEarr;
+    vector<TVector3> showerPos;
 };
 #endif
