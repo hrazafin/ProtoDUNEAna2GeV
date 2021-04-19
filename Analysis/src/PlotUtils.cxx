@@ -64,6 +64,9 @@ void PlotUtils::ProcessHist(TList *lout, const bool kMC)
         hnor->SetTitle(tag);
         lout->Add(hnor);
       }
+      if(tag.Contains("VS")){
+        getProfileFit(htmp); 
+      }
     }
   } // End of for loop
 }
@@ -403,3 +406,15 @@ void PlotUtils::gStyleSetup()
   gROOT->ForceStyle();
 }
 
+void PlotUtils::getProfileFit(TH2D * h2d)
+{
+  TH1D *hprof = h2d->ProfileX();
+  auto c0 = new TCanvas("c0","c0",800,600);
+  hprof->SetLineColor(kRed);
+  hprof->SetLineWidth(3);
+  hprof->Fit("pol1");
+  hprof->SetStats(1);
+  hprof->Draw();  
+  c0->Print("output/hprof_withP.eps");
+
+}

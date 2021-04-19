@@ -376,7 +376,7 @@ bool AnaCut::IsShower(const int ii)
 
   if((*AnaIO::reco_daughter_allShower_ID)[ii]==-1) return false;
   // Cut on number of hits
-  if(nhits <= 10) return false;
+  if(nhits <= 80) return false;
   // Cut on em score
   if(emScore <= 0.5) return false;
   
@@ -398,10 +398,11 @@ bool AnaCut::IsPiZeroShower(const int ii)
 {
   // Get the position vector point from vertex to shower start position
   const TVector3 dist = anaUtils.GetRecShowerDistVector(ii);
-  // Get reco shower momentum vector
-  const TLorentzVector showerLv = anaUtils.GetRecShowerVectLab(ii);
+  // Get reco shower momentum vector in both lab frame and refbeam
+  const TLorentzVector showerLvLab = anaUtils.GetRecShowerLTVectLab(ii);
+  const TLorentzVector showerLvRefBeam = anaUtils.GetShowerMomentumRefBeam(false,ii);
   // Calculate shower impact parameter
-  const double IP = dist.Mag()*TMath::Sin((showerLv.Angle(dist)));
+  const double IP = dist.Mag()*TMath::Sin((showerLvLab.Angle(dist)));
   
   const TVector3 showerPosition((*AnaIO::reco_daughter_allShower_startX)[ii],(*AnaIO::reco_daughter_allShower_startY)[ii],(*AnaIO::reco_daughter_allShower_startZ)[ii]);
  
@@ -410,10 +411,9 @@ bool AnaCut::IsPiZeroShower(const int ii)
   // In unit of cm
   if( dist.Mag() < 2 || dist.Mag() > 90 ) return false;
   // Impact Parameter Cut
-  if( IP > 1000 ) return false;
+  if( IP > 10 ) return false;
   // Need to save all pizero shower candidates to reconstruct pizero
-  anaUtils.SavePiZeroShower(showerLv, showerLv.E(), showerPosition, truthParticleType);
- 
+  anaUtils.SavePiZeroShower(showerLvLab, showerLvLab.E(), showerPosition, truthParticleType);
   return true;
 }
 

@@ -421,11 +421,18 @@ void AnaUtils::FillFSParticleKinematics(const int recIndex, const int truthParti
   // ---------------- Fill shower kinematics ----------------//
   if(recParticleType == gkGamma){
     // Get this reco particle momentum vector relative to beam
-    const TLorentzVector recMomLab = GetRecShowerVectLab(recIndex); 
-    plotUtils.FillHist(AnaIO::hRecShowerEnergy, recMomLab.E(), truthParticleType);
+    const TLorentzVector recShowerMomRefBeam = GetShowerMomentumRefBeam(false, recIndex); 
+    plotUtils.FillHist(AnaIO::hRecShowerEnergy, recShowerMomRefBeam.E(), truthParticleType);
+    plotUtils.FillHist(AnaIO::hRecShowerTheta, recShowerMomRefBeam.Theta()*TMath::RadToDeg(), truthParticleType);
     // Truth-matching
     if(truthParticleType == gkGamma){ // MC only (Data loop won't pass this)
-    
+      // Get the truth-matched particle truth momentum vector relative to beam
+      const TLorentzVector truthShowerMomRefBeam = GetShowerMomentumRefBeam(true, recIndex);    
+      const double momentumRes = recShowerMomRefBeam.E()/truthShowerMomRefBeam.E()-1;
+      const double thetaRes    = (recShowerMomRefBeam.Theta()-truthShowerMomRefBeam.Theta())*TMath::RadToDeg();
+      plotUtils.FillHist(AnaIO::hShowerEnergyRes, truthShowerMomRefBeam.E(), momentumRes);
+      plotUtils.FillHist(AnaIO::hShowerThetaRes, truthShowerMomRefBeam.Theta()*TMath::RadToDeg(), thetaRes);
+      plotUtils.FillHist(AnaIO::hShowerEnergyRecVsTruth, truthShowerMomRefBeam.E(), recShowerMomRefBeam.E());
     }
   }
 }
@@ -441,7 +448,31 @@ TVector3 AnaUtils::GetRecShowerDistVector(const int ii)
   return dist;
 }
 
-TLorentzVector AnaUtils::GetRecShowerVectLab(const int ii)
+TVector3 AnaUtils::GetTruthMatchedShowerVectLab(const int ii)
+{
+  const TVector3 showerVectLab((*AnaIO::reco_daughter_PFP_true_byHits_startPx)[ii],
+                              (*AnaIO::reco_daughter_PFP_true_byHits_startPy)[ii],
+                              (*AnaIO::reco_daughter_PFP_true_byHits_startPz)[ii] );
+  return showerVectLab;
+}
+
+TLorentzVector AnaUtils::GetRecShowerLTVectLab(const int ii)
+{
+  // Get reco shower direction
+  const TVector3 showerDir((*AnaIO::reco_daughter_allShower_dirX)[ii],(*AnaIO::reco_daughter_allShower_dirY)[ii],(*AnaIO::reco_daughter_allShower_dirZ)[ii] );
+  // Get reco shower energy in GeV
+  const double showerE = (*AnaIO::reco_daughter_allShower_energy)[ii] * 1E-3;
+  const double showerE_corrected = showerE;//(showerE - 0.01)/0.7;
+  // Combine diretion and energy to get shower 3 momemtum
+  const TVector3 showerVectLab = showerDir*showerE_corrected;
+  
+  TLorentzVector showerLTVectLab;
+  showerLTVectLab.SetVectM(showerVectLab, 0 );
+
+  return showerLTVectLab;
+}
+
+TVector3 AnaUtils::GetRecShowerVectLab(const int ii)
 {
   // Get reco shower direction
   const TVector3 showerDir((*AnaIO::reco_daughter_allShower_dirX)[ii],(*AnaIO::reco_daughter_allShower_dirY)[ii],(*AnaIO::reco_daughter_allShower_dirZ)[ii] );
@@ -449,11 +480,27 @@ TLorentzVector AnaUtils::GetRecShowerVectLab(const int ii)
   const double showerE = (*AnaIO::reco_daughter_allShower_energy)[ii] * 1E-3;
   const double showerE_corrected = showerE;//(showerE - 0.01167)/0.68;
   // Combine diretion and energy to get shower 3 momemtum
-  const TVector3 showerMomentum = showerDir*showerE_corrected; 
-  // Get shower lorentzVector
-  const TLorentzVector showerLv( showerMomentum, showerMomentum.Mag() );
+  const TVector3 showerVectLab = showerDir*showerE_corrected; 
 
-  return showerLv;
+  return showerVectLab;
+}
+
+TLorentzVector AnaUtils::GetShowerMomentumRefBeam(const bool isTruth, const int recIndex)
+{ 
+  // Get true/reco beam momentum vector
+  const TVector3 tmpBeam = isTruth ? GetTruthBeamFull() : GetRecBeamFull();
+  // Get true/reco FS particle momentum vector
+  const TVector3 vecLab = isTruth ? GetTruthMatchedShowerVectLab(recIndex) : GetRecShowerVectLab(recIndex);
+  // Get theta angle reletive to the beam
+  const double thetaRefBeam = AnaFunctions::GetThetaRef(vecLab, tmpBeam.Unit());
+  
+  TVector3 vectRefBeam;
+  vectRefBeam.SetMagThetaPhi(vecLab.Mag(), thetaRefBeam, 0);
+
+  TLorentzVector momentumRefBeam;
+  momentumRefBeam.SetVectM(vectRefBeam, 0 );
+
+  return momentumRefBeam;
 }
 
 TLorentzVector AnaUtils::GetPiZero()
@@ -483,13 +530,16 @@ TLorentzVector AnaUtils::GetPiZero()
     const TVector3 ldShowerPos = showerPos[nindex[0]];
     const TVector3 slShowerPos = showerPos[nindex[1]];
     const TVector3 distVect = ldShowerPos - slShowerPos;
-
+    // Calculate two shower start separation   
     const double separation = distVect.Mag();
     plotUtils.FillHist(AnaIO::hRecPi0ShowerSep, separation, truthEventType);
+ 
+    if(ldShower.E() > 0.05 && openingAngle > 20 && openingAngle < 80 && separation < 50){ 
     // Combine leading shower and subleading shower to get pi0 vector 
     PiZeroVec = ldShower + slShower;
     const double mpi0 = PiZeroVec.M();
     plotUtils.FillHist(AnaIO::hRecPi0Mass, mpi0, truthEventType);
+    }
   } 
   return PiZeroVec;
 }

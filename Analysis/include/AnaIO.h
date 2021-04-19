@@ -63,7 +63,8 @@ namespace AnaIO
   TH2D * hRecPiPlusTheta = 0x0;
   TH2D * hRecPiPlusMomentum = 0x0;
   TH2D * hRecShowerEnergy = 0x0;
-  
+  TH2D * hRecShowerTheta = 0x0; 
+
   TH2D * hRecPi0Nshower = 0x0;
   TH2D * hRecShowerOpenAngle = 0x0;
   TH2D * hRecPi0Mass = 0x0;
@@ -142,7 +143,11 @@ namespace AnaIO
   TH2D * hProtonMomentumRes = 0x0;
   TH2D * hPiPlusThetaRes = 0x0;
   TH2D * hPiPlusMomentumRes = 0x0;
- 
+  TH2D * hShowerEnergyRes = 0x0;
+  TH2D * hShowerThetaRes = 0x0; 
+
+  TH2D * hShowerEnergyRecVsTruth = 0x0;
+
   // Get input tree
   TTree * GetInputTree(TFile * fin, const TString tname, const TString tag)
   {
@@ -280,6 +285,8 @@ namespace AnaIO
     lout->Add(hRecPiPlusMomentum);
     hRecShowerEnergy = new TH2D("RecShowerEnergy_STK_"+tag,"", 15, 0, 1, nparType, parTypemin, parTypemax); 
     lout->Add(hRecShowerEnergy);
+    hRecShowerTheta = new TH2D("RecShowerTheta_STK_"+tag,"", 15, 0, 180, nparType, parTypemin, parTypemax);
+    lout->Add(hRecShowerTheta);
 
     hRecPi0Nshower = new TH2D("RecPi0Nshower_STK_"+tag,"", 10, -0.5, 9.5, 3, -0.5, 2.5); 
     lout->Add(hRecPi0Nshower);
@@ -337,6 +344,12 @@ namespace AnaIO
       lout->Add(hPiPlusThetaRes);
       hPiPlusMomentumRes = new TH2D("PiPlusMomentum_RES_"+tag,"", 20, 0, 1.2, 20, -0.2, 0.2); 
       lout->Add(hPiPlusMomentumRes);
+      hShowerEnergyRes = new TH2D("ShowerEnergy_RES_"+tag,"", 20, 0, 1, 30, -1.1, 0.7);
+      lout->Add(hShowerEnergyRes);
+      hShowerThetaRes = new TH2D("ShowerThetaRes_RES_"+tag,"", 15, 0, 180, 25, -20, 30);
+      lout->Add(hShowerThetaRes);
+      hShowerEnergyRecVsTruth = new TH2D("ShowerEnergyRecVSTruth_"+tag,"", 20, 0, 1, 20, 0, 1);
+      lout->Add(hShowerEnergyRecVsTruth);
     }
   }// End of IniHist
 

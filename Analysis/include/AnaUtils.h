@@ -31,11 +31,15 @@ class AnaUtils
  
     TVector3 GetTruthMatchedTrackVectLab(const int ii);
     TVector3 GetRecTrackVectLab(const int ii, const bool kProton);
-    TLorentzVector GetMomentumRefBeam(const bool isTruth, const int trackIndex, const bool kProton);
-    void FillFSParticleKinematics(const int trackIndex, const int truthParticleType, const int recParticleType);      
+    TLorentzVector GetMomentumRefBeam(const bool isTruth, const int recIndex, const bool kProton);
+    void FillFSParticleKinematics(const int recIndex, const int truthParticleType, const int recParticleType);      
     
     TVector3 GetRecShowerDistVector(const int ii);
-    TLorentzVector GetRecShowerVectLab(const int ii);
+    TVector3 GetTruthMatchedShowerVectLab(const int ii);
+    TVector3 GetRecShowerVectLab(const int ii);
+    TLorentzVector GetRecShowerLTVectLab(const int ii);
+    TLorentzVector GetShowerMomentumRefBeam(const bool isTruth, const int recIndex);
+    
     TLorentzVector GetPiZero();
     // Define particle types
     enum parType{
