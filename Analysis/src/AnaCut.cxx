@@ -28,7 +28,7 @@ bool AnaCut::CutBeamAllInOne(const bool kMC)
     return false;
   }
 
-  //3. beam position cut
+  //3. Beam position cut
   const bool kBeamPosPass = kMC ? CutMCBeamPos() : CutDataBeamPos();
   AnaIO::hCutBeamPosPass->Fill(kBeamPosPass);
   if(!kBeamPosPass){
@@ -252,11 +252,22 @@ int AnaCut::GetTruthParticleInfoFromRec(const int recidx)
 
 bool AnaCut::CutTopology(const bool kMC)
 {
-  CountPFP(kMC);
+  // Count reco final state particles and determine types 
+  CountPFP(kMC,true);
+  // ----------------------- Do cuts below ------------------------ // 
+  // Proton
+  if(nproton!=1) return false;
+  // Showers
+  if(npi0shower<2) return false;
+  // Piplus
+  if(npiplus!=0) return false;
+  // Michel electron
+  if(nmichel!=0) return false;
+
   return true;
 }
 
-void AnaCut::CountPFP(const bool kMC)
+void AnaCut::CountPFP(const bool kMC, const bool kFill)
 {
   // Get the size of reco final state particles
   const int recsize = AnaIO::reco_daughter_PFP_ID->size();
@@ -278,14 +289,14 @@ void AnaCut::CountPFP(const bool kMC)
       nproton++;
       recParticleType = anaUtils.gkProton;
       // Fill rec and truth-matching info
-      anaUtils.FillFSParticleKinematics(ii, truthParticleType, recParticleType);
+      if(kFill) anaUtils.FillFSParticleKinematics(ii, truthParticleType, recParticleType);
     }
     // Piplus candidates selection
     if(IsPiplus(ii)){
       npiplus++;
       recParticleType = anaUtils.gkPiPlus;
       // Fill rec and truth-matching info
-      anaUtils.FillFSParticleKinematics(ii, truthParticleType, recParticleType);
+      if(kFill) anaUtils.FillFSParticleKinematics(ii, truthParticleType, recParticleType);
     }
     // Shower candidates selection
     if(IsShower(ii)){
@@ -295,7 +306,7 @@ void AnaCut::CountPFP(const bool kMC)
         npi0shower++;
         recParticleType = anaUtils.gkGamma;
         // Fill rec and truth-matching info
-        anaUtils.FillFSParticleKinematics(ii, truthParticleType, recParticleType);
+        if(kFill) anaUtils.FillFSParticleKinematics(ii, truthParticleType, recParticleType);
       }
     }
     // Michel candidates selection
@@ -306,7 +317,7 @@ void AnaCut::CountPFP(const bool kMC)
     nPFP++; 
   }
   if(recsize!=nPFP) cout << "CountPFP not looping all FS particles!!" << endl;
-  anaUtils.GetPiZero();
+  if(kFill) anaUtils.GetPiZero();
   //if(npi0shower > 1 && nproton > 0) printf("CountPFP PFP size %d nlooped %d nshower %d npi0shower %d nmichel %d npiplus %d nproton %d\n", recsize, nPFP, nshower, npi0shower, nmichel, npiplus, nproton);
 }
 
@@ -398,22 +409,26 @@ bool AnaCut::IsPiZeroShower(const int ii)
 {
   // Get the position vector point from vertex to shower start position
   const TVector3 dist = anaUtils.GetRecShowerDistVector(ii);
-  // Get reco shower momentum vector in both lab frame and refbeam
-  const TLorentzVector showerLvLab = anaUtils.GetRecShowerLTVectLab(ii);
-  const TLorentzVector showerLvRefBeam = anaUtils.GetShowerMomentumRefBeam(false,ii);
+  // Get reco and truth shower momentum vector in both lab frame
+  const TLorentzVector recShowerMom = anaUtils.GetRecShowerLTVectLab(ii);
+  const TLorentzVector recShowerMomRaw = anaUtils.GetRecShowerLTVectLab(ii,false);
+  const TLorentzVector truthShowerMom = anaUtils.GetTruthMatchedShowerLTVectLab(ii);
   // Calculate shower impact parameter
-  const double IP = dist.Mag()*TMath::Sin((showerLvLab.Angle(dist)));
-  
+  const double IP = dist.Mag()*TMath::Sin((recShowerMom.Angle(dist)));
+  // Get the shower length
+  const double showerLength = (*AnaIO::reco_daughter_allShower_len)[ii];  
+  // Get the shower position vector
   const TVector3 showerPosition((*AnaIO::reco_daughter_allShower_startX)[ii],(*AnaIO::reco_daughter_allShower_startY)[ii],(*AnaIO::reco_daughter_allShower_startZ)[ii]);
  
   plotUtils.FillHist(AnaIO::hCutShowerDist, dist.Mag(), truthParticleType);
   plotUtils.FillHist(AnaIO::hCutShowerIP, IP, truthParticleType);
+  plotUtils.FillHist(AnaIO::hRecShowerLength, showerLength, truthParticleType);
   // In unit of cm
   if( dist.Mag() < 2 || dist.Mag() > 90 ) return false;
   // Impact Parameter Cut
-  if( IP > 10 ) return false;
+  if( IP > 15 ) return false;
   // Need to save all pizero shower candidates to reconstruct pizero
-  anaUtils.SavePiZeroShower(showerLvLab, showerLvLab.E(), showerPosition, truthParticleType);
+  anaUtils.SavePiZeroShower(recShowerMom, recShowerMomRaw, truthShowerMom, recShowerMom.E(), showerPosition, truthParticleType);
   return true;
 }
 

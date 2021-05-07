@@ -46,28 +46,50 @@ void PlotUtils::ProcessHist(TList *lout, const bool kMC)
     TH2D * htmp = dynamic_cast<TH2D *>( lout->At(ii) );
     if(htmp){
       const TString tag = htmp->GetName();
-      // check STK tag
+      // Check if the histogram name contians STK
       if(tag.Contains("STK")){
+        // Convert this tmp 2D histogram to a stack histogram
         THStack * stk = ConvertToStack(htmp);
+        // Check if the stk exist 
         if(stk){
-          if(kMC) lout->Add(stk);
-          else{
+          // Add to lout for MC
+          if(kMC) { 
+            lout->Add(stk);   
             TH1D * hsum = GetStackedSum(stk);
             lout->Add(hsum);
           }
-          //THStack * snor = NormalizeStack(stk);
-          //lout->Add(snor);
+          // Only need the sum of this stack histogram in data 
+          else{
+            // Get the sum of this hitogram
+            TH1D * hsum = GetStackedSum(stk);
+            lout->Add(hsum);
+          }
         }
-      }
-      if(tag.Contains("RES")){
+      } // End of STK tag
+
+      // Check if the histogram name contians RES (resolution)
+      else if(tag.Contains("RES")){
+        // Column normalise each bin to easily see the maximum
         TH2D * hnor = NormalHist(htmp, 5, true);
         hnor->SetTitle(tag);
         lout->Add(hnor);
+        // Get the 1D histogram resolution plot using projectY
+        TH1D * hprojY = htmp->ProjectionY(tag+"_projY");
+        lout->Add(hprojY);
+        TH1D * hprojX = htmp->ProjectionX(tag+"_projX");
+        lout->Add(hprojX);
       }
-      if(tag.Contains("VS")){
-        getProfileFit(htmp); 
+      // Check if the histogram name contians REG (regular)
+      else if(tag.Contains("REG")){
+        // Column normalise each bin to easily see the maximum
+        TH2D * hnor = NormalHist(htmp, 5, true);
+        hnor->SetTitle(tag);
+        lout->Add(hnor);
+        if(tag.Contains("RawRecVSTruth")) getProfileFit(htmp); 
       }
-    }
+      // Do nothing (You can add more else if to process more tags)
+      else {}
+    } // End of if(htmp)
   } // End of for loop
 }
 void PlotUtils::DrawHist(TList *lout, const double plotscale, TList * overlayList, const TString outdir)
@@ -82,53 +104,92 @@ void PlotUtils::DrawHist(TList *lout, const double plotscale, TList * overlayLis
   for(int ii=0; ii<lout->GetSize(); ii++){
     // Get the name of the histogram
     const TString tag = lout->At(ii)->GetName();
-    // Need to convert name from mc to data for finding corresponding data histogram when overlay
-    const TRegexp re("_mc");
-    const TString name = tag;
-    name(re) = "_data";
     // Create histograms and stack
+    // 1D histogram
     TH1 * hh = dynamic_cast<TH1*> (lout->At(ii));
+    // Stack histogram
     THStack * hstk = dynamic_cast<THStack *>(lout->At(ii));
+    // 2D histogram
     TH2 * h2d = 0x0;
-    //TH1 * holay = dynamic_cast<TH1*> (overlayList->FindObject(name));
-    TH1D *holay = (TH1D*)overlayList->FindObject(name);
+    // Data overlay histogram
+    TH1D *holay = (TH1D*)overlayList->FindObject(tag);
+    // If 1D histogram exist 
     if(hh){
+      // Cast to 2D histogram
       h2d = dynamic_cast<TH2 *>(hh);
-      if(tag.Contains("RES")) {
-        h2d->Draw("colz");
+      // Check if h2d exist
+      if(h2d){
+        // Draw 2D histogram from its name (MC only)
+        if(!tag.Contains("proj") && (tag.Contains("RES") || tag.Contains("REG"))) {
+          h2d->Draw("colz");
+        }
       }
-      else if(holay){
-      if(plotscale!=1) hh->Scale(plotscale);
-      hh->Draw("hist");
-      holay->SetMarkerStyle(8);
-      holay->SetMarkerSize(1);
-      holay->SetMarkerColor(kBlack);
-      holay->SetLineColor(kBlack);
-      holay->SetLineWidth(1);
-      holay->Draw("same E");
-      c1->Update();
+      // There is no h2d, we only have 1D histogram
+      else {
+        // Check if we have data overlay histogram
+        if(holay){
+          // Do the scaling for MC/Data
+          if(plotscale!=1) hh->Scale(plotscale);
+          hh->Draw("hist");
+          DrawOverlay(holay);
+          c1->Update();
+        }
+        // No data overlay histogram
+        else{
+          // Draw overlay for raw and corrected shower resolution
+          if(!tag.Contains("RAW") && tag.Contains("proj")){
+            // Get the name of raw shower histogram
+            TRegexp re("_proj");
+            TString name = tag;
+            name(re) = "_RAW_proj";
+            TH1D *holayRaw = (TH1D*)lout->FindObject(name);    
+            TString fit = tag;
+            fit(re) = "_FIT_proj";
+            TH1D *holayFit = (TH1D*)lout->FindObject(fit);
+            if(holayRaw){
+              if(holayRaw->GetMaximum() > hh->GetMaximum()) hh->SetMaximum(holayRaw->GetMaximum()*1.2);
+              else hh->SetMaximum(hh->GetMaximum()*1.2);
+              hh->SetFillStyle(3004);
+              hh->SetLineColor(kBlue); 
+              hh->SetLineWidth(3);
+              hh->Draw("hist");
+              c1->Update();
+              holayRaw->SetFillStyle(3005);
+              holayRaw->SetLineColor(kRed);
+              holayRaw->SetLineWidth(3);
+              holayRaw->Draw("hist same"); 
+              c1->Update();
+              if(holayFit){
+                holayFit->SetLineColor(kMagenta);
+                holayFit->SetLineWidth(3);
+                holayFit->Draw("hist same");
+                c1->Update();
+              }
+            }
+            else hh->Draw("hist");
+          }
+          else hh->Draw("hist");
+        }
       }
-    }
+    } // End of if(hh)
+
+    // If stack histogram exist
     else if (hstk) {
+      // Get the data overlay histogram for stack
+      holay = (TH1D*)overlayList->FindObject(tag+"_sum");
       hstk->Draw("hist");
-      holay = (TH1D*)overlayList->FindObject(name+"_sum");
       if(holay){
-      holay->Draw();//to generate statbox
-      c1->Update(); 
-      if(plotscale!=1) ScaleStack(hstk, plotscale); 
-      hstk->SetMaximum(holay->GetMaximum()*1.2);
-      hstk->Draw("hist");
-      holay->SetMarkerStyle(8);
-      holay->SetMarkerSize(1);
-      holay->SetMarkerColor(kBlack);
-      holay->SetLineColor(kBlack);
-      holay->SetLineWidth(1);
-      holay->Draw("same E");
-      c1->Update();
+        holay->Draw();//to generate statbox
+        c1->Update(); 
+        if(plotscale!=1) ScaleStack(hstk, plotscale); 
+        hstk->SetMaximum(holay->GetMaximum()*1.2);
+        hstk->Draw("hist");
+        DrawOverlay(holay);
+        c1->Update();
       }
     }
     else cout << "PlotUtils::DrawHist not found correct histogram!" << endl;
-    c1->Print(outdir+"/"+tag+".png");
+    c1->Print(outdir+"/"+tag+".eps");
   } // End of for loop
 }
 
@@ -187,6 +248,7 @@ TH1D * PlotUtils::GetStackedSum(THStack *stk)
   const TList * ll = stk->GetHists();
   const TString tag = stk->GetName();
   TH1D * hout = 0x0;
+  if(stk->GetHists()){
   hout = (TH1D*)ll->At(0)->Clone(tag);
   hout->SetName(tag+"_sum");
   hout->SetTitle(tag);
@@ -196,7 +258,7 @@ TH1D * PlotUtils::GetStackedSum(THStack *stk)
   }
 
   hout->SetEntries(hout->Integral(0,10000));
- 
+ }
   return hout;
 }
 void PlotUtils::ScaleStack(THStack *stk, const double scale)
@@ -401,7 +463,6 @@ void PlotUtils::gStyleSetup()
   gStyle->SetStatBorderSize(-1);
   gStyle->SetLegendBorderSize(-1);
   gStyle->SetPalette(1,0);
-
   SetColor();
   gROOT->ForceStyle();
 }
@@ -415,6 +476,15 @@ void PlotUtils::getProfileFit(TH2D * h2d)
   hprof->Fit("pol1");
   hprof->SetStats(1);
   hprof->Draw();  
-  c0->Print("output/hprof_withP.eps");
+  c0->Print("output/hprof_withP.png");
+}
 
+void PlotUtils::DrawOverlay(TH1D *holay)
+{
+  holay->SetMarkerStyle(8);
+  holay->SetMarkerSize(1);
+  holay->SetMarkerColor(kBlack);
+  holay->SetLineColor(kBlack);
+  holay->SetLineWidth(1);
+  holay->Draw("same E");
 }

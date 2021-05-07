@@ -62,6 +62,8 @@
 #include "TVirtualPad.h"
 #include "THStack.h"
 #include "TLorentzVector.h"
+#include "TFitter.h"
+#include "TMinuit.h"
 
 using namespace std;
 
@@ -76,6 +78,8 @@ class PlotUtils
   void ScaleStack(THStack *stk, const double scale);
   TH2D * NormalHist(const TH2D *hraw, const Double_t thres, const Bool_t kmax);
   void getProfileFit(TH2D * h2d);
+  TH1D * GetCDF(const TH2D *hraw, const TString hname);
+  void DrawOverlay(TH1D *holay);
   void IniColorCB();
   void SetColor();
   int GetColor(const int col);

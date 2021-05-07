@@ -29,10 +29,12 @@ class AnaCut
                              const double beam_inst_Y,     const double beam_inst_dirX,
                              const double beam_inst_dirY,  const double beam_inst_dirZ,
                              const int beam_inst_nMomenta, const int beam_inst_nTracks);
+    // Get truth particle PDG from it's ID
     int GetTruthPDGFromID(const int inID, const vector<int> * idarray, const vector<int> * pdgarray);
+    // Get truth-matched particle info using reco particle index
     int GetTruthParticleInfoFromRec(const int recidx);
     bool CutTopology(const bool kMC);
-    void CountPFP(const bool kMC);
+    void CountPFP(const bool kMC, const bool kFill = false);
     bool IsProton(const int ii);
     bool IsTrack(const int ii);  
     bool PassProtonSubPID(const int ii);

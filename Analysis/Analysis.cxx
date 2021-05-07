@@ -24,7 +24,7 @@ int anaRec(const TString finName, TList *lout, const TString tag, const int nEnt
   // Get the TTree from input file
   TTree  * tree = AnaIO::GetInputTree(fin, "pionana/beamana", tag);
   // Initialise reco histograms
-  AnaIO::IniHist(lout, tag, kMC);
+  AnaIO::IniHist(lout, kMC);
 
   AnaUtils anaUtils;
   AnaCut anaCut;
@@ -56,8 +56,11 @@ int anaRec(const TString finName, TList *lout, const TString tag, const int nEnt
     if(!anaCut.CutBeamAllInOne(kMC)) continue;
     // Count beam after beam cut before other cuts
     BeamCount++; 
+    // Fill beam info
     anaUtils.FillBeamKinematics(kMC);
-    if(anaCut.CutTopology(kMC)){} 
+    // Do event topology cut
+    if(!anaCut.CutTopology(kMC)) continue;
+    //anaCut.CountPFP(kMC,true);
   } // End of while loop
   return BeamCount;
 } // End of anaRec
@@ -78,11 +81,10 @@ int main(int argc, char * argv[])
   if(argc!=1) nEntryToStop = atoi(argv[1]);
   double mcBeamCount = anaRec(mcfinName,mclout,"mc", nEntryToStop);
   double dataBeamCount = anaRec(datafinName,datalout,"data", nEntryToStop);
-
   PlotUtils plotUtils;
   plotUtils.ProcessHist(mclout,true);
   plotUtils.ProcessHist(datalout,false);  
-   
+
   // Declare output root file
   TFile * fout = new TFile("output/outana.root","recreate");
   // Create mc subdirectory
@@ -101,8 +103,6 @@ int main(int argc, char * argv[])
   fout->Save();
   fout->Close();
   double plotScale = dataBeamCount/mcBeamCount; 
-  // Draw all histograms in mclout and datalout
   plotUtils.DrawHist(mclout,plotScale,datalout,"output");
-  //plotUtils.DrawHist(datalout,1,0x0,"output");
 
 }
