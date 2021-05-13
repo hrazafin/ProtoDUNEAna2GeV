@@ -53,11 +53,7 @@ void PlotUtils::ProcessHist(TList *lout, const bool kMC)
         // Check if the stk exist 
         if(stk){
           // Add to lout for MC
-          if(kMC) { 
-            lout->Add(stk);   
-            TH1D * hsum = GetStackedSum(stk);
-            lout->Add(hsum);
-          }
+          if(kMC) lout->Add(stk);   
           // Only need the sum of this stack histogram in data 
           else{
             // Get the sum of this hitogram
