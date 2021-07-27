@@ -86,6 +86,9 @@ class PlotUtils
   int * GetColorArray(const int minsize);
   void PadSetup(TPad *currentPad, const Double_t currentLeft=0.12, const Double_t currentTop=0.09, const Double_t currentRight=0.13, const Double_t currentBottom=0.14);
   void gStyleSetup();
+
+  void getSliceXDrawY(TH2D * h2d);
+
   private:
 };
 #endif

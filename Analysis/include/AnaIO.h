@@ -6,6 +6,22 @@
 
 namespace AnaIO
 {
+  //====================== Output Tree Variables ==================//
+  double LeadingShowerEnergy;
+  double SubLeadingShowerEnergy;
+  double LeadingShowerEnergyRaw;
+  double SubLeadingShowerEnergyRaw;
+  double OpeningAngle;
+
+  vector<double> * LeadingShowerEnergyUnitDir = 0x0;
+  vector<double> * SubLeadingShowerEnergyUnitDir = 0x0;
+
+  double LeadingShowerEnergyTruth;
+  double SubLeadingShowerEnergyTruth;
+  double OpeningAngleTruth;
+
+  vector<double> * LeadingShowerEnergyUnitDirTruth = 0x0;
+  vector<double> * SubLeadingShowerEnergyUnitDirTruth = 0x0;
 
   //====================== Reco (MC and Data)======================//
   // Declare variables
@@ -153,6 +169,8 @@ namespace AnaIO
   TH1D * hTruthLeadingProtonP = 0x0;
   TH1D * hTruthSubLeadingProtonP = 0x0;
   TH1D * hTruthGammaMaxE = 0x0;
+  TH2D * hTruthPi0ShowerEnergy = 0x0;
+
   // Resolution histograms need to use truth info
   TH2D * hBeamThetaRes = 0x0;
   TH2D * hBeamMomentumRes = 0x0;
@@ -182,6 +200,11 @@ namespace AnaIO
   TH2D * hPi0MassResRaw = 0x0;
   TH2D * hPi0MomentumResFit = 0x0;
   TH2D * hPi0MassResFit = 0x0;
+
+  TH1D * hPi0Momentum = 0x0;
+  TH1D * hldShowerTheta = 0x0;
+  TH1D * hslShowerTheta = 0x0;
+
   // Get input tree
   TTree * GetInputTree(TFile * fin, const TString tname, const TString tag)
   {
@@ -285,6 +308,28 @@ namespace AnaIO
     return tree;
   } // End of GetInputTree
   
+  TTree * GetOutputTree(TList * lout, const TString tag)
+  {
+    TTree * tout = new TTree("tree", tag); lout->Add(tout);
+
+    // Definitely need this to avoid memory-resident Tree
+    tout->SetDirectory(0);
+    tout->Branch("LeadingShowerEnergy",&LeadingShowerEnergy);
+    tout->Branch("SubLeadingShowerEnergy",&SubLeadingShowerEnergy);
+    tout->Branch("LeadingShowerEnergyRaw",&LeadingShowerEnergyRaw);
+    tout->Branch("SubLeadingShowerEnergyRaw",&SubLeadingShowerEnergyRaw);
+    tout->Branch("OpeningAngle",&OpeningAngle);
+    tout->Branch("LeadingShowerEnergyTruth",&LeadingShowerEnergyTruth);
+    tout->Branch("SubLeadingShowerEnergyTruth",&SubLeadingShowerEnergyTruth);
+    tout->Branch("OpeningAngleTruth",&OpeningAngleTruth);
+
+    tout->Branch("LeadingShowerEnergyUnitDir",&LeadingShowerEnergyUnitDir);
+    tout->Branch("SubLeadingShowerEnergyUnitDir",&SubLeadingShowerEnergyUnitDir);
+    tout->Branch("LeadingShowerEnergyUnitDirTruth",&LeadingShowerEnergyUnitDirTruth);
+    tout->Branch("SubLeadingShowerEnergyUnitDirTruth",&SubLeadingShowerEnergyUnitDirTruth);
+    return tout;
+  }
+
   // Initialise histograms
   void IniHist(TList * lout, const bool kMC)
   {
@@ -292,6 +337,10 @@ namespace AnaIO
     const int nparType = 11;
     const double parTypemin = 0.5;
     const double parTypemax = 11.5;
+
+    const int nevtType = 3;
+    const double evtTypemin = -0.5;
+    const double evtTypemax = 2.5;
 
     //====================== Reco (MC and Data)======================//
     hEvent = new TH1I("Event", "", 10000, 0, 100000); 
@@ -354,10 +403,6 @@ namespace AnaIO
     hRecSubLeadingShowerEnergyRaw = new TH2D("RecSubLeadingShowerEnergy_STK_RAW","", 15, 0, 0.5, nparType, parTypemin, parTypemax);
     lout->Add(hRecSubLeadingShowerEnergyRaw);
 
-  const int nevtType = 3;
-  const double evtTypemin = -0.5;
-  const double evtTypemax = 2.5;
-
     // Commom reco TKI
     hRecdalphat = new TH2D("Recdalphat_STK","", 9, 0, 180,nevtType, evtTypemin, evtTypemax); 
     lout->Add(hRecdalphat);
@@ -403,6 +448,9 @@ namespace AnaIO
       lout->Add(hTruthSubLeadingProtonP);
       hTruthGammaMaxE = new TH1D("TruthGammaMaxE", "", 20, 0, 2);
       lout->Add(hTruthGammaMaxE);
+      hTruthPi0ShowerEnergy = new TH2D("TruthPi0ShowerEnergy_OVERLAY", "", 20, 0, 1.2, 3, -0.5, 2.5);
+      lout->Add(hTruthPi0ShowerEnergy);
+
       hBeamThetaRes = new TH2D("BeamTheta_RES","", 80 , 0, 60, 25, -20, 30);
       lout->Add(hBeamThetaRes);
       hBeamMomentumRes  = new TH2D("BeamMomentum_RES","", 50, 0, 2, 20, -0.5, 0.5);
@@ -444,6 +492,14 @@ namespace AnaIO
       hPi0MassRes = new TH2D("Pi0Mass_RES","", 20, 0, 0.5, 20, -0.5, 0.5); 
       lout->Add(hPi0MassRes);
 
+      hPi0Momentum = new TH1D("Pi0Momentum","", 20, 0, 1.5);
+      lout->Add(hPi0Momentum);
+
+      hldShowerTheta = new TH1D("ldShowerTheta","", 30, 0, 180);
+      lout->Add(hldShowerTheta);
+      hslShowerTheta = new TH1D("slShowerTheta","", 30, 0, 180);
+      lout->Add(hslShowerTheta);
+
       hPi0MomentumResRaw = new TH2D("Pi0Momentum_RES_RAW","", 20, 0, 1, 10, -0.5, 0.5);
       lout->Add(hPi0MomentumResRaw);
       hPi0MassResRaw = new TH2D("Pi0Mass_RES_RAW","", 20, 0, 0.5, 20, -0.5, 0.5);
@@ -455,6 +511,8 @@ namespace AnaIO
       lout->Add(hPi0MassResFit);
       hShowerOpenAngleResFit = new TH2D("ShowerOpenAngle_RES_FIT","", 20, 0, 180, 20, -1.1, 1.1);
       lout->Add(hShowerOpenAngleResFit);
+
+
     }
   }// End of IniHist
 

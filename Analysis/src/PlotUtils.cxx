@@ -47,7 +47,7 @@ void PlotUtils::ProcessHist(TList *lout, const bool kMC)
     if(htmp){
       const TString tag = htmp->GetName();
       // Check if the histogram name contians STK
-      if(tag.Contains("STK")){
+      if(tag.Contains("STK") || tag.Contains("OVERLAY")){
         // Convert this tmp 2D histogram to a stack histogram
         THStack * stk = ConvertToStack(htmp);
         // Check if the stk exist 
@@ -71,8 +71,10 @@ void PlotUtils::ProcessHist(TList *lout, const bool kMC)
         lout->Add(hnor);
         // Get the 1D histogram resolution plot using projectY
         TH1D * hprojY = htmp->ProjectionY(tag+"_projY");
+	hprojY->SetStats(1);
         lout->Add(hprojY);
         TH1D * hprojX = htmp->ProjectionX(tag+"_projX");
+        hprojX->SetStats(1);
         lout->Add(hprojX);
       }
       // Check if the histogram name contians REG (regular)
@@ -81,7 +83,10 @@ void PlotUtils::ProcessHist(TList *lout, const bool kMC)
         TH2D * hnor = NormalHist(htmp, 5, true);
         hnor->SetTitle(tag);
         lout->Add(hnor);
-        if(tag.Contains("RawRecVSTruth")) getProfileFit(htmp); 
+        if(tag.Contains("RawRecVSTruth")){
+          getProfileFit(htmp);
+          getSliceXDrawY(htmp);
+        } 
       }
       // Do nothing (You can add more else if to process more tags)
       else {}
@@ -153,6 +158,7 @@ void PlotUtils::DrawHist(TList *lout, const double plotscale, TList * overlayLis
               holayRaw->SetFillStyle(3005);
               holayRaw->SetLineColor(kRed);
               holayRaw->SetLineWidth(3);
+	      holayRaw->SetStats(1);
               holayRaw->Draw("hist same"); 
               c1->Update();
               if(holayFit){
@@ -183,6 +189,27 @@ void PlotUtils::DrawHist(TList *lout, const double plotscale, TList * overlayLis
         DrawOverlay(holay);
         c1->Update();
       }
+      else if(tag.Contains("OVERLAY")){
+        TH1D * hsum = dynamic_cast<TH1D*> (hstk->GetStack()->Last());
+        hstk->SetMaximum(hsum->GetMaximum()*1.2);
+        hstk->Draw("nostack");
+        hsum->SetLineColor(kBlack);
+        hsum->SetFillStyle(0);
+        hsum->Draw("same");
+        auto* legend = new TLegend(0.65, 0.65, 0.85, 0.85);
+        // Cheat Legend
+        TH1D * E1 = 0x0;
+        TH1D * E2 = 0x0;
+        E1 = new TH1D("E1",  "", 20, -0.5, 19.5); 
+        E2 = new TH1D("E2",  "", 20, -0.5, 19.5); 
+        E1->SetFillStyle(3004);E2->SetFillStyle(3004);E1->SetFillColor(1509);E2->SetFillColor(1505);E1->SetLineColor(1509);E2->SetLineColor(1505);
+
+        legend->AddEntry(E1, "SubLeading photon", "f");
+        legend->AddEntry(E2, "Leading photon", "f");
+        legend->AddEntry(hsum, "Photon Spectrum", "f");
+        legend->Draw("same");
+      }
+      
     }
     else cout << "PlotUtils::DrawHist not found correct histogram!" << endl;
     c1->Print(outdir+"/"+tag+".eps");
@@ -228,13 +255,14 @@ THStack * PlotUtils::ConvertToStack(const TH2D * hh)
 
     const int icol = GetColor(col[iy-y0]);//need constant map between y and color
     htmp->SetFillColor(icol);
-    htmp->SetLineColor(kBlack);
+    htmp->SetFillStyle(3004);
+    htmp->SetLineColor(icol);
     htmp->SetMarkerSize(2);
-    printf("style::ConvertToStack %s adding y %f with color %d\n", tag.Data(), hh->GetYaxis()->GetBinCenter(iy), icol);
+    printf("PlotUtils::ConvertToStack %s adding y %f with color %d\n", tag.Data(), hh->GetYaxis()->GetBinCenter(iy), icol);
     stk->Add(htmp);
   }
   if(oldintegral!=newintegral){
-    printf("style::ConvertToStack integral not matched! %s old %f new %f\n", tag.Data(), oldintegral, newintegral); exit(1);
+    printf("PlotUtils::ConvertToStack integral not matched! %s old %f new %f\n", tag.Data(), oldintegral, newintegral); exit(1);
   }
 
   return stk;
@@ -373,11 +401,11 @@ void PlotUtils::IniColorCB()
 { 
   static bool kset = false;
   if(kset){
-    printf("style::IniColorCB arleady set\n");
+    printf("PlotUtils::IniColorCB arleady set\n");
     return;
   }
   else{
-    printf("style::IniColorCB creating new color\n");
+    printf("PlotUtils::IniColorCB creating new color\n");
   }
   const int fgkColorBase = 1500;  
   //http://www.somersault1824.com/tips-for-designing-scientific-figures-for-color-blind-readers/
@@ -444,7 +472,7 @@ void PlotUtils::gStyleSetup()
   gStyle->SetStatX(0.83);
   gStyle->SetStatW(0.12);
   gStyle->SetStatColor(0);
-  gStyle->SetStatStyle(0);
+  gStyle->SetStatStyle(1);
   gStyle->SetTitleX(0.55);
 
   gStyle->SetFrameBorderMode(0);
@@ -483,4 +511,25 @@ void PlotUtils::DrawOverlay(TH1D *holay)
   holay->SetLineColor(kBlack);
   holay->SetLineWidth(1);
   holay->Draw("same E");
+}
+
+void PlotUtils::getSliceXDrawY(TH2D * h2d)
+{ 
+  auto c0 = new TCanvas("c0","",1600,1200);
+  gStyle->SetOptStat(0);
+  c0->Divide(4,5,0,0);
+  
+  for(int ii=1; ii<=h2d->GetNbinsX(); ii++){
+    c0->cd(ii);
+    TF1 *f1 = new TF1(Form("f1%d",ii),"gaus",-.5,.5);
+    //TF1 *f1 = new TF1(Form("f1%d",ii),"[0]*TMath::Landau(x,[1],[2])",0,1);
+    TH1D * hpj= h2d->ProjectionY(Form("f1%d",ii), ii, ii);
+    if (hpj->GetEntries() != 0) {
+      f1->SetParameters(hpj->GetMaximum(), hpj->GetMean(), hpj->GetRMS() );
+      hpj->Fit(Form("f1%d",ii));
+    }
+    //hpj->SetStats(0);
+    hpj->Draw();
+  }  
+    c0->Print("output/hSliceXDrawY.eps");
 }

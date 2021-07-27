@@ -23,6 +23,7 @@ int anaRec(const TString finName, TList *lout, const TString tag, const int nEnt
 
   // Get the TTree from input file
   TTree  * tree = AnaIO::GetInputTree(fin, "pionana/beamana", tag);
+  TTree  * tout = AnaIO::GetOutputTree(lout, tag);
   // Initialise reco histograms
   AnaIO::IniHist(lout, kMC);
 
@@ -31,8 +32,10 @@ int anaRec(const TString finName, TList *lout, const TString tag, const int nEnt
   // Initialise entry and beam counter
   int ientry = 0;
   int BeamCount = 0;
+
   // Loop over TTree
   while(tree->GetEntry(ientry)){
+
     AnaIO::hEvent->Fill(AnaIO::event); 
     // Break 
     if(nEntryToStop > 0 && ientry>=nEntryToStop){
@@ -58,9 +61,11 @@ int anaRec(const TString finName, TList *lout, const TString tag, const int nEnt
     BeamCount++; 
     // Fill beam info
     anaUtils.FillBeamKinematics(kMC);
+    
     // Do event topology cut
     if(!anaCut.CutTopology(kMC)) continue;
     //anaCut.CountPFP(kMC,true);
+    tout->Fill();
   } // End of while loop
   return BeamCount;
 } // End of anaRec
@@ -102,7 +107,6 @@ int main(int argc, char * argv[])
   // Save the info
   fout->Save();
   fout->Close();
-  double plotScale = dataBeamCount/mcBeamCount; 
+  double plotScale = dataBeamCount/mcBeamCount;
   plotUtils.DrawHist(mclout,plotScale,datalout,"output");
-
 }
