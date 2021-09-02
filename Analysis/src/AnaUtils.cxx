@@ -40,7 +40,7 @@ int AnaUtils::GetParticleType(const int pdg)
   else if(pdg==14 || pdg==-14 || pdg==12 || pdg==-12){
     type = gkNeutrino;
   }
-  else if(pdg==3122||pdg==3212||pdg==3222){
+  else if(pdg==3112||pdg==3122||pdg==3212||pdg==3222){
     type = gkHyperon;
   }
   else if(pdg>9999){
@@ -74,18 +74,21 @@ int AnaUtils::GetFillEventType()
 
 void AnaUtils::SetFullSignal()
 {
-  //Phase space cut on protons 
-  //0.45 GeV/c is the reconstruction threshold, 1 GeV/c is limit where momentum by range is reliable)
-  //Leading proton momentum 0.45 - 1 GeV/c
-  //Subleading proton momentum < 0.45 GeV/c
-  //No cuts on pions
+  // Phase space cut on protons 
+  // 0.45 GeV/c is the reconstruction threshold, 1 GeV/c is limit where momentum by range is reliable
+  // Leading proton momentum 0.45 - 1 GeV/c
+  // Subleading proton momentum < 0.45 GeV/c
+  // No cuts on pions
 
+  // Make sure we start from false
   AnaIO::Signal = false;
+  // Get final state particles vector in this event
   vector<TLorentzVector> vecFSParticle = GetFSParticlesTruth();
-  
+  // Get the FS particles momentum
   double LeadingPiZeroP = vecFSParticle[0].P();
   double LeadingProtonP = vecFSParticle[1].P();
   double SubLeadingProtonP = vecFSParticle[2].P();
+
   // Check event topology 
   // Initial pion beam and at least one proton and one pizero, no other mesons in final state (but not consider number of neutrons)
   if( AnaIO::true_beam_PDG==211 && IsSignal(nProton,nPiZero,nPiPlus,nParticleBkg) == true){
@@ -104,14 +107,15 @@ vector<TLorentzVector> AnaUtils::GetFSParticlesTruth()
   const vector<double> * px = AnaIO::true_beam_daughter_startPx; // MeV/c
   const vector<double> * py = AnaIO::true_beam_daughter_startPy; // MeV/c
   const vector<double> * pz = AnaIO::true_beam_daughter_startPz; // MeV/c
-  // Class member variables
+  // Class member variables (beam truth daughter particles counter)
   nProton = 0;
   nNeutron = 0;
   nPiPlus = 0;
   nPiZero = 0;
   nGamma = 0;
   nParticleBkg = 0;
-  TLorentzVector pPiplus, pPiZero, pProton, pSecondaryProton;
+  // Vectors to save particle info
+  TLorentzVector pPiZero, pProton, pSecondaryProton;
 
   // Get the size of final state particles
   const int np = pdg->size();
@@ -131,21 +135,26 @@ vector<TLorentzVector> AnaUtils::GetFSParticlesTruth()
     const int itype = GetParticleType((*pdg)[ii]);
     // Get the FS particle 3-momentum
     const TVector3 tmpp( (*px)[ii], (*py)[ii], (*pz)[ii] );
+    // Fill the FS particle type
     AnaIO::hTruthFSParticleType->Fill(itype);  
+
     // Check each FS type and save info
     // Proton
     if(itype == gkProton){
-      // Store particle's momentum magnitude
+      // Save particle's momentum magnitude
       Protonmom[nProton] = tmpp.Mag();
-      // Store momentum vector
+      // Save momentum vector
       bufferProtonmom.push_back(tmpp);
       // Increase proton number 
       nProton++; 
     } 
     // PiZero
     else if(itype == gkPiZero){
+      // Save particle's momentum magnitude
       PiZeromom[nPiZero] = tmpp.Mag();
+      // Save momentum vector
       bufferPiZeromom.push_back(tmpp);
+      // Increase proton number 
       nPiZero++;
     }
     // Gamma
@@ -168,41 +177,53 @@ vector<TLorentzVector> AnaUtils::GetFSParticlesTruth()
     // Store FS particle type info
     bufferType.push_back(itype);
 
-  } // End of loop
+  } // End of loop over FS particles
   
-  //=======================Proton=======================
+  //======================= Proton =======================
   int leadingProtonID = 0, subldProtonID = -999;
+  // Sort protons when more than one protons are found
   if(nProton>1){
     int Protonsortid[nProton];
     // Sort index according to it's momentum
     TMath::Sort(nProton, Protonmom, Protonsortid);
-    // Save 
+    // Save sorted index
     leadingProtonID = Protonsortid[0];
     subldProtonID = Protonsortid[1];
   }
+  // At least one proton is found
   if(nProton>0){
+    // Save info to leading proton TLorentzVector
     pProton.SetVectM(bufferProtonmom[leadingProtonID], AnaFunctions::ProtonMass());
+    // Fill leading proton momentum
     AnaIO::hTruthLeadingProtonP->Fill(Protonmom[leadingProtonID]);
   }
+  // At least two proton is found
   if(nProton>1){
+    // Save info to subleading proton TLorentzVector
     pSecondaryProton.SetVectM(bufferProtonmom[subldProtonID], AnaFunctions::ProtonMass());
+    // Fill subleading proton momentum
     AnaIO::hTruthSubLeadingProtonP->Fill(Protonmom[subldProtonID]);
   }
-  //========================PiZero========================
+
+  //======================== PiZero ========================
   int leadingPiZeroID = 0;
   if(nPiZero>1){
-    // Fill histogram for FS multi pi0 number
+    // Fill the FS pi0 number (at least two pi0)
     AnaIO::hTruthFSMultiPi0->Fill(nPiZero);
     int PiZerosortid[nPiZero];
+    // Sort index according to it's momentum
     TMath::Sort(nPiZero, PiZeromom, PiZerosortid);
+    // Save sorted index
     leadingPiZeroID = PiZerosortid[0];
   }
   if(nPiZero>0){
     // Fill histogram for FS pi0 number
     AnaIO::hTruthFSPi0Number->Fill(nPiZero);
+    // Save info to pi0 TLorentzVector
     pPiZero.SetVectM(bufferPiZeromom[leadingPiZeroID], AnaFunctions::PiZeroMass());
   }
-  //========================Gamma========================
+
+  //======================== Gamma ========================
   int leadingGammaID = 0;
   if(nGamma>1){
     int Gammasortid[nGamma];
@@ -210,6 +231,7 @@ vector<TLorentzVector> AnaUtils::GetFSParticlesTruth()
     leadingGammaID = Gammasortid[0];
   }
   if(nGamma>0) AnaIO::hTruthGammaMaxE->Fill(Gammamom[leadingGammaID]);
+
   // Fill vector of FS particles 
   vector<TLorentzVector> vec;
   vec.push_back(pPiZero);
@@ -268,7 +290,7 @@ void AnaUtils::FillBeamKinematics(const int kMC)
     plotUtils.FillHist(AnaIO::hBeamThetaRes,    truthBeamFull.Theta()*TMath::RadToDeg(), beamthetaRes);
     plotUtils.FillHist(AnaIO::hBeamMomentumRes, truthBeamFull.Mag(),                     beammomentumRes);
   }
-
+  // This evtType only works for MC, data will not have this info but fill it anyway
   plotUtils.FillHist(AnaIO::hRecBeamTheta,    recBeamFull.Theta()*TMath::RadToDeg(), evtType);
   plotUtils.FillHist(AnaIO::hRecBeamMomentum, recBeamFull.Mag(),                     evtType);
 }
@@ -388,7 +410,7 @@ void AnaUtils::FillFSParticleKinematics(const int recIndex, const int truthParti
     const TLorentzVector recMomRefBeam = GetMomentumRefBeam(false /*=>reco*/, recIndex, true /*=>proton*/);
     plotUtils.FillHist(AnaIO::hRecProtonMomentum,recMomRefBeam.P(), truthParticleType);
     plotUtils.FillHist(AnaIO::hRecProtonTheta, recMomRefBeam.Theta()*TMath::RadToDeg(), truthParticleType); 
-    // Truth-matching
+    // Truth-matching primary proton
     if(truthParticleType == gkProton){ // MC only (Data loop won't pass this)
       // Get the truth-matched particle truth momentum vector relative to beam
       const TLorentzVector truthMomRefBeam = GetMomentumRefBeam(true /*=>truth-matched*/, recIndex, true /*=>proton*/);   
@@ -404,7 +426,7 @@ void AnaUtils::FillFSParticleKinematics(const int recIndex, const int truthParti
     const TLorentzVector recMomRefBeam = GetMomentumRefBeam(false /*=>reco*/, recIndex, false/*=>piplus*/);
     plotUtils.FillHist(AnaIO::hRecPiPlusMomentum,recMomRefBeam.P(), truthParticleType);
     plotUtils.FillHist(AnaIO::hRecPiPlusTheta, recMomRefBeam.Theta()*TMath::RadToDeg(), truthParticleType);
-    // Truth-matching
+    // Truth-matching primary piplus
     if(truthParticleType == gkPiPlus){ // MC only (Data loop won't pass this)
       // Get the truth-matched particle truth momentum vector relative to beam
       const TLorentzVector truthMomRefBeam = GetMomentumRefBeam(true /*=>truth-matched*/, recIndex, false /*=>piplus*/);
@@ -443,12 +465,12 @@ void AnaUtils::FillFSParticleKinematics(const int recIndex, const int truthParti
       // Calculate shower impact parameter
       const double IP = dist.Mag()*TMath::Sin((recShowerMom.Angle(dist)));
       plotUtils.FillHist(AnaIO::hShowerEnergyResVSIP_REG, IP, momentumRes);
-
+      /*
       cout << "event: " << AnaIO::event << endl;
       cout << "Truth Shower energy: " << truthShowerMom.E() << endl;
       cout << "Reco Raw Shower energy: " << recShowerMomRaw.E() << endl;
       cout << "Reco Shower energy: " << recShowerMom.E() << endl;
-  
+      */
     }
   }
 }
@@ -588,20 +610,20 @@ TLorentzVector AnaUtils::GetPiZero(bool & good)
 
       // True pi0 is found (with mass 0.134977... GeV/c^2)
       if( PiZeroTruthVec.M() < 0.1350 && PiZeroTruthVec.M() > 0.1349) {
-        AnaIO::LeadingShowerEnergyUnitDir->clear();
-        AnaIO::SubLeadingShowerEnergyUnitDir->clear();
-        AnaIO::LeadingShowerEnergyUnitDirTruth->clear();
-        AnaIO::SubLeadingShowerEnergyUnitDirTruth->clear();
+        //AnaIO::LeadingShowerEnergyUnitDir->clear();
+        //AnaIO::SubLeadingShowerEnergyUnitDir->clear();
+        //AnaIO::LeadingShowerEnergyUnitDirTruth->clear();
+        //AnaIO::SubLeadingShowerEnergyUnitDirTruth->clear();
         // True mass will have more decimal places in this range
         good = true;
 
-        AnaIO::LeadingShowerEnergy = ldShower.E();
-        AnaIO::SubLeadingShowerEnergy = slShower.E();
-        AnaIO::LeadingShowerEnergyRaw = ldShowerRaw.E();
-        AnaIO::SubLeadingShowerEnergyRaw = slShowerRaw.E();
-        AnaIO::OpeningAngle = openingAngle;
+        //AnaIO::LeadingShowerEnergy = ldShower.E();
+        //AnaIO::SubLeadingShowerEnergy = slShower.E();
+        //AnaIO::LeadingShowerEnergyRaw = ldShowerRaw.E();
+        //AnaIO::SubLeadingShowerEnergyRaw = slShowerRaw.E();
+        //AnaIO::OpeningAngle = openingAngle;
 
-
+/*
         AnaIO::LeadingShowerEnergyUnitDir->push_back(ldShower.Vect().Unit().X());
         AnaIO::LeadingShowerEnergyUnitDir->push_back(ldShower.Vect().Unit().Y());
         AnaIO::LeadingShowerEnergyUnitDir->push_back(ldShower.Vect().Unit().Z());
@@ -615,7 +637,7 @@ TLorentzVector AnaUtils::GetPiZero(bool & good)
         AnaIO::SubLeadingShowerEnergyUnitDirTruth->push_back(slShowerTruth.Vect().Unit().X());
         AnaIO::SubLeadingShowerEnergyUnitDirTruth->push_back(slShowerTruth.Vect().Unit().Y());
         AnaIO::SubLeadingShowerEnergyUnitDirTruth->push_back(slShowerTruth.Vect().Unit().Z());
-
+*/
         // Fill Truth Pi0 shower energy
         //AnaIO::hTruthPi0ShowerEnergy->Fill(ldShowerTruth.E());
         //AnaIO::hTruthPi0ShowerEnergy->Fill(slShowerTruth.E());
@@ -631,8 +653,8 @@ TLorentzVector AnaUtils::GetPiZero(bool & good)
 	      const double slShowerResRaw = (slShowerRaw.E()/slShowerTruth.E())-1;
 
         // Set output tree variables for true shower energy
-        AnaIO::LeadingShowerEnergyTruth = ldShowerTruth.E();
-        AnaIO::SubLeadingShowerEnergyTruth = slShowerTruth.E();
+        //AnaIO::LeadingShowerEnergyTruth = ldShowerTruth.E();
+        //AnaIO::SubLeadingShowerEnergyTruth = slShowerTruth.E();
         
 
         plotUtils.FillHist(AnaIO::hLeadingShowerEnergyRes, ldShowerTruth.E(), ldShowerRes);
@@ -646,7 +668,7 @@ TLorentzVector AnaUtils::GetPiZero(bool & good)
 	      plotUtils.FillHist(AnaIO::hShowerOpenAngleRes, openingAngleTruth, openingAngleRes);   
 
         // Set output tree variables for true opening angle
-        AnaIO::OpeningAngleTruth = ldShowerTruth.Angle(slShowerTruth.Vect())*TMath::RadToDeg();
+        //AnaIO::OpeningAngleTruth = ldShowerTruth.Angle(slShowerTruth.Vect())*TMath::RadToDeg();
         // Calculate pi0 mass resolution
 	      const double mpi0Res = PiZeroVec.M()/PiZeroTruthVec.M() -1;
 	      const double mpi0ResRaw = PiZeroVecRaw.M()/PiZeroTruthVec.M() -1;
@@ -671,6 +693,62 @@ TLorentzVector AnaUtils::GetPiZero(bool & good)
   return PiZeroVec;
 }
 
+void AnaUtils::GetPi0Showers()
+{
+
+  AnaIO::LeadingShowerEnergy = -1;
+  AnaIO::SubLeadingShowerEnergy = -1;
+  AnaIO::LeadingShowerEnergyRaw = -1;
+  AnaIO::SubLeadingShowerEnergyRaw = -1;
+  AnaIO::OpeningAngle = -1;
+  AnaIO::LeadingShowerEnergyTruth = -1;
+  AnaIO::SubLeadingShowerEnergyTruth = -1;
+  AnaIO::OpeningAngleTruth = -1;
+
+  // Get the size of truth shower array
+  const int showerSize = showerTruthArray.size();
+  // Need to have at least two showers to reconstruct pi0
+  if(showerSize>=2){
+    // Get [0] element of shower energy vector
+    const double* shE = &(showerTruthEarr[0]);
+    int *nindex = new int[showerSize];
+    // Sort truth shower energy
+    TMath::Sort(showerSize, shE, nindex, true);
+    if( showerTypeArray[nindex[0]] == gkGamma && showerTypeArray[nindex[1]] == gkGamma ){
+      // Get truth leading ans subleading shower energy
+      const TLorentzVector ldShowerTruth = showerTruthArray[nindex[0]];
+      const TLorentzVector slShowerTruth = showerTruthArray[nindex[1]];
+
+      // Get truth pi0 vector
+      TLorentzVector PiZeroTruthVec = ldShowerTruth + slShowerTruth;
+      //cout << "pi0 Mass: " << PiZeroTruthVec.M() << endl;
+      if( PiZeroTruthVec.M() < 0.1350 && PiZeroTruthVec.M() > 0.1349) {
+      //cout << "pi0 Mass: " << PiZeroTruthVec.M() << endl;
+      // Set reco leading and subleading shower vector
+      const TLorentzVector ldShower = showerArray[nindex[0]];
+      const TLorentzVector slShower = showerArray[nindex[1]];
+      // Set raw reco leading and subleading shower vector
+      const TLorentzVector ldShowerRaw = showerArrayRaw[nindex[0]];
+      const TLorentzVector slShowerRaw = showerArrayRaw[nindex[1]];
+      // Calculate reco opening angle
+      const double openingAngle = ldShower.Angle(slShower.Vect())*TMath::RadToDeg();
+      // Calculate truth opening angle
+      const double openingAngleTruth = ldShowerTruth.Angle(slShowerTruth.Vect())*TMath::RadToDeg();
+
+      // Set output tree variables
+      AnaIO::LeadingShowerEnergy = ldShower.E();
+      AnaIO::SubLeadingShowerEnergy = slShower.E();
+      AnaIO::LeadingShowerEnergyRaw = ldShowerRaw.E();
+      AnaIO::SubLeadingShowerEnergyRaw = slShowerRaw.E();
+      AnaIO::OpeningAngle = openingAngle;
+      AnaIO::LeadingShowerEnergyTruth = ldShowerTruth.E();
+      AnaIO::SubLeadingShowerEnergyTruth = slShowerTruth.E();
+      AnaIO::OpeningAngleTruth = openingAngleTruth;
+      }
+    }
+  }
+
+}
 void AnaUtils::TruthMatchingTKI(TLorentzVector dummypi0, TLorentzVector dummyproton)
 {
     const int truthEventType = GetFillEventType();

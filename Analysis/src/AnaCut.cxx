@@ -195,8 +195,8 @@ int AnaCut::GetTruthParticleInfoFromRec(const int recidx)
       }
       else{
         //--- lump great grand daughter here
-        if(TMath::Abs(directPDG)==11 || TMath::Abs(directPDG)==13 || TMath::Abs(directPDG)==22 || TMath::Abs(directPDG)==211 || directPDG==2212 || directPDG==2112 || directPDG==-1 || directPDG>1000000000){//when no true match found pdg = -1
-          pdg= directPDG;
+        if(TMath::Abs(directPDG)==11 || TMath::Abs(directPDG)==13 || TMath::Abs(directPDG)==22 || TMath::Abs(directPDG)==211 || TMath::Abs(directPDG)==321 || directPDG==2212 || directPDG==2112 || directPDG==-1 || directPDG>1000000000){//when no true match found pdg = -1
+          pdg = directPDG;
         }
         else{
           printf("AnaCut::GetTruthFromRec search not done! %d %d\n", recidx, directPDG); exit(1);
@@ -273,18 +273,19 @@ void AnaCut::CountPFP(const bool kMC, const bool kFill, bool &good)
 {
   // Get the size of reco final state particles
   const int recsize = AnaIO::reco_daughter_PFP_ID->size();
-  // Initialize number of particles 
+  // Initialize number of reco final state particles (beam reco daughter particles counter)
   nproton = 0;
   npiplus = 0;
   nshower = 0;
   npi0shower = 0;
   nmichel = 0;
   int nPFP = 0;
+  // Need to clear vector for each event
   anaUtils.CleanShowerArray();
-  // Loop over each reco FS particle
+  // Loop over all reco FS particles
   for(int ii=0; ii<recsize; ii++){
-    // Get the truth info for this reco particle
-    truthParticleType = kMC? GetTruthParticleInfoFromRec(ii) : anaUtils.gkOthers; 
+    // Get the truth particle type of this reco particle
+    truthParticleType = kMC? GetTruthParticleInfoFromRec(ii) : anaUtils.gkOthers;
     recParticleType = -999;
     // Proton candidates selection
     if(IsProton(ii)){
@@ -320,6 +321,8 @@ void AnaCut::CountPFP(const bool kMC, const bool kFill, bool &good)
   }
   if(recsize!=nPFP) cout << "CountPFP not looping all FS particles!!" << endl;
   if(kFill && npi0shower >= 2) anaUtils.GetPiZero(good);
+  if(kFill && npi0shower >= 2 && kMC) anaUtils.GetPi0Showers();
+  
   //if(npi0shower > 1 && nproton > 0) printf("CountPFP PFP size %d nlooped %d nshower %d npi0shower %d nmichel %d npiplus %d nproton %d\n", recsize, nPFP, nshower, npi0shower, nmichel, npiplus, nproton);
 }
 
@@ -389,7 +392,7 @@ bool AnaCut::IsShower(const int ii)
 
   if((*AnaIO::reco_daughter_allShower_ID)[ii]==-1) return false;
   // Cut on number of hits
-  if(nhits <= 200) return false;
+  if(nhits <= 80) return false;
   // Cut on em score
   if(emScore <= 0.5) return false;
   
@@ -430,7 +433,7 @@ bool AnaCut::IsPiZeroShower(const int ii)
   // Impact Parameter Cut
   if( IP > 15 ) return false;
   // Need to save all pizero shower candidates to reconstruct pizero
-  anaUtils.SavePiZeroShower(recShowerMom, recShowerMomRaw, truthShowerMom, recShowerMom.E(), showerPosition, truthParticleType);
+  anaUtils.SavePiZeroShower(recShowerMom, recShowerMomRaw, truthShowerMom, recShowerMom.E(), truthShowerMom.E(), showerPosition, truthParticleType);
   return true;
 }
 

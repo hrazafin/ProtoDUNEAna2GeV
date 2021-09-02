@@ -52,7 +52,8 @@ class AnaUtils
     TLorentzVector GetRecShowerLTVectLab(const int ii, bool DoCorrection = true);
     // Combine two showers to reconstruct pi0
     TLorentzVector GetPiZero(bool & good);
-
+    // Get the info for Fitting
+    void GetPi0Showers();
     //void Chi2FCN(int &npars, double *grad, double &value, double *par, int flag);
     //void KinematicFitting(double openAngle, double E1, double E2, double sigmaE1, double sigmaE2);
     // Define particle types
@@ -106,18 +107,19 @@ class AnaUtils
       gkBmBkg
      };
     // Save good shower candidates info for pi0 reco
-    void SavePiZeroShower(TLorentzVector shower, TLorentzVector showerRaw, TLorentzVector showerTruth, double showerE, TVector3 pos, int showerType)
+    void SavePiZeroShower(TLorentzVector shower, TLorentzVector showerRaw, TLorentzVector showerTruth, double showerE, double showerTruthE, TVector3 pos, int showerType)
     {
       showerArray.push_back(shower);
       showerArrayRaw.push_back(showerRaw);
       showerTruthArray.push_back(showerTruth);
       showerEarr.push_back(showerE);
+      showerTruthEarr.push_back(showerTruthE);
       showerTypeArray.push_back(showerType);
       showerPos.push_back(pos);
     }
     // Clean vectors
     void CleanShowerArray(){
-      showerArray.clear(); showerArrayRaw.clear(); showerTruthArray.clear();showerEarr.clear();showerPos.clear();showerTypeArray.clear();
+      showerArray.clear(); showerArrayRaw.clear(); showerTruthArray.clear();showerEarr.clear();showerTruthEarr.clear();showerPos.clear();showerTypeArray.clear();
     }
   private:
     PlotUtils plotUtils;
@@ -133,6 +135,7 @@ class AnaUtils
     vector<TLorentzVector> showerTruthArray;
     vector<int> showerTypeArray;
     vector<double> showerEarr;
+    vector<double> showerTruthEarr;
     vector<TVector3> showerPos;
 };
 #endif

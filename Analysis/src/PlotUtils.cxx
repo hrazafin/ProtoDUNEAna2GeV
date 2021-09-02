@@ -71,7 +71,7 @@ void PlotUtils::ProcessHist(TList *lout, const bool kMC)
         lout->Add(hnor);
         // Get the 1D histogram resolution plot using projectY
         TH1D * hprojY = htmp->ProjectionY(tag+"_projY");
-	hprojY->SetStats(1);
+	      hprojY->SetStats(1);
         lout->Add(hprojY);
         TH1D * hprojX = htmp->ProjectionX(tag+"_projX");
         hprojX->SetStats(1);
@@ -150,15 +150,15 @@ void PlotUtils::DrawHist(TList *lout, const double plotscale, TList * overlayLis
             if(holayRaw){
               if(holayRaw->GetMaximum() > hh->GetMaximum()) hh->SetMaximum(holayRaw->GetMaximum()*1.2);
               else hh->SetMaximum(hh->GetMaximum()*1.2);
-              hh->SetFillStyle(3004);
+              hh->SetFillStyle(1);
               hh->SetLineColor(kBlue); 
               hh->SetLineWidth(3);
               hh->Draw("hist");
               c1->Update();
-              holayRaw->SetFillStyle(3005);
+              holayRaw->SetFillStyle(1);
               holayRaw->SetLineColor(kRed);
               holayRaw->SetLineWidth(3);
-	      holayRaw->SetStats(1);
+	            holayRaw->SetStats(1);
               holayRaw->Draw("hist same"); 
               c1->Update();
               if(holayFit){
@@ -212,7 +212,7 @@ void PlotUtils::DrawHist(TList *lout, const double plotscale, TList * overlayLis
       
     }
     else cout << "PlotUtils::DrawHist not found correct histogram!" << endl;
-    c1->Print(outdir+"/"+tag+".eps");
+    c1->Print(outdir+"/"+tag+".png");
   } // End of for loop
 }
 

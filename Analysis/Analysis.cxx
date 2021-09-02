@@ -5,7 +5,7 @@
 
 int anaRec(const TString finName, TList *lout, const TString tag, const int nEntryToStop)
 {
-  //_____________________________________________________ basic settings _____________________________________________________ 
+  //======================================== Basic Settings ======================================== 
   cout << "Input file:" << endl;
   gSystem->Exec(Form("readlink -f %s", finName.Data()));
   cout << endl;
@@ -22,7 +22,7 @@ int anaRec(const TString finName, TList *lout, const TString tag, const int nEnt
   else cout << "fin is open!" << endl;
 
   // Get the TTree from input file
-  TTree  * tree = AnaIO::GetInputTree(fin, "pionana/beamana", tag);
+  TTree  * tree = AnaIO::GetInputTree(fin, "pduneana/beamana", tag);
   TTree  * tout = AnaIO::GetOutputTree(lout, tag);
   // Initialise reco histograms
   AnaIO::IniHist(lout, kMC);
@@ -36,7 +36,6 @@ int anaRec(const TString finName, TList *lout, const TString tag, const int nEnt
   // Loop over TTree
   while(tree->GetEntry(ientry)){
 
-    AnaIO::hEvent->Fill(AnaIO::event); 
     // Break 
     if(nEntryToStop > 0 && ientry>=nEntryToStop){
       cout << "Break the loop after " << nEntryToStop << " entries!" << endl;
@@ -48,7 +47,7 @@ int anaRec(const TString finName, TList *lout, const TString tag, const int nEnt
     //====================== Extract truth information (MC only)======================//
     if(kMC){
       // Get true beam particle type from it's pdg code
-      int TruthBeamType = anaUtils.GetParticleType(AnaIO::true_beam_PDG);
+      int TruthBeamType = anaUtils.GetParticleType(AnaIO::true_beam_PDG); 
       // Fill the TruthBeamType histogram
       AnaIO::hTruthBeamType->Fill(TruthBeamType); 
       // Set signal using truth info
@@ -64,7 +63,7 @@ int anaRec(const TString finName, TList *lout, const TString tag, const int nEnt
     
     // Do event topology cut
     if(!anaCut.CutTopology(kMC)) continue;
-    //anaCut.CountPFP(kMC,true);
+    // Fill output tree
     tout->Fill();
   } // End of while loop
   return BeamCount;
@@ -73,8 +72,8 @@ int anaRec(const TString finName, TList *lout, const TString tag, const int nEnt
 int main(int argc, char * argv[])
 {
   // Initialise the input file name
-  const TString mcfinName = "input/protoDUNE_mc_reco_flattree.root";
-  const TString datafinName  = "input/protoDUNE_data_reco_flattree.root";
+  const TString mcfinName = "input/protoDUNE_mc_reco_flattree_prod4a.root";
+  const TString datafinName  = "input/protoDUNE_data_reco_flattree_prod4a.root";
   // Declare output list
   TList * mclout = 0x0;
   TList * datalout = 0x0;
@@ -82,10 +81,13 @@ int main(int argc, char * argv[])
   datalout = new TList;
   // Run reco loop for both mc and data
   int nEntryToStop = -1; // Default is looping over all entries
-  // Get the input break entries
+  // Get the input break entries if provided 
   if(argc!=1) nEntryToStop = atoi(argv[1]);
+  // MC Analysis
   double mcBeamCount = anaRec(mcfinName,mclout,"mc", nEntryToStop);
+  // Data Analysis
   double dataBeamCount = anaRec(datafinName,datalout,"data", nEntryToStop);
+  // Process histograms
   PlotUtils plotUtils;
   plotUtils.ProcessHist(mclout,true);
   plotUtils.ProcessHist(datalout,false);  
@@ -107,6 +109,8 @@ int main(int argc, char * argv[])
   // Save the info
   fout->Save();
   fout->Close();
+  // Calculate the Data/MC normalisation constant
   double plotScale = dataBeamCount/mcBeamCount;
+  // Draw all histograms
   plotUtils.DrawHist(mclout,plotScale,datalout,"output");
 }
