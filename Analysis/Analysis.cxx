@@ -29,10 +29,10 @@ int anaRec(const TString finName, TList *lout, const TString tag, const int nEnt
 
   AnaUtils anaUtils;
   AnaCut anaCut;
-  // Initialise entry and beam counter
-  int ientry = 0;
-  int BeamCount = 0;
-
+  // Initialise entry and counters
+  double ientry = 0;
+  double BeamCount = 0;
+  double ESCount = 0;
   // Loop over TTree
   while(tree->GetEntry(ientry)){
 
@@ -63,10 +63,16 @@ int anaRec(const TString finName, TList *lout, const TString tag, const int nEnt
     
     // Do event topology cut
     if(!anaCut.CutTopology(kMC)) continue;
+    ESCount++;
+
     // Fill output tree
     tout->Fill();
   } // End of while loop
+  cout << "ientry: " << ientry << endl;
+  cout << "BeamCount: " << BeamCount << " " << BeamCount/ientry*100 << "%" <<endl;
+  cout << "ESCount: " << ESCount << " " << ESCount/BeamCount*100 << "%" << endl;
   return BeamCount;
+  
 } // End of anaRec
 
 int main(int argc, char * argv[])

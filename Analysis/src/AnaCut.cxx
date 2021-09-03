@@ -264,7 +264,7 @@ bool AnaCut::CutTopology(const bool kMC)
   //if(npiplus!=0) return false;
   // Michel electron
   //if(nmichel!=0) return false;
-  
+
   return true;
 }
 
@@ -431,7 +431,7 @@ bool AnaCut::IsPiZeroShower(const int ii)
   // In unit of cm
   if( dist.Mag() < 2 || dist.Mag() > 90 ) return false;
   // Impact Parameter Cut
-  if( IP > 15 ) return false;
+  //if( IP > 15 ) return false;
   // Need to save all pizero shower candidates to reconstruct pizero
   anaUtils.SavePiZeroShower(recShowerMom, recShowerMomRaw, truthShowerMom, recShowerMom.E(), truthShowerMom.E(), showerPosition, truthParticleType);
   return true;

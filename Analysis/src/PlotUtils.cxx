@@ -105,6 +105,7 @@ void PlotUtils::DrawHist(TList *lout, const double plotscale, TList * overlayLis
   for(int ii=0; ii<lout->GetSize(); ii++){
     // Get the name of the histogram
     const TString tag = lout->At(ii)->GetName();
+    if(tag == "tree") continue;
     // Create histograms and stack
     // 1D histogram
     TH1 * hh = dynamic_cast<TH1*> (lout->At(ii));
@@ -130,7 +131,7 @@ void PlotUtils::DrawHist(TList *lout, const double plotscale, TList * overlayLis
         // Check if we have data overlay histogram
         if(holay){
           // Do the scaling for MC/Data
-          if(plotscale!=1) hh->Scale(plotscale);
+          //if(plotscale!=1) hh->Scale(plotscale);
           hh->Draw("hist");
           DrawOverlay(holay);
           c1->Update();
@@ -212,7 +213,7 @@ void PlotUtils::DrawHist(TList *lout, const double plotscale, TList * overlayLis
       }
       
     }
-    else cout << "PlotUtils::DrawHist not found correct histogram!" << endl;
+    else cout << "PlotUtils::DrawHist not found correct histogram!" << " name: " << tag << endl;
     c1->Print(outdir+"/"+tag+".png");
   } // End of for loop
 }

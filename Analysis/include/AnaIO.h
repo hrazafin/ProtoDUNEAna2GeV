@@ -350,7 +350,7 @@ namespace AnaIO
     hCutBeamPosPass = new TH1I("a003CutBeamPosPass", "", 4, -0.5, 3.5); 
     lout->Add(hCutBeamPosPass);
     hCutBeamEndZPass = new TH1I("a004CutBeamEndZPass", "", 4, -0.5, 3.5);
-    lout->Add(hCutBeamEndZPass); 
+    lout->Add(hCutBeamEndZPass);
     hCutBeamEndZ = new TH1D("a005CutBeamEndZ","",50, 0, 500);
     lout->Add(hCutBeamEndZ);
     hRecBeamTheta = new TH2D("b001RecBeamTheta_STK","", 80 , 0, 60, 3, -0.5, 2.5); 
