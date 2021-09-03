@@ -51,7 +51,7 @@ class AnaUtils
     // Get LT vector of reco shower
     TLorentzVector GetRecShowerLTVectLab(const int ii, bool DoCorrection = true);
     // Combine two showers to reconstruct pi0
-    TLorentzVector GetPiZero(bool & good);
+    TLorentzVector GetPiZero();
     // Get the info for Fitting
     void GetPi0Showers();
     //void Chi2FCN(int &npars, double *grad, double &value, double *par, int flag);

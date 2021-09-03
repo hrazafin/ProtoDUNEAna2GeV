@@ -34,7 +34,7 @@ class AnaCut
     // Get truth-matched particle info using reco particle index
     int GetTruthParticleInfoFromRec(const int recidx);
     bool CutTopology(const bool kMC);
-    void CountPFP(const bool kMC, const bool kFill, bool &good);
+    void CountPFP(const bool kMC, const bool kFill);
     bool IsProton(const int ii);
     bool IsTrack(const int ii);  
     bool PassProtonSubPID(const int ii);

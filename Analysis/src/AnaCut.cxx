@@ -252,9 +252,8 @@ int AnaCut::GetTruthParticleInfoFromRec(const int recidx)
 
 bool AnaCut::CutTopology(const bool kMC)
 {
-  bool good = false;
   // Count reco final state particles and determine types 
-  CountPFP(kMC,true,good);
+  CountPFP(kMC,true);
   // ----------------------- Do cuts below ------------------------ // 
   
   // Proton
@@ -265,11 +264,11 @@ bool AnaCut::CutTopology(const bool kMC)
   //if(npiplus!=0) return false;
   // Michel electron
   //if(nmichel!=0) return false;
-  if(!good) return false;
+  
   return true;
 }
 
-void AnaCut::CountPFP(const bool kMC, const bool kFill, bool &good)
+void AnaCut::CountPFP(const bool kMC, const bool kFill)
 {
   // Get the size of reco final state particles
   const int recsize = AnaIO::reco_daughter_PFP_ID->size();
@@ -320,7 +319,8 @@ void AnaCut::CountPFP(const bool kMC, const bool kFill, bool &good)
     nPFP++; 
   }
   if(recsize!=nPFP) cout << "CountPFP not looping all FS particles!!" << endl;
-  if(kFill && npi0shower >= 2) anaUtils.GetPiZero(good);
+  if(kFill && npi0shower >= 2) anaUtils.GetPiZero();
+  // Output tree for kinematic fitting
   if(kFill && npi0shower >= 2 && kMC) anaUtils.GetPi0Showers();
   
   //if(npi0shower > 1 && nproton > 0) printf("CountPFP PFP size %d nlooped %d nshower %d npi0shower %d nmichel %d npiplus %d nproton %d\n", recsize, nPFP, nshower, npi0shower, nmichel, npiplus, nproton);
