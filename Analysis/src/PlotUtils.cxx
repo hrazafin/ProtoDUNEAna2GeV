@@ -202,7 +202,8 @@ void PlotUtils::DrawHist(TList *lout, const double plotscale, TList * overlayLis
         TH1D * E2 = 0x0;
         E1 = new TH1D("E1",  "", 20, -0.5, 19.5); 
         E2 = new TH1D("E2",  "", 20, -0.5, 19.5); 
-        E1->SetFillStyle(3004);E2->SetFillStyle(3004);E1->SetFillColor(1509);E2->SetFillColor(1505);E1->SetLineColor(1509);E2->SetLineColor(1505);
+        E1->SetFillStyle(3004);E2->SetFillStyle(3004);
+        E1->SetFillColor(1509);E2->SetFillColor(1505);E1->SetLineColor(1509);E2->SetLineColor(1505);
 
         legend->AddEntry(E1, "SubLeading photon", "f");
         legend->AddEntry(E2, "Leading photon", "f");
@@ -255,9 +256,9 @@ THStack * PlotUtils::ConvertToStack(const TH2D * hh)
 
     const int icol = GetColor(col[iy-y0]);//need constant map between y and color
     htmp->SetFillColor(icol);
-    htmp->SetFillStyle(3004);
     htmp->SetLineColor(icol);
     htmp->SetMarkerSize(2);
+    if(tag.Contains("OVERLAY")) htmp->SetFillStyle(3004);
     printf("PlotUtils::ConvertToStack %s adding y %f with color %d\n", tag.Data(), hh->GetYaxis()->GetBinCenter(iy), icol);
     stk->Add(htmp);
   }
@@ -373,7 +374,7 @@ int * PlotUtils::GetColorArray(const int minsize)
                    1008, 1004, 1006, 1010,
                    1012, 1013, 1011, kGreen+3,
                    1008, 1009, 1002, 1011, 1014, 1007, 1003, 1015, 1005, 1008, 1009, 1002, 1011, 1014, 1007, 1003, 1015, 1005, 1008, 1009, 1002, 1011, 1014, 1007, 1003, 1015, 1005, 1008, 1009, 1002, 1011, 1014, 1007, 1003, 1015, 1005};
-
+  
   const int nc = sizeof(col)/sizeof(int);
   if(nc<minsize){
     printf("PlotUtils::GetColorArray too small size %d %d\n", nc, minsize); exit(1);
