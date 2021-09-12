@@ -742,3 +742,22 @@ void AnaUtils::DoTruthTKICalculation(){
   if(NParList[0] == 1 && NParList[1] != 0) AnaIO::hTruthDalphat1pMn->Fill(AnaIO::dalphat);
   if(NParList[0] != 1 && NParList[1] != 0) AnaIO::hTruthDalphatNpMn->Fill(AnaIO::dalphat);
 }
+
+void AnaUtils::AddTruthTKIstk(){
+  // Event Categories 
+  vector<TString> cns;
+  cns.push_back("all");
+  cns.push_back("1p0n");
+  cns.push_back("Np0n");
+  cns.push_back("1pMn");
+  cns.push_back("NpMn");
+
+  AnaIO::hTruthDalphat1p0n->SetFillColor(plotUtils.GetColor(1014));
+  AnaIO::stkTruthDalphat->Add(AnaIO::hTruthDalphat1p0n);
+  AnaIO::hTruthDalphatNp0n->SetFillColor(plotUtils.GetColor(1011));
+  AnaIO::stkTruthDalphat->Add(AnaIO::hTruthDalphatNp0n);
+  AnaIO::hTruthDalphat1pMn->SetFillColor(plotUtils.GetColor(1007));
+  AnaIO::stkTruthDalphat->Add(AnaIO::hTruthDalphat1pMn);
+  AnaIO::hTruthDalphatNpMn->SetFillColor(plotUtils.GetColor(kOrange));
+  AnaIO::stkTruthDalphat->Add(AnaIO::hTruthDalphatNpMn);
+}

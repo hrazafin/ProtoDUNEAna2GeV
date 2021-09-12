@@ -56,6 +56,8 @@ class AnaUtils
     void GetPi0Showers();
     // Truth TKI calculation
     void DoTruthTKICalculation();
+    // Add truth TKI stack histogram
+    void AddTruthTKIstk();
 
     //void Chi2FCN(int &npars, double *grad, double &value, double *par, int flag);
     //void KinematicFitting(double openAngle, double E1, double E2, double sigmaE1, double sigmaE2);

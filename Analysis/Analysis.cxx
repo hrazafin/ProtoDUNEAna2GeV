@@ -33,7 +33,7 @@ int anaRec(const TString finName, TList *lout, const TString tag, const int nEnt
   // Initialise entry and counters
   double ientry = 0;
   double BeamCount = 0;
-  double ESCount = 0;
+  
   // Loop over TTree
   while(tree->GetEntry(ientry)){
 
@@ -82,27 +82,15 @@ int anaRec(const TString finName, TList *lout, const TString tag, const int nEnt
     // Fill output tree
     tout->Fill();
   } // End of while loop
-if(kMC){
-  // Event Categories 
-  vector<TString> cns;
-  cns.push_back("all");
-  cns.push_back("1p0n");
-  cns.push_back("Np0n");
-  cns.push_back("1pMn");
-  cns.push_back("NpMn");
 
-  AnaIO::hTruthDalphat1p0n->SetFillColor(plotUtils.GetColor(1014));
-  AnaIO::stkTruthDalphat->Add(AnaIO::hTruthDalphat1p0n);
-  AnaIO::hTruthDalphatNp0n->SetFillColor(plotUtils.GetColor(1011));
-  AnaIO::stkTruthDalphat->Add(AnaIO::hTruthDalphatNp0n);
-  AnaIO::hTruthDalphat1pMn->SetFillColor(plotUtils.GetColor(1007));
-  AnaIO::stkTruthDalphat->Add(AnaIO::hTruthDalphat1pMn);
-  AnaIO::hTruthDalphatNpMn->SetFillColor(plotUtils.GetColor(kOrange));
-  AnaIO::stkTruthDalphat->Add(AnaIO::hTruthDalphatNpMn);
-}
+  // Add truth TKI stack
+  if(kMC){
+    anaUtils.AddTruthTKIstk();
+  }
+
   cout << "All entries: " << ientry << endl;
   cout << "BeamCount: " << BeamCount << endl;
-  cout << "ESCount: " << ESCount << endl;
+  
   // Print cut flow statistics
   int icut = 0;
   double nsel = -999;
