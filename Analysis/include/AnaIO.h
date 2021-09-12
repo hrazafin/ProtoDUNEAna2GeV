@@ -20,6 +20,18 @@ namespace AnaIO
   double SubLeadingShowerEnergyTruth;
   double OpeningAngleTruth;
 
+  double dalphat;
+  double dphit;
+  double dpt;
+  double pn;
+  double iniPimomentum;
+  double iniPitheta;
+  double finPimomentum;
+  double finPitheta;
+  double finProtonmomentum;
+  double finProtontheta;
+  double fin2Pmom;
+
   vector<double> * LeadingShowerEnergyUnitDirTruth = 0x0;
   vector<double> * SubLeadingShowerEnergyUnitDirTruth = 0x0;
 
@@ -110,6 +122,11 @@ namespace AnaIO
   TH2D * hCutmichelScore = 0x0;
   TH2D * hCutShowerDist = 0x0;
   TH2D * hCutShowerIP = 0x0;
+
+  TH2D * hCutnproton = 0x0;
+  TH2D * hCutnpiplus = 0x0;
+  TH2D * hCutnshower = 0x0;
+  TH2D * hCutnmichel = 0x0;
   
   //====================== Reco (Data only)======================//
   // Declare variables
@@ -161,6 +178,7 @@ namespace AnaIO
 
   // Declare histograms
   TH1I * hTruthBeamType = 0x0;
+  TH1I * hTruthSignal = 0x0;
   TH1I * hTruthFSParticleNumber = 0x0;  
   TH1I * hTruthFSParticleType = 0x0;
   TH1I * hTruthFSPi0Number = 0x0;
@@ -169,6 +187,27 @@ namespace AnaIO
   TH1D * hTruthSubLeadingProtonP = 0x0;
   TH1D * hTruthGammaMaxE = 0x0;
   TH2D * hTruthPi0ShowerEnergy = 0x0;
+  TH1I * hTruthSignalFSParticleNumber = 0x0;  
+  TH1I * hTruthSignalFSParticleType = 0x0;
+
+  // Truth TKI related variables
+  TH1I * hTruthNproton = 0x0;
+  TH1I * hTruthNneutron = 0x0;
+  TH1I * hTruthNPiZero = 0x0;
+  TH1D * hTruthMomIniPi = 0x0;
+  TH1D * hTruthMomFinPi = 0x0;
+  TH1D * hTruthMomFinProton = 0x0;
+  TH1D * hTruthDalphat = 0x0;
+  TH1D * hTruthDphit = 0x0;
+  TH1D * hTruthDpt = 0x0;
+  TH1D * hTruthPn = 0x0;
+
+  THStack * stkTruthDalphat = 0x0;
+  TH1D * hTruthDalphatall = 0x0;
+  TH1D * hTruthDalphat1p0n = 0x0;
+  TH1D * hTruthDalphatNp0n = 0x0;
+  TH1D * hTruthDalphat1pMn = 0x0; 
+  TH1D * hTruthDalphatNpMn = 0x0;
 
   // Resolution histograms need to use truth info
   TH2D * hBeamThetaRes = 0x0;
@@ -341,6 +380,15 @@ namespace AnaIO
     const double evtTypemin = -0.5;
     const double evtTypemax = 2.5;
 
+    const int ncounter = 10;
+    const double countermin = -0.5;
+    const double countermax = 9.5;
+
+    const int nPass = 2;
+    const double Passmin = -0.5;
+    const double Passmax = 1.5;
+
+
     //====================== Reco (MC and Data)======================//
 
     hCutBeamIDPass = new TH1I("a001CutBeamIDPass","", 2, -0.5, 1.5); 
@@ -428,13 +476,23 @@ namespace AnaIO
     hCutShowerIP = new TH2D("e008CutShowerIP_STK","", 30, 0, 30, nparType, parTypemin, parTypemax); 
     lout->Add(hCutShowerIP);
 
+    hCutnproton = new TH2D("e009Cutnproton_STK","", ncounter, countermin, countermax, nevtType, evtTypemin, evtTypemax); 
+    lout->Add(hCutnproton);
+    hCutnshower = new TH2D("e010Cutnshower_STK","", ncounter, countermin, countermax, nevtType, evtTypemin, evtTypemax); 
+    lout->Add(hCutnshower);
+    hCutnpiplus = new TH2D("e011Cutnpiplus_STK","",  ncounter, countermin, countermax, nevtType, evtTypemin, evtTypemax); 
+    lout->Add(hCutnpiplus);
+    hCutnmichel = new TH2D("e012Cutnmichel_STK","", ncounter, countermin, countermax, nevtType, evtTypemin, evtTypemax); 
+    lout->Add(hCutnmichel);
+
+
     //====================== Truth (MC only)======================//
     if(kMC){
       hTruthBeamType = new TH1I("f001TruthBeamType",  "", 20, -0.5, 19.5); 
       lout->Add(hTruthBeamType);
-      hTruthFSParticleNumber = new TH1I("f002TruthFSParticleNumber", "", 160, -0.5, 159.5); 
+      hTruthFSParticleNumber = new TH1I("f002TruthFSParticleNumber", "", 36, -0.5, 35.5); 
       lout->Add(hTruthFSParticleNumber);
-      hTruthFSParticleType = new TH1I("f003TruthFSParticleType", "", 20, -0.5, 19.5);
+      hTruthFSParticleType = new TH1I("f003TruthFSParticleType", "", 23, -0.5, 22.5);
       lout->Add(hTruthFSParticleType);
       hTruthFSPi0Number = new TH1I("f004TruthFSPi0Number", "", 5, 0, 5);
       lout->Add(hTruthFSPi0Number);
@@ -448,6 +506,50 @@ namespace AnaIO
       lout->Add(hTruthGammaMaxE);
       hTruthPi0ShowerEnergy = new TH2D("f009TruthPi0ShowerEnergy_OVERLAY", "", 20, 0, 1.2, 3, -0.5, 2.5);
       lout->Add(hTruthPi0ShowerEnergy);
+      hTruthSignal = new TH1I("f010TruthSignal",  "",  nPass, Passmin, Passmax); 
+      lout->Add(hTruthSignal); 
+      hTruthSignalFSParticleNumber = new TH1I("f011TruthSignalFSParticleNumber", "", 36, -0.5, 35.5); 
+      lout->Add(hTruthSignalFSParticleNumber);
+      hTruthSignalFSParticleType = new TH1I("f012TruthSignalFSParticleType", "", 23, -0.5, 22.5);
+      lout->Add(hTruthSignalFSParticleType);
+
+      hTruthNproton = new TH1I("f100TruthNproton","",11, -0.5, 10.5); 
+      lout->Add(hTruthNproton);
+      hTruthNneutron = new TH1I("f101TruthNneutron","",11, -0.5, 10.5); 
+      lout->Add(hTruthNneutron);
+      hTruthNPiZero = new TH1I("f102TruthNPiZero","",11, -0.5, 10.5); 
+      lout->Add(hTruthNPiZero);
+      hTruthMomIniPi = new TH1D("f103TruthMomIniPi","", 50, 0, 2); 
+      lout->Add(hTruthMomIniPi);
+      hTruthMomFinPi = new TH1D("f104TruthMomFinPi","", 50, 0, 2); 
+      lout->Add(hTruthMomFinPi);
+      hTruthMomFinProton = new TH1D("f105TruthMomFinProton","", 50, 0, 2); 
+      lout->Add(hTruthMomFinProton);
+
+      hTruthDalphat = new TH1D("f200TruthDalphat","", 18, 0, 180); 
+      lout->Add(hTruthDalphat);
+      const double Fbin[]={0.000000, 2.500000, 5.000000, 7.500000, 10.000000, 12.500000, 15.000000, 17.500000, 20.000000, 22.500000, 25.000000, 27.500000, 30.000000, 35.000000, 40.000000, 45.000000, 50.000000, 55.000000, 60.000000, 70.000000, 85.000000, 105.000000, 130.000000, 180.000000};
+      hTruthDphit = new TH1D("f201TruthDphit","", sizeof(Fbin)/sizeof(double)-1, Fbin); 
+      lout->Add(hTruthDphit);
+      const double Gbin[]={0.000000, 0.025000, 0.050000, 0.075000, 0.100000, 0.125000, 0.150000, 0.175000, 0.200000, 0.225000, 0.250000, 0.275000, 0.300000, 0.350000, 0.400000, 0.450000, 0.500000, 0.550000, 0.600000, 0.650000, 0.700000, 0.800000, 1.000000, 1.200000, 2.000000};
+      hTruthDpt = new TH1D("f202TruthDpt","", sizeof(Gbin)/sizeof(double)-1, Gbin); 
+      lout->Add(hTruthDpt);
+      const double Hbin[]={0.000000, 0.025000, 0.050000, 0.075000, 0.100000, 0.125000, 0.150000, 0.175000, 0.200000, 0.225000, 0.250000, 0.275000, 0.300000, 0.350000, 0.400000, 0.450000, 0.500000, 0.550000, 0.600000, 0.650000, 0.700000, 0.800000, 1.000000, 1.200000, 2.000000};
+      hTruthPn = new TH1D("f203TruthPn","", sizeof(Hbin)/sizeof(double)-1, Hbin); 
+      lout->Add(hTruthPn);
+
+      stkTruthDalphat = new THStack("f303stkTruthDalphat",""); 
+      lout->Add(stkTruthDalphat);
+      hTruthDalphatall = new TH1D("f304TruthDalphatall","", 18, 0, 180); 
+      lout->Add(hTruthDalphatall);
+      hTruthDalphat1p0n = new TH1D("f304TruthDalphat1p0n","", 18, 0, 180); 
+      lout->Add(hTruthDalphat1p0n);
+      hTruthDalphatNp0n = new TH1D("f304TruthDalphatNp0n","", 18, 0, 180); 
+      lout->Add(hTruthDalphatNp0n);
+      hTruthDalphat1pMn = new TH1D("f304TruthDalphat1pMn","", 18, 0, 180); 
+      lout->Add(hTruthDalphat1pMn);
+      hTruthDalphatNpMn = new TH1D("f304TruthDalphatNpMn","", 18, 0, 180); 
+      lout->Add(hTruthDalphatNpMn);
 
       hBeamThetaRes = new TH2D("g001BeamTheta_RES","", 80 , 0, 60, 25, -20, 30);
       lout->Add(hBeamThetaRes);

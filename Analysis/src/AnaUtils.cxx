@@ -98,6 +98,7 @@ void AnaUtils::SetFullSignal()
       if(LeadingPiZeroP > 0) AnaIO::Signal = true; 
     }
   }
+
 }
 
 vector<TLorentzVector> AnaUtils::GetFSParticlesTruth()
@@ -127,8 +128,8 @@ vector<TLorentzVector> AnaUtils::GetFSParticlesTruth()
   double Gammamom[np];
   vector<TVector3> bufferProtonmom;
   vector<TVector3> bufferPiZeromom;
-  vector<int> bufferType;
-
+  //vector<int> bufferType;
+  bufferType.clear();
   // Now loop over FS particles
   for(int ii=0; ii<np; ii++){
     // Get the FS particle type
@@ -178,7 +179,7 @@ vector<TLorentzVector> AnaUtils::GetFSParticlesTruth()
     bufferType.push_back(itype);
 
   } // End of loop over FS particles
-  
+
   //======================= Proton =======================
   int leadingProtonID = 0, subldProtonID = -999;
   // Sort protons when more than one protons are found
@@ -692,15 +693,52 @@ void AnaUtils::GetPi0Showers()
 }
 void AnaUtils::TruthMatchingTKI(TLorentzVector dummypi0, TLorentzVector dummyproton)
 {
-    const int truthEventType = GetFillEventType();
-    const TLorentzVector beamFullP(GetRecBeamFull(), AnaFunctions::PionMass());
-    const int targetA = 40;
-    const int targetZ = 18;
-    double dalphat,dphit,dpt,pn,finPitheta,finProtontheta;
-    AnaFunctions::getCommonTKI(targetA, targetZ, &beamFullP, &(dummypi0), &(dummyproton), dalphat, dphit, dpt, pn, finPitheta, finProtontheta);
-    //cout << "dalphat,dphit,dpt,pn,finPitheta,finProtontheta"  << dalphat << " " << dphit << " " << dpt << " " << pn << " " << finPitheta << " " << finProtontheta<< endl;
-    plotUtils.FillHist(AnaIO::hRecdalphat,dalphat,truthEventType);
-    plotUtils.FillHist(AnaIO::hRecdphit,dphit,truthEventType);
-    plotUtils.FillHist(AnaIO::hRecdpt,dpt,truthEventType);
-    plotUtils.FillHist(AnaIO::hRecpn,pn,truthEventType);
+  const int truthEventType = GetFillEventType();
+  const TLorentzVector beamFullP(GetRecBeamFull(), AnaFunctions::PionMass());
+  const int targetA = 40;
+  const int targetZ = 18;
+  double dalphat,dphit,dpt,pn,finPitheta,finProtontheta;
+  AnaFunctions::getCommonTKI(targetA, targetZ, &beamFullP, &(dummypi0), &(dummyproton), dalphat, dphit, dpt, pn, finPitheta, finProtontheta);
+  //cout << "dalphat,dphit,dpt,pn,finPitheta,finProtontheta"  << dalphat << " " << dphit << " " << dpt << " " << pn << " " << finPitheta << " " << finProtontheta<< endl;
+  plotUtils.FillHist(AnaIO::hRecdalphat,dalphat,truthEventType);
+  plotUtils.FillHist(AnaIO::hRecdphit,dphit,truthEventType);
+  plotUtils.FillHist(AnaIO::hRecdpt,dpt,truthEventType);
+  plotUtils.FillHist(AnaIO::hRecpn,pn,truthEventType);
+}
+
+void AnaUtils::DoTruthTKICalculation(){
+  // Get number of truth FS particles
+  vector<double> NParList = GetNParticles();
+  AnaIO::hTruthNproton->Fill(NParList[0]);
+  AnaIO::hTruthNneutron->Fill(NParList[1]);
+  AnaIO::hTruthNPiZero->Fill(NParList[2]);
+
+  //======================== TKI calculation =====================//
+  const TLorentzVector beamFullP(AnaIO::true_beam_endPx, AnaIO::true_beam_endPy, AnaIO::true_beam_endPz, AnaFunctions::PionMass());
+  AnaIO::iniPimomentum = beamFullP.P();
+  AnaIO::iniPitheta = beamFullP.Theta()*TMath::RadToDeg();
+
+  const int targetA = 40;
+  const int targetZ = 18;
+
+  vector<TLorentzVector> vecPiP = GetFSParticlesTruth();
+  AnaIO::finPimomentum = vecPiP[0].P();
+  AnaIO::finProtonmomentum = vecPiP[1].P();
+  AnaIO::fin2Pmom = vecPiP[2].P();
+
+  AnaFunctions::getCommonTKI(targetA, targetZ, &beamFullP, &(vecPiP[0]), &(vecPiP[1]), 
+                              AnaIO::dalphat, AnaIO::dphit, AnaIO::dpt, AnaIO::pn, AnaIO::finPitheta, AnaIO::finProtontheta);
+
+  AnaIO::hTruthMomIniPi->Fill(AnaIO::iniPimomentum);
+  AnaIO::hTruthMomFinPi->Fill(AnaIO::finPimomentum);
+  AnaIO::hTruthMomFinProton->Fill(AnaIO::finProtonmomentum);
+  AnaIO::hTruthDalphat->Fill(AnaIO::dalphat);
+  AnaIO::hTruthDphit->Fill(AnaIO::dphit);
+  AnaIO::hTruthDpt->Fill(AnaIO::dpt);
+  AnaIO::hTruthPn->Fill(AnaIO::pn);
+  
+  if(NParList[0] == 1 && NParList[1] == 0) AnaIO::hTruthDalphat1p0n->Fill(AnaIO::dalphat);
+  if(NParList[0] != 1 && NParList[1] == 0) AnaIO::hTruthDalphatNp0n->Fill(AnaIO::dalphat);
+  if(NParList[0] == 1 && NParList[1] != 0) AnaIO::hTruthDalphat1pMn->Fill(AnaIO::dalphat);
+  if(NParList[0] != 1 && NParList[1] != 0) AnaIO::hTruthDalphatNpMn->Fill(AnaIO::dalphat);
 }

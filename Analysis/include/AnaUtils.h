@@ -54,6 +54,9 @@ class AnaUtils
     TLorentzVector GetPiZero();
     // Get the info for Fitting
     void GetPi0Showers();
+    // Truth TKI calculation
+    void DoTruthTKICalculation();
+
     //void Chi2FCN(int &npars, double *grad, double &value, double *par, int flag);
     //void KinematicFitting(double openAngle, double E1, double E2, double sigmaE1, double sigmaE2);
     // Define particle types
@@ -121,6 +124,18 @@ class AnaUtils
     void CleanShowerArray(){
       showerArray.clear(); showerArrayRaw.clear(); showerTruthArray.clear();showerEarr.clear();showerTruthEarr.clear();showerPos.clear();showerTypeArray.clear();
     }
+    // Get bufferType
+    vector<int> GetBufferType(){
+      return bufferType;
+    }
+    // Get FS particle number 
+    vector<double> GetNParticles(){
+      vector<double> NParList;
+      NParList.push_back(nProton);
+      NParList.push_back(nNeutron);
+      NParList.push_back(nPiZero);
+      return NParList;
+    }
   private:
     PlotUtils plotUtils;
     int nProton;
@@ -129,6 +144,8 @@ class AnaUtils
     int nPiZero;
     int nGamma;
     int nParticleBkg;
+    
+    vector<int> bufferType;
 
     vector<TLorentzVector> showerArray;
     vector<TLorentzVector> showerArrayRaw;

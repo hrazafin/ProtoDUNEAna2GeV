@@ -70,6 +70,7 @@ using namespace std;
 class PlotUtils
 {
   public:
+  double PrintStat(const TString tag, TH1 *hh, const double val0, const double val1, const double oldsel);
   void FillHist(TH1 * hh,  double xx, const double yy);
   void ProcessHist(TList *lout, const bool kMC);
   void DrawHist(TList *lout, const double plotscale, TList * overlayList, const TString outdir);

@@ -1,5 +1,37 @@
 #include "../include/PlotUtils.h"
 
+#ifndef EPSILON
+#define EPSILON 1E-12
+#endif
+
+double PlotUtils::PrintStat(const TString tag, TH1 *hh, const double val0, const double val1, const double oldsel)
+{
+  const double newall = hh->Integral(0,100000);
+  if(oldsel!=-999){
+    if( fabs(newall-oldsel)>EPSILON ){
+      printf("style::PrintStat newall != oldsel %f %f\n", newall, oldsel); exit(1);
+    }
+  }
+
+  double nsel = -999;
+  TH2 * h2d = dynamic_cast<TH2*>(hh);
+  if(h2d){
+    TAxis *ax = h2d->GetXaxis();
+    const int xbin0 = ax->FindBin(val0);
+    const int xbin1 = ax->FindBin(val1);
+    nsel = h2d->Integral(xbin0, xbin1, 0, 100000);
+  }
+  else{
+    const int xbin0 = hh->FindBin(val0);
+    const int xbin1 = hh->FindBin(val1);
+    nsel = hh->Integral(xbin0, xbin1);
+  }
+
+  printf("%-50s: all %5.1f selected %5.1f fraction %.1f%% histogram %s \n", tag.Data(), newall, nsel, nsel/newall*100, hh->GetName());
+  return nsel;
+}
+
+
 void PlotUtils::FillHist(TH1 * hh,  double xx, const double yy)
 {
   // Get histogram name
@@ -131,7 +163,7 @@ void PlotUtils::DrawHist(TList *lout, const double plotscale, TList * overlayLis
         // Check if we have data overlay histogram
         if(holay){
           // Do the scaling for MC/Data
-          //if(plotscale!=1) hh->Scale(plotscale);
+          if(plotscale!=1) hh->Scale(plotscale);
           hh->Draw("hist");
           DrawOverlay(holay);
           c1->Update();

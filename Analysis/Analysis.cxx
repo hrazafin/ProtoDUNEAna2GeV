@@ -29,6 +29,7 @@ int anaRec(const TString finName, TList *lout, const TString tag, const int nEnt
 
   AnaUtils anaUtils;
   AnaCut anaCut;
+  PlotUtils plotUtils;
   // Initialise entry and counters
   double ientry = 0;
   double BeamCount = 0;
@@ -51,8 +52,21 @@ int anaRec(const TString finName, TList *lout, const TString tag, const int nEnt
       // Fill the TruthBeamType histogram
       AnaIO::hTruthBeamType->Fill(TruthBeamType); 
       // Set signal using truth info
-      anaUtils.SetFullSignal(); 
+      anaUtils.SetFullSignal();
+      AnaIO::hTruthSignal->Fill(AnaIO::Signal);
+      // If this MC event is a signal 
+      if(AnaIO::Signal){
+        // Get FS particle type vector
+        vector<int> SignalFSParticleType = anaUtils.GetBufferType();
+        // Fill histograms
+        for(int type : SignalFSParticleType){
+          AnaIO::hTruthSignalFSParticleType->Fill(type);
+        }
+        AnaIO::hTruthSignalFSParticleNumber->Fill(SignalFSParticleType.size());
+        anaUtils.DoTruthTKICalculation();
+      }
     }
+
     //====================== Do cuts (both MC and data) ======================//
     // Do the beam cut
     if(!anaCut.CutBeamAllInOne(kMC)) continue;
@@ -63,14 +77,54 @@ int anaRec(const TString finName, TList *lout, const TString tag, const int nEnt
     
     // Do event topology cut
     if(!anaCut.CutTopology(kMC)) continue;
-    ESCount++;
+    
 
     // Fill output tree
     tout->Fill();
   } // End of while loop
-  cout << "ientry: " << ientry << endl;
-  cout << "BeamCount: " << BeamCount << " " << BeamCount/ientry*100 << "%" <<endl;
-  cout << "ESCount: " << ESCount << " " << ESCount/BeamCount*100 << "%" << endl;
+if(kMC){
+  // Event Categories 
+  vector<TString> cns;
+  cns.push_back("all");
+  cns.push_back("1p0n");
+  cns.push_back("Np0n");
+  cns.push_back("1pMn");
+  cns.push_back("NpMn");
+
+  AnaIO::hTruthDalphat1p0n->SetFillColor(plotUtils.GetColor(1014));
+  AnaIO::stkTruthDalphat->Add(AnaIO::hTruthDalphat1p0n);
+  AnaIO::hTruthDalphatNp0n->SetFillColor(plotUtils.GetColor(1011));
+  AnaIO::stkTruthDalphat->Add(AnaIO::hTruthDalphatNp0n);
+  AnaIO::hTruthDalphat1pMn->SetFillColor(plotUtils.GetColor(1007));
+  AnaIO::stkTruthDalphat->Add(AnaIO::hTruthDalphat1pMn);
+  AnaIO::hTruthDalphatNpMn->SetFillColor(plotUtils.GetColor(kOrange));
+  AnaIO::stkTruthDalphat->Add(AnaIO::hTruthDalphatNpMn);
+}
+  cout << "All entries: " << ientry << endl;
+  cout << "BeamCount: " << BeamCount << endl;
+  cout << "ESCount: " << ESCount << endl;
+  // Print cut flow statistics
+  int icut = 0;
+  double nsel = -999;
+
+  nsel = plotUtils.PrintStat(tag+Form(" %d. Beam ID",  icut++), AnaIO::hCutBeamIDPass, 1, 1, ientry);
+  nsel = plotUtils.PrintStat(tag+Form(" %d. Pandora beam type",  icut++), AnaIO::hCutBeamType, 13, 13, nsel);
+  nsel = plotUtils.PrintStat(tag+Form(" %d. Beam Pos",  icut++), AnaIO::hCutBeamPosPass, 1, 1, nsel);
+  nsel = plotUtils.PrintStat(tag+Form(" %d. APA3",  icut++), AnaIO::hCutBeamEndZPass, 1, 1, nsel);
+  nsel = plotUtils.PrintStat(tag+Form(" %d. Nproton", icut++), AnaIO::hCutnproton, 1, 100000, nsel);
+  nsel = plotUtils.PrintStat(tag+Form(" %d. Nshower",  icut++), AnaIO::hCutnshower, 2, 100000, nsel);
+  nsel = plotUtils.PrintStat(tag+Form(" %d. Npiplus",  icut++), AnaIO::hCutnpiplus, 0, 0, nsel);
+  nsel = plotUtils.PrintStat(tag+Form(" %d. Nmichel",  icut++), AnaIO::hCutnmichel, 0, 0, nsel);
+  
+  printf("End of %d cuts: %.1f selected\n", icut, nsel);
+
+  const double nsig = AnaIO::hTruthSignal->GetBinContent(2);
+  const double nbk = AnaIO::hTruthSignal->GetBinContent(1);
+  const double nall = nsig+nbk;
+  const double purity = nsig/nall;
+
+  cout << "nAll: " << nall << " nSignal: " << nsig << " nBackground: " << nbk << endl;
+  cout << "purity: " << purity << endl;
   return BeamCount;
   
 } // End of anaRec
