@@ -123,6 +123,39 @@ void PlotUtils::ProcessHist(TList *lout, const bool kMC)
       // Do nothing (You can add more else if to process more tags)
       else {}
     } // End of if(htmp)
+
+    // Stack histogram
+    THStack * hstk = dynamic_cast<THStack *>(lout->At(ii));
+    if(hstk){
+      const TString tag = hstk->GetName();
+      if(tag.Contains("stkTruth") && kMC == true){
+        // Get the name of raw shower histogram
+        TRegexp re("stk");
+        TString tmp = tag;
+        tmp(re) = "";
+        cout << "tmp: " << tmp << endl;
+        // Get the histogram name
+        TString name1p0n = tmp+"1p0n";
+        TString nameNp0n = tmp+"Np0n";
+        TString name1pMn = tmp+"1pMn";
+        TString nameNpMn = tmp+"NpMn";
+        // Find histograms in the list
+        TH1D *hh1p0n = (TH1D*)lout->FindObject(name1p0n);
+        TH1D *hhNp0n = (TH1D*)lout->FindObject(nameNp0n); 
+        TH1D *hh1pMn = (TH1D*)lout->FindObject(name1pMn); 
+        TH1D *hhNpMn = (TH1D*)lout->FindObject(nameNpMn); 
+        // Add to stk
+        hh1p0n->SetFillColor(GetColor(1014));
+        hstk->Add(hh1p0n);
+        hhNp0n->SetFillColor(GetColor(1011));
+        hstk->Add(hhNp0n);
+        hh1pMn->SetFillColor(GetColor(1007));
+        hstk->Add(hh1pMn);
+        hhNpMn->SetFillColor(GetColor(kOrange));
+        hstk->Add(hhNpMn);
+      }
+      else{}
+    } // End of if(hstk)
   } // End of for loop
 }
 void PlotUtils::DrawHist(TList *lout, const double plotscale, TList * overlayList, const TString outdir)

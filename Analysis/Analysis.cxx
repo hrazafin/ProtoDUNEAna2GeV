@@ -83,11 +83,6 @@ int anaRec(const TString finName, TList *lout, const TString tag, const int nEnt
     tout->Fill();
   } // End of while loop
 
-  // Add truth TKI stack
-  if(kMC){
-    anaUtils.AddTruthTKIstk();
-  }
-
   cout << "All entries: " << ientry << endl;
   cout << "BeamCount: " << BeamCount << endl;
   

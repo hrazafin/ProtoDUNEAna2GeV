@@ -740,7 +740,7 @@ void AnaUtils::DoTruthTKICalculation(){
   AnaIO::hTruthDphit->Fill(AnaIO::dphit);
   AnaIO::hTruthDpt->Fill(AnaIO::dpt);
   AnaIO::hTruthPn->Fill(AnaIO::pn);
-  
+  // 1p0n
   if(NParList[0] == 1 && NParList[1] == 0){
     AnaIO::hTruthDalphat1p0n->Fill(AnaIO::dalphat);
     AnaIO::hTruthDphit1p0n->Fill(AnaIO::dphit);
@@ -754,6 +754,7 @@ void AnaUtils::DoTruthTKICalculation(){
     AnaIO::hTruthThetaFinProton1p0n->Fill(AnaIO::finProtontheta);
     AnaIO::hTruthMomFin2Proton1p0n->Fill(AnaIO::fin2Pmom);
   }
+  // Np0n
   if(NParList[0] != 1 && NParList[1] == 0){
     AnaIO::hTruthDalphatNp0n->Fill(AnaIO::dalphat);
     AnaIO::hTruthDphitNp0n->Fill(AnaIO::dphit);
@@ -767,6 +768,7 @@ void AnaUtils::DoTruthTKICalculation(){
     AnaIO::hTruthThetaFinProtonNp0n->Fill(AnaIO::finProtontheta);
     AnaIO::hTruthMomFin2ProtonNp0n->Fill(AnaIO::fin2Pmom);
   }
+  // 1pMn
   if(NParList[0] == 1 && NParList[1] != 0){
     AnaIO::hTruthDalphat1pMn->Fill(AnaIO::dalphat);
     AnaIO::hTruthDphit1pMn->Fill(AnaIO::dphit);
@@ -780,6 +782,7 @@ void AnaUtils::DoTruthTKICalculation(){
     AnaIO::hTruthThetaFinProton1pMn->Fill(AnaIO::finProtontheta);
     AnaIO::hTruthMomFin2Proton1pMn->Fill(AnaIO::fin2Pmom);
   } 
+  // NpMn
   if(NParList[0] != 1 && NParList[1] != 0){
     AnaIO::hTruthDalphatNpMn->Fill(AnaIO::dalphat);
     AnaIO::hTruthDphitNpMn->Fill(AnaIO::dphit);
@@ -793,113 +796,4 @@ void AnaUtils::DoTruthTKICalculation(){
     AnaIO::hTruthThetaFinProtonNpMn->Fill(AnaIO::finProtontheta);
     AnaIO::hTruthMomFin2ProtonNpMn->Fill(AnaIO::fin2Pmom);
   }
-}
-
-void AnaUtils::AddTruthTKIstk(){
-  // Event Categories 
-  vector<TString> cns;
-  cns.push_back("all");
-  cns.push_back("1p0n");
-  cns.push_back("Np0n");
-  cns.push_back("1pMn");
-  cns.push_back("NpMn");
-
-  AnaIO::hTruthDalphat1p0n->SetFillColor(plotUtils.GetColor(1014));
-  AnaIO::stkTruthDalphat->Add(AnaIO::hTruthDalphat1p0n);
-  AnaIO::hTruthDalphatNp0n->SetFillColor(plotUtils.GetColor(1011));
-  AnaIO::stkTruthDalphat->Add(AnaIO::hTruthDalphatNp0n);
-  AnaIO::hTruthDalphat1pMn->SetFillColor(plotUtils.GetColor(1007));
-  AnaIO::stkTruthDalphat->Add(AnaIO::hTruthDalphat1pMn);
-  AnaIO::hTruthDalphatNpMn->SetFillColor(plotUtils.GetColor(kOrange));
-  AnaIO::stkTruthDalphat->Add(AnaIO::hTruthDalphatNpMn);
-
-  AnaIO::hTruthDphit1p0n->SetFillColor(plotUtils.GetColor(1014));
-  AnaIO::stkTruthDphit->Add(AnaIO::hTruthDphit1p0n);
-  AnaIO::hTruthDphitNp0n->SetFillColor(plotUtils.GetColor(1011));
-  AnaIO::stkTruthDphit->Add(AnaIO::hTruthDphitNp0n);
-  AnaIO::hTruthDphit1pMn->SetFillColor(plotUtils.GetColor(1007));
-  AnaIO::stkTruthDphit->Add(AnaIO::hTruthDphit1pMn);
-  AnaIO::hTruthDphitNpMn->SetFillColor(plotUtils.GetColor(kOrange));
-  AnaIO::stkTruthDphit->Add(AnaIO::hTruthDphitNpMn);
-
-  AnaIO::hTruthDpt1p0n->SetFillColor(plotUtils.GetColor(1014));
-  AnaIO::stkTruthDpt->Add(AnaIO::hTruthDpt1p0n);
-  AnaIO::hTruthDptNp0n->SetFillColor(plotUtils.GetColor(1011));
-  AnaIO::stkTruthDpt->Add(AnaIO::hTruthDptNp0n);
-  AnaIO::hTruthDpt1pMn->SetFillColor(plotUtils.GetColor(1007));
-  AnaIO::stkTruthDpt->Add(AnaIO::hTruthDpt1pMn);
-  AnaIO::hTruthDptNpMn->SetFillColor(plotUtils.GetColor(kOrange));
-  AnaIO::stkTruthDpt->Add(AnaIO::hTruthDptNpMn);
-
-  AnaIO::hTruthPn1p0n->SetFillColor(plotUtils.GetColor(1014));
-  AnaIO::stkTruthPn->Add(AnaIO::hTruthPn1p0n);
-  AnaIO::hTruthPnNp0n->SetFillColor(plotUtils.GetColor(1011));
-  AnaIO::stkTruthPn->Add(AnaIO::hTruthPnNp0n);
-  AnaIO::hTruthPn1pMn->SetFillColor(plotUtils.GetColor(1007));
-  AnaIO::stkTruthPn->Add(AnaIO::hTruthPn1pMn);
-  AnaIO::hTruthPnNpMn->SetFillColor(plotUtils.GetColor(kOrange));
-  AnaIO::stkTruthPn->Add(AnaIO::hTruthPnNpMn);
-
-  AnaIO::hTruthMomIniPi1p0n->SetFillColor(plotUtils.GetColor(1014));
-  AnaIO::stkTruthMomIniPi->Add(AnaIO::hTruthMomIniPi1p0n);
-  AnaIO::hTruthMomIniPiNp0n->SetFillColor(plotUtils.GetColor(1011));
-  AnaIO::stkTruthMomIniPi->Add(AnaIO::hTruthMomIniPiNp0n);
-  AnaIO::hTruthMomIniPi1pMn->SetFillColor(plotUtils.GetColor(1007));
-  AnaIO::stkTruthMomIniPi->Add(AnaIO::hTruthMomIniPi1pMn);
-  AnaIO::hTruthMomIniPiNpMn->SetFillColor(plotUtils.GetColor(kOrange));
-  AnaIO::stkTruthMomIniPi->Add(AnaIO::hTruthMomIniPiNpMn);
-
-  AnaIO::hTruthThetaIniPi1p0n->SetFillColor(plotUtils.GetColor(1014));
-  AnaIO::stkTruthThetaIniPi->Add(AnaIO::hTruthThetaIniPi1p0n);
-  AnaIO::hTruthThetaIniPiNp0n->SetFillColor(plotUtils.GetColor(1011));
-  AnaIO::stkTruthThetaIniPi->Add(AnaIO::hTruthThetaIniPiNp0n);
-  AnaIO::hTruthThetaIniPi1pMn->SetFillColor(plotUtils.GetColor(1007));
-  AnaIO::stkTruthThetaIniPi->Add(AnaIO::hTruthThetaIniPi1pMn);
-  AnaIO::hTruthThetaIniPiNpMn->SetFillColor(plotUtils.GetColor(kOrange));
-  AnaIO::stkTruthThetaIniPi->Add(AnaIO::hTruthThetaIniPiNpMn);
-
-  AnaIO::hTruthMomFinPi1p0n->SetFillColor(plotUtils.GetColor(1014));
-  AnaIO::stkTruthMomFinPi->Add(AnaIO::hTruthMomFinPi1p0n);
-  AnaIO::hTruthMomFinPiNp0n->SetFillColor(plotUtils.GetColor(1011));
-  AnaIO::stkTruthMomFinPi->Add(AnaIO::hTruthMomFinPiNp0n);
-  AnaIO::hTruthMomFinPi1pMn->SetFillColor(plotUtils.GetColor(1007));
-  AnaIO::stkTruthMomFinPi->Add(AnaIO::hTruthMomFinPi1pMn);
-  AnaIO::hTruthMomFinPiNpMn->SetFillColor(plotUtils.GetColor(kOrange));
-  AnaIO::stkTruthMomFinPi->Add(AnaIO::hTruthMomFinPiNpMn);
-
-  AnaIO::hTruthThetaFinPi1p0n->SetFillColor(plotUtils.GetColor(1014));
-  AnaIO::stkTruthThetaFinPi->Add(AnaIO::hTruthThetaFinPi1p0n);
-  AnaIO::hTruthThetaFinPiNp0n->SetFillColor(plotUtils.GetColor(1011));
-  AnaIO::stkTruthThetaFinPi->Add(AnaIO::hTruthThetaFinPiNp0n);
-  AnaIO::hTruthThetaFinPi1pMn->SetFillColor(plotUtils.GetColor(1007));
-  AnaIO::stkTruthThetaFinPi->Add(AnaIO::hTruthThetaFinPi1pMn);
-  AnaIO::hTruthThetaFinPiNpMn->SetFillColor(plotUtils.GetColor(kOrange));
-  AnaIO::stkTruthThetaFinPi->Add(AnaIO::hTruthThetaFinPiNpMn);
-
-  AnaIO::hTruthMomFinProton1p0n->SetFillColor(plotUtils.GetColor(1014));
-  AnaIO::stkTruthMomFinProton->Add(AnaIO::hTruthMomFinProton1p0n);
-  AnaIO::hTruthMomFinProtonNp0n->SetFillColor(plotUtils.GetColor(1011));
-  AnaIO::stkTruthMomFinProton->Add(AnaIO::hTruthMomFinProtonNp0n);
-  AnaIO::hTruthMomFinProton1pMn->SetFillColor(plotUtils.GetColor(1007));
-  AnaIO::stkTruthMomFinProton->Add(AnaIO::hTruthMomFinProton1pMn);
-  AnaIO::hTruthMomFinProtonNpMn->SetFillColor(plotUtils.GetColor(kOrange));
-  AnaIO::stkTruthMomFinProton->Add(AnaIO::hTruthMomFinProtonNpMn);
-
-  AnaIO::hTruthThetaFinProton1p0n->SetFillColor(plotUtils.GetColor(1014));
-  AnaIO::stkTruthThetaFinProton->Add(AnaIO::hTruthThetaFinProton1p0n);
-  AnaIO::hTruthThetaFinProtonNp0n->SetFillColor(plotUtils.GetColor(1011));
-  AnaIO::stkTruthThetaFinProton->Add(AnaIO::hTruthThetaFinProtonNp0n);
-  AnaIO::hTruthThetaFinProton1pMn->SetFillColor(plotUtils.GetColor(1007));
-  AnaIO::stkTruthThetaFinProton->Add(AnaIO::hTruthThetaFinProton1pMn);
-  AnaIO::hTruthThetaFinProtonNpMn->SetFillColor(plotUtils.GetColor(kOrange));
-  AnaIO::stkTruthThetaFinProton->Add(AnaIO::hTruthThetaFinProtonNpMn);
-
-  AnaIO::hTruthMomFin2Proton1p0n->SetFillColor(plotUtils.GetColor(1014));
-  AnaIO::stkTruthMomFin2Proton->Add(AnaIO::hTruthMomFin2Proton1p0n);
-  AnaIO::hTruthMomFin2ProtonNp0n->SetFillColor(plotUtils.GetColor(1011));
-  AnaIO::stkTruthMomFin2Proton->Add(AnaIO::hTruthMomFin2ProtonNp0n);
-  AnaIO::hTruthMomFin2Proton1pMn->SetFillColor(plotUtils.GetColor(1007));
-  AnaIO::stkTruthMomFin2Proton->Add(AnaIO::hTruthMomFin2Proton1pMn);
-  AnaIO::hTruthMomFin2ProtonNpMn->SetFillColor(plotUtils.GetColor(kOrange));
-  AnaIO::stkTruthMomFin2Proton->Add(AnaIO::hTruthMomFin2ProtonNpMn);
 }
