@@ -194,20 +194,87 @@ namespace AnaIO
   TH1I * hTruthNproton = 0x0;
   TH1I * hTruthNneutron = 0x0;
   TH1I * hTruthNPiZero = 0x0;
+
   TH1D * hTruthMomIniPi = 0x0;
+  TH1D * hTruthThetaIniPi = 0x0;
   TH1D * hTruthMomFinPi = 0x0;
+  TH1D * hTruthThetaFinPi = 0x0;
+
   TH1D * hTruthMomFinProton = 0x0;
+  TH1D * hTruthThetaFinProton = 0x0;
+
+  TH1D * hTruthMomFin2Proton = 0x0;
+
   TH1D * hTruthDalphat = 0x0;
   TH1D * hTruthDphit = 0x0;
   TH1D * hTruthDpt = 0x0;
   TH1D * hTruthPn = 0x0;
 
   THStack * stkTruthDalphat = 0x0;
-  TH1D * hTruthDalphatall = 0x0;
   TH1D * hTruthDalphat1p0n = 0x0;
   TH1D * hTruthDalphatNp0n = 0x0;
   TH1D * hTruthDalphat1pMn = 0x0; 
   TH1D * hTruthDalphatNpMn = 0x0;
+
+  THStack * stkTruthDphit = 0x0;
+  TH1D * hTruthDphit1p0n = 0x0;
+  TH1D * hTruthDphitNp0n = 0x0;
+  TH1D * hTruthDphit1pMn = 0x0; 
+  TH1D * hTruthDphitNpMn = 0x0;
+
+  THStack * stkTruthDpt = 0x0;
+  TH1D * hTruthDpt1p0n = 0x0;
+  TH1D * hTruthDptNp0n = 0x0;
+  TH1D * hTruthDpt1pMn = 0x0; 
+  TH1D * hTruthDptNpMn = 0x0;
+
+  THStack * stkTruthPn = 0x0;
+  TH1D * hTruthPn1p0n = 0x0;
+  TH1D * hTruthPnNp0n = 0x0;
+  TH1D * hTruthPn1pMn = 0x0; 
+  TH1D * hTruthPnNpMn = 0x0;
+
+  THStack * stkTruthMomIniPi = 0x0;
+  TH1D * hTruthMomIniPi1p0n = 0x0;
+  TH1D * hTruthMomIniPiNp0n = 0x0;
+  TH1D * hTruthMomIniPi1pMn = 0x0; 
+  TH1D * hTruthMomIniPiNpMn = 0x0;
+
+  THStack * stkTruthThetaIniPi = 0x0;
+  TH1D * hTruthThetaIniPi1p0n = 0x0;
+  TH1D * hTruthThetaIniPiNp0n = 0x0;
+  TH1D * hTruthThetaIniPi1pMn = 0x0; 
+  TH1D * hTruthThetaIniPiNpMn = 0x0;
+
+  THStack * stkTruthMomFinPi = 0x0;
+  TH1D * hTruthMomFinPi1p0n = 0x0;
+  TH1D * hTruthMomFinPiNp0n = 0x0;
+  TH1D * hTruthMomFinPi1pMn = 0x0; 
+  TH1D * hTruthMomFinPiNpMn = 0x0;
+
+  THStack * stkTruthThetaFinPi = 0x0;
+  TH1D * hTruthThetaFinPi1p0n = 0x0;
+  TH1D * hTruthThetaFinPiNp0n = 0x0;
+  TH1D * hTruthThetaFinPi1pMn = 0x0; 
+  TH1D * hTruthThetaFinPiNpMn = 0x0;
+
+  THStack * stkTruthMomFinProton = 0x0;
+  TH1D * hTruthMomFinProton1p0n = 0x0;
+  TH1D * hTruthMomFinProtonNp0n = 0x0;
+  TH1D * hTruthMomFinProton1pMn = 0x0; 
+  TH1D * hTruthMomFinProtonNpMn = 0x0;
+
+  THStack * stkTruthThetaFinProton = 0x0;
+  TH1D * hTruthThetaFinProton1p0n = 0x0;
+  TH1D * hTruthThetaFinProtonNp0n = 0x0;
+  TH1D * hTruthThetaFinProton1pMn = 0x0; 
+  TH1D * hTruthThetaFinProtonNpMn = 0x0;
+
+  THStack * stkTruthMomFin2Proton = 0x0;
+  TH1D * hTruthMomFin2Proton1p0n = 0x0;
+  TH1D * hTruthMomFin2ProtonNp0n = 0x0;
+  TH1D * hTruthMomFin2Proton1pMn = 0x0; 
+  TH1D * hTruthMomFin2ProtonNpMn = 0x0;
 
   // Resolution histograms need to use truth info
   TH2D * hBeamThetaRes = 0x0;
@@ -519,37 +586,151 @@ namespace AnaIO
       lout->Add(hTruthNneutron);
       hTruthNPiZero = new TH1I("f102TruthNPiZero","",11, -0.5, 10.5); 
       lout->Add(hTruthNPiZero);
-      hTruthMomIniPi = new TH1D("f103TruthMomIniPi","", 50, 0, 2); 
+
+      hTruthMomIniPi = new TH1D("f103TruthMomIniPi","", 30, 0, 1.3); 
       lout->Add(hTruthMomIniPi);
-      hTruthMomFinPi = new TH1D("f104TruthMomFinPi","", 50, 0, 2); 
+      hTruthThetaIniPi = new TH1D("f104TruthThetaIniPi","", 30, 0, 30); 
+      lout->Add(hTruthThetaIniPi);
+      hTruthMomFinPi = new TH1D("f105TruthMomFinPi","", 20, 0, 1.1); 
       lout->Add(hTruthMomFinPi);
-      hTruthMomFinProton = new TH1D("f105TruthMomFinProton","", 50, 0, 2); 
+      hTruthThetaFinPi = new TH1D("f106TruthThetaFinPi","", 20, 0, 180); 
+      lout->Add(hTruthThetaFinPi);
+      hTruthMomFinProton = new TH1D("f107TruthMomFinProton","", 30, 0, 1.5); 
       lout->Add(hTruthMomFinProton);
+      hTruthThetaFinProton = new TH1D("f108TruthThetaFinProton","", 20, 0, 180); 
+      lout->Add(hTruthThetaFinProton);
+      hTruthMomFin2Proton = new TH1D("f109TruthMomFin2Proton","", 30, 0, 1.5); 
+      lout->Add(hTruthMomFin2Proton);
 
       hTruthDalphat = new TH1D("f200TruthDalphat","", 18, 0, 180); 
       lout->Add(hTruthDalphat);
-      const double Fbin[]={0.000000, 2.500000, 5.000000, 7.500000, 10.000000, 12.500000, 15.000000, 17.500000, 20.000000, 22.500000, 25.000000, 27.500000, 30.000000, 35.000000, 40.000000, 45.000000, 50.000000, 55.000000, 60.000000, 70.000000, 85.000000, 105.000000, 130.000000, 180.000000};
-      hTruthDphit = new TH1D("f201TruthDphit","", sizeof(Fbin)/sizeof(double)-1, Fbin); 
+      hTruthDphit = new TH1D("f201TruthDphit","", 18, 0, 180); 
       lout->Add(hTruthDphit);
-      const double Gbin[]={0.000000, 0.025000, 0.050000, 0.075000, 0.100000, 0.125000, 0.150000, 0.175000, 0.200000, 0.225000, 0.250000, 0.275000, 0.300000, 0.350000, 0.400000, 0.450000, 0.500000, 0.550000, 0.600000, 0.650000, 0.700000, 0.800000, 1.000000, 1.200000, 2.000000};
-      hTruthDpt = new TH1D("f202TruthDpt","", sizeof(Gbin)/sizeof(double)-1, Gbin); 
+      hTruthDpt = new TH1D("f202TruthDpt","", 30, 0, 1.2); 
       lout->Add(hTruthDpt);
-      const double Hbin[]={0.000000, 0.025000, 0.050000, 0.075000, 0.100000, 0.125000, 0.150000, 0.175000, 0.200000, 0.225000, 0.250000, 0.275000, 0.300000, 0.350000, 0.400000, 0.450000, 0.500000, 0.550000, 0.600000, 0.650000, 0.700000, 0.800000, 1.000000, 1.200000, 2.000000};
-      hTruthPn = new TH1D("f203TruthPn","", sizeof(Hbin)/sizeof(double)-1, Hbin); 
+      hTruthPn = new TH1D("f203TruthPn","", 30, 0, 1.2); 
       lout->Add(hTruthPn);
 
-      stkTruthDalphat = new THStack("f303stkTruthDalphat",""); 
+      stkTruthDalphat = new THStack("f300stkTruthDalphat",""); 
       lout->Add(stkTruthDalphat);
-      hTruthDalphatall = new TH1D("f304TruthDalphatall","", 18, 0, 180); 
-      lout->Add(hTruthDalphatall);
-      hTruthDalphat1p0n = new TH1D("f304TruthDalphat1p0n","", 18, 0, 180); 
+      hTruthDalphat1p0n = new TH1D("f300TruthDalphat1p0n","", 18, 0, 180); 
       lout->Add(hTruthDalphat1p0n);
-      hTruthDalphatNp0n = new TH1D("f304TruthDalphatNp0n","", 18, 0, 180); 
+      hTruthDalphatNp0n = new TH1D("f300TruthDalphatNp0n","", 18, 0, 180); 
       lout->Add(hTruthDalphatNp0n);
-      hTruthDalphat1pMn = new TH1D("f304TruthDalphat1pMn","", 18, 0, 180); 
+      hTruthDalphat1pMn = new TH1D("f300TruthDalphat1pMn","", 18, 0, 180); 
       lout->Add(hTruthDalphat1pMn);
-      hTruthDalphatNpMn = new TH1D("f304TruthDalphatNpMn","", 18, 0, 180); 
+      hTruthDalphatNpMn = new TH1D("f300TruthDalphatNpMn","", 18, 0, 180); 
       lout->Add(hTruthDalphatNpMn);
+
+      stkTruthDphit = new THStack("f301stkTruthDphit",""); 
+      lout->Add(stkTruthDphit);
+      hTruthDphit1p0n = new TH1D("f301TruthDphit1p0n","", 18, 0, 180); 
+      lout->Add(hTruthDphit1p0n);
+      hTruthDphitNp0n = new TH1D("f301TruthDphitNp0n","", 18, 0, 180); 
+      lout->Add(hTruthDphitNp0n);
+      hTruthDphit1pMn = new TH1D("f301TruthDphit1pMn","", 18, 0, 180); 
+      lout->Add(hTruthDphit1pMn);
+      hTruthDphitNpMn = new TH1D("f301TruthDphitNpMn","", 18, 0, 180); 
+      lout->Add(hTruthDphitNpMn);
+
+      stkTruthDpt = new THStack("f302stkTruthDpt",""); 
+      lout->Add(stkTruthDpt);
+      hTruthDpt1p0n = new TH1D("f302TruthDpt1p0n","", 30, 0, 1.2); 
+      lout->Add(hTruthDpt1p0n);
+      hTruthDptNp0n = new TH1D("f302TruthDptNp0n","", 30, 0, 1.2); 
+      lout->Add(hTruthDptNp0n);
+      hTruthDpt1pMn = new TH1D("f302TruthDpt1pMn","", 30, 0, 1.2); 
+      lout->Add(hTruthDpt1pMn);
+      hTruthDptNpMn = new TH1D("f302TruthDptNpMn","", 30, 0, 1.2); 
+      lout->Add(hTruthDptNpMn);
+
+      stkTruthPn = new THStack("f303stkTruthPn",""); 
+      lout->Add(stkTruthPn);
+      hTruthPn1p0n = new TH1D("f303TruthPn1p0n","", 30, 0, 1.2); 
+      lout->Add(hTruthPn1p0n);
+      hTruthPnNp0n = new TH1D("f303TruthPnNp0n","", 30, 0, 1.2); 
+      lout->Add(hTruthPnNp0n);
+      hTruthPn1pMn = new TH1D("f303TruthPn1pMn","", 30, 0, 1.2); 
+      lout->Add(hTruthPn1pMn);
+      hTruthPnNpMn = new TH1D("f303TruthPnNpMn","", 30, 0, 1.2); 
+      lout->Add(hTruthPnNpMn);
+
+      stkTruthMomIniPi = new THStack("f400stkTruthMomIniPi",""); 
+      lout->Add(stkTruthMomIniPi);
+      hTruthMomIniPi1p0n = new TH1D("f400TruthMomIniPi1p0n","", 30, 0, 1.2); 
+      lout->Add(hTruthMomIniPi1p0n);
+      hTruthMomIniPiNp0n = new TH1D("f400TruthMomIniPiNp0n","", 30, 0, 1.2); 
+      lout->Add(hTruthMomIniPiNp0n);
+      hTruthMomIniPi1pMn = new TH1D("f400TruthMomIniPi1pMn","", 30, 0, 1.2); 
+      lout->Add(hTruthMomIniPi1pMn);
+      hTruthMomIniPiNpMn = new TH1D("f400TruthMomIniPiNpMn","", 30, 0, 1.2); 
+      lout->Add(hTruthMomIniPiNpMn);
+
+      stkTruthThetaIniPi = new THStack("f401stkTruthThetaIniPi",""); 
+      lout->Add(stkTruthThetaIniPi);
+      hTruthThetaIniPi1p0n = new TH1D("f401TruthThetaIniPi1p0n","", 30, 0, 30); 
+      lout->Add(hTruthThetaIniPi1p0n);
+      hTruthThetaIniPiNp0n = new TH1D("f401TruthThetaIniPiNp0n","", 30, 0, 30); 
+      lout->Add(hTruthThetaIniPiNp0n);
+      hTruthThetaIniPi1pMn = new TH1D("f401TruthThetaIniPi1pMn","", 30, 0, 30); 
+      lout->Add(hTruthThetaIniPi1pMn);
+      hTruthThetaIniPiNpMn = new TH1D("f401TruthThetaIniPiNpMn","", 30, 0, 30); 
+      lout->Add(hTruthThetaIniPiNpMn);
+
+      stkTruthMomFinPi = new THStack("f402stkTruthMomFinPi",""); 
+      lout->Add(stkTruthMomFinPi);
+      hTruthMomFinPi1p0n = new TH1D("f402TruthMomFinPi1p0n","", 20, 0, 1.1); 
+      lout->Add(hTruthMomFinPi1p0n);
+      hTruthMomFinPiNp0n = new TH1D("f402TruthMomFinPiNp0n","", 20, 0, 1.1); 
+      lout->Add(hTruthMomFinPiNp0n);
+      hTruthMomFinPi1pMn = new TH1D("f402TruthMomFinPi1pMn","", 20, 0, 1.1); 
+      lout->Add(hTruthMomFinPi1pMn);
+      hTruthMomFinPiNpMn = new TH1D("f402TruthMomFinPiNpMn","", 20, 0, 1.1); 
+      lout->Add(hTruthMomFinPiNpMn);
+
+      stkTruthThetaFinPi = new THStack("f403stkTruthThetaFinPi",""); 
+      lout->Add(stkTruthThetaFinPi);
+      hTruthThetaFinPi1p0n = new TH1D("f403TruthThetaFinPi1p0n","", 20, 0, 180); 
+      lout->Add(hTruthThetaFinPi1p0n);
+      hTruthThetaFinPiNp0n = new TH1D("f403TruthThetaFinPiNp0n","", 20, 0, 180); 
+      lout->Add(hTruthThetaFinPiNp0n);
+      hTruthThetaFinPi1pMn = new TH1D("f403TruthThetaFinPi1pMn","", 20, 0, 180); 
+      lout->Add(hTruthThetaFinPi1pMn);
+      hTruthThetaFinPiNpMn = new TH1D("f403TruthThetaFinPiNpMn","", 20, 0, 180); 
+      lout->Add(hTruthThetaFinPiNpMn);
+
+      stkTruthMomFinProton = new THStack("f404stkTruthMomFinProton",""); 
+      lout->Add(stkTruthMomFinProton);
+      hTruthMomFinProton1p0n = new TH1D("f404TruthMomFinProton1p0n","", 30, 0, 1.5); 
+      lout->Add(hTruthMomFinProton1p0n);
+      hTruthMomFinProtonNp0n = new TH1D("f404TruthMomFinProtonNp0n","", 30, 0, 1.5); 
+      lout->Add(hTruthMomFinProtonNp0n);
+      hTruthMomFinProton1pMn = new TH1D("f404TruthMomFinProton1pMn","", 30, 0, 1.5); 
+      lout->Add(hTruthMomFinProton1pMn);
+      hTruthMomFinProtonNpMn = new TH1D("f404TruthMomFinProtonNpMn","", 30, 0, 1.5); 
+      lout->Add(hTruthMomFinProtonNpMn);
+
+      stkTruthThetaFinProton = new THStack("f405stkTruthThetaFinProton",""); 
+      lout->Add(stkTruthThetaFinProton);
+      hTruthThetaFinProton1p0n = new TH1D("f405TruthThetaFinProton1p0n","", 20, 0, 180); 
+      lout->Add(hTruthThetaFinProton1p0n);
+      hTruthThetaFinProtonNp0n = new TH1D("f405TruthThetaFinProtonNp0n","", 20, 0, 180); 
+      lout->Add(hTruthThetaFinProtonNp0n);
+      hTruthThetaFinProton1pMn = new TH1D("f405TruthThetaFinProton1pMn","", 20, 0, 180); 
+      lout->Add(hTruthThetaFinProton1pMn);
+      hTruthThetaFinProtonNpMn = new TH1D("f405TruthThetaFinProtonNpMn","", 20, 0, 180); 
+      lout->Add(hTruthThetaFinProtonNpMn);
+
+      stkTruthMomFin2Proton = new THStack("f406stkTruthMomFin2Proton",""); 
+      lout->Add(stkTruthMomFin2Proton);
+      hTruthMomFin2Proton1p0n = new TH1D("f406TruthMomFin2Proton1p0n","", 30, 0, 1.5); 
+      lout->Add(hTruthMomFin2Proton1p0n);
+      hTruthMomFin2ProtonNp0n = new TH1D("f406TruthMomFin2ProtonNp0n","", 30, 0, 1.5); 
+      lout->Add(hTruthMomFin2ProtonNp0n);
+      hTruthMomFin2Proton1pMn = new TH1D("f406TruthMomFin2Proton1pMn","", 30, 0, 1.5); 
+      lout->Add(hTruthMomFin2Proton1pMn);
+      hTruthMomFin2ProtonNpMn = new TH1D("f406TruthMomFin2ProtonNpMn","", 30, 0, 1.5); 
+      lout->Add(hTruthMomFin2ProtonNpMn); 
 
       hBeamThetaRes = new TH2D("g001BeamTheta_RES","", 80 , 0, 60, 25, -20, 30);
       lout->Add(hBeamThetaRes);
