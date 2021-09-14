@@ -740,6 +740,7 @@ void AnaUtils::DoTruthTKICalculation(){
   AnaIO::hTruthDphit->Fill(AnaIO::dphit);
   AnaIO::hTruthDpt->Fill(AnaIO::dpt);
   AnaIO::hTruthPn->Fill(AnaIO::pn);
+
   // 1p0n
   if(NParList[0] == 1 && NParList[1] == 0){
     AnaIO::hTruthDalphat1p0n->Fill(AnaIO::dalphat);

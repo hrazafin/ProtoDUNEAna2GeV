@@ -154,6 +154,7 @@ int main(int argc, char * argv[])
   fout->Close();
   // Calculate the Data/MC normalisation constant
   double plotScale = dataBeamCount/mcBeamCount;
+  cout << "plotScale: " << plotScale << endl;
   // Draw all histograms
   plotUtils.DrawHist(mclout,plotScale,datalout,"output");
 }

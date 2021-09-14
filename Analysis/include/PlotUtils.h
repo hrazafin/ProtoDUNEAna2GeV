@@ -74,7 +74,7 @@ class PlotUtils
   void FillHist(TH1 * hh,  double xx, const double yy);
   void ProcessHist(TList *lout, const bool kMC);
   void DrawHist(TList *lout, const double plotscale, TList * overlayList, const TString outdir);
-  THStack * ConvertToStack(const TH2D * hh);
+  THStack * ConvertToStack(const TH2D * hh, const bool kMC);
   TH1D * GetStackedSum(THStack *stk);
   void ScaleStack(THStack *stk, const double scale);
   TH2D * NormalHist(const TH2D *hraw, const Double_t thres, const Bool_t kmax);
@@ -84,10 +84,10 @@ class PlotUtils
   void IniColorCB();
   void SetColor();
   int GetColor(const int col);
-  int * GetColorArray(const int minsize);
+  int * GetColorArray(const int minsize = -999);
   void PadSetup(TPad *currentPad, const Double_t currentLeft=0.12, const Double_t currentTop=0.09, const Double_t currentRight=0.13, const Double_t currentBottom=0.14);
   void gStyleSetup();
-
+  TLegend * DrawLegend(const vector<TString> &entries, const vector<TString>& htype, const TString tag, const int *tmpcol=0x0, const int * tmpmkr=0x0, const int ncol = 1);
   void getSliceXDrawY(TH2D * h2d);
 
   private:

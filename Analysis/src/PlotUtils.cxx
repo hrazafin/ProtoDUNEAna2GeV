@@ -81,7 +81,7 @@ void PlotUtils::ProcessHist(TList *lout, const bool kMC)
       // Check if the histogram name contians STK
       if(tag.Contains("STK") || tag.Contains("OVERLAY")){
         // Convert this tmp 2D histogram to a stack histogram
-        THStack * stk = ConvertToStack(htmp);
+        THStack * stk = ConvertToStack(htmp,kMC);
         // Check if the stk exist 
         if(stk){
           // Add to lout for MC
@@ -96,7 +96,7 @@ void PlotUtils::ProcessHist(TList *lout, const bool kMC)
       } // End of STK tag
 
       // Check if the histogram name contians RES (resolution)
-      else if(tag.Contains("RES")){
+      else if(tag.Contains("RES") && kMC){
         // Column normalise each bin to easily see the maximum
         TH2D * hnor = NormalHist(htmp, 5, true);
         hnor->SetTitle(tag);
@@ -110,7 +110,7 @@ void PlotUtils::ProcessHist(TList *lout, const bool kMC)
         lout->Add(hprojX);
       }
       // Check if the histogram name contians REG (regular)
-      else if(tag.Contains("REG")){
+      else if(tag.Contains("REG") && kMC){
         // Column normalise each bin to easily see the maximum
         TH2D * hnor = NormalHist(htmp, 5, true);
         hnor->SetTitle(tag);
@@ -133,7 +133,7 @@ void PlotUtils::ProcessHist(TList *lout, const bool kMC)
         TRegexp re("stk");
         TString tmp = tag;
         tmp(re) = "";
-        cout << "tmp: " << tmp << endl;
+
         // Get the histogram name
         TString name1p0n = tmp+"1p0n";
         TString nameNp0n = tmp+"Np0n";
@@ -144,6 +144,15 @@ void PlotUtils::ProcessHist(TList *lout, const bool kMC)
         TH1D *hhNp0n = (TH1D*)lout->FindObject(nameNp0n); 
         TH1D *hh1pMn = (TH1D*)lout->FindObject(name1pMn); 
         TH1D *hhNpMn = (TH1D*)lout->FindObject(nameNpMn); 
+
+        // Get the total number of entries
+        double ntotall = -999;
+        double n1 = hh1p0n->Integral(0,hh1p0n->GetNbinsX()+1); 
+        double n2 = hhNp0n->Integral(0,hhNp0n->GetNbinsX()+1); 
+        double n3 = hh1pMn->Integral(0,hh1pMn->GetNbinsX()+1); 
+        double n4 = hhNpMn->Integral(0,hhNpMn->GetNbinsX()+1);
+        ntotall = n1 + n2 + n3 + n4;
+
         // Add to stk
         hh1p0n->SetFillColor(GetColor(1014));
         hstk->Add(hh1p0n);
@@ -153,6 +162,8 @@ void PlotUtils::ProcessHist(TList *lout, const bool kMC)
         hstk->Add(hh1pMn);
         hhNpMn->SetFillColor(GetColor(kOrange));
         hstk->Add(hhNpMn);
+
+        hstk->SetTitle(Form("Total %.0f events", ntotall));
       }
       else{}
     } // End of if(hstk)
@@ -170,8 +181,9 @@ void PlotUtils::DrawHist(TList *lout, const double plotscale, TList * overlayLis
   for(int ii=0; ii<lout->GetSize(); ii++){
     // Get the name of the histogram
     const TString tag = lout->At(ii)->GetName();
+    // Skip TTree object in the list
     if(tag == "tree") continue;
-    // Create histograms and stack
+    // Create histograms and stack histogram if they exist
     // 1D histogram
     TH1 * hh = dynamic_cast<TH1*> (lout->At(ii));
     // Stack histogram
@@ -180,7 +192,8 @@ void PlotUtils::DrawHist(TList *lout, const double plotscale, TList * overlayLis
     TH2 * h2d = 0x0;
     // Data overlay histogram
     TH1D *holay = (TH1D*)overlayList->FindObject(tag);
-    // If 1D histogram exist 
+
+    //=========================== 1D and 2D histograms ===========================//
     if(hh){
       // Cast to 2D histogram
       h2d = dynamic_cast<TH2 *>(hh);
@@ -241,11 +254,39 @@ void PlotUtils::DrawHist(TList *lout, const double plotscale, TList * overlayLis
       }
     } // End of if(hh)
 
-    // If stack histogram exist
+    ////=========================== stack histogram ===========================//
     else if (hstk) {
       // Get the data overlay histogram for stack
       holay = (TH1D*)overlayList->FindObject(tag+"_sum");
       hstk->Draw("hist");
+      // Draw legend if needed
+      if(tag.Contains("stkTruth")){
+        const TString tag = hstk->GetName();
+        // Get the name of raw shower histogram
+        TRegexp re("stk");
+        TString tmp = tag;
+        tmp(re) = "";
+        // Get the histogram name
+        TString name1p0n = tmp+"1p0n";
+        TString nameNp0n = tmp+"Np0n";
+        TString name1pMn = tmp+"1pMn";
+        TString nameNpMn = tmp+"NpMn";
+        // Find histograms in the list
+        TH1D *hh1p0n = (TH1D*)lout->FindObject(name1p0n);
+        TH1D *hhNp0n = (TH1D*)lout->FindObject(nameNp0n); 
+        TH1D *hh1pMn = (TH1D*)lout->FindObject(name1pMn); 
+        TH1D *hhNpMn = (TH1D*)lout->FindObject(nameNpMn); 
+        double lxoff = 0.5;
+        if(tmp.Contains("Dalphat") || tmp.Contains("MomIniPi") || tmp.Contains("ThetaIniPi")) lxoff = 0.05;
+        TLegend * lg = new TLegend(lxoff+0.15, 0.65, lxoff+0.35, 0.85);
+        TString lheader("signal phase space");
+        lg->SetHeader(lheader);
+        lg->AddEntry(hh1p0n, "1p0n", "f");
+        lg->AddEntry(hhNp0n, "Np0n", "f");
+        lg->AddEntry(hh1pMn, "1pMn", "f");
+        lg->AddEntry(hhNpMn, "NpMn", "f");
+        lg->Draw("same");
+      }
       if(holay){
         holay->Draw();//to generate statbox
         c1->Update(); 
@@ -254,7 +295,30 @@ void PlotUtils::DrawHist(TList *lout, const double plotscale, TList * overlayLis
         hstk->Draw("hist");
         DrawOverlay(holay);
         c1->Update();
+        
+        const int overlayColor = kBlack;
+
+        vector<TString> evtType;
+        evtType.push_back("signal");
+        evtType.push_back("background");
+        evtType.push_back("non-#pi^{+} beam");
+        evtType.push_back("data");
+
+        vector<TString> htype;
+        htype.push_back("f");
+        htype.push_back("f");
+        htype.push_back("f");
+        htype.push_back("ple");
+
+        int *cols=GetColorArray(4);
+        cols[3]=overlayColor;
+        const int mrks[]={1,1,1,6};
+        TLegend * lg = 0x0;
+        lg = DrawLegend(evtType, htype, tag, cols, mrks);
+        lg->Draw("same");
+  
       }
+      // Spectial case
       else if(tag.Contains("OVERLAY")){
         TH1D * hsum = dynamic_cast<TH1D*> (hstk->GetStack()->Last());
         hstk->SetMaximum(hsum->GetMaximum()*1.2);
@@ -283,11 +347,12 @@ void PlotUtils::DrawHist(TList *lout, const double plotscale, TList * overlayLis
   } // End of for loop
 }
 
-THStack * PlotUtils::ConvertToStack(const TH2D * hh)
+THStack * PlotUtils::ConvertToStack(const TH2D * hh, const bool kMC)
 {
   const TString tag = hh->GetName();
   const TString tit = hh->GetTitle();
-
+  TString typ = "DATA";
+  if(kMC) typ = "MC";
   const int nx = hh->GetNbinsX();
   const double xmin = hh->GetXaxis()->GetBinLowEdge(1);
   const double xmax = hh->GetXaxis()->GetBinUpEdge(nx);
@@ -312,7 +377,7 @@ THStack * PlotUtils::ConvertToStack(const TH2D * hh)
       continue;
     }
 
-    TH1D * htmp = new TH1D(Form("%sy%d", tag.Data(), iy), tit.Data(), nx, xmin, xmax);
+    TH1D * htmp = new TH1D(Form("%s%sy%d", typ.Data(), tag.Data(), iy), tit.Data(), nx, xmin, xmax);
     for(int ix=0; ix<=nx+1; ix++){
       const double ientry = hh->GetBinContent(ix, iy);
       newintegral += ientry;
@@ -340,15 +405,15 @@ TH1D * PlotUtils::GetStackedSum(THStack *stk)
   const TString tag = stk->GetName();
   TH1D * hout = 0x0;
   if(stk->GetHists()){
-  hout = (TH1D*)ll->At(0)->Clone(tag);
-  hout->SetName(tag+"_sum");
-  hout->SetTitle(tag);
-  hout->SetDirectory(0);
-  for(Int_t ii=1; ii<ll->GetEntries(); ii++){
-    hout->Add((TH1D*)ll->At(ii));
-  }
+    hout = (TH1D*)ll->At(0)->Clone(tag);
+    hout->SetName(tag+"_sum");
+    hout->SetTitle(tag);
+    hout->SetDirectory(0);
+    for(Int_t ii=1; ii<ll->GetEntries(); ii++){
+      hout->Add((TH1D*)ll->At(ii));
+    }
 
-  hout->SetEntries(hout->Integral(0,10000));
+    hout->SetEntries(hout->Integral(0,10000));
  }
   return hout;
 }
@@ -561,13 +626,13 @@ void PlotUtils::gStyleSetup()
 void PlotUtils::getProfileFit(TH2D * h2d)
 {
   TH1D *hprof = h2d->ProfileX();
-  auto c0 = new TCanvas("c0","c0",800,600);
+  auto cctmp = new TCanvas("cctmp","cctmp",800,600);
   hprof->SetLineColor(kRed);
   hprof->SetLineWidth(3);
   hprof->Fit("pol1");
   hprof->SetStats(1);
   hprof->Draw();  
-  c0->Print("output/hprof_withP.png");
+  cctmp->Print("output/hprof_withP.png");
 }
 
 void PlotUtils::DrawOverlay(TH1D *holay)
@@ -582,12 +647,12 @@ void PlotUtils::DrawOverlay(TH1D *holay)
 
 void PlotUtils::getSliceXDrawY(TH2D * h2d)
 { 
-  auto c0 = new TCanvas("c0","",1600,1200);
+  auto cc = new TCanvas("cc","cc",1600,1200);
   gStyle->SetOptStat(0);
-  c0->Divide(4,5,0,0);
+  cc->Divide(4,5,0,0);
   
   for(int ii=1; ii<=h2d->GetNbinsX(); ii++){
-    c0->cd(ii);
+    cc->cd(ii);
     TF1 *f1 = new TF1(Form("f1%d",ii),"gaus",-.5,.5);
     //TF1 *f1 = new TF1(Form("f1%d",ii),"[0]*TMath::Landau(x,[1],[2])",0,1);
     TH1D * hpj= h2d->ProjectionY(Form("f1%d",ii), ii, ii);
@@ -598,5 +663,49 @@ void PlotUtils::getSliceXDrawY(TH2D * h2d)
     //hpj->SetStats(0);
     hpj->Draw();
   }  
-    c0->Print("output/hSliceXDrawY.eps");
+    cc->Print("output/hSliceXDrawY.eps");
+}
+
+TLegend *PlotUtils::DrawLegend(const vector<TString> &entries, const vector<TString>& htype, const TString tag, const int *tmpcol, const int * tmpmkr, const int ncol)
+{
+  const int *defcol=GetColorArray();
+  const int * cols=0x0;
+  if(tmpcol){
+    cols=tmpcol;
+  }
+  else{
+    cols=defcol;
+    printf("PlotUtils::DrawLegend using default color\n");
+  }
+
+  const int defmkr[]={20, 24, 21, 25, 22, 26, 23, 32, 34, 28, 29, 30, 20, 24, 21, 25, 22, 26, 23, 32, 34, 28, 29, 30};
+  const int * mkrs=0x0;
+  if(tmpmkr){
+    mkrs=tmpmkr;
+  }
+  else{
+    mkrs=defmkr;
+    printf("PlotUtils::DrawLegend using default maker\n");
+  }
+
+  const int nent = entries.size();
+
+  //SetGlobalStyle();
+
+  TLegend * lg = new TLegend(0.6, 0.6, 0.88, 0.88);
+
+  for(int ii=0; ii<nent; ii++){
+    TH1D * hh=new TH1D(Form("h%d%s",ii,tag.Data()),"",1,0,1);
+    const int col = GetColor(cols[ii]);
+    hh->SetFillColor(col);
+    hh->SetLineColor(col);
+    hh->SetMarkerStyle(mkrs[ii]);
+    hh->SetMarkerSize(3);
+    hh->SetMarkerColor(col);
+    lg->AddEntry(hh, entries[ii], htype[ii]);
+  }
+
+  lg->SetNColumns(ncol);
+
+  return lg;
 }
