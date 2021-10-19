@@ -26,7 +26,7 @@ int anaRec(const TString finName, TList *lout, const TString tag, const int nEnt
   TTree  * tout = AnaIO::GetOutputTree(lout, tag);
   // Initialise reco histograms
   AnaIO::IniHist(lout, kMC);
-
+  // Initialise class objects
   AnaUtils anaUtils;
   AnaCut anaCut;
   PlotUtils plotUtils;

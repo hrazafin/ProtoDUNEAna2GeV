@@ -297,25 +297,69 @@ void PlotUtils::DrawHist(TList *lout, const double plotscale, TList * overlayLis
         c1->Update();
         
         const int overlayColor = kBlack;
+        // Event type legend
+        if(hstk->GetNhists() <= 3){
+          vector<TString> evtType;
+          evtType.push_back("signal");
+          evtType.push_back("background");
+          evtType.push_back("non-#pi^{+} beam");
+          evtType.push_back("data");
 
-        vector<TString> evtType;
-        evtType.push_back("signal");
-        evtType.push_back("background");
-        evtType.push_back("non-#pi^{+} beam");
-        evtType.push_back("data");
+          vector<TString> htype;
+          htype.push_back("f");
+          htype.push_back("f");
+          htype.push_back("f");
+          htype.push_back("ple");
 
-        vector<TString> htype;
-        htype.push_back("f");
-        htype.push_back("f");
-        htype.push_back("f");
-        htype.push_back("ple");
+          int *cols=GetColorArray(4);
+          cols[3]=overlayColor;
+          const int mrks[]={1,1,1,6};
+          TLegend * lg = 0x0;
+          lg = DrawLegend(evtType, htype, tag, cols, mrks);
+          lg->Draw("same");
+        }
+        // Particle type legend
+        else{
+          vector<TString> parType;
+          parType.push_back("p");
+          parType.push_back("#pi^{+}");
+          parType.push_back("#pi^{#minus}");
+          parType.push_back("#gamma");
 
-        int *cols=GetColorArray(4);
-        cols[3]=overlayColor;
-        const int mrks[]={1,1,1,6};
-        TLegend * lg = 0x0;
-        lg = DrawLegend(evtType, htype, tag, cols, mrks);
-        lg->Draw("same");
+          parType.push_back("2ry p");
+          parType.push_back("2ry #pi^{+}");
+          parType.push_back("2ry #pi^{#minus}");
+          parType.push_back("2ry #gamma");
+          parType.push_back("2ry e^{#pm}");
+          parType.push_back("2ry #mu^{#pm}");
+
+          parType.push_back("others");
+          parType.push_back("data");
+
+          vector<TString> htype;//need to matcy parType
+          htype.push_back("f");
+          htype.push_back("f");
+          htype.push_back("f");
+          htype.push_back("f");
+
+          htype.push_back("f");
+          htype.push_back("f");
+          htype.push_back("f");
+          htype.push_back("f");
+          htype.push_back("f");
+          htype.push_back("f");
+
+          htype.push_back("f");
+          htype.push_back("pl");
+
+          const int mrks[]={1,1,1,1, 1,1,1,1,1,1, 1,6};
+          int *cols=GetColorArray(parType.size());
+          cols[parType.size()-1]=overlayColor;
+          TLegend * lg = 0x0;
+          lg = DrawLegend(parType, htype, tag, cols, mrks, 4);
+          lg->Draw("same");
+
+        }
   
       }
       // Spectial case
@@ -691,8 +735,9 @@ TLegend *PlotUtils::DrawLegend(const vector<TString> &entries, const vector<TStr
   const int nent = entries.size();
 
   //SetGlobalStyle();
-
-  TLegend * lg = new TLegend(0.6, 0.6, 0.88, 0.88);
+  TLegend * lg = 0x0;
+  lg = new TLegend(0.6, 0.6, 0.85, 0.85);
+ 
 
   for(int ii=0; ii<nent; ii++){
     TH1D * hh=new TH1D(Form("h%d%s",ii,tag.Data()),"",1,0,1);
