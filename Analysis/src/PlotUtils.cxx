@@ -388,6 +388,7 @@ void PlotUtils::DrawHist(TList *lout, const double plotscale, TList * overlayLis
     }
     else cout << "PlotUtils::DrawHist not found correct histogram!" << " name: " << tag << endl;
     c1->Print(outdir+"/"+tag+".png");
+    
   } // End of for loop
 }
 
