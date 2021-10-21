@@ -306,9 +306,10 @@ namespace AnaIO
   TH2D * hPi0MomentumResFit = 0x0;
   TH2D * hPi0MassResFit = 0x0;
 
-  TH1D * hPi0Momentum = 0x0;
-  TH1D * hldShowerTheta = 0x0;
-  TH1D * hslShowerTheta = 0x0;
+  TH1D * hTruthPi0Momentum = 0x0;
+  TH1D * hTruthldShowerTheta = 0x0;
+  TH1D * hTruthslShowerTheta = 0x0;
+  TH1D * hTruthPi0Mass = 0x0;
 
   // Get input tree
   TTree * GetInputTree(TFile * fin, const TString tname, const TString tag)
@@ -775,13 +776,13 @@ namespace AnaIO
       hPi0MassRes = new TH2D("i002Pi0Mass_RES","", 20, 0, 0.5, 20, -0.5, 0.5); 
       lout->Add(hPi0MassRes);
 
-      hPi0Momentum = new TH1D("i003Pi0Momentum","", 20, 0, 1.5);
-      lout->Add(hPi0Momentum);
+      hTruthPi0Momentum = new TH1D("i003TruthPi0Momentum","", 20, 0, 1.5);
+      lout->Add(hTruthPi0Momentum);
 
-      hldShowerTheta = new TH1D("i004ldShowerTheta","", 30, 0, 180);
-      lout->Add(hldShowerTheta);
-      hslShowerTheta = new TH1D("i005slShowerTheta","", 30, 0, 180);
-      lout->Add(hslShowerTheta);
+      hTruthldShowerTheta = new TH1D("i004TruthldShowerTheta","", 30, 0, 180);
+      lout->Add(hTruthldShowerTheta);
+      hTruthslShowerTheta = new TH1D("i005TruthslShowerTheta","", 30, 0, 180);
+      lout->Add(hTruthslShowerTheta);
 
       hPi0MomentumResRaw = new TH2D("i006Pi0Momentum_RES_RAW","", 20, 0, 1, 10, -0.5, 0.5);
       lout->Add(hPi0MomentumResRaw);
@@ -794,6 +795,9 @@ namespace AnaIO
       lout->Add(hPi0MassResFit);
       hShowerOpenAngleResFit = new TH2D("i010ShowerOpenAngle_RES_FIT","", 20, 0, 180, 20, -1.1, 1.1);
       lout->Add(hShowerOpenAngleResFit);
+
+      hTruthPi0Mass = new TH1D("i011hTruthPi0Mass","", 20, 0, 1);
+      lout->Add(hTruthPi0Mass);
 
 
     }

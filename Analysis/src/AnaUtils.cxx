@@ -584,12 +584,13 @@ TLorentzVector AnaUtils::GetPiZero()
 
       // Get the theta angle (relative to z axis)
       TVector3 unitZ(0,0,1);
-      double ldTheta = (ldShowerTruth.Vect()).Angle(unitZ);
-      double slTheta = (slShowerTruth.Vect()).Angle(unitZ);
-      AnaIO::hldShowerTheta->Fill(ldTheta*TMath::RadToDeg());
-      AnaIO::hslShowerTheta->Fill(slTheta*TMath::RadToDeg());
+      double TruthldTheta = (ldShowerTruth.Vect()).Angle(unitZ);
+      double TruthslTheta = (slShowerTruth.Vect()).Angle(unitZ);
+      AnaIO::hTruthldShowerTheta->Fill(TruthldTheta*TMath::RadToDeg());
+      AnaIO::hTruthslShowerTheta->Fill(TruthslTheta*TMath::RadToDeg());
       // Get truth pi0 vector
       TLorentzVector PiZeroTruthVec = ldShowerTruth + slShowerTruth;
+      AnaIO::hTruthPi0Mass->Fill(PiZeroTruthVec.M());
 
       // True pi0 is found (with mass 0.134977... GeV/c^2)
       if( PiZeroTruthVec.M() < 0.1350 && PiZeroTruthVec.M() > 0.1349) {
@@ -625,7 +626,7 @@ TLorentzVector AnaUtils::GetPiZero()
         plotUtils.FillHist(AnaIO::hPi0MomentumRes, PiZeroTruthVec.P(), pi0momRes);
         plotUtils.FillHist(AnaIO::hPi0MomentumResRaw, PiZeroTruthVec.P(), pi0momResRaw);
 
-        AnaIO::hPi0Momentum->Fill(PiZeroTruthVec.P());
+        AnaIO::hTruthPi0Momentum->Fill(PiZeroTruthVec.P());
 
       }
     } // End of Truth-Matching
@@ -649,11 +650,11 @@ void AnaUtils::GetPi0Showers()
   AnaIO::OpeningAngleTruth = -1;
 
   // Get the size of truth shower array
-  const int showerSize = showerTruthArray.size();
+  const int showerSize = showerArray.size();
   // Need to have at least two showers to reconstruct pi0
   if(showerSize>=2){
     // Get [0] element of shower energy vector
-    const double* shE = &(showerTruthEarr[0]);
+    const double* shE = &(showerEarr[0]);
     int *nindex = new int[showerSize];
     // Sort truth shower energy
     TMath::Sort(showerSize, shE, nindex, true);

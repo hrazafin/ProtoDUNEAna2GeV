@@ -83,9 +83,10 @@ int anaRec(const TString finName, TList *lout, const TString tag, const int nEnt
     tout->Fill();
   } // End of while loop
 
+  // Print info
   cout << "All entries: " << ientry << endl;
   cout << "BeamCount: " << BeamCount << endl;
-  
+
   // Print cut flow statistics
   int icut = 0;
   double nsel = -999;
@@ -101,6 +102,7 @@ int anaRec(const TString finName, TList *lout, const TString tag, const int nEnt
   
   printf("End of %d cuts: %.1f selected\n", icut, nsel);
 
+  // Print signal/background info MC
   const double nsig = AnaIO::hTruthSignal->GetBinContent(2);
   const double nbk = AnaIO::hTruthSignal->GetBinContent(1);
   const double nall = nsig+nbk;
