@@ -311,6 +311,29 @@ namespace AnaIO
   TH1D * hTruthslShowerTheta = 0x0;
   TH1D * hTruthPi0Mass = 0x0;
 
+  // CVM bin histograms
+  TH2D * hV11_1x1 = 0x0;
+  TH2D * hV12_1x1 = 0x0;
+  TH2D * hV22_1x1 = 0x0;
+
+  TH2D * hV11_2x2 = 0x0;
+  TH2D * hV12_2x2 = 0x0;
+  TH2D * hV22_2x2 = 0x0;
+
+  TH2D * hV11_3x3 = 0x0;
+  TH2D * hV12_3x3 = 0x0;
+  TH2D * hV22_3x3 = 0x0;
+
+  TH2D * hV11_4x4 = 0x0;
+  TH2D * hV12_4x4 = 0x0;
+  TH2D * hV22_4x4 = 0x0;
+
+  TH2D * hBinSize_1x1 = 0x0;
+  TH2D * hBinSize_2x2 = 0x0;
+  TH2D * hBinSize_3x3 = 0x0;
+  TH2D * hBinSize_4x4 = 0x0;
+
+
   // Get input tree
   TTree * GetInputTree(TFile * fin, const TString tname, const TString tag)
   {
@@ -798,6 +821,58 @@ namespace AnaIO
 
       hTruthPi0Mass = new TH1D("i011hTruthPi0Mass","", 20, 0, 1);
       lout->Add(hTruthPi0Mass);
+
+      // CVM bin histograms
+      const double BinE1_1x1[] = {0,1.2};
+      const double BinE2_1x1[] = {0,0.8};
+      
+      const double BinE1_2x2[] = {0,0.3,1.2};
+      const double BinE2_2x2[] = {0,0.15,0.8};
+
+      const double BinE1_3x3[] = {0,0.25,0.35,1.2};
+      const double BinE2_3x3[] = {0,0.12,0.2,0.8};
+      
+      const double BinE1_4x4[] = {0,0.2,0.3,0.4,1.2};
+      const double BinE2_4x4[] = {0,0.1,0.16,0.26,0.8};
+
+
+      hV11_1x1 = new TH2D("hV11_1x1Bin", "", sizeof(BinE1_1x1)/sizeof(double)-1, BinE1_1x1, sizeof(BinE2_1x1)/sizeof(double)-1, BinE2_1x1);
+      lout->Add(hV11_1x1);
+      hV12_1x1 = new TH2D("hV12_1x1Bin", "", sizeof(BinE1_1x1)/sizeof(double)-1, BinE1_1x1, sizeof(BinE2_1x1)/sizeof(double)-1, BinE2_1x1);
+      lout->Add(hV12_1x1);
+      hV22_1x1 = new TH2D("hV22_1x1Bin", "", sizeof(BinE1_1x1)/sizeof(double)-1, BinE1_1x1, sizeof(BinE2_1x1)/sizeof(double)-1, BinE2_1x1);
+      lout->Add(hV22_1x1);
+
+      hV11_2x2 = new TH2D("hV11_2x2Bin", "", sizeof(BinE1_2x2)/sizeof(double)-1, BinE1_2x2, sizeof(BinE2_2x2)/sizeof(double)-1, BinE2_2x2);
+      lout->Add(hV11_2x2);
+      hV12_2x2 = new TH2D("hV12_2x2Bin", "", sizeof(BinE1_2x2)/sizeof(double)-1, BinE1_2x2, sizeof(BinE2_2x2)/sizeof(double)-1, BinE2_2x2);
+      lout->Add(hV12_2x2);
+      hV22_2x2 = new TH2D("hV22_2x2Bin", "", sizeof(BinE1_2x2)/sizeof(double)-1, BinE1_2x2, sizeof(BinE2_2x2)/sizeof(double)-1, BinE2_2x2);
+      lout->Add(hV22_2x2);
+
+      hV11_3x3 = new TH2D("hV11_3x3Bin", "", sizeof(BinE1_3x3)/sizeof(double)-1, BinE1_3x3, sizeof(BinE2_3x3)/sizeof(double)-1, BinE2_3x3);
+      lout->Add(hV11_3x3);
+      hV12_3x3 = new TH2D("hV12_3x3Bin", "", sizeof(BinE1_3x3)/sizeof(double)-1, BinE1_3x3, sizeof(BinE2_3x3)/sizeof(double)-1, BinE2_3x3);
+      lout->Add(hV12_3x3);
+      hV22_3x3 = new TH2D("hV22_3x3Bin", "", sizeof(BinE1_3x3)/sizeof(double)-1, BinE1_3x3, sizeof(BinE2_3x3)/sizeof(double)-1, BinE2_3x3);
+      lout->Add(hV22_3x3);
+
+      hV11_4x4 = new TH2D("hV11_4x4Bin", "", sizeof(BinE1_4x4)/sizeof(double)-1, BinE1_4x4, sizeof(BinE2_4x4)/sizeof(double)-1, BinE2_4x4);
+      lout->Add(hV11_4x4);
+      hV12_4x4 = new TH2D("hV12_4x4Bin", "", sizeof(BinE1_4x4)/sizeof(double)-1, BinE1_4x4, sizeof(BinE2_4x4)/sizeof(double)-1, BinE2_4x4);
+      lout->Add(hV12_4x4);
+      hV22_4x4 = new TH2D("hV22_4x4Bin", "", sizeof(BinE1_4x4)/sizeof(double)-1, BinE1_4x4, sizeof(BinE2_4x4)/sizeof(double)-1, BinE2_4x4);
+      lout->Add(hV22_4x4);
+
+      hBinSize_1x1 = new TH2D("hBinSize_1x1Bin", "", sizeof(BinE1_1x1)/sizeof(double)-1, BinE1_1x1, sizeof(BinE2_1x1)/sizeof(double)-1, BinE2_1x1);
+      lout->Add(hBinSize_1x1);
+      hBinSize_2x2 = new TH2D("hBinSize_2x2Bin", "", sizeof(BinE1_2x2)/sizeof(double)-1, BinE1_2x2, sizeof(BinE2_2x2)/sizeof(double)-1, BinE2_2x2);
+      lout->Add(hBinSize_2x2);
+      hBinSize_3x3 = new TH2D("hBinSize_3x3Bin", "", sizeof(BinE1_3x3)/sizeof(double)-1, BinE1_3x3, sizeof(BinE2_3x3)/sizeof(double)-1, BinE2_3x3);
+      lout->Add(hBinSize_3x3);
+      hBinSize_4x4 = new TH2D("hBinSize_4x4Bin", "", sizeof(BinE1_4x4)/sizeof(double)-1, BinE1_4x4, sizeof(BinE2_4x4)/sizeof(double)-1, BinE2_4x4);
+      lout->Add(hBinSize_4x4);
+
 
 
     }

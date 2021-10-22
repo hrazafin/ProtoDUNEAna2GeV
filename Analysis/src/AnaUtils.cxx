@@ -628,6 +628,13 @@ TLorentzVector AnaUtils::GetPiZero()
 
         AnaIO::hTruthPi0Momentum->Fill(PiZeroTruthVec.P());
 
+        LdShowerEnergyTruth.push_back(ldShowerTruth.E());
+        SlShowerEnergyTruth.push_back(slShowerTruth.E());
+        OpenAngleTruth.push_back(openingAngleTruth);
+        LdShowerEnergyRaw.push_back(ldShowerRaw.E());
+        SlShowerEnergyRaw.push_back(slShowerRaw.E());
+        OpenAngle.push_back(openingAngle);
+
       }
     } // End of Truth-Matching
 

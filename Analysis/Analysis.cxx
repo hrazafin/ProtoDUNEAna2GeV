@@ -78,7 +78,6 @@ int anaRec(const TString finName, TList *lout, const TString tag, const int nEnt
     // Do event topology cut
     if(!anaCut.CutTopology(kMC)) continue;
     
-
     // Fill output tree
     tout->Fill();
   } // End of while loop
@@ -86,6 +85,8 @@ int anaRec(const TString finName, TList *lout, const TString tag, const int nEnt
   // Print info
   cout << "All entries: " << ientry << endl;
   cout << "BeamCount: " << BeamCount << endl;
+
+  AnaFit::DoCVM(AnaUtils::LdShowerEnergyTruth,AnaUtils::SlShowerEnergyTruth,AnaUtils::OpenAngleTruth,AnaUtils::LdShowerEnergyRaw,AnaUtils::SlShowerEnergyRaw,AnaUtils::OpenAngle);
 
   // Print cut flow statistics
   int icut = 0;

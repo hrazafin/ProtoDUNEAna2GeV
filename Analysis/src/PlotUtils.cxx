@@ -203,6 +203,10 @@ void PlotUtils::DrawHist(TList *lout, const double plotscale, TList * overlayLis
         if(!tag.Contains("proj") && (tag.Contains("RES") || tag.Contains("REG"))) {
           h2d->Draw("colz");
         }
+        if(!tag.Contains("proj") && tag.Contains("Bin")){
+          h2d->SetMarkerColor(kMagenta);
+          h2d->Draw("colz text");
+        }
       }
       // There is no h2d, we only have 1D histogram
       else {

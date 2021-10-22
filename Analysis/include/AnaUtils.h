@@ -136,6 +136,14 @@ class AnaUtils
       NParList.push_back(nPiZero);
       return NParList;
     }
+
+    static vector<double> LdShowerEnergyTruth;
+    static vector<double> SlShowerEnergyTruth; 
+    static vector<double> OpenAngleTruth; 
+    static vector<double> LdShowerEnergyRaw; 
+    static vector<double> SlShowerEnergyRaw; 
+    static vector<double> OpenAngle;
+
   private:
     PlotUtils plotUtils;
     int nProton;
@@ -155,4 +163,12 @@ class AnaUtils
     vector<double> showerTruthEarr;
     vector<TVector3> showerPos;
 };
+
+vector<double> AnaUtils::LdShowerEnergyTruth;
+vector<double> AnaUtils::SlShowerEnergyTruth;
+vector<double> AnaUtils::OpenAngleTruth;
+vector<double> AnaUtils::LdShowerEnergyRaw;
+vector<double> AnaUtils::SlShowerEnergyRaw;
+vector<double> AnaUtils::OpenAngle;
+
 #endif
