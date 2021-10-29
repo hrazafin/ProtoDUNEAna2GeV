@@ -204,7 +204,8 @@ void PlotUtils::DrawHist(TList *lout, const double plotscale, TList * overlayLis
           h2d->Draw("colz");
         }
         if(!tag.Contains("proj") && tag.Contains("Bin")){
-          h2d->SetMarkerColor(kMagenta);
+          h2d->SetMarkerSize(2);
+          gStyle->SetPaintTextFormat("4.3f");
           h2d->Draw("colz text");
         }
       }
@@ -252,6 +253,32 @@ void PlotUtils::DrawHist(TList *lout, const double plotscale, TList * overlayLis
               }
             }
             else hh->Draw("hist");
+          }
+          // Compare fitted results
+          else if(tag.Contains("Compare") && !tag.Contains("Post")){
+            // Get the name of raw shower histogram
+            TRegexp re("Compare");
+            TString name = tag;
+            name(re) = "ComparePost";
+            TH1D *holay = (TH1D*)lout->FindObject(name);
+            if(holay->GetMaximum() > hh->GetMaximum()) hh->SetMaximum(holay->GetMaximum()*1.2);
+            else hh->SetMaximum(hh->GetMaximum()*1.2);
+            if(tag.Contains("E1")) hh->SetMaximum(350);
+            if(tag.Contains("E2")) hh->SetMaximum(200);
+            if(tag.Contains("OA")) hh->SetMaximum(200);
+            auto lg = new TLegend(0.7,0.7,0.85,0.88);
+            hh->SetStats(0);
+            hh->SetFillStyle(4050);
+            hh->SetFillColor(24);
+            hh->SetLineColor(24);
+            hh->Draw("hist");
+            holay->SetFillStyle(3001);
+            holay->SetFillColor(46);
+            holay->SetLineColor(46);
+            holay->Draw("SAMES hist");
+            lg->AddEntry(hh,"Before Fitting","f");
+            lg->AddEntry(holay,"After Fitting","f");
+            lg->Draw("same");
           }
           else hh->Draw("hist");
         }
@@ -668,7 +695,7 @@ void PlotUtils::gStyleSetup()
   gStyle->SetStatBorderSize(-1);
   gStyle->SetLegendBorderSize(-1);
   gStyle->SetPalette(1,0);
-  SetColor();
+  //SetColor();
   gROOT->ForceStyle();
 }
 

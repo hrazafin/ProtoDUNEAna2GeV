@@ -611,9 +611,22 @@ TLorentzVector AnaUtils::GetPiZero()
 	
 	      // Calculate opening angle resolution
       	const double openingAngleTruth = ldShowerTruth.Angle(slShowerTruth.Vect())*TMath::RadToDeg();
-	      const double openingAngleRes = (openingAngle/openingAngleTruth)-1;
-	      plotUtils.FillHist(AnaIO::hShowerOpenAngleRes, openingAngleTruth, openingAngleRes);   
+	      const double openingAngleRes = openingAngle - openingAngleTruth;
+	      plotUtils.FillHist(AnaIO::hShowerOpenAngleRes, openingAngleTruth, openingAngleRes); 
 
+        if(slShowerResRaw < -0.5){
+          cout << "LD E reco: " << ldShowerRaw.E() << endl;
+          cout << "SL E reco: " << slShowerRaw.E() << endl;
+          cout << "OA reco: " << openingAngle << endl;
+
+          cout << "\nLD E truth: " << ldShowerTruth.E() << endl;
+          cout << "SL E truth: " << slShowerTruth.E() << endl;
+          cout << "OA truth: " << openingAngleTruth << endl;
+
+          cout << "-------------------------" << endl;
+
+        }  
+        
         // Calculate pi0 mass resolution
 	      const double mpi0Res = PiZeroVec.M()/PiZeroTruthVec.M() -1;
 	      const double mpi0ResRaw = PiZeroVecRaw.M()/PiZeroTruthVec.M() -1;
@@ -630,10 +643,10 @@ TLorentzVector AnaUtils::GetPiZero()
 
         LdShowerEnergyTruth.push_back(ldShowerTruth.E());
         SlShowerEnergyTruth.push_back(slShowerTruth.E());
-        OpenAngleTruth.push_back(openingAngleTruth);
+        OpenAngleTruth.push_back(openingAngleTruth*TMath::DegToRad());
         LdShowerEnergyRaw.push_back(ldShowerRaw.E());
         SlShowerEnergyRaw.push_back(slShowerRaw.E());
-        OpenAngle.push_back(openingAngle);
+        OpenAngle.push_back(openingAngle*TMath::DegToRad());
 
       }
     } // End of Truth-Matching

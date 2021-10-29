@@ -2,6 +2,7 @@
 #include "src/PlotUtils.cxx"
 #include "src/AnaUtils.cxx"
 #include "src/AnaCut.cxx"
+#include "../Fitting/UserKF/KF/src/UserKF.cxx"
 
 int anaRec(const TString finName, TList *lout, const TString tag, const int nEntryToStop)
 {
@@ -86,7 +87,71 @@ int anaRec(const TString finName, TList *lout, const TString tag, const int nEnt
   cout << "All entries: " << ientry << endl;
   cout << "BeamCount: " << BeamCount << endl;
 
-  AnaFit::DoCVM(AnaUtils::LdShowerEnergyTruth,AnaUtils::SlShowerEnergyTruth,AnaUtils::OpenAngleTruth,AnaUtils::LdShowerEnergyRaw,AnaUtils::SlShowerEnergyRaw,AnaUtils::OpenAngle);
+  // Kinematic Fitting for Pi0 shower
+  if(kMC){
+    // Get the CVM matrix
+    // Method A (energy independent)
+    vector<double> CVM_Dir = AnaFit::GetCVM(AnaUtils::LdShowerEnergyTruth,AnaUtils::SlShowerEnergyTruth,AnaUtils::OpenAngleTruth,
+                  AnaUtils::LdShowerEnergyRaw,AnaUtils::SlShowerEnergyRaw,AnaUtils::OpenAngle);
+    // Get the sample size
+    int sampleSize = AnaUtils::LdShowerEnergyTruth.size();
+    // Counters
+    int BadFitVar = 0;
+    // Loop over shower vetor
+    for(int ii = 0; ii < sampleSize; ii++){
+      // Method B (energy dependent)
+      vector<double> CVM_Bin = AnaFit::GetBinCVM(AnaUtils::LdShowerEnergyTruth[ii],AnaUtils::SlShowerEnergyTruth[ii],AnaUtils::OpenAngleTruth[ii],
+                  AnaUtils::LdShowerEnergyRaw[ii],AnaUtils::SlShowerEnergyRaw[ii],AnaUtils::OpenAngle[ii],
+                  AnaUtils::LdShowerEnergyTruth,AnaUtils::SlShowerEnergyTruth,AnaUtils::OpenAngleTruth,
+                  AnaUtils::LdShowerEnergyRaw,AnaUtils::SlShowerEnergyRaw,AnaUtils::OpenAngle);
+      // Get the fitted variables
+      vector<double> FittedVars = DoKF(AnaUtils::LdShowerEnergyTruth[ii],AnaUtils::SlShowerEnergyTruth[ii],AnaUtils::OpenAngleTruth[ii],
+                                      AnaUtils::LdShowerEnergyRaw[ii],AnaUtils::SlShowerEnergyRaw[ii],AnaUtils::OpenAngle[ii],
+                                      CVM_Dir,CVM_Bin);
+      // check good fit results                                 
+      if(FittedVars.size() == 0){
+        cout << "FittedVars size 0" << endl;
+        BadFitVar++;
+        continue;
+      }
+      // Fill histograms
+      AnaIO::hShowerE1PreFitRes->Fill(AnaUtils::LdShowerEnergyTruth[ii],AnaUtils::LdShowerEnergyRaw[ii]/AnaUtils::LdShowerEnergyTruth[ii]-1);
+      AnaIO::hShowerE1PostFitRes->Fill(AnaUtils::LdShowerEnergyTruth[ii],FittedVars[0]/AnaUtils::LdShowerEnergyTruth[ii]-1);
+
+      AnaIO::hShowerE2PreFitRes->Fill(AnaUtils::SlShowerEnergyTruth[ii],AnaUtils::SlShowerEnergyRaw[ii]/AnaUtils::SlShowerEnergyTruth[ii]-1);
+      AnaIO::hShowerE2PostFitRes->Fill(AnaUtils::SlShowerEnergyTruth[ii],FittedVars[1]/AnaUtils::SlShowerEnergyTruth[ii]-1);
+
+      AnaIO::hShowerOAPreFitRes->Fill(AnaUtils::OpenAngleTruth[ii]*TMath::RadToDeg(),AnaUtils::OpenAngle[ii]*TMath::RadToDeg()-AnaUtils::OpenAngleTruth[ii]*TMath::RadToDeg());
+      AnaIO::hShowerOAPostFitRes->Fill(AnaUtils::OpenAngleTruth[ii]*TMath::RadToDeg(),FittedVars[2]*TMath::RadToDeg()-AnaUtils::OpenAngleTruth[ii]*TMath::RadToDeg());
+
+      AnaIO::hShowerE1Compare->Fill(AnaUtils::LdShowerEnergyRaw[ii]/AnaUtils::LdShowerEnergyTruth[ii]-1);
+      AnaIO::hShowerE1ComparePost->Fill(FittedVars[0]/AnaUtils::LdShowerEnergyTruth[ii]-1);
+
+      AnaIO::hShowerE2Compare->Fill(AnaUtils::SlShowerEnergyRaw[ii]/AnaUtils::SlShowerEnergyTruth[ii]-1);
+      AnaIO::hShowerE2ComparePost->Fill(FittedVars[1]/AnaUtils::SlShowerEnergyTruth[ii]-1);
+
+      AnaIO::hShowerOACompare->Fill(AnaUtils::OpenAngle[ii]*TMath::RadToDeg()-AnaUtils::OpenAngleTruth[ii]*TMath::RadToDeg());
+      AnaIO::hShowerOAComparePost->Fill(FittedVars[2]*TMath::RadToDeg()-AnaUtils::OpenAngleTruth[ii]*TMath::RadToDeg());
+
+      AnaIO::hPi0MassCompare->Fill(sqrt(2*AnaUtils::LdShowerEnergyRaw[ii]*AnaUtils::SlShowerEnergyRaw[ii]*(1-cos(AnaUtils::OpenAngle[ii]))));
+      AnaIO::hPi0MassComparePost->Fill(sqrt(2*FittedVars[0]*FittedVars[1]*(1-cos(FittedVars[2]))));
+
+
+      // Print out some info
+      cout << "LD shower E: " << AnaUtils::LdShowerEnergyRaw[ii] << endl;
+      cout << "LD shower E (fitted): " << FittedVars[0] << endl;
+      cout << "\nSL shower E: " << AnaUtils::SlShowerEnergyRaw[ii] << endl;
+      cout << "SL shower E (fitted): " << FittedVars[1] << endl;
+      cout << "\nOpenAngle: " << AnaUtils::OpenAngle[ii] << endl;
+      cout << "OpenAngle (fitted): " << FittedVars[2] << endl;
+      cout << "\nMass: " << sqrt(2*AnaUtils::LdShowerEnergyRaw[ii]*AnaUtils::SlShowerEnergyRaw[ii]*(1-cos(AnaUtils::OpenAngle[ii]))) << endl;
+      cout << "Mass (fitted): " << sqrt(2*FittedVars[0]*FittedVars[1]*(1-cos(FittedVars[2]))) << endl;
+
+    }
+    cout << "BadFitVar: " << BadFitVar << endl;
+
+  } // End of KF
+
 
   // Print cut flow statistics
   int icut = 0;

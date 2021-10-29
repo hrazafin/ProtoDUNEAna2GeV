@@ -333,6 +333,28 @@ namespace AnaIO
   TH2D * hBinSize_3x3 = 0x0;
   TH2D * hBinSize_4x4 = 0x0;
 
+  TH2D * hCVM = 0x0;
+
+  TH2D * hShowerE1PreFitRes = 0x0;
+  TH2D * hShowerE1PostFitRes = 0x0;
+
+  TH2D * hShowerE2PreFitRes = 0x0;
+  TH2D * hShowerE2PostFitRes = 0x0;
+
+  TH2D * hShowerOAPreFitRes = 0x0;
+  TH2D * hShowerOAPostFitRes = 0x0;
+
+  TH1D * hShowerE1Compare = 0x0;
+  TH1D * hShowerE2Compare = 0x0;
+  TH1D * hShowerOACompare = 0x0;
+
+  TH1D * hShowerE1ComparePost = 0x0;
+  TH1D * hShowerE2ComparePost = 0x0;
+  TH1D * hShowerOAComparePost = 0x0;
+
+  TH1D * hPi0MassCompare = 0x0;
+  TH1D * hPi0MassComparePost = 0x0;
+  
 
   // Get input tree
   TTree * GetInputTree(TFile * fin, const TString tname, const TString tag)
@@ -792,7 +814,7 @@ namespace AnaIO
       lout->Add(hLeadingShowerEnergyResRaw);
       hSubLeadingShowerEnergyResRaw = new TH2D("h011SubLeadingShowerEnergy_RES_RAW","", 10, 0, 1.5, 20, -1.1, 1.1);
       lout->Add(hSubLeadingShowerEnergyResRaw);
-      hShowerOpenAngleRes = new TH2D("h012ShowerOpenAngle_RES","", 20, 0, 180, 20, -1.1, 1.1);
+      hShowerOpenAngleRes = new TH2D("h012ShowerOpenAngle_RES","", 20, 0, 180, 20, -50, 50);
       lout->Add(hShowerOpenAngleRes); 
       hPi0MomentumRes = new TH2D("i001Pi0Momentum_RES","", 20, 0, 1, 10, -0.5, 0.5);
       lout->Add(hPi0MomentumRes);
@@ -873,7 +895,42 @@ namespace AnaIO
       hBinSize_4x4 = new TH2D("hBinSize_4x4Bin", "", sizeof(BinE1_4x4)/sizeof(double)-1, BinE1_4x4, sizeof(BinE2_4x4)/sizeof(double)-1, BinE2_4x4);
       lout->Add(hBinSize_4x4);
 
+      hCVM = new TH2D("hCVM_Bin", "", 3, 0, 3, 3, 0, 3);
+      lout->Add(hCVM);
 
+
+      hShowerE1PreFitRes = new TH2D("x001hShowerE1Pre_RES"," ",20, 0, 0.8, 20, -1.1, 1.1);
+      lout->Add(hShowerE1PreFitRes);
+      hShowerE1PostFitRes = new TH2D("x002hShowerE1Post_RES"," ",20, 0, 0.8, 20, -1.1, 1.1);
+      lout->Add(hShowerE1PostFitRes);
+
+      hShowerE2PreFitRes = new TH2D("x003hShowerE2Pre_RES"," ",20, 0, 0.5, 20, -1.1, 1.1);
+      lout->Add(hShowerE2PreFitRes);
+      hShowerE2PostFitRes = new TH2D("x004hShowerE2Post_RES"," ",20, 0, 0.5, 20, -1.1, 1.1);
+      lout->Add(hShowerE2PostFitRes);
+
+      hShowerOAPreFitRes = new TH2D("x005hShowerOAPre_RES"," ",20, 0, 180, 20, -30, 30);
+      lout->Add(hShowerOAPreFitRes);
+      hShowerOAPostFitRes = new TH2D("x006hShowerOAPost_RES"," ",20, 0, 180, 20, -30, 30);
+      lout->Add(hShowerOAPostFitRes);
+
+      hShowerE1Compare = new TH1D("y001hShowerE1Compare","", 20, -1.1, 1.1);
+      lout->Add(hShowerE1Compare);
+      hShowerE2Compare = new TH1D("y002hShowerE2Compare","", 20, -1.1, 1.1);
+      lout->Add(hShowerE2Compare);
+      hShowerOACompare = new TH1D("y003hShowerOACompare","", 20, -50, 50);
+      lout->Add(hShowerOACompare);
+      hPi0MassCompare = new TH1D("y004hPi0MassCompare","", 20, 0, 0.3);
+      lout->Add(hPi0MassCompare);
+
+      hShowerE1ComparePost = new TH1D("y001hShowerE1ComparePost","", 20, -1.1, 1.1);
+      lout->Add(hShowerE1ComparePost);
+      hShowerE2ComparePost = new TH1D("y002hShowerE2ComparePost","", 20, -1.1, 1.1);
+      lout->Add(hShowerE2ComparePost);
+      hShowerOAComparePost = new TH1D("y003hShowerOAComparePost","", 20, -50, 50);
+      lout->Add(hShowerOAComparePost);
+      hPi0MassComparePost = new TH1D("y004hPi0MassComparePost","", 20, 0, 0.3);
+      lout->Add(hPi0MassComparePost);
 
     }
   }// End of IniHist
