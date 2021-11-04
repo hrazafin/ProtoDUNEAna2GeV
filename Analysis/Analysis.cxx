@@ -78,6 +78,9 @@ int anaRec(const TString finName, TList *lout, const TString tag, const int nEnt
     
     // Do event topology cut
     if(!anaCut.CutTopology(kMC)) continue;
+
+    // Do TKI calculation
+    anaUtils.TruthMatchingTKI(anaUtils.RecPi0LTVet,anaUtils.RecProtonLTVet);
     
     // Fill output tree
     tout->Fill();
@@ -86,7 +89,8 @@ int anaRec(const TString finName, TList *lout, const TString tag, const int nEnt
   // Print info
   cout << "All entries: " << ientry << endl;
   cout << "BeamCount: " << BeamCount << endl;
-
+  
+  /*
   // Kinematic Fitting for Pi0 shower
   if(kMC){
     // Get the CVM matrix
@@ -151,7 +155,7 @@ int anaRec(const TString finName, TList *lout, const TString tag, const int nEnt
     cout << "BadFitVar: " << BadFitVar << endl;
 
   } // End of KF
-
+  */
 
   // Print cut flow statistics
   int icut = 0;

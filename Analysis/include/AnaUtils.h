@@ -39,6 +39,8 @@ class AnaUtils
     TVector3 GetRecTrackVectLab(const int ii, const bool kProton);
     // Return a LT vector relative to beam direction (only consider theta)
     TLorentzVector GetMomentumRefBeam(const bool isTruth, const int recIndex, const bool kProton);
+    // Return a Pi0 LT vector relative to beam direction (only consider theta)
+    TLorentzVector GetPi0MomentumRefBeam(const TLorentzVector dummyPi0);
 
     void TruthMatchingTKI(TLorentzVector dummypi0, TLorentzVector dummyproton);
 
@@ -143,6 +145,9 @@ class AnaUtils
     static vector<double> LdShowerEnergyRaw; 
     static vector<double> SlShowerEnergyRaw; 
     static vector<double> OpenAngle;
+    // TKI analysis
+    static TLorentzVector RecPi0LTVet;
+    static TLorentzVector RecProtonLTVet;
 
   private:
     PlotUtils plotUtils;
@@ -170,5 +175,8 @@ vector<double> AnaUtils::OpenAngleTruth;
 vector<double> AnaUtils::LdShowerEnergyRaw;
 vector<double> AnaUtils::SlShowerEnergyRaw;
 vector<double> AnaUtils::OpenAngle;
+
+TLorentzVector AnaUtils::RecPi0LTVet;
+TLorentzVector AnaUtils::RecProtonLTVet;
 
 #endif

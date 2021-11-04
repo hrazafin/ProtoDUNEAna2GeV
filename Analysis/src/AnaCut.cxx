@@ -286,30 +286,37 @@ void AnaCut::CountPFP(const bool kMC, const bool kFill)
   int nPFP = 0;
   // Need to clear vector for each event
   anaUtils.CleanShowerArray();
+
+  double ProtonMom = -999;
   // Loop over all reco FS particles
   for(int ii=0; ii<recsize; ii++){
     // Get the truth particle type of this reco particle
     truthParticleType = kMC? GetTruthParticleInfoFromRec(ii) : anaUtils.gkOthers;
     recParticleType = -999;
     // Proton candidates selection
-    if(IsProton(ii)){
+    if(IsProton(ii,kMC)){
       nproton++;
       recParticleType = anaUtils.gkProton;
       // Fill rec and truth-matching info
       if(kFill) anaUtils.FillFSParticleKinematics(ii, truthParticleType, recParticleType);
+      const TLorentzVector recMomRefBeam = anaUtils.GetMomentumRefBeam(false /*=>reco*/, ii, true /*=>proton*/);
+      if(recMomRefBeam.P() > ProtonMom) {
+        anaUtils.RecProtonLTVet = recMomRefBeam;
+        ProtonMom = recMomRefBeam.P();
+      }
     }
     // Piplus candidates selection
-    if(IsPiplus(ii)){
+    if(IsPiplus(ii,kMC)){
       npiplus++;
       recParticleType = anaUtils.gkPiPlus;
       // Fill rec and truth-matching info
       if(kFill) anaUtils.FillFSParticleKinematics(ii, truthParticleType, recParticleType);
     }
     // Shower candidates selection
-    if(IsShower(ii)){
+    if(IsShower(ii,kMC)){
       nshower++;
       // Select good shower candidates for reconstructing pi0   
-      if(IsPiZeroShower(ii)){
+      if(IsPiZeroShower(ii,kMC)){
         npi0shower++;
         recParticleType = anaUtils.gkGamma;
         // Fill rec and truth-matching info
@@ -317,7 +324,7 @@ void AnaCut::CountPFP(const bool kMC, const bool kFill)
       }
     }
     // Michel candidates selection
-    if(IsMichel(ii)){
+    if(IsMichel(ii,kMC)){
       nmichel++;
     }
     // Count total number of FS particles
@@ -331,33 +338,41 @@ void AnaCut::CountPFP(const bool kMC, const bool kFill)
   //if(npi0shower > 1 && nproton > 0) printf("CountPFP PFP size %d nlooped %d nshower %d npi0shower %d nmichel %d npiplus %d nproton %d\n", recsize, nPFP, nshower, npi0shower, nmichel, npiplus, nproton);
 }
 
-bool AnaCut::IsProton(const int ii)
+bool AnaCut::IsProton(const int ii, const bool kMC)
 {
   // Proton candidate must be a track like particle
-  if(!IsTrack(ii)) return false; 
+  if(!IsTrack(ii,kMC)) return false; 
   // Proton candidate must pass the folowing cuts 
   if(!PassProtonSubPID(ii)) return false;
 
   return true;
 }
 
-bool AnaCut::IsTrack(const int ii)
+bool AnaCut::IsTrack(const int ii,const bool kMC)
 {
   // Get the number of hits of this reco particle
   const int nhits = (*AnaIO::reco_daughter_PFP_nHits)[ii];
   // Get the track score
   const double trackScore = (*AnaIO::reco_daughter_PFP_trackScore_collection)[ii];
+  // Get the shower purity and completeness
+  const double Purity = (*AnaIO::reco_daughter_PFP_true_byHits_purity)[ii];
+  const double Completeness = (*AnaIO::reco_daughter_PFP_true_byHits_completeness)[ii];
+
   // Fill Cut histograms for those two variables
   plotUtils.FillHist(AnaIO::hCutTracknHits, nhits, truthParticleType);  
   plotUtils.FillHist(AnaIO::hCutTrackScore, trackScore, truthParticleType);
-
+  if(kMC) plotUtils.FillHist(AnaIO::hTrackCompleteness, Completeness, truthParticleType);
   // Check if this reco particle has forced track ID
   if((*AnaIO::reco_daughter_allTrack_ID)[ii]==-1) return false;
-  // Cut on number of hits
-  if(nhits <= 40) return false;
   // Cut on track score
   if(trackScore <= 0.5) return false;
-  
+
+  if(kMC) plotUtils.FillHist(AnaIO::hTrackPurityVSnHits, nhits, Purity);
+  if(kMC) plotUtils.FillHist(AnaIO::hTrackCompletenessVSnHits, nhits, Completeness);
+
+  // Cut on number of hits
+  if(nhits <= 40) return false;
+
   return true;
 }
 
@@ -377,34 +392,43 @@ bool AnaCut::PassProtonSubPID(const int ii)
   return false;
 }
 
-bool AnaCut::IsPiplus(const int ii)
+bool AnaCut::IsPiplus(const int ii, const bool kMC)
 {
   // PiPlus candidate must be a track like particle  
-  if(!IsTrack(ii)) return false;
+  if(!IsTrack(ii,kMC)) return false;
   // Assume particle not pass ProtonSubPID is piplus 
   if(PassProtonSubPID(ii)) return false;
   
   return true;  
 }
 
-bool AnaCut::IsShower(const int ii)
+bool AnaCut::IsShower(const int ii, const bool kMC)
 {
   // Get the em score and nhits of this particle
   const double emScore = (*AnaIO::reco_daughter_PFP_emScore_collection)[ii];
   const int nhits = (*AnaIO::reco_daughter_PFP_nHits)[ii];
+  // Get the shower purity and completeness
+  const double Purity = (*AnaIO::reco_daughter_PFP_true_byHits_purity)[ii];
+  const double Completeness = (*AnaIO::reco_daughter_PFP_true_byHits_completeness)[ii];
+
   // Fill Cut histogram
   plotUtils.FillHist(AnaIO::hCutemScore, emScore, truthParticleType);
+  if(kMC) plotUtils.FillHist(AnaIO::hShowerCompleteness, Completeness, truthParticleType);
 
   if((*AnaIO::reco_daughter_allShower_ID)[ii]==-1) return false;
-  // Cut on number of hits
-  if(nhits <= 80) return false;
   // Cut on em score
   if(emScore <= 0.5) return false;
+
+  if(kMC) plotUtils.FillHist(AnaIO::hShowerPurityVSnHits, nhits, Purity);
+  if(kMC) plotUtils.FillHist(AnaIO::hShowerCompletenessVSnHits, nhits, Completeness);
   
+  // Cut on number of hits
+  if(nhits <= 80) return false;
+
   return true; 
 }
 
-bool AnaCut::IsMichel(const int ii)
+bool AnaCut::IsMichel(const int ii, const bool kMC)
 {
   // Get Michel score of this particle
   const double michelScore = (*AnaIO::reco_daughter_PFP_michelScore_collection)[ii];
@@ -415,7 +439,7 @@ bool AnaCut::IsMichel(const int ii)
   return true;
 }
 
-bool AnaCut::IsPiZeroShower(const int ii)
+bool AnaCut::IsPiZeroShower(const int ii, const bool kMC)
 {
   // Get the position vector point from vertex to shower start position
   const TVector3 dist = anaUtils.GetRecShowerDistVector(ii);
@@ -429,7 +453,7 @@ bool AnaCut::IsPiZeroShower(const int ii)
   const double showerLength = (*AnaIO::reco_daughter_allShower_len)[ii];  
   // Get the shower position vector
   const TVector3 showerPosition((*AnaIO::reco_daughter_allShower_startX)[ii],(*AnaIO::reco_daughter_allShower_startY)[ii],(*AnaIO::reco_daughter_allShower_startZ)[ii]);
- 
+  // Fill Cut histogram
   plotUtils.FillHist(AnaIO::hCutShowerDist, dist.Mag(), truthParticleType);
   plotUtils.FillHist(AnaIO::hCutShowerIP, IP, truthParticleType);
   plotUtils.FillHist(AnaIO::hRecShowerLength, showerLength, truthParticleType);

@@ -266,6 +266,7 @@ vector<double> GetCVM(vector<double> LdShowerEnergyTruth, vector<double> SlShowe
   sigma3 = sqrt(V_33);
   vector<double> CVM; // Covariance Matrix vector
   // Full CVM
+  
   CVM.push_back(V_11); AnaIO::hCVM->SetBinContent(1,1,V_11/(sigma1*sigma1));
   CVM.push_back(V_12); AnaIO::hCVM->SetBinContent(1,2,V_12/(sigma1*sigma2));
   CVM.push_back(V_13); AnaIO::hCVM->SetBinContent(1,3,V_13/(sigma1*sigma3));

@@ -85,7 +85,11 @@ void PlotUtils::ProcessHist(TList *lout, const bool kMC)
         // Check if the stk exist 
         if(stk){
           // Add to lout for MC
-          if(kMC) lout->Add(stk);   
+          if(kMC) {
+            lout->Add(stk);
+            THStack * snor = NormalizeStack(stk);
+            lout->Add(snor);
+          } 
           // Only need the sum of this stack histogram in data 
           else{
             // Get the sum of this hitogram
@@ -254,6 +258,7 @@ void PlotUtils::DrawHist(TList *lout, const double plotscale, TList * overlayLis
             }
             else hh->Draw("hist");
           }
+          /*
           // Compare fitted results
           else if(tag.Contains("Compare") && !tag.Contains("Post")){
             // Get the name of raw shower histogram
@@ -267,19 +272,37 @@ void PlotUtils::DrawHist(TList *lout, const double plotscale, TList * overlayLis
             if(tag.Contains("E2")) hh->SetMaximum(200);
             if(tag.Contains("OA")) hh->SetMaximum(200);
             auto lg = new TLegend(0.7,0.7,0.85,0.88);
-            hh->SetStats(0);
+            //hh->SetStats(0);
             hh->SetFillStyle(4050);
             hh->SetFillColor(24);
             hh->SetLineColor(24);
             hh->Draw("hist");
+            gPad->Update();
+            TPaveStats *st = (TPaveStats*)hh->GetListOfFunctions()->FindObject("stats");
+            st->SetY1NDC(0.7); 
+            st->SetY2NDC(0.9);
+            st->SetX1NDC(0.7); 
+            st->SetX2NDC(0.93);
             holay->SetFillStyle(3001);
             holay->SetFillColor(46);
             holay->SetLineColor(46);
+            //holay->SetStats(0);
             holay->Draw("SAMES hist");
+            gPad->Update();
+            TPaveStats *st_holay = (TPaveStats*)holay->GetListOfFunctions()->FindObject("stats");
+            st_holay->SetY1NDC(0.5); 
+            st_holay->SetY2NDC(0.7);
+            st_holay->SetX1NDC(0.7); 
+            st_holay->SetX2NDC(0.93);
+
+
             lg->AddEntry(hh,"Before Fitting","f");
             lg->AddEntry(holay,"After Fitting","f");
-            lg->Draw("same");
+            //lg->Draw("same");
+
+            
           }
+          */
           else hh->Draw("hist");
         }
       }
@@ -418,7 +441,7 @@ void PlotUtils::DrawHist(TList *lout, const double plotscale, TList * overlayLis
       
     }
     else cout << "PlotUtils::DrawHist not found correct histogram!" << " name: " << tag << endl;
-    c1->Print(outdir+"/"+tag+".png");
+    c1->Print(outdir+"/"+tag+".eps");
     
   } // End of for loop
 }
@@ -463,7 +486,8 @@ THStack * PlotUtils::ConvertToStack(const TH2D * hh, const bool kMC)
 
     const int icol = GetColor(col[iy-y0]);//need constant map between y and color
     htmp->SetFillColor(icol);
-    htmp->SetLineColor(icol);
+    htmp->SetLineColor(kBlack);
+    htmp->SetLineWidth(1);
     htmp->SetMarkerSize(2);
     if(tag.Contains("OVERLAY")) htmp->SetFillStyle(3004);
     printf("PlotUtils::ConvertToStack %s adding y %f with color %d\n", tag.Data(), hh->GetYaxis()->GetBinCenter(iy), icol);
@@ -563,6 +587,32 @@ TH2D * PlotUtils::NormalHist(const TH2D *hraw, const Double_t thres, const Bool_
 
   return hh; 
 }
+
+THStack * PlotUtils::NormalizeStack(THStack * hstk)
+{ 
+  const TString tag = hstk->GetName();
+  THStack * hout = new THStack(tag+"_normalized", tag);
+  
+  const TH1D * hsum = GetStackedSum(hstk); 
+  const double sumintegral = hsum->Integral(0,1000000);
+  if(sumintegral<EPSILON){
+    printf("PlotUtils::NormalizeStack sum integral 0 %e\n", sumintegral); exit(1);
+  }
+  const TList * ll = hstk->GetHists();
+  for(int ii=0; ii<ll->GetEntries(); ii++){
+    const TH1D * hold=(TH1D*) ll->At(ii);
+    TH1D * htmp=(TH1D*)hold->Clone(Form("%scopy", hold->GetName()));
+    
+    htmp->Sumw2();
+    htmp->Divide(hsum);
+    hout->Add(htmp);
+  }
+
+  delete hsum;
+
+  return hout;
+}
+
 int PlotUtils::GetColor(const int col)
 {
   if(col>=1000){
@@ -673,14 +723,16 @@ void PlotUtils::SetColor()
 void PlotUtils::gStyleSetup()
 {
   IniColorCB();
-
+  //TGaxis::SetMaxDigits(2);
+  gStyle->SetOptStat(0);
   gStyle->SetOptTitle(1);
   gStyle->SetStatY(0.87);
   gStyle->SetStatH(0.12);
   gStyle->SetStatX(0.83);
   gStyle->SetStatW(0.12);
-  gStyle->SetStatColor(0);
-  gStyle->SetStatStyle(1);
+  //gStyle->SetStatColor(0);
+  gStyle->SetStatStyle(1001);
+  gStyle->SetStatBorderSize(2);
   gStyle->SetTitleX(0.55);
 
   gStyle->SetFrameBorderMode(0);
@@ -724,7 +776,6 @@ void PlotUtils::DrawOverlay(TH1D *holay)
 void PlotUtils::getSliceXDrawY(TH2D * h2d)
 { 
   auto cc = new TCanvas("cc","cc",1600,1200);
-  gStyle->SetOptStat(0);
   cc->Divide(4,5,0,0);
   
   for(int ii=1; ii<=h2d->GetNbinsX(); ii++){

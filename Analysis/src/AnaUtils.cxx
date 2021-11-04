@@ -403,6 +403,25 @@ TLorentzVector AnaUtils::GetMomentumRefBeam(const bool isTruth, const int recInd
   return momentumRefBeam;
 }
 
+TLorentzVector AnaUtils::GetPi0MomentumRefBeam(const TLorentzVector dummyPi0)
+{
+  // Get reco beam momentum vector
+  const TVector3 tmpBeam = GetRecBeamFull();
+  // Get reco Pi0 particle momentum vector
+  const TVector3 vecLab = dummyPi0.Vect();
+  // Get theta angle reletive to the beam
+  const double thetaRefBeam = AnaFunctions::GetThetaRef(vecLab, tmpBeam.Unit());
+
+  TVector3 vectRefBeam;
+  vectRefBeam.SetMagThetaPhi(vecLab.Mag(), thetaRefBeam, 0);
+
+  TLorentzVector momentumRefBeam;
+  momentumRefBeam.SetVectM(vectRefBeam, AnaFunctions::PiZeroMass() );
+
+  return momentumRefBeam;
+}
+
+
 void AnaUtils::FillFSParticleKinematics(const int recIndex, const int truthParticleType, const int recParticleType)
 {
   // ---------------- Fill proton kinematics ----------------//
@@ -410,7 +429,7 @@ void AnaUtils::FillFSParticleKinematics(const int recIndex, const int truthParti
     // Get this reco particle momentum vector relative to beam
     const TLorentzVector recMomRefBeam = GetMomentumRefBeam(false /*=>reco*/, recIndex, true /*=>proton*/);
     plotUtils.FillHist(AnaIO::hRecProtonMomentum,recMomRefBeam.P(), truthParticleType);
-    plotUtils.FillHist(AnaIO::hRecProtonTheta, recMomRefBeam.Theta()*TMath::RadToDeg(), truthParticleType); 
+    plotUtils.FillHist(AnaIO::hRecProtonTheta, recMomRefBeam.Theta()*TMath::RadToDeg(), truthParticleType);
     // Truth-matching primary proton
     if(truthParticleType == gkProton){ // MC only (Data loop won't pass this)
       // Get the truth-matched particle truth momentum vector relative to beam
@@ -568,6 +587,8 @@ TLorentzVector AnaUtils::GetPiZero()
     PiZeroVec = ldShower + slShower;
     PiZeroVecRaw = ldShowerRaw + slShowerRaw;
 
+    RecPi0LTVet = GetPi0MomentumRefBeam(PiZeroVec);
+
     // Fill pi0 mass and momentum
     plotUtils.FillHist(AnaIO::hRecPi0Mass, PiZeroVec.M(), truthEventType);
     plotUtils.FillHist(AnaIO::hRecPi0MassRaw, PiZeroVecRaw.M(), truthEventType);
@@ -613,19 +634,6 @@ TLorentzVector AnaUtils::GetPiZero()
       	const double openingAngleTruth = ldShowerTruth.Angle(slShowerTruth.Vect())*TMath::RadToDeg();
 	      const double openingAngleRes = openingAngle - openingAngleTruth;
 	      plotUtils.FillHist(AnaIO::hShowerOpenAngleRes, openingAngleTruth, openingAngleRes); 
-
-        if(slShowerResRaw < -0.5){
-          cout << "LD E reco: " << ldShowerRaw.E() << endl;
-          cout << "SL E reco: " << slShowerRaw.E() << endl;
-          cout << "OA reco: " << openingAngle << endl;
-
-          cout << "\nLD E truth: " << ldShowerTruth.E() << endl;
-          cout << "SL E truth: " << slShowerTruth.E() << endl;
-          cout << "OA truth: " << openingAngleTruth << endl;
-
-          cout << "-------------------------" << endl;
-
-        }  
         
         // Calculate pi0 mass resolution
 	      const double mpi0Res = PiZeroVec.M()/PiZeroTruthVec.M() -1;

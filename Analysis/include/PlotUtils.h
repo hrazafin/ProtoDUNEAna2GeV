@@ -78,6 +78,7 @@ class PlotUtils
   TH1D * GetStackedSum(THStack *stk);
   void ScaleStack(THStack *stk, const double scale);
   TH2D * NormalHist(const TH2D *hraw, const Double_t thres, const Bool_t kmax);
+  THStack * NormalizeStack(THStack * hstk);
   void getProfileFit(TH2D * h2d);
   TH1D * GetCDF(const TH2D *hraw, const TString hname);
   void DrawOverlay(TH1D *holay);

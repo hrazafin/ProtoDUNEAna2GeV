@@ -175,7 +175,9 @@ namespace AnaIO
   vector<double>  *reco_daughter_PFP_true_byHits_startPx = 0x0;
   vector<double>  *reco_daughter_PFP_true_byHits_startPy = 0x0;
   vector<double>  *reco_daughter_PFP_true_byHits_startPz = 0x0;
-
+  vector<double>  *reco_daughter_PFP_true_byHits_purity = 0x0;
+  vector<double>  *reco_daughter_PFP_true_byHits_completeness = 0x0;
+  vector<double>  *reco_daughter_PFP_true_byE_completeness = 0x0;
   // Declare histograms
   TH1I * hTruthBeamType = 0x0;
   TH1I * hTruthSignal = 0x0;
@@ -354,6 +356,15 @@ namespace AnaIO
 
   TH1D * hPi0MassCompare = 0x0;
   TH1D * hPi0MassComparePost = 0x0;
+
+  // Completeness and Purity
+  TH2D * hTrackPurityVSnHits = 0x0;
+  TH2D * hTrackCompletenessVSnHits = 0x0;
+  TH2D * hShowerPurityVSnHits = 0x0;
+  TH2D * hShowerCompletenessVSnHits = 0x0;
+
+  TH2D * hTrackCompleteness = 0x0;
+  TH2D * hShowerCompleteness = 0x0;
   
 
   // Get input tree
@@ -455,7 +466,9 @@ namespace AnaIO
     tree->SetBranchAddress("reco_daughter_PFP_true_byHits_startPx", &reco_daughter_PFP_true_byHits_startPx);
     tree->SetBranchAddress("reco_daughter_PFP_true_byHits_startPy", &reco_daughter_PFP_true_byHits_startPy);
     tree->SetBranchAddress("reco_daughter_PFP_true_byHits_startPz", &reco_daughter_PFP_true_byHits_startPz);
-
+    tree->SetBranchAddress("reco_daughter_PFP_true_byHits_purity",&reco_daughter_PFP_true_byHits_purity);
+    tree->SetBranchAddress("reco_daughter_PFP_true_byHits_completeness",&reco_daughter_PFP_true_byHits_completeness);
+    tree->SetBranchAddress("reco_daughter_PFP_true_byE_completeness",&reco_daughter_PFP_true_byE_completeness);
     return tree;
   } // End of GetInputTree
   
@@ -544,8 +557,8 @@ namespace AnaIO
     lout->Add(hRecPi0Mass);
     hRecPi0MassRaw = new TH2D("b014RecPi0Mass_STK_RAW","", 15, 0, 0.5, 3, -0.5, 2.5);
     lout->Add(hRecPi0MassRaw);
-    hRecPi0MassFit = new TH2D("b015RecPi0Mass_STK_FIT","", 15, 0, 0.5, 3, -0.5, 2.5);
-    lout->Add(hRecPi0MassFit);
+    //hRecPi0MassFit = new TH2D("b015RecPi0Mass_STK_FIT","", 15, 0, 0.5, 3, -0.5, 2.5);
+    //lout->Add(hRecPi0MassFit);
     hRecPi0Momentum = new TH2D("b016RecPi0Momentum_STK", "", 15, 0, 1, 3, -0.5, 2.5);
     lout->Add(hRecPi0Momentum);
     hRecPi0MomentumRaw = new TH2D("b017RecPi0Momentum_STK_RAW", "", 15, 0, 1, 3, -0.5, 2.5);
@@ -563,16 +576,16 @@ namespace AnaIO
     lout->Add(hRecSubLeadingShowerEnergyRaw);
 
     // Commom reco TKI
-    hRecdalphat = new TH2D("d001Recdalphat_STK","", 9, 0, 180,nevtType, evtTypemin, evtTypemax); 
+    hRecdalphat = new TH2D("d001Recdalphat_STK","", 9, 0, 360,nevtType, evtTypemin, evtTypemax); 
     lout->Add(hRecdalphat);
-    hRecdphit = new TH2D("d002Recphit_STK","", 9, 0, 180,nevtType, evtTypemin, evtTypemax); 
+    hRecdphit = new TH2D("d002Recphit_STK","", 9, 0, 360,nevtType, evtTypemin, evtTypemax); 
     lout->Add(hRecdphit);
-    hRecdpt = new TH2D("d003Recdpt_STK","", 8, 0, 0.8,nevtType, evtTypemin, evtTypemax); 
+    hRecdpt = new TH2D("d003Recdpt_STK","", 8, 0, 1.8,nevtType, evtTypemin, evtTypemax); 
     lout->Add(hRecdpt);
-    hRecpn = new TH2D("d004Recpn_STK","", 8, 0, 0.8,nevtType, evtTypemin, evtTypemax); 
+    hRecpn = new TH2D("d004Recpn_STK","", 8, 0, 1.8,nevtType, evtTypemin, evtTypemax); 
     lout->Add(hRecpn);
 
-    hCutTracknHits = new TH2D("e001CutTracknHits_STK","", 50, 0, 1000, nparType, parTypemin, parTypemax); 
+    hCutTracknHits = new TH2D("e001CutTracknHits_STK","", 50, 0, 500, nparType, parTypemin, parTypemax); 
     lout->Add(hCutTracknHits);
     hCutTrackScore = new TH2D("e002CutTrackScore_STK","", 50, 0, 1, nparType, parTypemin, parTypemax);
     lout->Add(hCutTrackScore);
@@ -834,12 +847,12 @@ namespace AnaIO
       hPi0MassResRaw = new TH2D("i007Pi0Mass_RES_RAW","", 20, 0, 0.5, 20, -0.5, 0.5);
       lout->Add(hPi0MassResRaw);
 
-      hPi0MomentumResFit = new TH2D("i008Pi0Momentum_RES_FIT","", 20, 0, 1, 10, -0.5, 0.5);
-      lout->Add(hPi0MomentumResFit);
-      hPi0MassResFit = new TH2D("i009Pi0Mass_RES_FIT","", 20, 0, 0.5, 20, -0.5, 0.5);
-      lout->Add(hPi0MassResFit);
-      hShowerOpenAngleResFit = new TH2D("i010ShowerOpenAngle_RES_FIT","", 20, 0, 180, 20, -1.1, 1.1);
-      lout->Add(hShowerOpenAngleResFit);
+      //hPi0MomentumResFit = new TH2D("i008Pi0Momentum_RES_FIT","", 20, 0, 1, 10, -0.5, 0.5);
+      //lout->Add(hPi0MomentumResFit);
+      //hPi0MassResFit = new TH2D("i009Pi0Mass_RES_FIT","", 20, 0, 0.5, 20, -0.5, 0.5);
+      //lout->Add(hPi0MassResFit);
+      //hShowerOpenAngleResFit = new TH2D("i010ShowerOpenAngle_RES_FIT","", 20, 0, 180, 20, -1.1, 1.1);
+      //lout->Add(hShowerOpenAngleResFit);
 
       hTruthPi0Mass = new TH1D("i011hTruthPi0Mass","", 20, 0, 1);
       lout->Add(hTruthPi0Mass);
@@ -931,6 +944,22 @@ namespace AnaIO
       lout->Add(hShowerOAComparePost);
       hPi0MassComparePost = new TH1D("y004hPi0MassComparePost","", 20, 0, 0.3);
       lout->Add(hPi0MassComparePost);
+
+      hTrackPurityVSnHits = new TH2D("z001hTrackPurityVSnHits_REG","", 50, 0, 1000, 20, 0, 1.2);
+      lout->Add(hTrackPurityVSnHits);
+      hTrackCompletenessVSnHits = new TH2D("z002hTrackCompletenessVSnHits_REG","", 50, 0, 1000, 20, 0, 1.2);
+      lout->Add(hTrackCompletenessVSnHits);
+
+      hShowerPurityVSnHits = new TH2D("z003hShowerPurityVSnHits_REG","", 50, 0, 1000, 20, 0, 1.2);
+      lout->Add(hShowerPurityVSnHits);
+      hShowerCompletenessVSnHits = new TH2D("z004hShowerCompletenessVSnHits_REG","", 50, 0, 1000, 20, 0, 1.2);
+      lout->Add(hShowerCompletenessVSnHits);
+
+      hTrackCompleteness = new TH2D("z005hTrackCompleteness_STK","", 20, 0, 1, nparType, parTypemin, parTypemax );
+      lout->Add(hTrackCompleteness);
+      hShowerCompleteness = new TH2D("z006hShowerCompleteness_STK","", 20, 0, 1, nparType, parTypemin, parTypemax );
+      lout->Add(hShowerCompleteness);
+
 
     }
   }// End of IniHist
