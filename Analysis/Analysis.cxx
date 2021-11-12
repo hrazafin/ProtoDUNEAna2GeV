@@ -156,6 +156,26 @@ int anaRec(const TString finName, TList *lout, const TString tag, const int nEnt
 
   } // End of KF
   */
+  if(kMC) {
+    cout << "size of true proton mom vector MC: " << anaUtils.ProtonMomTruth.size() << endl;
+    cout << "size of reco proton mom vector MC: " << anaUtils.ProtonMomRaw.size() << endl;
+    plotUtils.xSlicedEnergyCorrection(AnaIO::hProtonMomentumRecVSTruth_REG_Correction);
+    for(unsigned int ii = 0; ii < anaUtils.ProtonMomTruth.size(); ii++){
+      for(int jj = 0; jj < AnaIO::hMeanPMom->GetNbinsX(); jj++){
+        if(anaUtils.ProtonMomRaw[ii] > AnaIO::hMeanPMom->GetBinLowEdge(jj) && anaUtils.ProtonMomRaw[ii] < AnaIO::hMeanPMom->GetBinLowEdge(jj+1)){
+          const double EAfter = anaUtils.ProtonMomRaw[ii]/(1.0+(AnaIO::hMeanPMom->GetBinContent(jj)));
+          const double resAfter = EAfter/anaUtils.ProtonMomTruth[ii] -1;
+          double binContent = AnaIO::hMeanPMom->GetBinContent(jj);
+          cout << "Bin content: " << jj << " " << binContent << endl;
+          cout << "ERaw: " << anaUtils.ProtonMomRaw[ii] << endl;
+          cout << "EAfter: " << EAfter << endl;
+          cout << "ETruth: " << anaUtils.ProtonMomTruth[ii] << endl;
+          AnaIO::hProtonMomCor->Fill(EAfter,resAfter);
+        }
+      }
+    }
+  }
+  
 
   // Print cut flow statistics
   int icut = 0;

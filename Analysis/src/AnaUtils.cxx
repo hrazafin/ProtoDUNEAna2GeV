@@ -403,6 +403,21 @@ TLorentzVector AnaUtils::GetMomentumRefBeam(const bool isTruth, const int recInd
   return momentumRefBeam;
 }
 
+double AnaUtils::GetTransverseMomentumRefBeam(const bool isTruth, const int recIndex, const bool kProton)
+{
+  // Get true/reco beam momentum vector
+  const TVector3 tmpBeam = isTruth ? GetTruthBeamFull() : GetRecBeamFull();
+  // Get true/reco FS particle momentum vector
+  const TVector3 vecLab = isTruth ? GetTruthMatchedTrackVectLab(recIndex) : GetRecTrackVectLab(recIndex, kProton);
+  // Get theta angle reletive to the beam
+  const double thetaRefBeam = AnaFunctions::GetThetaRef(vecLab, tmpBeam.Unit());
+
+  double pT = vecLab.Mag()*sin(thetaRefBeam);
+
+  return pT;
+}
+
+
 TLorentzVector AnaUtils::GetPi0MomentumRefBeam(const TLorentzVector dummyPi0)
 {
   // Get reco beam momentum vector
@@ -437,7 +452,20 @@ void AnaUtils::FillFSParticleKinematics(const int recIndex, const int truthParti
       const double momentumRes = recMomRefBeam.P()/truthMomRefBeam.P()-1;
       const double thetaRes    = (recMomRefBeam.Theta()-truthMomRefBeam.Theta())*TMath::RadToDeg();
       plotUtils.FillHist(AnaIO::hProtonMomentumRes, truthMomRefBeam.P(), momentumRes);
-      plotUtils.FillHist(AnaIO::hProtonThetaRes, truthMomRefBeam.Theta()*TMath::RadToDeg(), thetaRes); 
+      plotUtils.FillHist(AnaIO::hProtonThetaRes, truthMomRefBeam.Theta()*TMath::RadToDeg(), thetaRes);
+      plotUtils.FillHist(AnaIO::hProtonMomentumRecVSTruth_REG,recMomRefBeam.P(),truthMomRefBeam.P());
+      plotUtils.FillHist(AnaIO::hProtonTransverseMomentumRecVSTruth_REG,GetTransverseMomentumRefBeam(false,recIndex,true),
+                         GetTransverseMomentumRefBeam(true, recIndex, true));
+      plotUtils.FillHist(AnaIO::hProtonMomentumRecVSTruth_REG_Correction,recMomRefBeam.P(),momentumRes);
+      // Transverse momentum
+      const double pTRaw = GetTransverseMomentumRefBeam(false,recIndex,true);
+      const double pTTruth = GetTransverseMomentumRefBeam(true, recIndex, true);
+      plotUtils.FillHist(AnaIO::hProtonTransverseMomentumRecVSTruth_REG_Correction, pTRaw, pTRaw/pTTruth - 1 );
+      // Save proton truth and raw momentum
+      //ProtonMomTruth.push_back(GetTransverseMomentumRefBeam(true,recIndex,true));
+      //ProtonMomRaw.push_back(GetTransverseMomentumRefBeam(false,recIndex,true));
+      ProtonMomTruth.push_back(truthMomRefBeam.P());
+      ProtonMomRaw.push_back(recMomRefBeam.P());
     }
   }
   // ---------------- Fill piplus kinematics ----------------//
@@ -826,4 +854,55 @@ void AnaUtils::DoTruthTKICalculation(){
     AnaIO::hTruthThetaFinProtonNpMn->Fill(AnaIO::finProtontheta);
     AnaIO::hTruthMomFin2ProtonNpMn->Fill(AnaIO::fin2Pmom);
   }
+}
+
+
+// Function to do the energy correction using a MC driven method
+void AnaUtils::xSlicedEnergyCorrection()
+{
+  cout << "size of true proton mom vector: " << ProtonMomTruth.size() << endl;
+  cout << "size of reco proton mom vector: " << ProtonMomRaw.size() << endl;
+  for(unsigned int ii = 0; ii < ProtonMomTruth.size(); ii++){
+    AnaIO::hTruthRecRatioProtonMom->Fill(ProtonMomRaw[ii]/ProtonMomTruth[ii] - 1 );
+    //AnaIO::hTruthRecRatioProtonMom->Fill(1/ProtonMomRaw[ii]-1/ProtonMomTruth[ii]);
+  }
+
+  // Creates a Root function based on function CauchDens defined in header file
+  //TF1 *func = new TF1("cauchy",CauchyDens,0.3,1.8,2);
+  TF1 *func = new TF1("cauchy",CauchyDens,-1,1,2);
+
+  // Sets initial values and parameter names
+  Double_t par[2];
+  par[0] = AnaIO::hTruthRecRatioProtonMom->GetMean(); 
+  par[1] = AnaIO::hTruthRecRatioProtonMom->GetRMS();
+  func->SetParameters(par);
+  func->SetParNames("Mean","FWHM");
+  // Increase the number of points for calculating the integral of the density
+  func->SetNpx(AnaIO::hTruthRecRatioProtonMom->GetNbinsX());
+
+  // Extract the Cauchy density parameters from the fit
+  Double_t height = AnaIO::hTruthRecRatioProtonMom->GetMaximum()*1.2;
+  cout << "Max: " << height << endl;
+  //TF1 *fitfunc = new TF1("fitfunc",CauchyPeak,0.3,1.8,3);
+  TF1 *fitfunc = new TF1("fitfunc",CauchyPeak,-1,1,3);
+
+  Double_t fitpar[3];
+  fitpar[0] = par[0];
+  fitpar[1] = par[1];
+  fitpar[2] = Double_t(height);
+  fitfunc->SetParameters(fitpar);
+  AnaIO::hTruthRecRatioProtonMom->Fit(fitfunc);
+
+  TCanvas *c1 = new TCanvas("c11","the fit canvas",500,400);
+
+  AnaIO::hTruthRecRatioProtonMom->SetMarkerStyle(kFullCircle);
+  AnaIO::hTruthRecRatioProtonMom->SetMarkerSize(0.5);
+  AnaIO::hTruthRecRatioProtonMom->SetMarkerColor(kBlack);
+  AnaIO::hTruthRecRatioProtonMom->SetLineColor(kBlack);
+  AnaIO::hTruthRecRatioProtonMom->SetLineWidth(1);
+  AnaIO::hTruthRecRatioProtonMom->Draw("E");
+  fitfunc->Draw("same");
+
+  c1->Print("Chachy.png");
+  
 }

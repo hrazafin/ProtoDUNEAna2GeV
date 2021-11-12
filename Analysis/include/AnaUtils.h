@@ -39,6 +39,8 @@ class AnaUtils
     TVector3 GetRecTrackVectLab(const int ii, const bool kProton);
     // Return a LT vector relative to beam direction (only consider theta)
     TLorentzVector GetMomentumRefBeam(const bool isTruth, const int recIndex, const bool kProton);
+    // Return the transverse momentum relative to the beam direction
+    double GetTransverseMomentumRefBeam(const bool isTruth, const int recIndex, const bool kProton);
     // Return a Pi0 LT vector relative to beam direction (only consider theta)
     TLorentzVector GetPi0MomentumRefBeam(const TLorentzVector dummyPi0);
 
@@ -58,6 +60,9 @@ class AnaUtils
     void GetPi0Showers();
     // Truth TKI calculation
     void DoTruthTKICalculation();
+
+    // Energy Correction
+    void xSlicedEnergyCorrection();
 
     //void Chi2FCN(int &npars, double *grad, double &value, double *par, int flag);
     //void KinematicFitting(double openAngle, double E1, double E2, double sigmaE1, double sigmaE2);
@@ -139,12 +144,38 @@ class AnaUtils
       return NParList;
     }
 
+    static Double_t CauchyDens(Double_t *x, Double_t *par)
+    {
+      Double_t pi   = TMath::Pi();
+      Double_t mean = par[0];
+      Double_t fwhm = par[1];
+
+      Double_t arg = x[0]-mean;
+      Double_t top = fwhm;
+      Double_t bot = pi*(arg*arg+top*top);
+
+      Double_t func = top/bot;
+      return func;
+    }
+
+    static Double_t CauchyPeak(Double_t *x, Double_t *par)
+    {
+      Double_t height = par[2];
+      Double_t func = height*CauchyDens(x,par);
+      return func;
+    }
+
     static vector<double> LdShowerEnergyTruth;
     static vector<double> SlShowerEnergyTruth; 
     static vector<double> OpenAngleTruth; 
     static vector<double> LdShowerEnergyRaw; 
     static vector<double> SlShowerEnergyRaw; 
     static vector<double> OpenAngle;
+
+    // Energy Correction
+    static vector<double> ProtonMomTruth;
+    static vector<double> ProtonMomRaw;
+
     // TKI analysis
     static TLorentzVector RecPi0LTVet;
     static TLorentzVector RecProtonLTVet;
@@ -176,7 +207,12 @@ vector<double> AnaUtils::LdShowerEnergyRaw;
 vector<double> AnaUtils::SlShowerEnergyRaw;
 vector<double> AnaUtils::OpenAngle;
 
+vector<double> AnaUtils::ProtonMomTruth;
+vector<double> AnaUtils::ProtonMomRaw;
+
 TLorentzVector AnaUtils::RecPi0LTVet;
 TLorentzVector AnaUtils::RecProtonLTVet;
+
+
 
 #endif

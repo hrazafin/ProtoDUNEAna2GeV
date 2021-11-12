@@ -289,6 +289,16 @@ namespace AnaIO
   TH2D * hShowerEnergyResRaw = 0x0;
   TH2D * hShowerThetaRes = 0x0; 
 
+  TH2D * hProtonMomentumRecVSTruth_REG = 0x0;
+  TH2D * hProtonTransverseMomentumRecVSTruth_REG = 0x0;
+  TH2D * hProtonMomentumRecVSTruth_REG_Correction = 0x0;
+  TH2D * hProtonTransverseMomentumRecVSTruth_REG_Correction = 0x0;
+
+  TH1D * hMeanPMom = 0x0;
+  TH1D * hMeanPMomT = 0x0;
+
+  TH2D * hProtonMomCor = 0x0;
+
   TH2D * hShowerEnergyRecVSTruth_REG = 0x0;
   TH2D * hShowerEnergyRawRecVSTruth_REG = 0x0;
   TH2D * hShowerEnergyResVSnHits_REG = 0x0;
@@ -365,6 +375,8 @@ namespace AnaIO
 
   TH2D * hTrackCompleteness = 0x0;
   TH2D * hShowerCompleteness = 0x0;
+
+  TH1D * hTruthRecRatioProtonMom = 0x0;
   
 
   // Get input tree
@@ -805,6 +817,25 @@ namespace AnaIO
       hPiPlusMomentumRes = new TH2D("g007PiPlusMomentum_RES","", 20, 0, 1.2, 20, -0.2, 0.2); 
       lout->Add(hPiPlusMomentumRes);
 
+      hProtonMomentumRecVSTruth_REG  = new TH2D("g008ProtonMomentumRecVSTruth_REG_diag","",20, 0.2, 1.2, 20, 0.2, 1.2);
+      lout->Add(hProtonMomentumRecVSTruth_REG);
+      hProtonTransverseMomentumRecVSTruth_REG  = new TH2D("g009ProtonTransverseMomentumRecVSTruth_REG_diag","",20, 0, 1, 20, 0, 1);
+      lout->Add(hProtonTransverseMomentumRecVSTruth_REG);
+      hProtonMomentumRecVSTruth_REG_Correction  = new TH2D("g010ProtonMomentumRecVSTruth_REG_Correction","",12, 0.45, 1.05, 50, -0.6, 0.6);
+      lout->Add(hProtonMomentumRecVSTruth_REG_Correction);
+      hProtonTransverseMomentumRecVSTruth_REG_Correction  = new TH2D("g011ProtonTransverseMomentumRecVSTruth_REG_Correction","",12, 0.2, 0.8, 50, -0.6, 0.6);
+      lout->Add(hProtonTransverseMomentumRecVSTruth_REG_Correction);
+
+
+      hMeanPMom = new TH1D("g012ProtonMomentum_Cor","", 12, 0.45, 1.05);
+      lout->Add(hMeanPMom);
+      hMeanPMomT = new TH1D("g013ProtonMomentumT_Cor","",12, 0.2, 0.8);
+      lout->Add(hMeanPMomT);
+
+      hProtonMomCor = new TH2D("g014ProtonMomentumRecVSTruth_REG_AfterCor","",12, 0.45, 1.05, 50, -0.6, 0.6);
+      lout->Add(hProtonMomCor);
+
+
       hShowerEnergyRes = new TH2D("h001ShowerEnergy_RES","", 20, 0, 1.2, 30, -1.1, 0.7);
       lout->Add(hShowerEnergyRes);
       hShowerEnergyResRaw = new TH2D("h002ShowerEnergy_RES_RAW","", 20, 0, 1.2, 30, -1.1, 0.7);
@@ -933,7 +964,7 @@ namespace AnaIO
       lout->Add(hShowerE2Compare);
       hShowerOACompare = new TH1D("y003hShowerOACompare","", 20, -50, 50);
       lout->Add(hShowerOACompare);
-      hPi0MassCompare = new TH1D("y004hPi0MassCompare","", 20, 0, 0.3);
+      hPi0MassCompare = new TH1D("y004hPi0MassCompare","", 100, 0, 0.3);
       lout->Add(hPi0MassCompare);
 
       hShowerE1ComparePost = new TH1D("y001hShowerE1ComparePost","", 20, -1.1, 1.1);
@@ -942,7 +973,7 @@ namespace AnaIO
       lout->Add(hShowerE2ComparePost);
       hShowerOAComparePost = new TH1D("y003hShowerOAComparePost","", 20, -50, 50);
       lout->Add(hShowerOAComparePost);
-      hPi0MassComparePost = new TH1D("y004hPi0MassComparePost","", 20, 0, 0.3);
+      hPi0MassComparePost = new TH1D("y004hPi0MassComparePost","", 100, 0, 0.3);
       lout->Add(hPi0MassComparePost);
 
       hTrackPurityVSnHits = new TH2D("z001hTrackPurityVSnHits_REG","", 50, 0, 1000, 20, 0, 1.2);
@@ -959,6 +990,10 @@ namespace AnaIO
       lout->Add(hTrackCompleteness);
       hShowerCompleteness = new TH2D("z006hShowerCompleteness_STK","", 20, 0, 1, nparType, parTypemin, parTypemax );
       lout->Add(hShowerCompleteness);
+
+      //hTruthRecRatioProtonMom = new TH1D("zz001hTruthRecRatioProtonMom","", 60, 0.5, 1.5);
+      hTruthRecRatioProtonMom = new TH1D("zz001hTruthRecRatioProtonMom","", 200, -0.6, 0.6);
+      lout->Add(hTruthRecRatioProtonMom);
 
 
     }

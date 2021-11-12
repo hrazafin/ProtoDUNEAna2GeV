@@ -123,6 +123,9 @@ void PlotUtils::ProcessHist(TList *lout, const bool kMC)
           getProfileFit(htmp);
           getSliceXDrawY(htmp);
         } 
+        else if (tag.Contains("Correction") && kMC){
+          xSlicedEnergyCorrection(htmp);
+        }
       }
       // Do nothing (You can add more else if to process more tags)
       else {}
@@ -206,6 +209,15 @@ void PlotUtils::DrawHist(TList *lout, const double plotscale, TList * overlayLis
         // Draw 2D histogram from its name (MC only)
         if(!tag.Contains("proj") && (tag.Contains("RES") || tag.Contains("REG"))) {
           h2d->Draw("colz");
+          if(tag.Contains("diag")){
+            // Draw the diagonal line for rec. VS true histogram
+            double max = h2d->GetXaxis()->GetBinUpEdge(h2d->GetXaxis()->GetLast());
+            double min = h2d->GetXaxis()->GetBinLowEdge(h2d->GetXaxis()->GetFirst());
+            TLine *line = new TLine(min,min,max,max);
+            line->SetLineColor(kBlack);
+            line->SetLineWidth(2);
+            line->Draw();
+          }
         }
         if(!tag.Contains("proj") && tag.Contains("Bin")){
           h2d->SetMarkerSize(2);
@@ -278,29 +290,31 @@ void PlotUtils::DrawHist(TList *lout, const double plotscale, TList * overlayLis
             hh->SetLineColor(24);
             hh->Draw("hist");
             gPad->Update();
-            TPaveStats *st = (TPaveStats*)hh->GetListOfFunctions()->FindObject("stats");
-            st->SetY1NDC(0.7); 
-            st->SetY2NDC(0.9);
-            st->SetX1NDC(0.7); 
-            st->SetX2NDC(0.93);
+            
+            //TPaveStats *st = (TPaveStats*)hh->GetListOfFunctions()->FindObject("stats");
+            //st->SetY1NDC(0.7); 
+            //st->SetY2NDC(0.9);
+            //st->SetX1NDC(0.7); 
+            //st->SetX2NDC(0.93);
+            
             holay->SetFillStyle(3001);
             holay->SetFillColor(46);
             holay->SetLineColor(46);
             //holay->SetStats(0);
             holay->Draw("SAMES hist");
             gPad->Update();
-            TPaveStats *st_holay = (TPaveStats*)holay->GetListOfFunctions()->FindObject("stats");
-            st_holay->SetY1NDC(0.5); 
-            st_holay->SetY2NDC(0.7);
-            st_holay->SetX1NDC(0.7); 
-            st_holay->SetX2NDC(0.93);
+            //TPaveStats *st_holay = (TPaveStats*)holay->GetListOfFunctions()->FindObject("stats");
+            
+            //st_holay->SetY1NDC(0.5); 
+            //st_holay->SetY2NDC(0.7);
+            //st_holay->SetX1NDC(0.7); 
+            //st_holay->SetX2NDC(0.93);
 
 
             lg->AddEntry(hh,"Before Fitting","f");
             lg->AddEntry(holay,"After Fitting","f");
             //lg->Draw("same");
 
-            
           }
           */
           else hh->Draw("hist");
@@ -441,7 +455,7 @@ void PlotUtils::DrawHist(TList *lout, const double plotscale, TList * overlayLis
       
     }
     else cout << "PlotUtils::DrawHist not found correct histogram!" << " name: " << tag << endl;
-    c1->Print(outdir+"/"+tag+".eps");
+    c1->Print(outdir+"/"+tag+".png");
     
   } // End of for loop
 }
@@ -791,6 +805,60 @@ void PlotUtils::getSliceXDrawY(TH2D * h2d)
     hpj->Draw();
   }  
     cc->Print("output/hSliceXDrawY.eps");
+}
+
+void PlotUtils::xSlicedEnergyCorrection(TH2D * h2d)
+{ 
+  auto cc = new TCanvas("cc","cc",1600,1200);
+  cc->Divide(3,4,0,0);
+  const TString name = h2d->GetName();
+  for(int ii=1; ii<=h2d->GetNbinsX(); ii++){
+    cc->cd(ii);
+    TF1 *func = new TF1(Form("func%d",ii),CauchyDens,-1,1,2);
+    TH1D * hpj= h2d->ProjectionY(Form("ftmp%d",ii), ii, ii);
+    if (hpj->GetEntries() != 0) {
+      // Sets initial values and parameter names
+      Double_t par[2];
+      par[0] = hpj->GetMean(); 
+      par[1] = hpj->GetRMS();
+      func->SetParameters(par);
+      func->SetParNames("Mean","FWHM");
+
+      Double_t height = hpj->GetMaximum()*1.2;
+      TF1 *fitfunc = new TF1(Form("fitfunc%d",ii),CauchyPeak,-1,1,3);
+      Double_t fitpar[3];
+      fitpar[0] = par[0];
+      fitpar[1] = par[1];
+      fitpar[2] = Double_t(height);
+      fitfunc->SetParameters(fitpar);
+
+      hpj->SetMarkerStyle(kFullCircle);
+      hpj->SetMarkerSize(0.5);
+      hpj->SetMarkerColor(kBlack);
+      hpj->SetLineColor(kBlack);
+      hpj->SetLineWidth(1);
+      
+      hpj->Fit(Form("fitfunc%d",ii));
+      fitfunc->Draw("same");
+   
+      if(name == "g011ProtonTransverseMomentumRecVSTruth_REG_Correction"){
+        AnaIO::hMeanPMomT->SetMinimum(-0.1);
+        AnaIO::hMeanPMomT->SetMaximum(0.1);
+        AnaIO::hMeanPMomT->SetBinContent(ii,fitfunc->GetParameter(0));
+        AnaIO::hMeanPMomT->SetBinError(ii,fitfunc->GetParError(0));
+      }
+      if(name == "g010ProtonMomentumRecVSTruth_REG_Correction"){
+        AnaIO::hMeanPMom->SetMinimum(-0.1);
+        AnaIO::hMeanPMom->SetMaximum(0.04);
+        AnaIO::hMeanPMom->SetBinContent(ii,fitfunc->GetParameter(0));
+        AnaIO::hMeanPMom->SetBinError(ii,fitfunc->GetParError(0));
+      }
+
+    }
+    //hpj->SetStats(0);
+    hpj->Draw("E");
+  }  
+    cc->Print("output/"+name+"_sliced.png");
 }
 
 TLegend *PlotUtils::DrawLegend(const vector<TString> &entries, const vector<TString>& htype, const TString tag, const int *tmpcol, const int * tmpmkr, const int ncol)

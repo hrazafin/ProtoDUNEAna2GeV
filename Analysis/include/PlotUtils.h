@@ -90,6 +90,29 @@ class PlotUtils
   void gStyleSetup();
   TLegend * DrawLegend(const vector<TString> &entries, const vector<TString>& htype, const TString tag, const int *tmpcol=0x0, const int * tmpmkr=0x0, const int ncol = 1);
   void getSliceXDrawY(TH2D * h2d);
+  void xSlicedEnergyCorrection(TH2D * h2d);
+
+  static Double_t CauchyDens(Double_t *x, Double_t *par)
+  {
+    Double_t pi   = TMath::Pi();
+    Double_t mean = par[0];
+    Double_t fwhm = par[1];
+
+    Double_t arg = x[0]-mean;
+    Double_t top = fwhm;
+    Double_t bot = pi*(arg*arg+top*top);
+
+    Double_t func = top/bot;
+    return func;
+  }
+
+  static Double_t CauchyPeak(Double_t *x, Double_t *par)
+  {
+    Double_t height = par[2];
+    Double_t func = height*CauchyDens(x,par);
+    return func;
+  }
+
 
   private:
 };
