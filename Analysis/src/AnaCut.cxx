@@ -2,55 +2,205 @@
 
 bool AnaCut::CutBeamAllInOne(const bool kMC)
 {
-  // Standard procedure from pion analyses
-  
-  // 1. Beam ID cut (pion beam/other)
-  if(kMC){ // MC
-    // In data the beam instrumentation is able to filter for these events but is not inside the MC
-    const bool mc_beamID =(AnaIO::true_beam_PDG == 211 || AnaIO::true_beam_PDG == -13);
-    AnaIO::hCutBeamIDPass->Fill(mc_beamID);
-    if(!mc_beamID){
-      return false;
-    }
-  }
-  else{ // Data
-    const bool data_beamID = CutBeamID((*AnaIO::beam_inst_PDG_candidates));
-    AnaIO::hCutBeamIDPass->Fill(data_beamID);
-    if(!data_beamID){
-      return false;
-    }
-  }
-  
-  //2. Primary beam type cut (track like/shower like)
-  const int beam_recoType = AnaIO::reco_beam_type;
-  AnaIO::hCutBeamType->Fill(beam_recoType);
-  if(beam_recoType!=13){//13: Pandora "track like"
-    return false;
-  }
+  // Standard procedure from pion analyses (updates on 16 Nov.)
 
-  //3. Beam position cut
-  const bool kBeamPosPass = kMC ? CutMCBeamPos() : CutDataBeamPos();
-  AnaIO::hCutBeamPosPass->Fill(kBeamPosPass);
-  if(!kBeamPosPass){
-    return false;
-  }
+  // 1. Beam PDG cut (pion beam/other)
+  const bool passBeamPDG = CutBeamPDG(kMC);
+  AnaIO::hCutBeamPDGPass->Fill(passBeamPDG);
+  if(!passBeamPDG) return false;
 
-  //4. APA3 cut
-  const double endzcut = 226;
-  AnaIO::hCutBeamEndZ->Fill(AnaIO::reco_beam_endZ);
-  AnaIO::hCutBeamEndZPass->Fill(!(AnaIO::reco_beam_endZ>=endzcut));
-  if(AnaIO::reco_beam_endZ >= endzcut){
-    return false;
-  }
+  // Fill beam quality cut histograms (use fitted value for beam quality cut latter)
+  FillBeamQualityHist();
+
+  // 2. Pandora slice cut (track like/shower like)
+  const bool passPandoraSlice = CutPandoraSlice();
+  AnaIO::hCutPandoraSlicePass->Fill(passPandoraSlice);
+  if(!passPandoraSlice) return false;
+
+  // 3. Calo size cut 
+  const bool passCaloSize = CutCaloSize();
+  AnaIO::hCutCaloSizePass->Fill(passCaloSize);
+  if(!passCaloSize) return false;
+
+  // 4. Beam quality cut
+  const bool passBeamQuality = CutBeamQuality(kMC);
+  AnaIO::hCutBeamQualityPass->Fill(passBeamQuality);
+  if(!passBeamQuality) return false;
+
+  // 5. APA3 cut
+  const bool passAPA3EndZ = CutAPA3EndZ();
+  AnaIO::hCutAPA3EndZPass->Fill(passAPA3EndZ);
+  if(!passAPA3EndZ) return false;
+
+  // 6. Michel Score cut (remove muons)
+  const bool passMichelScore = CutMichelScore(kMC);
+  AnaIO::hCutMichelScorePass->Fill(passMichelScore);
+  if(!passMichelScore) return false;
+
+  // 7. Median dEdx cut (remove protons)
+  const bool passMediandEdx = CutMediandEdx(kMC);
+  AnaIO::hCutMediandEdxPass->Fill(passMediandEdx);
+  if(!passMediandEdx) return false;
   
   return true;
 }
 
-
-bool AnaCut::CutBeamID(const std::vector<int> & pidCandidates)
+void AnaCut::FillBeamQualityHist()
 {
-  return ( (std::find(pidCandidates.begin(), pidCandidates.end(), 211)) != pidCandidates.end());
+  // Beam direction vector
+  TVector3 BeamDir(AnaIO::reco_beam_calo_endX-AnaIO::reco_beam_calo_startX,
+                  AnaIO::reco_beam_calo_endY-AnaIO::reco_beam_calo_startY,AnaIO::reco_beam_calo_endZ-AnaIO::reco_beam_calo_startZ);
+  // Detector axis
+  TVector3 DetX(1,0,0);
+  TVector3 DetY(0,1,0);
+  TVector3 DetZ(0,0,1);
+  // Fill histograms
+  AnaIO::hRecBeamStartX->Fill(AnaIO::reco_beam_calo_startX);
+  AnaIO::hRecBeamStartY->Fill(AnaIO::reco_beam_calo_startY);
+  AnaIO::hRecBeamStartZ->Fill(AnaIO::reco_beam_calo_startZ);
+
+  AnaIO::hRecBeamThetaX->Fill(BeamDir.Angle(DetX)*TMath::RadToDeg());
+  AnaIO::hRecBeamThetaY->Fill(BeamDir.Angle(DetY)*TMath::RadToDeg());
+  AnaIO::hRecBeamThetaZ->Fill(BeamDir.Angle(DetZ)*TMath::RadToDeg());
 }
+
+
+bool AnaCut::CutBeamPDG(const bool kMC)
+{
+  if(kMC){ // MC
+    // In data the beam instrumentation cannot distinguish 1GeV muon and pion, need to select both in MC
+    const bool passMC_beamPDG = (AnaIO::true_beam_PDG == 211 || AnaIO::true_beam_PDG == -13);
+    if(!passMC_beamPDG){
+      return false;
+    }
+  }
+  else{ // Data
+    const bool passData_beamPDG = ((std::find(AnaIO::beam_inst_PDG_candidates->begin(), AnaIO::beam_inst_PDG_candidates->end(), 211)) != AnaIO::beam_inst_PDG_candidates->end());
+    if(!passData_beamPDG){
+      return false;
+    }
+  }
+  return true;
+}
+
+bool AnaCut::CutPandoraSlice()
+{
+  const int beam_recoType = AnaIO::reco_beam_type;
+  if(beam_recoType!=13){ //13: Pandora "track like"
+    return false;
+  }
+
+  return true;
+}
+
+bool AnaCut::CutCaloSize()
+{
+  if(AnaIO::reco_beam_calo_wire->empty()) return false;
+  
+  return true;
+}
+
+bool AnaCut::CutBeamQuality(bool kMC, bool DoAngleCut)
+{
+  // More info: https://docs.dunescience.org/cgi-bin/private/RetrieveFile?docid=23122&filename=ProtoDUNE_CNN_Hit_Tagging_Technote.pdf&version=1
+
+  const double cut_beamQuality_TPC_xy = 3.;
+  const double cut_beamQuality_TPC_z = 3.;
+  const double cut_beamQuality_TPC_cosTheta = 0.95;
+
+  TVector3 BeamDir(AnaIO::reco_beam_calo_endX-AnaIO::reco_beam_calo_startX,
+                  AnaIO::reco_beam_calo_endY-AnaIO::reco_beam_calo_startY,
+                  AnaIO::reco_beam_calo_endZ-AnaIO::reco_beam_calo_startZ);
+  TVector3 DetX(1,0,0);
+  TVector3 DetY(0,1,0);
+  TVector3 DetZ(0,0,1);
+
+  const double thetaX = BeamDir.Angle(DetX);
+  const double thetaY = BeamDir.Angle(DetY);
+  const double thetaZ = BeamDir.Angle(DetZ);
+
+  const double deltaX = kMC ? AnaIO::reco_beam_calo_startX - MCmeanStartX : AnaIO::reco_beam_calo_startX - DATAmeanStartX;
+  const double deltaY = kMC ? AnaIO::reco_beam_calo_startY - MCmeanStartY : AnaIO::reco_beam_calo_startY - DATAmeanStartY;
+  const double deltaZ = kMC ? AnaIO::reco_beam_calo_startZ - MCmeanStartZ : AnaIO::reco_beam_calo_startZ - DATAmeanStartZ;
+  
+  const double cut_xy = kMC ? sqrt(pow(deltaX/MCsigmaStartX,2)+pow(deltaY/MCsigmaStartY,2)) : sqrt(pow(deltaX/DATAsigmaStartX,2)+pow(deltaY/DATAsigmaStartY,2));
+
+  const double cut_x = kMC ? deltaX/MCsigmaStartX : deltaX/DATAsigmaStartX;
+  const double cut_y = kMC ? deltaY/MCsigmaStartY : deltaY/DATAsigmaStartY;
+  const double cut_z = kMC ? deltaZ/MCsigmaStartZ : deltaZ/DATAsigmaStartZ;
+  
+
+
+  const double cut_theta = kMC ? cos(thetaX)*cos(MCmeanThetaX)+cos(thetaY)*cos(MCmeanThetaY)+cos(thetaZ)*cos(MCmeanThetaZ)
+                               : cos(thetaX)*cos(DATAmeanThetaX)+cos(thetaY)*cos(DATAmeanThetaY)+cos(thetaZ)*cos(DATAmeanThetaZ);
+  
+  AnaIO::hCutBeamDeltaXYSigma->Fill(cut_xy);
+  AnaIO::hCutBeamDeltaZSigma->Fill(cut_z);
+  AnaIO::hCutBeamCosTheta->Fill(cut_theta);
+
+  const int parType = kMC ? anaUtils.GetBeamParticleType(AnaIO::reco_beam_true_byHits_PDG) : anaUtils.gkBeamOthers;
+  plotUtils.FillHist(AnaIO::hCutBeamQualityXY, cut_xy , parType);
+  plotUtils.FillHist(AnaIO::hCutBeamQualityX, cut_x , parType);
+  plotUtils.FillHist(AnaIO::hCutBeamQualityY, cut_y , parType);
+  plotUtils.FillHist(AnaIO::hCutBeamQualityZ, cut_z , parType);
+  plotUtils.FillHist(AnaIO::hCutBeamQualityTheta, cut_theta , parType);
+  
+  
+
+
+  if(cut_xy > cut_beamQuality_TPC_xy) return false;
+
+  if(cut_z > cut_beamQuality_TPC_z) return false;
+
+  if(DoAngleCut){
+    if(cut_theta < cut_beamQuality_TPC_cosTheta) return false;
+  }
+
+  return true;
+}
+
+bool AnaCut::CutAPA3EndZ(){
+
+  //AnaIO::hCutBeamEndZ->Fill(AnaIO::reco_beam_calo_endZ);
+  if(AnaIO::reco_beam_calo_endZ >= cut_EndZ_APA3){
+    return false;
+  }
+
+  return true;
+}
+
+bool AnaCut::CutMichelScore(const bool kMC)
+{
+  if( AnaIO::reco_beam_vertex_michel_score == 0) return true;
+  const double MichelScorePerHits = AnaIO::reco_beam_vertex_michel_score/AnaIO::reco_beam_vertex_nHits;
+  
+  const int parType = kMC ? anaUtils.GetBeamParticleType(AnaIO::reco_beam_true_byHits_PDG) : anaUtils.gkBeamOthers;
+  plotUtils.FillHist(AnaIO::hCutBeamMichelScoreNhits, MichelScorePerHits , parType);
+  // There is a muon candidate 
+  if(MichelScorePerHits > cut_MichelScore) return false;
+
+  return true;
+}
+
+bool AnaCut::CutMediandEdx(const bool kMC)
+{
+  auto median_it = AnaIO::reco_beam_calibrated_dEdX_SCE->begin() + AnaIO::reco_beam_calibrated_dEdX_SCE->size()/2;
+  std::nth_element(AnaIO::reco_beam_calibrated_dEdX_SCE->begin(), median_it, AnaIO::reco_beam_calibrated_dEdX_SCE->end());
+  const double median = (*AnaIO::reco_beam_calibrated_dEdX_SCE)[AnaIO::reco_beam_calibrated_dEdX_SCE->size()/2];
+
+  const int parType = kMC ? anaUtils.GetBeamParticleType(AnaIO::reco_beam_true_byHits_PDG) : anaUtils.gkBeamOthers;
+  plotUtils.FillHist(AnaIO::hCutBeamMediandEdx, median , parType);
+  
+  if(kMC){
+    AnaIO::hCutBeamMedianType->Fill(parType);
+  }
+
+  if(median > 2.4) return false;
+
+  return true;
+}
+
+// --------------------------------- Legacy Cuts (not used anymore) ----------------------- //
 
 bool AnaCut::CutMCBeamPos()
 {
@@ -138,6 +288,8 @@ bool AnaCut::Manual_beamPos_data(const int event,            const double data_s
 
 }
 
+// --------------------------------- Legacy Cuts (not used anymore) ----------------------- //
+
 int AnaCut::GetTruthPDGFromID(const int inID, const vector<int> * idarray, const vector<int> * pdgarray)
 { 
   int outpdg = -999;
@@ -149,6 +301,7 @@ int AnaCut::GetTruthPDGFromID(const int inID, const vector<int> * idarray, const
   return outpdg;
 }
 
+// Aim to find secondary daughter particles
 int AnaCut::GetTruthParticleInfoFromRec(const int recidx)
 {
   // Get true PDG of this reco particle at index recidx
@@ -299,10 +452,17 @@ void AnaCut::CountPFP(const bool kMC, const bool kFill)
       recParticleType = anaUtils.gkProton;
       // Fill rec and truth-matching info
       if(kFill) anaUtils.FillFSParticleKinematics(ii, truthParticleType, recParticleType);
-      const TLorentzVector recMomRefBeam = anaUtils.GetMomentumRefBeam(false /*=>reco*/, ii, true /*=>proton*/);
-      if(recMomRefBeam.P() > ProtonMom) {
-        anaUtils.RecProtonLTVet = recMomRefBeam;
-        ProtonMom = recMomRefBeam.P();
+
+      const TVector3 recMomProton = anaUtils.GetRecTrackVectLab(ii, true);
+      TLorentzVector rec4MomProton;
+      const TVector3 truthMomProton = anaUtils.GetTruthMatchedTrackVectLab(ii);
+      TLorentzVector truth4MomProton;
+      rec4MomProton.SetVectM(recMomProton,AnaFunctions::ProtonMass());
+      truth4MomProton.SetVectM(truthMomProton,AnaFunctions::ProtonMass());
+      if(rec4MomProton.P() > ProtonMom) {
+        anaUtils.RecProtonLTVet = rec4MomProton;
+        anaUtils.TruthProtonLTVet = truth4MomProton;
+        ProtonMom = rec4MomProton.P();
       }
     }
     // Piplus candidates selection
@@ -331,9 +491,10 @@ void AnaCut::CountPFP(const bool kMC, const bool kFill)
     nPFP++; 
   }
   if(recsize!=nPFP) cout << "CountPFP not looping all FS particles!!" << endl;
-  if(kFill && npi0shower >= 2) anaUtils.GetPiZero();
+ 
+  if(kFill) anaUtils.GetRecPiZeroFromShowers();
   // Output tree for kinematic fitting
-  if(kFill && npi0shower >= 2 && kMC) anaUtils.GetPi0Showers();
+  if(kFill && kMC) anaUtils.SavePi0ShowersForKF();
   
   //if(npi0shower > 1 && nproton > 0) printf("CountPFP PFP size %d nlooped %d nshower %d npi0shower %d nmichel %d npiplus %d nproton %d\n", recsize, nPFP, nshower, npi0shower, nmichel, npiplus, nproton);
 }
@@ -441,12 +602,15 @@ bool AnaCut::IsMichel(const int ii, const bool kMC)
 
 bool AnaCut::IsPiZeroShower(const int ii, const bool kMC)
 {
+  if((*AnaIO::reco_daughter_allShower_energy)[ii] == -999) return false;
+
   // Get the position vector point from vertex to shower start position
   const TVector3 dist = anaUtils.GetRecShowerDistVector(ii);
+
   // Get reco and truth shower momentum vector in both lab frame
-  const TLorentzVector recShowerMom = anaUtils.GetRecShowerLTVectLab(ii);
-  const TLorentzVector recShowerMomRaw = anaUtils.GetRecShowerLTVectLab(ii,false);
-  const TLorentzVector truthShowerMom = anaUtils.GetTruthMatchedShowerLTVectLab(ii);
+  const TLorentzVector recShowerMom = anaUtils.GetRecShowerLTVectLab(ii);//GetRecShowerRefBeam(false,ii);//GetRecShowerLTVectLab(ii);
+  const TLorentzVector recShowerMomRaw = anaUtils.GetRecShowerLTVectLab(ii,false);//GetRecShowerRefBeam(false,ii,false);//GetRecShowerLTVectLab(ii,false);
+  const TLorentzVector truthShowerMom = anaUtils.GetTruthMatchedShowerLTVectLab(ii);//GetRecShowerRefBeam(true,ii);//GetTruthMatchedShowerLTVectLab(ii);
   // Calculate shower impact parameter
   const double IP = dist.Mag()*TMath::Sin((recShowerMom.Angle(dist)));
   // Get the shower length
@@ -465,7 +629,6 @@ bool AnaCut::IsPiZeroShower(const int ii, const bool kMC)
   anaUtils.SavePiZeroShower(recShowerMom, recShowerMomRaw, truthShowerMom, recShowerMom.E(), truthShowerMom.E(), showerPosition, truthParticleType);
   return true;
 }
-
 
 
 

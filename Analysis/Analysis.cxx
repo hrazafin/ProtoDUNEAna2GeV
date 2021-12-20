@@ -2,6 +2,7 @@
 #include "src/PlotUtils.cxx"
 #include "src/AnaUtils.cxx"
 #include "src/AnaCut.cxx"
+// Kinematic fitting codes
 #include "../Fitting/UserKF/KF/src/UserKF.cxx"
 
 int anaRec(const TString finName, TList *lout, const TString tag, const int nEntryToStop)
@@ -25,8 +26,10 @@ int anaRec(const TString finName, TList *lout, const TString tag, const int nEnt
   // Get the TTree from input file
   TTree  * tree = AnaIO::GetInputTree(fin, "pduneana/beamana", tag);
   TTree  * tout = AnaIO::GetOutputTree(lout, tag);
+
   // Initialise reco histograms
   AnaIO::IniHist(lout, kMC);
+
   // Initialise class objects
   AnaUtils anaUtils;
   AnaCut anaCut;
@@ -64,9 +67,11 @@ int anaRec(const TString finName, TList *lout, const TString tag, const int nEnt
           AnaIO::hTruthSignalFSParticleType->Fill(type);
         }
         AnaIO::hTruthSignalFSParticleNumber->Fill(SignalFSParticleType.size());
+        // Calcualte the TKI in truth level
         anaUtils.DoTruthTKICalculation();
       }
     }
+    //====================== End truth information (MC only)======================//
 
     //====================== Do cuts (both MC and data) ======================//
     // Do the beam cut
@@ -79,8 +84,9 @@ int anaRec(const TString finName, TList *lout, const TString tag, const int nEnt
     // Do event topology cut
     if(!anaCut.CutTopology(kMC)) continue;
 
-    // Do TKI calculation
-    anaUtils.TruthMatchingTKI(anaUtils.RecPi0LTVet,anaUtils.RecProtonLTVet);
+    // Do TKI calculation 
+    cout << "TKI: pi0 mom: " <<  anaUtils.RecPi0LTVet.P() << "P mom: " << anaUtils.RecProtonLTVet.P() << endl;
+    anaUtils.TruthMatchingTKI(anaUtils.RecPi0LTVet,anaUtils.RecProtonLTVet,anaUtils.TruthPi0LTVet,anaUtils.TruthProtonLTVet,kMC);
     
     // Fill output tree
     tout->Fill();
@@ -89,16 +95,21 @@ int anaRec(const TString finName, TList *lout, const TString tag, const int nEnt
   // Print info
   cout << "All entries: " << ientry << endl;
   cout << "BeamCount: " << BeamCount << endl;
+
+  if(kMC) cout << AnaUtils::LdShowerEnergyTruth.size() << endl;
   
-  /*
+
   // Kinematic Fitting for Pi0 shower
   if(kMC){
     // Get the CVM matrix
     // Method A (energy independent)
     vector<double> CVM_Dir = AnaFit::GetCVM(AnaUtils::LdShowerEnergyTruth,AnaUtils::SlShowerEnergyTruth,AnaUtils::OpenAngleTruth,
                   AnaUtils::LdShowerEnergyRaw,AnaUtils::SlShowerEnergyRaw,AnaUtils::OpenAngle);
+    vector<double> tmp_Bin = AnaFit::DoBinCVM(AnaUtils::LdShowerEnergyTruth,AnaUtils::SlShowerEnergyTruth,AnaUtils::OpenAngleTruth,
+                  AnaUtils::LdShowerEnergyRaw,AnaUtils::SlShowerEnergyRaw,AnaUtils::OpenAngle);
     // Get the sample size
     int sampleSize = AnaUtils::LdShowerEnergyTruth.size();
+    cout << "sampleSize: " << sampleSize << endl;
     // Counters
     int BadFitVar = 0;
     // Loop over shower vetor
@@ -108,83 +119,172 @@ int anaRec(const TString finName, TList *lout, const TString tag, const int nEnt
                   AnaUtils::LdShowerEnergyRaw[ii],AnaUtils::SlShowerEnergyRaw[ii],AnaUtils::OpenAngle[ii],
                   AnaUtils::LdShowerEnergyTruth,AnaUtils::SlShowerEnergyTruth,AnaUtils::OpenAngleTruth,
                   AnaUtils::LdShowerEnergyRaw,AnaUtils::SlShowerEnergyRaw,AnaUtils::OpenAngle);
-      // Get the fitted variables
-      vector<double> FittedVars = DoKF(AnaUtils::LdShowerEnergyTruth[ii],AnaUtils::SlShowerEnergyTruth[ii],AnaUtils::OpenAngleTruth[ii],
-                                      AnaUtils::LdShowerEnergyRaw[ii],AnaUtils::SlShowerEnergyRaw[ii],AnaUtils::OpenAngle[ii],
-                                      CVM_Dir,CVM_Bin);
-      // check good fit results                                 
-      if(FittedVars.size() == 0){
-        cout << "FittedVars size 0" << endl;
-        BadFitVar++;
-        continue;
+      if(CVM_Bin.size()!=0){
+        cout << "CVM_Bin: " << endl;
+        for(auto i : CVM_Bin){
+          cout << "ele: " << i << endl;
+        }
+        
+        // Get the fitted variables
+        vector<double> FittedVars = DoKF(AnaUtils::LdShowerEnergyTruth[ii],AnaUtils::SlShowerEnergyTruth[ii],AnaUtils::OpenAngleTruth[ii],
+                                        AnaUtils::LdShowerEnergyRaw[ii],AnaUtils::SlShowerEnergyRaw[ii],AnaUtils::OpenAngle[ii],
+                                        CVM_Dir,CVM_Bin);
+        // check good fit results                                 
+        if(FittedVars.size() == 0){
+          cout << "FittedVars size 0" << endl;
+          BadFitVar++;
+          continue;
+        }
+        
+        // Fill histograms
+        AnaIO::hShowerE1PreFitRes->Fill(AnaUtils::LdShowerEnergyTruth[ii],AnaUtils::LdShowerEnergyRaw[ii]/AnaUtils::LdShowerEnergyTruth[ii]-1);
+        AnaIO::hShowerE1PostFitRes->Fill(AnaUtils::LdShowerEnergyTruth[ii],FittedVars[0]/AnaUtils::LdShowerEnergyTruth[ii]-1);
+
+        AnaIO::hShowerE2PreFitRes->Fill(AnaUtils::SlShowerEnergyTruth[ii],AnaUtils::SlShowerEnergyRaw[ii]/AnaUtils::SlShowerEnergyTruth[ii]-1);
+        AnaIO::hShowerE2PostFitRes->Fill(AnaUtils::SlShowerEnergyTruth[ii],FittedVars[1]/AnaUtils::SlShowerEnergyTruth[ii]-1);
+
+        AnaIO::hShowerOAPreFitRes->Fill(AnaUtils::OpenAngleTruth[ii]*TMath::RadToDeg(),AnaUtils::OpenAngle[ii]*TMath::RadToDeg()-AnaUtils::OpenAngleTruth[ii]*TMath::RadToDeg());
+        AnaIO::hShowerOAPostFitRes->Fill(AnaUtils::OpenAngleTruth[ii]*TMath::RadToDeg(),FittedVars[2]*TMath::RadToDeg()-AnaUtils::OpenAngleTruth[ii]*TMath::RadToDeg());
+
+        AnaIO::hShowerE1Compare->Fill(AnaUtils::LdShowerEnergyRaw[ii]/AnaUtils::LdShowerEnergyTruth[ii]-1);
+        AnaIO::hShowerE1ComparePost->Fill(FittedVars[0]/AnaUtils::LdShowerEnergyTruth[ii]-1);
+
+        AnaIO::hShowerE2Compare->Fill(AnaUtils::SlShowerEnergyRaw[ii]/AnaUtils::SlShowerEnergyTruth[ii]-1);
+        AnaIO::hShowerE2ComparePost->Fill(FittedVars[1]/AnaUtils::SlShowerEnergyTruth[ii]-1);
+
+        AnaIO::hShowerOACompare->Fill(AnaUtils::OpenAngle[ii]*TMath::RadToDeg()-AnaUtils::OpenAngleTruth[ii]*TMath::RadToDeg());
+        AnaIO::hShowerOAComparePost->Fill(FittedVars[2]*TMath::RadToDeg()-AnaUtils::OpenAngleTruth[ii]*TMath::RadToDeg());
+
+        AnaIO::hPi0MassCompare->Fill(sqrt(2*AnaUtils::LdShowerEnergyRaw[ii]*AnaUtils::SlShowerEnergyRaw[ii]*(1-cos(AnaUtils::OpenAngle[ii]))));
+        AnaIO::hPi0MassComparePost->Fill(sqrt(2*FittedVars[0]*FittedVars[1]*(1-cos(FittedVars[2]))));
+
+
+        // Print out some info
+        cout << "LD shower E (truth): " << AnaUtils::LdShowerEnergyTruth[ii] << endl;
+        cout << "LD shower E: " << AnaUtils::LdShowerEnergyRaw[ii] << endl;
+        cout << "LD shower E (fitted): " << FittedVars[0] << endl;
+
+        cout << "\nSL shower E (truth): " << AnaUtils::SlShowerEnergyTruth[ii] << endl;
+        cout << "SL shower E: " << AnaUtils::SlShowerEnergyRaw[ii] << endl;
+        cout << "SL shower E (fitted): " << FittedVars[1] << endl;
+
+        cout << "\nOpenAngle (truth): " << AnaUtils::OpenAngleTruth[ii] << endl;
+        cout << "OpenAngle: " << AnaUtils::OpenAngle[ii] << endl;
+        cout << "OpenAngle (fitted): " << FittedVars[2] << endl;
+
+        cout << "\nMass (truth): " << sqrt(2*AnaUtils::LdShowerEnergyTruth[ii]*AnaUtils::SlShowerEnergyTruth[ii]*(1-cos(AnaUtils::OpenAngleTruth[ii]))) << endl;
+        cout << "Mass: " << sqrt(2*AnaUtils::LdShowerEnergyRaw[ii]*AnaUtils::SlShowerEnergyRaw[ii]*(1-cos(AnaUtils::OpenAngle[ii]))) << endl;
+        cout << "Mass (fitted): " << sqrt(2*FittedVars[0]*FittedVars[1]*(1-cos(FittedVars[2]))) << endl;
+
+        const TVector3 ldShower3Vect = AnaUtils::LdShowerDir[ii].Unit()*FittedVars[0];
+        const TVector3 slShower3Vect = AnaUtils::SlShowerDir[ii].Unit()*FittedVars[1];
+
+        const TVector3 ldShower3VectPre = AnaUtils::LdShowerDir[ii].Unit()*AnaUtils::LdShowerEnergyRaw[ii];
+        const TVector3 slShower3VectPre = AnaUtils::SlShowerDir[ii].Unit()*AnaUtils::SlShowerEnergyRaw[ii];
+
+        const TVector3 ldShower3VectTruth = AnaUtils::LdShowerDirTruth[ii].Unit()*AnaUtils::LdShowerEnergyTruth[ii];
+        const TVector3 slShower3VectTruth = AnaUtils::SlShowerDirTruth[ii].Unit()*AnaUtils::SlShowerEnergyTruth[ii];
+
+        TLorentzVector ldShowerLTVectLab;
+        ldShowerLTVectLab.SetVectM(ldShower3Vect, 0 );
+
+        TLorentzVector slShowerLTVectLab;
+        slShowerLTVectLab.SetVectM(slShower3Vect, 0 );
+
+        TLorentzVector ldShowerLTVectLabPre;
+        ldShowerLTVectLabPre.SetVectM(ldShower3VectPre, 0 );
+
+        TLorentzVector slShowerLTVectLabPre;
+        slShowerLTVectLabPre.SetVectM(slShower3VectPre, 0 );
+        
+        TLorentzVector ldShowerLTVectLab_Truth;
+        ldShowerLTVectLab_Truth.SetVectM(ldShower3VectTruth, 0 );
+
+        TLorentzVector slShowerLTVectLab_Truth;
+        slShowerLTVectLab_Truth.SetVectM(slShower3VectTruth, 0 );
+
+        TLorentzVector RecPi0 = ldShowerLTVectLab + slShowerLTVectLab;
+
+        TLorentzVector RecPi0Pre = ldShowerLTVectLabPre + slShowerLTVectLabPre;
+
+        TLorentzVector TruthPi0 = ldShowerLTVectLab_Truth + slShowerLTVectLab_Truth;
+
+        
+        double LDRes = AnaUtils::LdShowerEnergyRaw[ii]/AnaUtils::LdShowerEnergyTruth[ii] - 1;
+        double SLRes = AnaUtils::SlShowerEnergyRaw[ii]/AnaUtils::SlShowerEnergyTruth[ii] - 1;
+        double OARes = (AnaUtils::OpenAngle[ii]/AnaUtils::OpenAngleTruth[ii]) -1;
+
+        AnaIO::hLDShowerE->Fill(LDRes);
+        AnaIO::hSLShowerE->Fill(SLRes);
+        AnaIO::hOAShower->Fill(OARes);
+
+        cout << "LD: " << AnaUtils::LdShowerEnergyRaw[ii] - AnaUtils::LdShowerEnergyTruth[ii] << endl;
+        cout << "SL: " << AnaUtils::SlShowerEnergyRaw[ii] - AnaUtils::SlShowerEnergyTruth[ii] << endl;
+        cout << "OA: " << (AnaUtils::OpenAngle[ii] - AnaUtils::OpenAngleTruth[ii])*TMath::RadToDeg() << endl;
+
+        double E1 = AnaUtils::LdShowerEnergyRaw[ii];
+        double E1_Truth = AnaUtils::LdShowerEnergyTruth[ii];
+        double E2_Truth = AnaUtils::SlShowerEnergyTruth[ii];
+
+        double OA = FittedVars[2];
+        double OA_truth = AnaUtils::OpenAngleTruth[ii];
+        
+        double pion_E = E1 + 0.134977*0.134977/(2*E1*(1-cos(OA)));
+        double pion_P = sqrt(pion_E*pion_E - 0.134977*0.134977);
+
+        double pion_E_Pre = E1 + 0.134977*0.134977/(2*E1*(1-cos(AnaUtils::OpenAngle[ii])));
+        double pion_P_Pre = sqrt(pion_E_Pre*pion_E_Pre - 0.134977*0.134977);
+
+        double pion_E_Truth = E1_Truth + 0.134977*0.134977/(2*E1_Truth*(1-cos(OA_truth)));
+
+        double pion_E_dir_Truth = E1_Truth + E2_Truth;
+
+        double pion_P_Truth = sqrt(pion_E_Truth*pion_E_Truth - 0.134977*0.134977);
+
+
+        cout << "RecPi0Pre.P(): " << RecPi0Pre.E() << "RecPi0.E() : " << RecPi0.E() << "TruthPi0.E() : " << TruthPi0.E() << endl;
+        cout << "pion_E_Truth: " << pion_P_Truth << endl;
+        cout << "pion_E_Truth.E(): " << TruthPi0.E() << endl;
+        cout << "pion_E_dir_Truth: " << pion_E_dir_Truth << endl;
+        cout << "pion_E: " << pion_E << endl;
+        cout << "E2: " << E2_Truth << " " << 0.134977*0.134977/(2*E1_Truth*(1-cos(OA_truth))) << endl;
+        cout << "pion_E_Pre: " << pion_P_Pre << endl;
+        cout << "pion_P: " << pion_P << endl;
+        cout << "TruthPi0Pre.M(): " << TruthPi0.M() << endl;
+
+        AnaIO::hPi0MomCompare->Fill(pion_E_Pre/pion_E_Truth - 1);
+        AnaIO::hPi0MomComparePre->Fill(pion_E_Pre/pion_E_Truth - 1);
+        //if(RecPi0.E()/pion_E_Truth < 0.8)
+        AnaIO::hPi0MomComparePost->Fill(pion_E/pion_E_Truth - 1);
+        //else AnaIO::hPi0MomComparePost->Fill(RecPi0.E()/TruthPi0.E() - 1);
+
+        AnaIO::hPi0MomPreFitRes->Fill(pion_E_Pre,pion_E_Truth);
+        AnaIO::hPi0MomPostFitRes->Fill(pion_E,pion_E_Truth);
+
+        const TLorentzVector recMomRefBeam = anaUtils.GetPi0MomentumRefBeam(RecPi0,TruthPi0,false);
+        const TLorentzVector truthMomRefBeam = anaUtils.GetPi0MomentumRefBeam(RecPi0,TruthPi0,true);
+
+        AnaIO::hPi0ThetaFitRes->Fill(truthMomRefBeam.Theta()*TMath::RadToDeg(),recMomRefBeam.Theta()*TMath::RadToDeg() - truthMomRefBeam.Theta()*TMath::RadToDeg());
+        AnaIO::hLDShowerThetaFitRes->Fill(ldShowerLTVectLab_Truth.Theta()*TMath::RadToDeg(), ldShowerLTVectLab.Theta()*TMath::RadToDeg() - ldShowerLTVectLab_Truth.Theta()*TMath::RadToDeg());
       }
-      // Fill histograms
-      AnaIO::hShowerE1PreFitRes->Fill(AnaUtils::LdShowerEnergyTruth[ii],AnaUtils::LdShowerEnergyRaw[ii]/AnaUtils::LdShowerEnergyTruth[ii]-1);
-      AnaIO::hShowerE1PostFitRes->Fill(AnaUtils::LdShowerEnergyTruth[ii],FittedVars[0]/AnaUtils::LdShowerEnergyTruth[ii]-1);
-
-      AnaIO::hShowerE2PreFitRes->Fill(AnaUtils::SlShowerEnergyTruth[ii],AnaUtils::SlShowerEnergyRaw[ii]/AnaUtils::SlShowerEnergyTruth[ii]-1);
-      AnaIO::hShowerE2PostFitRes->Fill(AnaUtils::SlShowerEnergyTruth[ii],FittedVars[1]/AnaUtils::SlShowerEnergyTruth[ii]-1);
-
-      AnaIO::hShowerOAPreFitRes->Fill(AnaUtils::OpenAngleTruth[ii]*TMath::RadToDeg(),AnaUtils::OpenAngle[ii]*TMath::RadToDeg()-AnaUtils::OpenAngleTruth[ii]*TMath::RadToDeg());
-      AnaIO::hShowerOAPostFitRes->Fill(AnaUtils::OpenAngleTruth[ii]*TMath::RadToDeg(),FittedVars[2]*TMath::RadToDeg()-AnaUtils::OpenAngleTruth[ii]*TMath::RadToDeg());
-
-      AnaIO::hShowerE1Compare->Fill(AnaUtils::LdShowerEnergyRaw[ii]/AnaUtils::LdShowerEnergyTruth[ii]-1);
-      AnaIO::hShowerE1ComparePost->Fill(FittedVars[0]/AnaUtils::LdShowerEnergyTruth[ii]-1);
-
-      AnaIO::hShowerE2Compare->Fill(AnaUtils::SlShowerEnergyRaw[ii]/AnaUtils::SlShowerEnergyTruth[ii]-1);
-      AnaIO::hShowerE2ComparePost->Fill(FittedVars[1]/AnaUtils::SlShowerEnergyTruth[ii]-1);
-
-      AnaIO::hShowerOACompare->Fill(AnaUtils::OpenAngle[ii]*TMath::RadToDeg()-AnaUtils::OpenAngleTruth[ii]*TMath::RadToDeg());
-      AnaIO::hShowerOAComparePost->Fill(FittedVars[2]*TMath::RadToDeg()-AnaUtils::OpenAngleTruth[ii]*TMath::RadToDeg());
-
-      AnaIO::hPi0MassCompare->Fill(sqrt(2*AnaUtils::LdShowerEnergyRaw[ii]*AnaUtils::SlShowerEnergyRaw[ii]*(1-cos(AnaUtils::OpenAngle[ii]))));
-      AnaIO::hPi0MassComparePost->Fill(sqrt(2*FittedVars[0]*FittedVars[1]*(1-cos(FittedVars[2]))));
-
-
-      // Print out some info
-      cout << "LD shower E: " << AnaUtils::LdShowerEnergyRaw[ii] << endl;
-      cout << "LD shower E (fitted): " << FittedVars[0] << endl;
-      cout << "\nSL shower E: " << AnaUtils::SlShowerEnergyRaw[ii] << endl;
-      cout << "SL shower E (fitted): " << FittedVars[1] << endl;
-      cout << "\nOpenAngle: " << AnaUtils::OpenAngle[ii] << endl;
-      cout << "OpenAngle (fitted): " << FittedVars[2] << endl;
-      cout << "\nMass: " << sqrt(2*AnaUtils::LdShowerEnergyRaw[ii]*AnaUtils::SlShowerEnergyRaw[ii]*(1-cos(AnaUtils::OpenAngle[ii]))) << endl;
-      cout << "Mass (fitted): " << sqrt(2*FittedVars[0]*FittedVars[1]*(1-cos(FittedVars[2]))) << endl;
+      
 
     }
     cout << "BadFitVar: " << BadFitVar << endl;
 
   } // End of KF
-  */
-  if(kMC) {
-    cout << "size of true proton mom vector MC: " << anaUtils.ProtonMomTruth.size() << endl;
-    cout << "size of reco proton mom vector MC: " << anaUtils.ProtonMomRaw.size() << endl;
-    plotUtils.xSlicedEnergyCorrection(AnaIO::hProtonMomentumRecVSTruth_REG_Correction);
-    for(unsigned int ii = 0; ii < anaUtils.ProtonMomTruth.size(); ii++){
-      for(int jj = 0; jj < AnaIO::hMeanPMom->GetNbinsX(); jj++){
-        if(anaUtils.ProtonMomRaw[ii] > AnaIO::hMeanPMom->GetBinLowEdge(jj) && anaUtils.ProtonMomRaw[ii] < AnaIO::hMeanPMom->GetBinLowEdge(jj+1)){
-          const double EAfter = anaUtils.ProtonMomRaw[ii]/(1.0+(AnaIO::hMeanPMom->GetBinContent(jj)));
-          const double resAfter = EAfter/anaUtils.ProtonMomTruth[ii] -1;
-          double binContent = AnaIO::hMeanPMom->GetBinContent(jj);
-          cout << "Bin content: " << jj << " " << binContent << endl;
-          cout << "ERaw: " << anaUtils.ProtonMomRaw[ii] << endl;
-          cout << "EAfter: " << EAfter << endl;
-          cout << "ETruth: " << anaUtils.ProtonMomTruth[ii] << endl;
-          AnaIO::hProtonMomCor->Fill(EAfter,resAfter);
-        }
-      }
-    }
-  }
   
-
   // Print cut flow statistics
   int icut = 0;
   double nsel = -999;
 
-  nsel = plotUtils.PrintStat(tag+Form(" %d. Beam ID",  icut++), AnaIO::hCutBeamIDPass, 1, 1, ientry);
-  nsel = plotUtils.PrintStat(tag+Form(" %d. Pandora beam type",  icut++), AnaIO::hCutBeamType, 13, 13, nsel);
-  nsel = plotUtils.PrintStat(tag+Form(" %d. Beam Pos",  icut++), AnaIO::hCutBeamPosPass, 1, 1, nsel);
-  nsel = plotUtils.PrintStat(tag+Form(" %d. APA3",  icut++), AnaIO::hCutBeamEndZPass, 1, 1, nsel);
+  nsel = plotUtils.PrintStat(tag+Form(" %d. Beam PDG",  icut++), AnaIO::hCutBeamPDGPass, 1, 1, ientry);
+  nsel = plotUtils.PrintStat(tag+Form(" %d. Pandora slice",  icut++), AnaIO::hCutPandoraSlicePass, 1, 1, nsel);
+  nsel = plotUtils.PrintStat(tag+Form(" %d. Calo size",  icut++), AnaIO::hCutCaloSizePass, 1, 1, nsel);
+  nsel = plotUtils.PrintStat(tag+Form(" %d. Beam Quality",  icut++), AnaIO::hCutBeamQualityPass, 1, 1, nsel);
+  nsel = plotUtils.PrintStat(tag+Form(" %d. APA3 endZ",  icut++), AnaIO::hCutAPA3EndZPass, 1, 1, nsel);
+  nsel = plotUtils.PrintStat(tag+Form(" %d. Michel score",  icut++), AnaIO::hCutMichelScorePass, 1, 1, nsel);
+  nsel = plotUtils.PrintStat(tag+Form(" %d. Median dEdx",  icut++), AnaIO::hCutMediandEdxPass, 1, 1, nsel);
   nsel = plotUtils.PrintStat(tag+Form(" %d. Nproton", icut++), AnaIO::hCutnproton, 1, 100000, nsel);
   nsel = plotUtils.PrintStat(tag+Form(" %d. Nshower",  icut++), AnaIO::hCutnshower, 2, 100000, nsel);
   nsel = plotUtils.PrintStat(tag+Form(" %d. Npiplus",  icut++), AnaIO::hCutnpiplus, 0, 0, nsel);
@@ -200,15 +300,16 @@ int anaRec(const TString finName, TList *lout, const TString tag, const int nEnt
 
   cout << "nAll: " << nall << " nSignal: " << nsig << " nBackground: " << nbk << endl;
   cout << "purity: " << purity << endl;
+
   return BeamCount;
   
 } // End of anaRec
 
 int main(int argc, char * argv[])
 {
-  // Initialise the input file name
-  const TString mcfinName = "input/protoDUNE_mc_reco_flattree_prod4a.root";
-  const TString datafinName  = "input/protoDUNE_data_reco_flattree_prod4a.root";
+  // Initialise the input file nameßß
+  const TString mcfinName = "input/protoDUNE_mc_reco_flattree_prod4a_whole.root";
+  const TString datafinName  = "input/protoDUNE_data_reco_flattree_prod4a_whole.root";
   // Declare output list
   TList * mclout = 0x0;
   TList * datalout = 0x0;

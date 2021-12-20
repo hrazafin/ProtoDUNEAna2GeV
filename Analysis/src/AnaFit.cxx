@@ -20,7 +20,7 @@ namespace AnaFit
     CovarianceMatrix.push_back(sum_sigma12/X.size());
     CovarianceMatrix.push_back(sum_sigma22/X.size());
     */
-
+    /*
     CovarianceMatrix.push_back(sum_sigma11/X.size());
     CovarianceMatrix.push_back(sum_sigma12/X.size());
     CovarianceMatrix.push_back(0.00000001);
@@ -30,6 +30,17 @@ namespace AnaFit
     CovarianceMatrix.push_back(0.00000001);
     CovarianceMatrix.push_back(0.00000001);
     CovarianceMatrix.push_back(1);
+    */
+
+    CovarianceMatrix.push_back(1);
+    CovarianceMatrix.push_back(0.00000001);
+    CovarianceMatrix.push_back(0.00000001);
+    CovarianceMatrix.push_back(0.00000001);
+    CovarianceMatrix.push_back(sum_sigma22/X.size());
+    CovarianceMatrix.push_back(sum_sigma12/X.size());
+    CovarianceMatrix.push_back(0.00000001);
+    CovarianceMatrix.push_back(sum_sigma12/X.size());
+    CovarianceMatrix.push_back(sum_sigma11/X.size());
 
     return CovarianceMatrix;
 
@@ -160,15 +171,19 @@ vector<double> DoBinCVM(vector<double> LdShowerEnergyTruth, vector<double> SlSho
   // Now creat the bin sizes for Covariance Matrix calculation
   vector<double> BinE1_1x1={0,1.2};
   vector<double> BinE2_1x1={0,0.8};
+  vector<double> BinOA_1x1={0,180*TMath::DegToRad()};
 
   vector<double> BinE1_2x2={0,0.3,1.2};
   vector<double> BinE2_2x2={0,0.15,0.8};
+  vector<double> BinOA_2x2={0,40*TMath::DegToRad(),180*TMath::DegToRad()};
 
   vector<double> BinE1_3x3={0,0.25,0.35,1.2};
   vector<double> BinE2_3x3={0,0.12,0.2,0.8};
+  vector<double> BinOA_3x3={0,25*TMath::DegToRad(),60*TMath::DegToRad(),180*TMath::DegToRad()};
 
   vector<double> BinE1_4x4={0,0.2,0.3,0.4,1.2};
   vector<double> BinE2_4x4={0,0.1,0.16,0.26,0.8};
+  vector<double> BinOA_4x4={0,20*TMath::DegToRad(),40*TMath::DegToRad(),80*TMath::DegToRad(),180*TMath::DegToRad()};
 
   // Reco bin maps
   std::map<std::pair <int,int>,vector<double>> BinMapE1_1x1, BinMapE1_2x2, BinMapE1_3x3, BinMapE1_4x4;
@@ -186,14 +201,15 @@ vector<double> DoBinCVM(vector<double> LdShowerEnergyTruth, vector<double> SlSho
   FillBinMaps(LdShowerEnergyTruth,SlShowerEnergyTruth,OpenAngleTruth,LdShowerEnergyRaw,SlShowerEnergyRaw,OpenAngle,BinE1_4x4,BinE2_4x4,BinMapE1_4x4,BinMapE2_4x4,BinMapTheta_4x4,BinMapE1Truth_4x4,BinMapE2Truth_4x4,BinMapThetaTruth_4x4);
 
   vector<double> CVM_1x1;
-  CVM_1x1 = FillVij(BinE1_1x1,BinE2_1x1,BinMapE1_1x1,BinMapE2_1x1,BinMapE1Truth_1x1,BinMapE2Truth_1x1,AnaIO::hV11_1x1,AnaIO::hV12_1x1,AnaIO::hV22_1x1,AnaIO::hBinSize_1x1);
+  CVM_1x1 = FillVij(BinOA_1x1,BinE2_1x1,BinMapTheta_1x1,BinMapE2_1x1,BinMapThetaTruth_1x1,BinMapE2Truth_1x1,AnaIO::hV11_1x1,AnaIO::hV12_1x1,AnaIO::hV22_1x1,AnaIO::hBinSize_1x1);
   vector<double> CVM_2x2;
-  CVM_2x2 = FillVij(BinE1_2x2,BinE2_2x2,BinMapE1_2x2,BinMapE2_2x2,BinMapE1Truth_2x2,BinMapE2Truth_2x2,AnaIO::hV11_2x2,AnaIO::hV12_2x2,AnaIO::hV22_2x2,AnaIO::hBinSize_2x2);
+  CVM_2x2 = FillVij(BinOA_2x2,BinE2_2x2,BinMapTheta_2x2,BinMapE2_2x2,BinMapThetaTruth_2x2,BinMapE2Truth_2x2,AnaIO::hV11_2x2,AnaIO::hV12_2x2,AnaIO::hV22_2x2,AnaIO::hBinSize_2x2);
   vector<double> CVM_3x3;
-  CVM_3x3 = FillVij(BinE1_3x3,BinE2_3x3,BinMapE1_3x3,BinMapE2_3x3,BinMapE1Truth_3x3,BinMapE2Truth_3x3,AnaIO::hV11_3x3,AnaIO::hV12_3x3,AnaIO::hV22_3x3,AnaIO::hBinSize_3x3);
+  CVM_3x3 = FillVij(BinOA_3x3,BinE2_3x3,BinMapTheta_3x3,BinMapE2_3x3,BinMapThetaTruth_3x3,BinMapE2Truth_3x3,AnaIO::hV11_3x3,AnaIO::hV12_3x3,AnaIO::hV22_3x3,AnaIO::hBinSize_3x3);
   vector<double> CVM_4x4;
-  CVM_4x4 = FillVij(BinE1_4x4,BinE2_4x4,BinMapE1_4x4,BinMapE2_4x4,BinMapE1Truth_4x4,BinMapE2Truth_4x4,AnaIO::hV11_4x4,AnaIO::hV12_4x4,AnaIO::hV22_4x4,AnaIO::hBinSize_4x4);
+  CVM_4x4 = FillVij(BinOA_4x4,BinE2_4x4,BinMapTheta_4x4,BinMapE2_4x4,BinMapThetaTruth_4x4,BinMapE2Truth_4x4,AnaIO::hV11_4x4,AnaIO::hV12_4x4,AnaIO::hV22_4x4,AnaIO::hBinSize_4x4);
 
+  
   return CVM_4x4;
 }
 
@@ -205,15 +221,19 @@ vector<double> GetBinCVM(const double &LdShowerEnergyTruth, const double &SlShow
   // Now creat the bin sizes for Covariance Matrix calculation
   vector<double> BinE1_1x1={0,1.2};
   vector<double> BinE2_1x1={0,0.8};
+  vector<double> BinOA_1x1={0,180*TMath::DegToRad()};
 
   vector<double> BinE1_2x2={0,0.3,1.2};
   vector<double> BinE2_2x2={0,0.15,0.8};
+  vector<double> BinOA_2x2={0,40*TMath::DegToRad(),180*TMath::DegToRad()};
 
   vector<double> BinE1_3x3={0,0.25,0.35,1.2};
   vector<double> BinE2_3x3={0,0.12,0.2,0.8};
+  vector<double> BinOA_3x3={0,25*TMath::DegToRad(),60*TMath::DegToRad(),180*TMath::DegToRad()};
 
   vector<double> BinE1_4x4={0,0.2,0.3,0.4,1.2};
   vector<double> BinE2_4x4={0,0.1,0.16,0.26,0.8};
+  vector<double> BinOA_4x4={0,20*TMath::DegToRad(),40*TMath::DegToRad(),80*TMath::DegToRad(),180*TMath::DegToRad()};
 
   // Reco bin maps
   std::map<std::pair <int,int>,vector<double>> BinMapE1_1x1, BinMapE1_2x2, BinMapE1_3x3, BinMapE1_4x4;
@@ -231,12 +251,12 @@ vector<double> GetBinCVM(const double &LdShowerEnergyTruth, const double &SlShow
   FillBinMaps(LdShowerEnergyTruthVet,SlShowerEnergyTruthVet,OpenAngleTruthVet,LdShowerEnergyRawVet,SlShowerEnergyRawVet,OpenAngleVet,BinE1_4x4,BinE2_4x4,BinMapE1_4x4,BinMapE2_4x4,BinMapTheta_4x4,BinMapE1Truth_4x4,BinMapE2Truth_4x4,BinMapThetaTruth_4x4);
 
   vector<double> tmp_CVM;
-  for(unsigned int xx = 1; xx <= BinE1_3x3.size() - 1; xx++){
+  for(unsigned int xx = 1; xx <= BinOA_3x3.size() - 1; xx++){
     for(unsigned int yy = 1; yy <= BinE2_3x3.size() - 1; yy++){
-      if(LdShowerEnergyTruth > BinE1_3x3[xx - 1]  && LdShowerEnergyTruth < BinE1_3x3[xx] 
+      if(LdShowerEnergyTruth > BinOA_3x3[xx - 1]  && LdShowerEnergyTruth < BinOA_3x3[xx] 
         && SlShowerEnergyTruth > BinE2_3x3[yy - 1] && SlShowerEnergyTruth < BinE2_3x3[yy]){
         std::pair <int,int> bin = std::make_pair (xx,yy);
-        tmp_CVM = GetVij(BinE1_3x3,BinE2_3x3,BinMapE1_3x3,BinMapE2_3x3,BinMapE1Truth_3x3,BinMapE2Truth_3x3,bin);
+        tmp_CVM = GetVij(BinOA_3x3,BinE2_3x3,BinMapTheta_3x3,BinMapE2_3x3,BinMapThetaTruth_3x3,BinMapE2Truth_3x3,bin);
       }
     }
   }
@@ -249,7 +269,7 @@ vector<double> GetCVM(vector<double> LdShowerEnergyTruth, vector<double> SlShowe
                       vector<double> LdShowerEnergyRaw, vector<double> SlShowerEnergyRaw, vector<double> OpenAngle)
 {
   double V_11 = 0, V_12 = 0, V_22 = 0, V_13 = 0, V_23 = 0, V_33 = 0;
-  double sigma1 = 0, sigma2 = 0, sigma3 = 0;
+  //double sigma1 = 0, sigma2 = 0, sigma3 = 0;
   int sampleSize = LdShowerEnergyTruth.size();
 
   for(int ii = 0; ii < sampleSize; ii++){
@@ -261,32 +281,33 @@ vector<double> GetCVM(vector<double> LdShowerEnergyTruth, vector<double> SlShowe
     V_23 += (SlShowerEnergyRaw[ii]-SlShowerEnergyTruth[ii])*(OpenAngle[ii]-OpenAngleTruth[ii])/sampleSize;
   }
   
-  sigma1 = sqrt(V_11);
-  sigma2 = sqrt(V_22);
-  sigma3 = sqrt(V_33);
+  //sigma1 = sqrt(V_11);
+  //sigma2 = sqrt(V_22);
+  //sigma3 = sqrt(V_33);
   vector<double> CVM; // Covariance Matrix vector
   // Full CVM
   
-  CVM.push_back(V_11); AnaIO::hCVM->SetBinContent(1,1,V_11/(sigma1*sigma1));
-  CVM.push_back(V_12); AnaIO::hCVM->SetBinContent(1,2,V_12/(sigma1*sigma2));
-  CVM.push_back(V_13); AnaIO::hCVM->SetBinContent(1,3,V_13/(sigma1*sigma3));
-  CVM.push_back(V_12); AnaIO::hCVM->SetBinContent(2,1,V_12/(sigma1*sigma2));
-  CVM.push_back(V_22); AnaIO::hCVM->SetBinContent(2,2,V_22/(sigma2*sigma2));
-  CVM.push_back(V_23); AnaIO::hCVM->SetBinContent(2,3,V_23/(sigma3*sigma2));
-  CVM.push_back(V_13); AnaIO::hCVM->SetBinContent(3,1,V_13/(sigma1*sigma3));
-  CVM.push_back(V_23); AnaIO::hCVM->SetBinContent(3,2,V_23/(sigma3*sigma2));
-  CVM.push_back(V_33); AnaIO::hCVM->SetBinContent(3,3,V_33/(sigma3*sigma3));
+  CVM.push_back(V_11); AnaIO::hCVM->SetBinContent(1,1,V_11);///(sigma1*sigma1));
+  CVM.push_back(V_12); AnaIO::hCVM->SetBinContent(1,2,V_12);///(sigma1*sigma2));
+  CVM.push_back(V_13); AnaIO::hCVM->SetBinContent(1,3,V_13);///(sigma1*sigma3));
+  CVM.push_back(V_12); AnaIO::hCVM->SetBinContent(2,1,V_12);///(sigma1*sigma2));
+  CVM.push_back(V_22); AnaIO::hCVM->SetBinContent(2,2,V_22);///(sigma2*sigma2));
+  CVM.push_back(V_23); AnaIO::hCVM->SetBinContent(2,3,V_23);///(sigma3*sigma2));
+  CVM.push_back(V_13); AnaIO::hCVM->SetBinContent(3,1,V_13);///(sigma1*sigma3));
+  CVM.push_back(V_23); AnaIO::hCVM->SetBinContent(3,2,V_23);///(sigma3*sigma2));
+  CVM.push_back(V_33); AnaIO::hCVM->SetBinContent(3,3,V_33);///(sigma3*sigma3));
+  
   // Digonal elements only
   /*
-  CVM.push_back(V_11); AnaIO::hCVM->SetBinContent(1,1,V_11/(sigma1*sigma1));
-  CVM.push_back(0.000001); AnaIO::hCVM->SetBinContent(1,2,V_12/(sigma1*sigma2));
-  CVM.push_back(0.000001); AnaIO::hCVM->SetBinContent(1,3,V_13/(sigma1*sigma3));
-  CVM.push_back(0.000001); AnaIO::hCVM->SetBinContent(2,1,V_12/(sigma1*sigma2));
-  CVM.push_back(V_22); AnaIO::hCVM->SetBinContent(2,2,V_22/(sigma2*sigma2));
-  CVM.push_back(0.000001); AnaIO::hCVM->SetBinContent(2,3,V_23/(sigma3*sigma2));
-  CVM.push_back(0.000001); AnaIO::hCVM->SetBinContent(3,1,V_13/(sigma1*sigma3));
-  CVM.push_back(0.000001); AnaIO::hCVM->SetBinContent(3,2,V_23/(sigma3*sigma2));
-  CVM.push_back(V_33); AnaIO::hCVM->SetBinContent(3,3,V_33/(sigma3*sigma3));
+  CVM.push_back(1); AnaIO::hCVM->SetBinContent(1,1,V_11);///(sigma1*sigma1));
+  CVM.push_back(0.000001); AnaIO::hCVM->SetBinContent(1,2,V_12);///(sigma1*sigma2));
+  CVM.push_back(0.000001); AnaIO::hCVM->SetBinContent(1,3,V_13);///(sigma1*sigma3));
+  CVM.push_back(0.000001); AnaIO::hCVM->SetBinContent(2,1,V_12);///(sigma1*sigma2));
+  CVM.push_back(V_22); AnaIO::hCVM->SetBinContent(2,2,V_22);///(sigma2*sigma2));
+  CVM.push_back(V_23); AnaIO::hCVM->SetBinContent(2,3,V_23);///(sigma3*sigma2));
+  CVM.push_back(0.000001); AnaIO::hCVM->SetBinContent(3,1,V_13);///(sigma1*sigma3));
+  CVM.push_back(V_23); AnaIO::hCVM->SetBinContent(3,2,V_23);///(sigma3*sigma2));
+  CVM.push_back(V_33); AnaIO::hCVM->SetBinContent(3,3,V_33);///(sigma3*sigma3));
   */
   return CVM;
 

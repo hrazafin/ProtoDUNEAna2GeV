@@ -97,20 +97,19 @@ class PlotUtils
     Double_t pi   = TMath::Pi();
     Double_t mean = par[0];
     Double_t fwhm = par[1];
+    Double_t height = par[2];
 
     Double_t arg = x[0]-mean;
     Double_t top = fwhm;
     Double_t bot = pi*(arg*arg+top*top);
 
-    Double_t func = top/bot;
+    Double_t func = height*(top/bot);
     return func;
   }
 
-  static Double_t CauchyPeak(Double_t *x, Double_t *par)
+  static Double_t ShowerEenergyFCN(Double_t *x, Double_t *par)
   {
-    Double_t height = par[2];
-    Double_t func = height*CauchyDens(x,par);
-    return func;
+    return par[3] + (par[0] - par[3])/(1 + pow((x[0]/par[2]),par[1]));
   }
 
 

@@ -229,11 +229,101 @@ void PlotUtils::DrawHist(TList *lout, const double plotscale, TList * overlayLis
       else {
         // Check if we have data overlay histogram
         if(holay){
-          // Do the scaling for MC/Data
-          if(plotscale!=1) hh->Scale(plotscale);
-          hh->Draw("hist");
-          DrawOverlay(holay);
-          c1->Update();
+          // Fracitonal plots
+          if(tag.Contains("FCN")){
+            auto lg = new TLegend(0.7,0.7,0.85,0.88);
+            TF1 *fitfuncMC = 0x0;
+            TF1 *fitfuncData = 0x0;
+            if(tag.Contains("Start")){
+              fitfuncMC = new TF1("fMC","gaus",-100,100);
+              fitfuncMC->SetLineColor(kRed);
+              fitfuncData = new TF1("fData","gaus",-100,100);
+              fitfuncData->SetLineColor(kBlack);
+            }
+            else{
+              TF1 *fitfuncMC = new TF1("fMC",CauchyDens,-1000,1000,3);
+              //TF1 *fitfuncMC = new TF1("fMC", "TMath::Voigt(x - [0], [1], [2], 4)", -1000,1000);
+              Double_t parMC[3];
+              parMC[0] = hh->GetMean(); 
+              parMC[1] = hh->GetRMS();
+              parMC[2] = hh->GetMaximum();
+              fitfuncMC->SetParameters(parMC);
+              fitfuncMC->SetParNames("Mean","FWHM","Constant");
+
+              fitfuncMC->SetLineColor(kRed);
+
+              TF1 *fitfuncData = new TF1("fData",CauchyDens,-1000,1000,3);
+              //TF1 *fitfuncData = new TF1("fData", "TMath::Voigt(x - [0], [1], [2], 4)", -1000,1000);
+              Double_t parData[3];
+              parData[0] = holay->GetMean(); 
+              parData[1] = holay->GetRMS();
+              parData[2] = holay->GetMaximum();
+              fitfuncData->SetParameters(parData);
+              fitfuncData->SetParNames("Mean","FWHM","Constant");
+
+              fitfuncData->SetLineColor(kBlack);
+              gPad->Update();
+            }
+
+            hh->Scale(1/hh->Integral(0,1000));
+            hh->SetMarkerStyle(8);
+            hh->SetMarkerSize(1);
+            hh->SetMarkerColor(kRed);
+            hh->SetLineColor(kRed);
+            hh->SetLineWidth(1);
+
+            hh->Fit("fMC");
+            hh->Draw("E");
+            
+            gPad->Update();
+            TPaveStats *st = (TPaveStats*)hh->GetListOfFunctions()->FindObject("stats");
+            st->SetOptFit(1);
+            gPad->Modified(); gPad->Update(); // make sure it’s (re)drawn
+
+            st->SetY1NDC(0.48); 
+            st->SetY2NDC(0.68);
+            st->SetX1NDC(0.7); 
+            st->SetX2NDC(0.93);
+            st->SetTextColor(kRed);
+
+            holay->Scale(1/holay->Integral(0,1000));
+            
+            DrawOverlay(holay);
+            holay->Fit("fData");
+            
+            //holay->Draw("sames E");
+
+            gPad->Update();
+            TPaveStats *st1 = (TPaveStats*)holay->GetListOfFunctions()->FindObject("stats");
+            st1->SetOptFit(1);
+            gPad->Modified(); gPad->Update(); // make sure it’s (re)drawn
+
+            st1->SetY1NDC(0.28); 
+            st1->SetY2NDC(0.48);
+            st1->SetX1NDC(0.7); 
+            st1->SetX2NDC(0.93);
+            st1->SetTextColor(kBlack);
+
+            TLegendEntry *le = lg->AddEntry(hh,"MC","lp");
+            le->SetTextColor(kRed);
+            lg->AddEntry(holay,"DATA","lp");
+            lg->Draw("same");
+
+            
+
+            c1->Update();
+
+            
+
+          }
+          else{
+            // Do the scaling for MC/Data
+            if(plotscale!=1) hh->Scale(plotscale);
+            hh->Draw("hist");
+            DrawOverlay(holay);
+            c1->Update();
+          }
+
         }
         // No data overlay histogram
         else{
@@ -270,9 +360,9 @@ void PlotUtils::DrawHist(TList *lout, const double plotscale, TList * overlayLis
             }
             else hh->Draw("hist");
           }
-          /*
+          
           // Compare fitted results
-          else if(tag.Contains("Compare") && !tag.Contains("Post")){
+          else if(tag.Contains("Compare") && !tag.Contains("Post") && !tag.Contains("Pre")){
             // Get the name of raw shower histogram
             TRegexp re("Compare");
             TString name = tag;
@@ -280,15 +370,16 @@ void PlotUtils::DrawHist(TList *lout, const double plotscale, TList * overlayLis
             TH1D *holay = (TH1D*)lout->FindObject(name);
             if(holay->GetMaximum() > hh->GetMaximum()) hh->SetMaximum(holay->GetMaximum()*1.2);
             else hh->SetMaximum(hh->GetMaximum()*1.2);
-            if(tag.Contains("E1")) hh->SetMaximum(350);
-            if(tag.Contains("E2")) hh->SetMaximum(200);
-            if(tag.Contains("OA")) hh->SetMaximum(200);
+            //if(tag.Contains("E1")) hh->SetMaximum(350);
+            //if(tag.Contains("E2")) hh->SetMaximum(200);
+            //if(tag.Contains("OA")) hh->SetMaximum(200);
             auto lg = new TLegend(0.7,0.7,0.85,0.88);
             //hh->SetStats(0);
             hh->SetFillStyle(4050);
             hh->SetFillColor(24);
             hh->SetLineColor(24);
             hh->Draw("hist");
+            //hh->SetName("Pre Fit");
             gPad->Update();
             
             //TPaveStats *st = (TPaveStats*)hh->GetListOfFunctions()->FindObject("stats");
@@ -302,11 +393,12 @@ void PlotUtils::DrawHist(TList *lout, const double plotscale, TList * overlayLis
             holay->SetLineColor(46);
             //holay->SetStats(0);
             holay->Draw("SAMES hist");
+            //holay->SetName("Post Fit");
             gPad->Update();
             //TPaveStats *st_holay = (TPaveStats*)holay->GetListOfFunctions()->FindObject("stats");
             
-            //st_holay->SetY1NDC(0.5); 
-            //st_holay->SetY2NDC(0.7);
+            //st_holay->SetY1NDC(0.47); 
+            //st_holay->SetY2NDC(0.67);
             //st_holay->SetX1NDC(0.7); 
             //st_holay->SetX2NDC(0.93);
 
@@ -316,7 +408,19 @@ void PlotUtils::DrawHist(TList *lout, const double plotscale, TList * overlayLis
             //lg->Draw("same");
 
           }
-          */
+          
+          else if(tag.Contains("Mean")){
+            TF1 *fConst = new TF1("fConst","pol5",0,2);
+            if(tag.Contains("MeanShowerE")){
+              fConst = new TF1("fConst",ShowerEenergyFCN,0,1,4);
+              fConst->SetParameters(-0.58,5.01,0.09,-0.18);
+              //fConst = new TF1("fConst","pol1",0,2);
+            }
+            fConst->SetLineColor(kRed);
+            hh->Fit("fConst");
+            hh->Draw("hist");
+            fConst->Draw("same");
+          }
           else hh->Draw("hist");
         }
       }
@@ -363,8 +467,9 @@ void PlotUtils::DrawHist(TList *lout, const double plotscale, TList * overlayLis
         hstk->Draw("hist");
         DrawOverlay(holay);
         c1->Update();
-        
+/*        
         const int overlayColor = kBlack;
+
         // Event type legend
         if(hstk->GetNhists() <= 3){
           vector<TString> evtType;
@@ -379,11 +484,39 @@ void PlotUtils::DrawHist(TList *lout, const double plotscale, TList * overlayLis
           htype.push_back("f");
           htype.push_back("ple");
 
-          int *cols=GetColorArray(4);
+          int *cols=GetColorArray(evtType.size());
           cols[3]=overlayColor;
           const int mrks[]={1,1,1,6};
           TLegend * lg = 0x0;
           lg = DrawLegend(evtType, htype, tag, cols, mrks);
+          lg->Draw("same");
+        }
+        // Beam particle type
+        else if(hstk->GetNhists() == 6){
+          vector<TString> beamType;
+          beamType.push_back("p");
+          beamType.push_back("#pi^{+}");
+          beamType.push_back("#mu^{#pm}");
+          beamType.push_back("e/#gamma");
+          beamType.push_back("#pi^{-}");
+          beamType.push_back("others");
+          beamType.push_back("data");
+
+          vector<TString> htype;
+          htype.push_back("f");
+          htype.push_back("f");
+          htype.push_back("f");
+          htype.push_back("f");
+          htype.push_back("f");
+          htype.push_back("f");
+          htype.push_back("ple");
+
+          int *cols=GetColorArray(beamType.size());
+          const int mrks[]={1,1,1,1,1,1,6};
+          cols[beamType.size()-1]=overlayColor;
+
+          TLegend * lg = 0x0;
+          lg = DrawLegend(beamType, htype, tag, cols, mrks, 2);
           lg->Draw("same");
         }
         // Particle type legend
@@ -428,6 +561,7 @@ void PlotUtils::DrawHist(TList *lout, const double plotscale, TList * overlayLis
           lg->Draw("same");
 
         }
+*/
   
       }
       // Spectial case
@@ -738,6 +872,8 @@ void PlotUtils::gStyleSetup()
 {
   IniColorCB();
   //TGaxis::SetMaxDigits(2);
+  gStyle->SetOptFit(1);
+  // Set overall stats box
   gStyle->SetOptStat(0);
   gStyle->SetOptTitle(1);
   gStyle->SetStatY(0.87);
@@ -761,7 +897,8 @@ void PlotUtils::gStyleSetup()
   gStyle->SetStatBorderSize(-1);
   gStyle->SetLegendBorderSize(-1);
   gStyle->SetPalette(1,0);
-  //SetColor();
+  // Set color blind color
+  SetColor();
   gROOT->ForceStyle();
 }
 
@@ -784,7 +921,7 @@ void PlotUtils::DrawOverlay(TH1D *holay)
   holay->SetMarkerColor(kBlack);
   holay->SetLineColor(kBlack);
   holay->SetLineWidth(1);
-  holay->Draw("same E");
+  holay->Draw("sames E");
 }
 
 void PlotUtils::getSliceXDrawY(TH2D * h2d)
@@ -804,7 +941,7 @@ void PlotUtils::getSliceXDrawY(TH2D * h2d)
     //hpj->SetStats(0);
     hpj->Draw();
   }  
-    cc->Print("output/hSliceXDrawY.eps");
+    cc->Print("output/hSliceXDrawY.png");
 }
 
 void PlotUtils::xSlicedEnergyCorrection(TH2D * h2d)
@@ -814,23 +951,16 @@ void PlotUtils::xSlicedEnergyCorrection(TH2D * h2d)
   const TString name = h2d->GetName();
   for(int ii=1; ii<=h2d->GetNbinsX(); ii++){
     cc->cd(ii);
-    TF1 *func = new TF1(Form("func%d",ii),CauchyDens,-1,1,2);
+    TF1 *fitfunc = new TF1(Form("fitfunc%d",ii),CauchyDens,-1,1,3);
     TH1D * hpj= h2d->ProjectionY(Form("ftmp%d",ii), ii, ii);
     if (hpj->GetEntries() != 0) {
       // Sets initial values and parameter names
-      Double_t par[2];
+      Double_t par[3];
       par[0] = hpj->GetMean(); 
       par[1] = hpj->GetRMS();
-      func->SetParameters(par);
-      func->SetParNames("Mean","FWHM");
-
-      Double_t height = hpj->GetMaximum()*1.2;
-      TF1 *fitfunc = new TF1(Form("fitfunc%d",ii),CauchyPeak,-1,1,3);
-      Double_t fitpar[3];
-      fitpar[0] = par[0];
-      fitpar[1] = par[1];
-      fitpar[2] = Double_t(height);
-      fitfunc->SetParameters(fitpar);
+      par[2] = hpj->GetMaximum();
+      fitfunc->SetParameters(par);
+      fitfunc->SetParNames("Mean","FWHM","Constant");
 
       hpj->SetMarkerStyle(kFullCircle);
       hpj->SetMarkerSize(0.5);
@@ -853,12 +983,19 @@ void PlotUtils::xSlicedEnergyCorrection(TH2D * h2d)
         AnaIO::hMeanPMom->SetBinContent(ii,fitfunc->GetParameter(0));
         AnaIO::hMeanPMom->SetBinError(ii,fitfunc->GetParError(0));
       }
+      if(name == "g015hShowerEnergyRecVSTruth_REG_Correction"){
+        AnaIO::hMeanShowerE->SetMinimum(-1);
+        AnaIO::hMeanShowerE->SetMaximum(1);
+        AnaIO::hMeanShowerE->SetBinContent(ii,fitfunc->GetParameter(0));
+        AnaIO::hMeanShowerE->SetBinError(ii,fitfunc->GetParError(0));
+      }
 
     }
     //hpj->SetStats(0);
     hpj->Draw("E");
-  }  
-    cc->Print("output/"+name+"_sliced.png");
+  }
+
+  cc->Print("output/"+name+"_sliced.png");
 }
 
 TLegend *PlotUtils::DrawLegend(const vector<TString> &entries, const vector<TString>& htype, const TString tag, const int *tmpcol, const int * tmpmkr, const int ncol)

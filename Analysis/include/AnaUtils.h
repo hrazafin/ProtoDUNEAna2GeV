@@ -9,6 +9,8 @@ class AnaUtils
     // Constructor & Destructor
     AnaUtils() {};
     ~AnaUtils() {};
+
+    int GetBeamParticleType(const int pdg);
     // Tell you the particle type from pdg (only primary particle type)
     int GetParticleType(const int pdg);
     // Set if event is a signal based on phase space cuts on protons 
@@ -42,27 +44,36 @@ class AnaUtils
     // Return the transverse momentum relative to the beam direction
     double GetTransverseMomentumRefBeam(const bool isTruth, const int recIndex, const bool kProton);
     // Return a Pi0 LT vector relative to beam direction (only consider theta)
-    TLorentzVector GetPi0MomentumRefBeam(const TLorentzVector dummyPi0);
+    TLorentzVector GetPi0MomentumRefBeam(const TLorentzVector RecPi0, const TLorentzVector TruthPi0, const bool isTruth);
 
-    void TruthMatchingTKI(TLorentzVector dummypi0, TLorentzVector dummyproton);
+    void TruthMatchingTKI(TLorentzVector dummypi0, TLorentzVector dummyproton, TLorentzVector dummypi0Truth, TLorentzVector dummyprotonTruth, const bool kMC);
 
     // Fill different reco FS particle theta and momentum and truth-matched resolution
     void FillFSParticleKinematics(const int recIndex, const int truthParticleType, const int recParticleType);      
     // Get reco shower distance vector from vertex to start point 
     TVector3 GetRecShowerDistVector(const int ii);
-    // Get LT vector of truth-matched shower
+
+    TVector3 GetTruthMatchedShower3VectLab(const int ii);
+    // Get LT vector of truth-matched shower in lab frame
     TLorentzVector GetTruthMatchedShowerLTVectLab(const int ii);
-    // Get LT vector of reco shower
+
+    TVector3 GetRecShower3VectLab(const int ii, bool DoCorrection = true);
+    // Get LT vector of reco shower in lab frame
     TLorentzVector GetRecShowerLTVectLab(const int ii, bool DoCorrection = true);
+    // Get LT vector of reco shower relative to the beam direction
+    TLorentzVector GetRecShowerRefBeam(const bool isTruth, const int ii, bool DoCorrection = true);
+
     // Combine two showers to reconstruct pi0
-    TLorentzVector GetPiZero();
+    TLorentzVector GetRecPiZeroFromShowers();
+
+    vector<TLorentzVector> GetTwoPi0Showers();
+
+    vector<TLorentzVector> GetTwoTruthMatchedPi0Showers(int &truthPi0Type);
+
     // Get the info for Fitting
-    void GetPi0Showers();
+    void SavePi0ShowersForKF();
     // Truth TKI calculation
     void DoTruthTKICalculation();
-
-    // Energy Correction
-    void xSlicedEnergyCorrection();
 
     //void Chi2FCN(int &npars, double *grad, double &value, double *par, int flag);
     //void KinematicFitting(double openAngle, double E1, double E2, double sigmaE1, double sigmaE2);
@@ -110,12 +121,33 @@ class AnaUtils
       gkNoTruth
     }; // End of parType
 
+    enum BeamparType{
+
+      //1-5
+      gkBeamProton=1,
+      gkBeamPiPlus,
+      gkBeamMuPlus,
+      gkBeamElectronGamma,
+      gkBeamPiMinus,
+
+      //6
+      gkBeamOthers,
+      
+    }; // End of parType
+
+
     // Define event types (signal/eventBk/BeamBk)
     enum evtType{
       gkSignal = 0,
       gkEvtBkg,
       gkBmBkg
-     };
+    };
+
+    enum truthPi0Type{
+      gkTwoGammas = 0,
+      gkOneGamma,
+      gkNoGammas
+    };
     // Save good shower candidates info for pi0 reco
     void SavePiZeroShower(TLorentzVector shower, TLorentzVector showerRaw, TLorentzVector showerTruth, double showerE, double showerTruthE, TVector3 pos, int showerType)
     {
@@ -165,12 +197,49 @@ class AnaUtils
       return func;
     }
 
+    double GetProtonCorrectedMom(double rawMom){
+      TF1 *fpCor = new TF1("fpCor","pol5",0,2);
+      fpCor->SetParameter(0,3.63507);
+      fpCor->SetParameter(1,-28.0287);
+      fpCor->SetParameter(2,81.5051);
+      fpCor->SetParameter(3,-113.576);
+      fpCor->SetParameter(4,76.2824);
+      fpCor->SetParameter(5,-19.8619);
+      const double factor = fpCor->Eval(rawMom);
+      return rawMom/(1+factor);
+    }
+
+    static Double_t ShowerEenergyFCN(Double_t *x, Double_t *par)
+    {
+      return par[3] + (par[0] - par[3])/(1 + pow((x[0]/par[2]),par[1]));
+    }
+
+    double GetShowerCorrectedE(double rawE){
+      TF1 *fpCor = new TF1("fpCor",ShowerEenergyFCN,0,1,4);
+      fpCor->SetParameter(0,-0.5921); 
+      fpCor->SetParameter(1,2.236); 
+      fpCor->SetParameter(2,0.1076);
+      fpCor->SetParameter(3,-0.1334);
+
+      //fpCor->SetParameter(0,-65.13); 
+      //fpCor->SetParameter(1,2.722); 
+      //fpCor->SetParameter(2,0.01652);
+      //fpCor->SetParameter(3,-0.1459);
+
+      const double factor = fpCor->Eval(rawE);
+      return rawE/(1+factor);
+    }
+
     static vector<double> LdShowerEnergyTruth;
     static vector<double> SlShowerEnergyTruth; 
     static vector<double> OpenAngleTruth; 
     static vector<double> LdShowerEnergyRaw; 
     static vector<double> SlShowerEnergyRaw; 
     static vector<double> OpenAngle;
+    static vector<TVector3> LdShowerDirTruth;
+    static vector<TVector3> SlShowerDirTruth;
+    static vector<TVector3> LdShowerDir;
+    static vector<TVector3> SlShowerDir;
 
     // Energy Correction
     static vector<double> ProtonMomTruth;
@@ -178,8 +247,9 @@ class AnaUtils
 
     // TKI analysis
     static TLorentzVector RecPi0LTVet;
+    static TLorentzVector TruthPi0LTVet;
     static TLorentzVector RecProtonLTVet;
-
+    static TLorentzVector TruthProtonLTVet;
   private:
     PlotUtils plotUtils;
     int nProton;
@@ -207,12 +277,19 @@ vector<double> AnaUtils::LdShowerEnergyRaw;
 vector<double> AnaUtils::SlShowerEnergyRaw;
 vector<double> AnaUtils::OpenAngle;
 
+vector<TVector3> AnaUtils::LdShowerDirTruth;
+vector<TVector3> AnaUtils::SlShowerDirTruth;
+
+vector<TVector3> AnaUtils::LdShowerDir;
+vector<TVector3> AnaUtils::SlShowerDir;
+
 vector<double> AnaUtils::ProtonMomTruth;
 vector<double> AnaUtils::ProtonMomRaw;
 
 TLorentzVector AnaUtils::RecPi0LTVet;
 TLorentzVector AnaUtils::RecProtonLTVet;
-
+TLorentzVector AnaUtils::TruthPi0LTVet;
+TLorentzVector AnaUtils::TruthProtonLTVet;
 
 
 #endif
