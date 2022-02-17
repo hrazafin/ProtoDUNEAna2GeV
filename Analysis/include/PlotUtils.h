@@ -77,7 +77,7 @@ class PlotUtils
   THStack * ConvertToStack(const TH2D * hh, const bool kMC);
   TH1D * GetStackedSum(THStack *stk);
   void ScaleStack(THStack *stk, const double scale);
-  TH2D * NormalHist(const TH2D *hraw, const Double_t thres, const Bool_t kmax);
+  TH2D * NormalHist(const TH2D *hraw, const Double_t thres, const Bool_t kmax, TH1D * &hmean);
   THStack * NormalizeStack(THStack * hstk);
   void getProfileFit(TH2D * h2d);
   TH1D * GetCDF(const TH2D *hraw, const TString hname);
@@ -107,7 +107,7 @@ class PlotUtils
     return func;
   }
 
-  static Double_t ShowerEenergyFCN(Double_t *x, Double_t *par)
+  static Double_t CorrectionFCN(Double_t *x, Double_t *par)
   {
     return par[3] + (par[0] - par[3])/(1 + pow((x[0]/par[2]),par[1]));
   }

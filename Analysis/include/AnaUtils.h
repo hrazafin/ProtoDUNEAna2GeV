@@ -17,6 +17,8 @@ class AnaUtils
     void SetFullSignal();
     // Get a vector of true Final-State(FS) particles 4 vector with Pi0 + leading + subleading proton 
     vector<TLorentzVector> GetFSParticlesTruth(); 
+    // Get a vector of true pi0 showers 4 vector 
+    vector<TLorentzVector> GetFSPiZeroDecayDaughterTruth(); 
     // Check event topology for signal
     bool IsSignal(const int nProton, const int nPiZero, const int nPiPlus, const int nParticleBkg);
     // Check if event is Signal/EvtBkg/BmBkg(beamBkg) using Truth info
@@ -38,11 +40,11 @@ class AnaUtils
     // Get the truth-matched track vector in the lab frame
     TVector3 GetTruthMatchedTrackVectLab(const int ii);
     // Get the reco track vector in the lab frame
-    TVector3 GetRecTrackVectLab(const int ii, const bool kProton);
+    TVector3 GetRecTrackVectLab(const int ii, const bool kProton, bool DoCorrection = true);
     // Return a LT vector relative to beam direction (only consider theta)
-    TLorentzVector GetMomentumRefBeam(const bool isTruth, const int recIndex, const bool kProton);
+    TLorentzVector GetMomentumRefBeam(const bool isTruth, const int recIndex, const bool kProton, bool DoProtonMomCorrection = true);
     // Return the transverse momentum relative to the beam direction
-    double GetTransverseMomentumRefBeam(const bool isTruth, const int recIndex, const bool kProton);
+    double GetTransverseMomentumRefBeam(const bool isTruth, const int recIndex, const bool kProton, bool DoProtonMomCorrection = true);
     // Return a Pi0 LT vector relative to beam direction (only consider theta)
     TLorentzVector GetPi0MomentumRefBeam(const TLorentzVector RecPi0, const TLorentzVector TruthPi0, const bool isTruth);
 
@@ -74,6 +76,12 @@ class AnaUtils
     void SavePi0ShowersForKF();
     // Truth TKI calculation
     void DoTruthTKICalculation();
+
+    // Do Kinematic Fitting
+    void DoKinematicFitting();
+
+    // Set the value of CVM
+    void SetCVM();
 
     //void Chi2FCN(int &npars, double *grad, double &value, double *par, int flag);
     //void KinematicFitting(double openAngle, double E1, double E2, double sigmaE1, double sigmaE2);
@@ -144,7 +152,8 @@ class AnaUtils
     };
 
     enum truthPi0Type{
-      gkTwoGammas = 0,
+      gkTwoGammasSamePi0 = 0,
+      gkTwoGammasDiffPi0,
       gkOneGamma,
       gkNoGammas
     };
@@ -197,34 +206,97 @@ class AnaUtils
       return func;
     }
 
-    double GetProtonCorrectedMom(double rawMom){
-      TF1 *fpCor = new TF1("fpCor","pol5",0,2);
-      fpCor->SetParameter(0,3.63507);
-      fpCor->SetParameter(1,-28.0287);
-      fpCor->SetParameter(2,81.5051);
-      fpCor->SetParameter(3,-113.576);
-      fpCor->SetParameter(4,76.2824);
-      fpCor->SetParameter(5,-19.8619);
-      const double factor = fpCor->Eval(rawMom);
-      return rawMom/(1+factor);
-    }
+    
 
-    static Double_t ShowerEenergyFCN(Double_t *x, Double_t *par)
+    static Double_t CorrectionFCN(Double_t *x, Double_t *par)
     {
       return par[3] + (par[0] - par[3])/(1 + pow((x[0]/par[2]),par[1]));
     }
 
-    double GetShowerCorrectedE(double rawE){
-      TF1 *fpCor = new TF1("fpCor",ShowerEenergyFCN,0,1,4);
-      fpCor->SetParameter(0,-0.5921); 
-      fpCor->SetParameter(1,2.236); 
-      fpCor->SetParameter(2,0.1076);
-      fpCor->SetParameter(3,-0.1334);
+    double GetProtonCorrectedMom(double rawMom){
+      TF1 *fpCor = new TF1("fpCor",CorrectionFCN,0,2,4);
+      //TF1 *fpCor = new TF1("fpCor","pol5",0,2);
+      fpCor->SetParameter(0,-3.815e4);
+      fpCor->SetParameter(1,7.181);
+      fpCor->SetParameter(2,0.07183);
+      fpCor->SetParameter(3,-0.005464);
 
-      //fpCor->SetParameter(0,-65.13); 
-      //fpCor->SetParameter(1,2.722); 
-      //fpCor->SetParameter(2,0.01652);
-      //fpCor->SetParameter(3,-0.1459);
+      const double factor = fpCor->Eval(rawMom);
+      return rawMom/(1+factor);
+    }
+
+    double GetShowerCorrectedE(double rawE){
+      TF1 *fpCor = new TF1("fpCor",CorrectionFCN,0,1,4);
+      fpCor->SetParameter(0,-0.9257); 
+      fpCor->SetParameter(1,1.591); 
+      fpCor->SetParameter(2,0.06717);
+      fpCor->SetParameter(3,-0.1116);
+
+      const double factor = fpCor->Eval(rawE);
+      return rawE/(1+factor);
+    }
+
+    double GetShowerCorrectedTheta(double rawTheta){
+      TF1 *fpCor = new TF1("fpCor","gaus",0,180);
+      fpCor->SetParameter(0,5.163);
+      fpCor->SetParameter(1,66.37);
+      fpCor->SetParameter(2,26.14);  
+      const double factor = fpCor->Eval(rawTheta);
+      return rawTheta - factor;
+    }
+
+    double GetShowerCorrectedPhi(double rawPhi){
+      TF1 *fpCor = new TF1("fpCor","pol7",0,180);
+      fpCor->SetParameter(0,-0.0635279);
+      fpCor->SetParameter(1,0.0941388);
+      fpCor->SetParameter(2,-4.78192e-05);
+      fpCor->SetParameter(3,-2.0647e-05);
+      fpCor->SetParameter(4,7.65803e-09);
+      fpCor->SetParameter(5,1.12047e-09);
+      fpCor->SetParameter(6,-1.93702e-13); 
+      fpCor->SetParameter(7,-1.76401e-14);    
+      const double factor = fpCor->Eval(rawPhi);
+      return rawPhi - factor;
+    }
+
+    double GetProtonCorrectedTheta(double rawTheta){
+      TF1 *fpCor = new TF1("fpCor","gaus",0,180);
+      fpCor->SetParameter(0,4.601);
+      fpCor->SetParameter(1,50.44);
+      fpCor->SetParameter(2,24.42);  
+      const double factor = fpCor->Eval(rawTheta);
+      return rawTheta - factor;
+    }
+
+    double GetProtonCorrectedPhi(double rawPhi){
+      TF1 *fpCor = new TF1("fpCor","pol5",0,180);
+      fpCor->SetParameter(0,-1.16553);
+      fpCor->SetParameter(1,-0.00766996);
+      fpCor->SetParameter(2,0.00019561);
+      fpCor->SetParameter(3,1.012e-07);
+      fpCor->SetParameter(4,-4.78252e-09);
+      fpCor->SetParameter(5,6.90576e-12);   
+      const double factor = fpCor->Eval(rawPhi);
+      return rawPhi - factor;
+    }
+
+    double GetLDShowerCorrectedE(double rawE){
+      TF1 *fpCor = new TF1("fpCor",CorrectionFCN,0,1,4);
+      fpCor->SetParameter(0,-0.412); 
+      fpCor->SetParameter(1,2.002); 
+      fpCor->SetParameter(2,0.1559);
+      fpCor->SetParameter(3,-0.1185);
+
+      const double factor = fpCor->Eval(rawE);
+      return rawE/(1+factor);
+    }
+
+    double GetSLShowerCorrectedE(double rawE){
+      TF1 *fpCor = new TF1("fpCor",CorrectionFCN,0,1,4);
+      fpCor->SetParameter(0,-0.4897); 
+      fpCor->SetParameter(1,3.457); 
+      fpCor->SetParameter(2,0.1216);
+      fpCor->SetParameter(3,-0.1419);
 
       const double factor = fpCor->Eval(rawE);
       return rawE/(1+factor);
@@ -250,6 +322,12 @@ class AnaUtils
     static TLorentzVector TruthPi0LTVet;
     static TLorentzVector RecProtonLTVet;
     static TLorentzVector TruthProtonLTVet;
+
+    // KF CVM 
+    static std::map<std::pair <int,int>,vector<double>> CVM;
+    static int selected;
+    static int total;
+
   private:
     PlotUtils plotUtils;
     int nProton;
@@ -260,6 +338,10 @@ class AnaUtils
     int nParticleBkg;
     
     vector<int> bufferType;
+
+    int nPiZeroGamma;
+    int nPiZeroElectron;
+    int nPiZeroPositron;
 
     vector<TLorentzVector> showerArray;
     vector<TLorentzVector> showerArrayRaw;
@@ -291,5 +373,9 @@ TLorentzVector AnaUtils::RecProtonLTVet;
 TLorentzVector AnaUtils::TruthPi0LTVet;
 TLorentzVector AnaUtils::TruthProtonLTVet;
 
+std::map<std::pair <int,int>,vector<double>> AnaUtils::CVM;
+
+int AnaUtils::selected = 0;
+int AnaUtils::total = 0;
 
 #endif

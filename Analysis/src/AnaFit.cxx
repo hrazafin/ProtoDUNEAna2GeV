@@ -20,7 +20,7 @@ namespace AnaFit
     CovarianceMatrix.push_back(sum_sigma12/X.size());
     CovarianceMatrix.push_back(sum_sigma22/X.size());
     */
-    /*
+/*    
     CovarianceMatrix.push_back(sum_sigma11/X.size());
     CovarianceMatrix.push_back(sum_sigma12/X.size());
     CovarianceMatrix.push_back(0.00000001);
@@ -30,7 +30,7 @@ namespace AnaFit
     CovarianceMatrix.push_back(0.00000001);
     CovarianceMatrix.push_back(0.00000001);
     CovarianceMatrix.push_back(1);
-    */
+*/   
 
     CovarianceMatrix.push_back(1);
     CovarianceMatrix.push_back(0.00000001);
@@ -139,9 +139,14 @@ namespace AnaFit
         //CVM = CorrelationMatrixElements(BinMapE1[bin],BinMapE2[bin],E1TruthMean,E2TruthMean);
         // Set each truth bin entries
         TruthBin_Entries->SetBinContent(xx,yy,BinMapE1Truth[bin].size());
-        V11->SetBinContent(xx,yy,CVM[0]);
-        V12->SetBinContent(xx,yy,CVM[1]);
-        V22->SetBinContent(xx,yy,CVM[3]);
+        V11->SetBinContent(xx,yy,CVM[4]);
+        V12->SetBinContent(xx,yy,CVM[5]);
+        V22->SetBinContent(xx,yy,CVM[8]);
+
+        //cout << "xx: " << xx << "yy: " << yy << endl;
+        //cout << "V11: " << CVM[4] << endl;
+        //cout << "V12: " << CVM[5] << endl;
+        //cout << "V22: " << CVM[8] << endl;
       }
     } 
     return CVM;
@@ -253,10 +258,11 @@ vector<double> GetBinCVM(const double &LdShowerEnergyTruth, const double &SlShow
   vector<double> tmp_CVM;
   for(unsigned int xx = 1; xx <= BinOA_3x3.size() - 1; xx++){
     for(unsigned int yy = 1; yy <= BinE2_3x3.size() - 1; yy++){
-      if(LdShowerEnergyTruth > BinOA_3x3[xx - 1]  && LdShowerEnergyTruth < BinOA_3x3[xx] 
+      if(OpenAngleTruth > BinOA_3x3[xx - 1]  && OpenAngleTruth < BinOA_3x3[xx] 
         && SlShowerEnergyTruth > BinE2_3x3[yy - 1] && SlShowerEnergyTruth < BinE2_3x3[yy]){
         std::pair <int,int> bin = std::make_pair (xx,yy);
         tmp_CVM = GetVij(BinOA_3x3,BinE2_3x3,BinMapTheta_3x3,BinMapE2_3x3,BinMapThetaTruth_3x3,BinMapE2Truth_3x3,bin);
+        //tmp_CVM = GetVij(BinE1_3x3,BinE2_3x3,BinMapE1_3x3,BinMapE2_3x3,BinMapE1Truth_3x3,BinMapE2Truth_3x3,bin);
       }
     }
   }
@@ -266,8 +272,12 @@ vector<double> GetBinCVM(const double &LdShowerEnergyTruth, const double &SlShow
 
 
 vector<double> GetCVM(vector<double> LdShowerEnergyTruth, vector<double> SlShowerEnergyTruth, vector<double> OpenAngleTruth, 
-                      vector<double> LdShowerEnergyRaw, vector<double> SlShowerEnergyRaw, vector<double> OpenAngle)
+                      vector<double> LdShowerEnergyRaw, vector<double> SlShowerEnergyRaw, vector<double> OpenAngle,
+                      const double &LdShowerEnergyTruth_val, const double &SlShowerEnergyTruth_val, const double &OpenAngleTruth_val, 
+           const double &LdShowerEnergyRaw_val, const double &SlShowerEnergyRaw_val, const double &OpenAngle_val)
 {
+  cout << "GetCVM!!" << endl;
+  /*
   double V_11 = 0, V_12 = 0, V_22 = 0, V_13 = 0, V_23 = 0, V_33 = 0;
   //double sigma1 = 0, sigma2 = 0, sigma3 = 0;
   int sampleSize = LdShowerEnergyTruth.size();
@@ -296,7 +306,7 @@ vector<double> GetCVM(vector<double> LdShowerEnergyTruth, vector<double> SlShowe
   CVM.push_back(V_13); AnaIO::hCVM->SetBinContent(3,1,V_13);///(sigma1*sigma3));
   CVM.push_back(V_23); AnaIO::hCVM->SetBinContent(3,2,V_23);///(sigma3*sigma2));
   CVM.push_back(V_33); AnaIO::hCVM->SetBinContent(3,3,V_33);///(sigma3*sigma3));
-  
+  */
   // Digonal elements only
   /*
   CVM.push_back(1); AnaIO::hCVM->SetBinContent(1,1,V_11);///(sigma1*sigma1));
@@ -309,6 +319,100 @@ vector<double> GetCVM(vector<double> LdShowerEnergyTruth, vector<double> SlShowe
   CVM.push_back(V_23); AnaIO::hCVM->SetBinContent(3,2,V_23);///(sigma3*sigma2));
   CVM.push_back(V_33); AnaIO::hCVM->SetBinContent(3,3,V_33);///(sigma3*sigma3));
   */
+
+  // Energy dependent CVM
+  double V_11_bin1 = 0, V_12_bin1 = 0, V_22_bin1 = 0, V_13_bin1 = 0, V_23_bin1 = 0, V_33_bin1 = 0;
+  double V_11_bin2 = 0, V_12_bin2 = 0, V_22_bin2 = 0, V_13_bin2 = 0, V_23_bin2 = 0, V_33_bin2 = 0;
+  double V_11_bin3 = 0, V_12_bin3 = 0, V_22_bin3 = 0, V_13_bin3 = 0, V_23_bin3 = 0, V_33_bin3 = 0;
+  double V_11_bin4 = 0, V_12_bin4 = 0, V_22_bin4 = 0, V_13_bin4 = 0, V_23_bin4 = 0, V_33_bin4 = 0;
+  double sample_bin1 = 0, sample_bin2 = 0, sample_bin3 = 0, sample_bin4 = 0;
+
+  int sampleSize = LdShowerEnergyTruth.size();
+  for(int ii = 0; ii < sampleSize; ii++){
+    if(/*LdShowerEnergyTruth[ii] < 0.3 && */SlShowerEnergyTruth[ii] < 0.15 && OpenAngleTruth[ii] < 35*TMath::RadToDeg()){
+      V_11_bin1 += pow((LdShowerEnergyRaw[ii]-LdShowerEnergyTruth[ii]),2);
+      V_22_bin1 += pow((SlShowerEnergyRaw[ii]-SlShowerEnergyTruth[ii]),2);
+      V_33_bin1 += pow((OpenAngle[ii]-OpenAngleTruth[ii]),2);
+      V_12_bin1 += (LdShowerEnergyRaw[ii]-LdShowerEnergyTruth[ii])*(SlShowerEnergyRaw[ii]-SlShowerEnergyTruth[ii]);
+      V_13_bin1 += (LdShowerEnergyRaw[ii]-LdShowerEnergyTruth[ii])*(OpenAngle[ii]-OpenAngleTruth[ii]);
+      V_23_bin1 += (SlShowerEnergyRaw[ii]-SlShowerEnergyTruth[ii])*(OpenAngle[ii]-OpenAngleTruth[ii]);
+      sample_bin1++;
+    }
+    else if(/*LdShowerEnergyTruth[ii] < 0.3 && */SlShowerEnergyTruth[ii] > 0.15 && OpenAngleTruth[ii] < 35*TMath::RadToDeg()){
+      V_11_bin2 += pow((LdShowerEnergyRaw[ii]-LdShowerEnergyTruth[ii]),2);
+      V_22_bin2 += pow((SlShowerEnergyRaw[ii]-SlShowerEnergyTruth[ii]),2);
+      V_33_bin2 += pow((OpenAngle[ii]-OpenAngleTruth[ii]),2);
+      V_12_bin2 += (LdShowerEnergyRaw[ii]-LdShowerEnergyTruth[ii])*(SlShowerEnergyRaw[ii]-SlShowerEnergyTruth[ii]);
+      V_13_bin2 += (LdShowerEnergyRaw[ii]-LdShowerEnergyTruth[ii])*(OpenAngle[ii]-OpenAngleTruth[ii]);
+      V_23_bin2 += (SlShowerEnergyRaw[ii]-SlShowerEnergyTruth[ii])*(OpenAngle[ii]-OpenAngleTruth[ii]);
+      sample_bin2++;
+    }
+    else if(/*LdShowerEnergyTruth[ii] > 0.3 &&*/ SlShowerEnergyTruth[ii] < 0.15 && OpenAngleTruth[ii] > 35*TMath::RadToDeg()){
+      V_11_bin3 += pow((LdShowerEnergyRaw[ii]-LdShowerEnergyTruth[ii]),2);
+      V_22_bin3 += pow((SlShowerEnergyRaw[ii]-SlShowerEnergyTruth[ii]),2);
+      V_33_bin3 += pow((OpenAngle[ii]-OpenAngleTruth[ii]),2);
+      V_12_bin3 += (LdShowerEnergyRaw[ii]-LdShowerEnergyTruth[ii])*(SlShowerEnergyRaw[ii]-SlShowerEnergyTruth[ii]);
+      V_13_bin3 += (LdShowerEnergyRaw[ii]-LdShowerEnergyTruth[ii])*(OpenAngle[ii]-OpenAngleTruth[ii]);
+      V_23_bin3 += (SlShowerEnergyRaw[ii]-SlShowerEnergyTruth[ii])*(OpenAngle[ii]-OpenAngleTruth[ii]);
+      sample_bin3++;
+    }
+    else{
+      V_11_bin4 += pow((LdShowerEnergyRaw[ii]-LdShowerEnergyTruth[ii]),2);
+      V_22_bin4 += pow((SlShowerEnergyRaw[ii]-SlShowerEnergyTruth[ii]),2);
+      V_33_bin4 += pow((OpenAngle[ii]-OpenAngleTruth[ii]),2);
+      V_12_bin4 += (LdShowerEnergyRaw[ii]-LdShowerEnergyTruth[ii])*(SlShowerEnergyRaw[ii]-SlShowerEnergyTruth[ii]);
+      V_13_bin4 += (LdShowerEnergyRaw[ii]-LdShowerEnergyTruth[ii])*(OpenAngle[ii]-OpenAngleTruth[ii]);
+      V_23_bin4 += (SlShowerEnergyRaw[ii]-SlShowerEnergyTruth[ii])*(OpenAngle[ii]-OpenAngleTruth[ii]);
+      sample_bin4++;
+    }
+  }
+  vector<double> CVM;
+ 
+  if(/*LdShowerEnergyTruth_val < 0.3 &&*/ SlShowerEnergyTruth_val < 0.15 && OpenAngle_val < 35*TMath::RadToDeg()){
+    CVM.push_back(V_11_bin1/sample_bin1); 
+    CVM.push_back(V_12_bin1/sample_bin1); 
+    CVM.push_back(V_13_bin1/sample_bin1); 
+    CVM.push_back(V_12_bin1/sample_bin1); 
+    CVM.push_back(V_22_bin1/sample_bin1); 
+    CVM.push_back(V_23_bin1/sample_bin1); 
+    CVM.push_back(V_13_bin1/sample_bin1); 
+    CVM.push_back(V_23_bin1/sample_bin1); 
+    CVM.push_back(V_33_bin1/sample_bin1);
+  }
+  else if(/*LdShowerEnergyTruth_val < 0.3 &&*/ SlShowerEnergyTruth_val > 0.15 && OpenAngle_val < 35*TMath::RadToDeg()){
+    CVM.push_back(V_11_bin2/sample_bin2); 
+    CVM.push_back(V_12_bin2/sample_bin2); 
+    CVM.push_back(V_13_bin2/sample_bin2); 
+    CVM.push_back(V_12_bin2/sample_bin2); 
+    CVM.push_back(V_22_bin2/sample_bin2); 
+    CVM.push_back(V_23_bin2/sample_bin2); 
+    CVM.push_back(V_13_bin2/sample_bin2); 
+    CVM.push_back(V_23_bin2/sample_bin2); 
+    CVM.push_back(V_33_bin2/sample_bin2);
+  }
+  else if(/*LdShowerEnergyTruth_val > 0.3 &&*/ SlShowerEnergyTruth_val < 0.15 && OpenAngle_val > 35*TMath::RadToDeg()){
+    CVM.push_back(V_11_bin3/sample_bin3); 
+    CVM.push_back(V_12_bin3/sample_bin3); 
+    CVM.push_back(V_13_bin3/sample_bin3); 
+    CVM.push_back(V_12_bin3/sample_bin3); 
+    CVM.push_back(V_22_bin3/sample_bin3); 
+    CVM.push_back(V_23_bin3/sample_bin3); 
+    CVM.push_back(V_13_bin3/sample_bin3); 
+    CVM.push_back(V_23_bin3/sample_bin3); 
+    CVM.push_back(V_33_bin3/sample_bin3);
+  }
+  else{
+    CVM.push_back(V_11_bin4/sample_bin4); 
+    CVM.push_back(V_12_bin4/sample_bin4); 
+    CVM.push_back(V_13_bin4/sample_bin4); 
+    CVM.push_back(V_12_bin4/sample_bin4); 
+    CVM.push_back(V_22_bin4/sample_bin4); 
+    CVM.push_back(V_23_bin4/sample_bin4); 
+    CVM.push_back(V_13_bin4/sample_bin4); 
+    CVM.push_back(V_23_bin4/sample_bin4); 
+    CVM.push_back(V_33_bin4/sample_bin4);
+  }
+  
   return CVM;
 
 }
