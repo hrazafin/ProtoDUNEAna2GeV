@@ -76,8 +76,8 @@ int anaRec(const TString finName, TList *lout, const TString tag, const int nEnt
       }
     }
     //====================== End truth information (MC only)======================//
-    if(kMC) cout << "Purity num: " << anaUtils.selected << endl;
-    if(kMC) cout << "Purity demo: " << anaUtils.total << endl;
+    //if(kMC) cout << "Purity num: " << anaUtils.selected << endl;
+    //if(kMC) cout << "Purity demo: " << anaUtils.total << endl;
 
     // Fill beam info
     anaUtils.FillBeamKinematics(kMC);
@@ -86,7 +86,7 @@ int anaRec(const TString finName, TList *lout, const TString tag, const int nEnt
     if(!anaCut.CutTopology(kMC)) continue;
 
     // Do TKI calculation 
-    anaUtils.TruthMatchingTKI(anaUtils.RecPi0LTVet,anaUtils.RecProtonLTVet,anaUtils.TruthPi0LTVet,anaUtils.TruthProtonLTVet,kMC);
+    //anaUtils.TruthMatchingTKI(anaUtils.RecPi0LTVet,anaUtils.RecProtonLTVet,anaUtils.TruthPi0LTVet,anaUtils.TruthProtonLTVet,kMC);
     
     // Fill output tree
     tout->Fill();
@@ -111,12 +111,21 @@ int anaRec(const TString finName, TList *lout, const TString tag, const int nEnt
   nsel = plotUtils.PrintStat(tag+Form(" %d. APA3 endZ",  icut++), AnaIO::hCutAPA3EndZPass, 1, 1, nsel);
   nsel = plotUtils.PrintStat(tag+Form(" %d. Michel score",  icut++), AnaIO::hCutMichelScorePass, 1, 1, nsel);
   nsel = plotUtils.PrintStat(tag+Form(" %d. Median dEdx",  icut++), AnaIO::hCutMediandEdxPass, 1, 1, nsel);
-  //nsel = plotUtils.PrintStat(tag+Form(" %d. Nproton", icut++), AnaIO::hCutnproton, 1, 1, nsel);
-  //nsel = plotUtils.PrintStat(tag+Form(" %d. Nshower",  icut++), AnaIO::hCutnshower, 2, 100000, nsel);
-  //nsel = plotUtils.PrintStat(tag+Form(" %d. Npiplus",  icut++), AnaIO::hCutnpiplus, 0, 0, nsel);
-  //nsel = plotUtils.PrintStat(tag+Form(" %d. Nmichel",  icut++), AnaIO::hCutnmichel, 0, 0, nsel);
+  nsel = plotUtils.PrintStat(tag+Form(" %d. Nshower",  icut++), AnaIO::hCutnshower, 2, 100000, nsel);
+  nsel = plotUtils.PrintStat(tag+Form(" %d. Npi0",  icut++), AnaIO::hCutnpi0, 1, 1, nsel);
+
+  cout << "Shower Cuts: " << endl;
+  int icut_shower = 0;
+  double nsel_shower = -999;
+  nsel_shower = plotUtils.PrintStat(tag+Form(" %d. Shower EM score",  icut_shower++), AnaIO::hCutDaughterShowerScorePass, 1, 1, nsel_shower);
+  nsel_shower = plotUtils.PrintStat(tag+Form(" %d. Shower nhits",  icut_shower++), AnaIO::hCutDaughterShowernHitsPass, 1, 1, nsel_shower);
+  nsel_shower = plotUtils.PrintStat(tag+Form(" %d. Shower non-empty E",  icut_shower++), AnaIO::hCutDaughterShowerNonEmptyEPass, 1, 1, nsel_shower);
+  nsel_shower = plotUtils.PrintStat(tag+Form(" %d. Shower distance",  icut_shower++), AnaIO::hCutDaughterShowerDistPass, 1, 1, nsel_shower);
+  nsel_shower = plotUtils.PrintStat(tag+Form(" %d. Shower IP",  icut_shower++), AnaIO::hCutDaughterShowerIPPass, 1, 1, nsel_shower);
 
   printf("End of %d cuts: %.1f selected\n", icut, nsel);
+
+  printf("End of %d shower cuts: %.1f selected\n", icut_shower, nsel_shower);
 
   // Print signal/background info MC
   const double nsig = AnaIO::hTruthSignal->GetBinContent(2);

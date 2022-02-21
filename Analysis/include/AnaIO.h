@@ -74,6 +74,9 @@ namespace AnaIO
   Double_t        reco_beam_vertex_michel_score;
   Int_t           reco_beam_vertex_nHits;
 
+  Double_t        reco_beam_PFP_emScore_collection;
+  Double_t        reco_beam_PFP_emScore_collection_weight_by_charge;
+
   Int_t           reco_beam_true_byHits_PDG;
   Double_t        reco_beam_true_byHits_startPx;
   Double_t        reco_beam_true_byHits_startPy;
@@ -124,6 +127,7 @@ namespace AnaIO
   TH1I * hCutAPA3EndZPass = 0x0;
   TH1I * hCutMichelScorePass = 0x0;
   TH1I * hCutMediandEdxPass = 0x0;
+
   TH1D * hRecBeamStartX = 0x0;
   TH1D * hRecBeamStartY = 0x0;
   TH1D * hRecBeamStartZ = 0x0;
@@ -141,6 +145,11 @@ namespace AnaIO
   TH2D * hCutBeamQualityY = 0x0;
   TH2D * hCutBeamQualityZ = 0x0;
   TH2D * hCutBeamQualityTheta = 0x0;
+
+  TH2D * hBeamemScore = 0x0;
+  TH2D * hBeamemScore_wbc = 0x0;
+
+
   // Class B - reconstructed beam/FS particles
   TH2D * hRecBeamTheta = 0x0;
   TH2D * hRecBeamMomentum = 0x0;
@@ -158,7 +167,7 @@ namespace AnaIO
   TH2D * hRecLeadingShowerEnergyRaw = 0x0;
   TH2D * hRecSubLeadingShowerEnergyRaw = 0x0;
   TH2D * hRecShowerOpenAngle = 0x0;
-  TH2D * hRecPi0ShowerSep = 0x0;
+  TH2D * hRecPi0ShowerSep_OVERLAY = 0x0;
   TH2D * hRecPi0Mass = 0x0;
   TH2D * hRecPi0MassRaw = 0x0;
   TH2D * hRecPi0Momentum = 0x0;
@@ -192,7 +201,14 @@ namespace AnaIO
   TH2D * hdphit_RES = 0x0;
   TH2D * hdpt_RES = 0x0;
   TH2D * hpn_RES = 0x0;
- 
+
+  // FS particle cut
+  TH1I * hCutDaughterShowerScorePass = 0x0;
+  TH1I * hCutDaughterShowernHitsPass = 0x0;
+  TH1I * hCutDaughterShowerNonEmptyEPass = 0x0;
+  TH1I * hCutDaughterShowerDistPass = 0x0;
+  TH1I * hCutDaughterShowerIPPass = 0x0;
+
   TH2D * hCutTracknHits = 0x0;
   TH2D * hCutTrackScore = 0x0;
   TH2D * hCutlastTME = 0x0;
@@ -207,6 +223,7 @@ namespace AnaIO
   TH2D * hCutnpiplus = 0x0;
   TH2D * hCutnshower = 0x0;
   TH2D * hCutnmichel = 0x0;
+  TH2D * hCutnpi0 = 0x0;
 
   TH2D * hNhitsCollection = 0x0;
   
@@ -619,6 +636,8 @@ namespace AnaIO
     tree->SetBranchAddress("reco_beam_calo_wire", &reco_beam_calo_wire);
     tree->SetBranchAddress("reco_beam_vertex_michel_score", &reco_beam_vertex_michel_score);
     tree->SetBranchAddress("reco_beam_vertex_nHits", &reco_beam_vertex_nHits);
+    tree->SetBranchAddress("reco_beam_PFP_emScore_collection",&reco_beam_PFP_emScore_collection);
+    tree->SetBranchAddress("reco_beam_PFP_emScore_collection_weight_by_charge",&reco_beam_PFP_emScore_collection_weight_by_charge);
 
     tree->SetBranchAddress("reco_beam_true_byHits_PDG", &reco_beam_true_byHits_PDG);
     tree->SetBranchAddress("reco_beam_true_byHits_endPx", &reco_beam_true_byHits_endPx);
@@ -817,6 +836,12 @@ namespace AnaIO
     hCutBeamQualityTheta = new TH2D("a024hCutBeamQualityTheta_STK","", 100, 0.9, 1, 8, 0.5, 8.5); 
     lout->Add(hCutBeamQualityTheta);
 
+    hBeamemScore = new TH2D("a025hBeamemScore_STK",";Beam EM Shower Score;Candidates", 50, 0, 1, 8, 0.5, 8.5); 
+    lout->Add(hBeamemScore);
+
+    hBeamemScore_wbc = new TH2D("a026hBeamemScore_wbc_STK",";Beam EM Shower Score;Candidates", 50, 0, 1, 8, 0.5, 8.5); 
+    lout->Add(hBeamemScore_wbc);
+
     // Class B - reconstructed beam/FS particles
     hRecBeamTheta = new TH2D("b001hRecBeamTheta_STK",";Beam #theta (deg);Candidates", 80 , 0, 60, 3, -0.5, 2.5); 
     lout->Add(hRecBeamTheta);
@@ -850,8 +875,6 @@ namespace AnaIO
     lout->Add(hRecSubLeadingShowerEnergyRaw);
     hRecShowerOpenAngle = new TH2D("b016hRecShowerOpenAngle_STK",";Shower Opening Angle (deg);Candidates", 20, 0, 180, 3, -0.5, 2.5); 
     lout->Add(hRecShowerOpenAngle);
-    hRecPi0ShowerSep = new TH2D("b017hRecPi0ShowerSep_STK",";Shower Separation (cm);Candidates", 20, 0, 150, 3, -0.5, 2.5);
-    lout->Add(hRecPi0ShowerSep);
     hRecPi0Mass = new TH2D("b018hRecPi0Mass_STK",";#pi^{0} Mass (GeV/c^{2});Candidates", 20, 0, 0.5, 3, -0.5, 3.5); 
     lout->Add(hRecPi0Mass);
     hRecPi0MassRaw = new TH2D("b019hRecPi0Mass_STK_RAW",";#pi^{0} Mass Raw(GeV/c^{2});Candidates", 20, 0, 0.5, 3, -0.5, 3.5);
@@ -878,7 +901,21 @@ namespace AnaIO
     hRecPi0Energy_OVERLAY = new TH2D("b023hRecPi0Energy_COMPOSE",";#pi^{0} Energy (GeV);Candidates", 20, 0, 1, 3, -0.5, 3.5); 
     lout->Add(hRecPi0Energy_OVERLAY);
 
+    hRecPi0ShowerSep_OVERLAY = new TH2D("b024hRecPi0ShowerSep_COMPOSE",";Shower Separation (cm);Candidates", 20, 0, 150, 3, -0.5, 3.5);
+    lout->Add(hRecPi0ShowerSep_OVERLAY);
+
     // Class C - event topoplogy cut related
+    hCutDaughterShowerScorePass = new TH1I("c001hCutDaughterShowerScorePass",";Fail/Pass;Candidates", nPass, Passmin, Passmax); 
+    lout->Add(hCutDaughterShowerScorePass);
+    hCutDaughterShowernHitsPass = new TH1I("c002hCutDaughterShowernHitsPass",";Fail/Pass;Candidates", nPass, Passmin, Passmax); 
+    lout->Add(hCutDaughterShowernHitsPass);
+    hCutDaughterShowerNonEmptyEPass = new TH1I("c003hCutDaughterShowerNonEmptyEPass",";Fail/Pass;Candidates", nPass, Passmin, Passmax); 
+    lout->Add(hCutDaughterShowerNonEmptyEPass);
+    hCutDaughterShowerDistPass = new TH1I("c004hCutDaughterShowerDistPass",";Fail/Pass;Candidates", nPass, Passmin, Passmax); 
+    lout->Add(hCutDaughterShowerDistPass);
+    hCutDaughterShowerIPPass = new TH1I("c005hCutDaughterShowerIPPass",";Fail/Pass;Candidates", nPass, Passmin, Passmax); 
+    lout->Add(hCutDaughterShowerIPPass);
+
     hCutTracknHits = new TH2D("c001hCutTracknHits_STK",";Number of Hits - total;Candidates", 50, 0, 500, nparType, parTypemin, parTypemax); 
     lout->Add(hCutTracknHits);
     hCutTrackScore = new TH2D("c002hCutTrackScore_STK",";Track Score;Candidates", 50, 0, 1, nparType, parTypemin, parTypemax);
@@ -907,6 +944,8 @@ namespace AnaIO
     lout->Add(hCutnmichel);
     hNhitsCollection = new TH2D("c013NhitsCollection_COMPOSE_LOG",";Number of Hits -coll.;Candidates", 50, 0, 200, nparType, parTypemin, parTypemax); 
     lout->Add(hNhitsCollection);
+    hCutnpi0 = new TH2D("c012hCutnpi0_STK",";Number of #pi^{0};Candidates", ncounter, countermin, countermax, nevtType, evtTypemin, evtTypemax); 
+    lout->Add(hCutnpi0);
 
     // Class D - reconstructed TKI variables
     hRecdalphat = new TH2D("d001Recdalphat_STK","", 9, 0, 180,nevtType, evtTypemin, evtTypemax); 

@@ -78,15 +78,16 @@ void PlotUtils::ProcessHist(TList *lout, const bool kMC)
     TH2D * htmp = dynamic_cast<TH2D *>( lout->At(ii) );
     if(htmp){
       const TString tag = htmp->GetName();
-      // Check if the histogram name contians STK
+      // Check if the histogram name contians stack tags
       if(tag.Contains("STK") || tag.Contains("OVERLAY") || tag.Contains("COMPOSE")){
         // Convert this tmp 2D histogram to a stack histogram
-        THStack * stk = ConvertToStack(htmp,kMC);
+        THStack * stk = ConvertToStack(htmp,kMC,typeMaps);
         // Check if the stk exist 
         if(stk){
           // Add to lout for MC
           if(kMC) {
             lout->Add(stk);
+            // Normalize the stk histogram
             THStack * snor = NormalizeStack(stk);
             lout->Add(snor);
           } 
@@ -97,7 +98,7 @@ void PlotUtils::ProcessHist(TList *lout, const bool kMC)
             lout->Add(hsum);
           }
         }
-      } // End of STK tag
+      } // End of stack tag
 
       // Check if the histogram name contians RES (resolution)
       else if(tag.Contains("RES") && kMC){
@@ -122,11 +123,8 @@ void PlotUtils::ProcessHist(TList *lout, const bool kMC)
         hnor->SetTitle(tag);
         lout->Add(hnor);
         lout->Add(hmean);
-        if(tag.Contains("EnergyRawRecVSTruth")){
-          getProfileFit(htmp);
-          getSliceXDrawY(htmp);
-        } 
-        else if (tag.Contains("Correction") && kMC){
+        // Do the corrections
+        if (tag.Contains("Correction") && kMC){
           xSlicedEnergyCorrection(htmp);
         }
       }
@@ -138,12 +136,12 @@ void PlotUtils::ProcessHist(TList *lout, const bool kMC)
     THStack * hstk = dynamic_cast<THStack *>(lout->At(ii));
     if(hstk){
       const TString tag = hstk->GetName();
-      if(tag.Contains("stkTruth") && kMC == true){
+      // TKI related variables
+      if(tag.Contains("stkTruth") && kMC){
         // Get the name of raw shower histogram
         TRegexp re("stk");
         TString tmp = tag;
         tmp(re) = "h";
-
         // Get the histogram name
         TString name1p0n = tmp+"1p0n";
         TString nameNp0n = tmp+"Np0n";
@@ -154,7 +152,6 @@ void PlotUtils::ProcessHist(TList *lout, const bool kMC)
         TH1D *hhNp0n = (TH1D*)lout->FindObject(nameNp0n); 
         TH1D *hh1pMn = (TH1D*)lout->FindObject(name1pMn); 
         TH1D *hhNpMn = (TH1D*)lout->FindObject(nameNpMn); 
-
         // Get the total number of entries
         double ntotall = -999;
         double n1 = hh1p0n->Integral(0,hh1p0n->GetNbinsX()+1); 
@@ -162,7 +159,6 @@ void PlotUtils::ProcessHist(TList *lout, const bool kMC)
         double n3 = hh1pMn->Integral(0,hh1pMn->GetNbinsX()+1); 
         double n4 = hhNpMn->Integral(0,hhNpMn->GetNbinsX()+1);
         ntotall = n1 + n2 + n3 + n4;
-
         // Add to stk
         hh1p0n->SetFillColor(GetColor(1014));
         hstk->Add(hh1p0n);
@@ -172,7 +168,6 @@ void PlotUtils::ProcessHist(TList *lout, const bool kMC)
         hstk->Add(hh1pMn);
         hhNpMn->SetFillColor(GetColor(kOrange));
         hstk->Add(hhNpMn);
-
         hstk->SetTitle(Form("Total %.0f events", ntotall));
       }
       else{}
@@ -184,181 +179,63 @@ void PlotUtils::ProcessHist(TList *lout, const bool kMC)
       const TString tag = hh->GetName();
       // Pi0 rec. efficiency
       if(tag.Contains("hMatchedTruthPi0Momentum") && kMC && !tag.Contains("_ratio")){
-        const TString TM_tmp = "e008hTruthLeadingPiZeroP";
-        TH1D *holay_TM = (TH1D*)lout->FindObject(TM_tmp);
-        TH1D *hRatio = (TH1D*)hh->Clone();
-        hRatio->Scale(0);
-        const int nx = hh->GetNbinsX();
-        cout << "Eff: " << hh->Integral(0,10000)/holay_TM->Integral(0,10000) << endl;
-        //const double xmin = hh->GetXaxis()->GetBinLowEdge(1);
-        //const double xmax = hh->GetXaxis()->GetBinUpEdge(nx);
-        for(int ix=0; ix<=nx+1; ix++){
-          const double ientry = hh->GetBinContent(ix);
-          const double error = hh->GetBinError(ix);
-          const double ientry_demo = holay_TM->GetBinContent(ix);
-          const double error_demo = holay_TM->GetBinError(ix);
-          if(ientry_demo > 0 && ientry > 0){
-            const double ratio = ientry/ientry_demo;
-            const double error_bin = sqrt(ratio*ratio*(pow(error/ientry,2)+pow(error_demo/ientry_demo,2)));
-            hRatio->SetBinContent(ix, ratio);
-            hRatio->SetBinError(ix, error_bin);
-            cout << "ratio: " << ratio << endl;
-            cout << "error_bin: " << error_bin << endl;
-          }
-        }
-        hRatio->SetName(tag+"_ratio");
-        //hRatio->Divide(holay_TM);
-        lout->Add(hRatio);
+        const TString truth_tmp = "e008hTruthLeadingPiZeroP";
+        TH1D *htrue = (TH1D*)lout->FindObject(truth_tmp);
+        TH1D *hEff = GetRecEfficiency(hh,htrue,tag);
+        lout->Add(hEff);
       }
       // Leading photon rec. efficiency
       if(tag.Contains("hMatchedTruthldShowerEnergy") && kMC && !tag.Contains("_ratio")){
-        const TString TM_tmp = "e012hTruthLeadingPi0GammaP";
-        TH1D *holay_TM = (TH1D*)lout->FindObject(TM_tmp);
-        TH1D *hRatio = (TH1D*)hh->Clone();
-        const int nx = hh->GetNbinsX();
-        //const double xmin = hh->GetXaxis()->GetBinLowEdge(1);
-        //const double xmax = hh->GetXaxis()->GetBinUpEdge(nx);
-        for(int ix=0; ix<=nx+1; ix++){
-          const double ientry = hh->GetBinContent(ix);
-          const double error = hh->GetBinError(ix);
-          const double ientry_demo = holay_TM->GetBinContent(ix);
-          const double error_demo = holay_TM->GetBinError(ix);
-          if(ientry_demo > 0 && ientry > 0){
-            const double ratio = ientry/ientry_demo;
-            const double error_bin = sqrt(ratio*ratio*(pow(error/ientry,2)+pow(error_demo/ientry_demo,2)));
-            hRatio->SetBinContent(ix, ratio);
-            hRatio->SetBinError(ix, error_bin);
-            cout << "ratio: " << ratio << endl;
-            cout << "error_bin: " << error_bin << endl;
-          }
-        }
-        hRatio->SetName(tag+"_ratio");
-        //hRatio->Divide(holay_TM);
-        lout->Add(hRatio);
+        const TString truth_tmp = "e012hTruthLeadingPi0GammaP";
+        TH1D *htrue = (TH1D*)lout->FindObject(truth_tmp);
+        TH1D *hEff = GetRecEfficiency(hh,htrue,tag);
+        lout->Add(hEff);
       }
       // Leading photon rec. efficiency
       if(tag.Contains("hMatchedTruthslShowerEnergy") && kMC && !tag.Contains("_ratio")){
-        const TString TM_tmp = "e013hTruthSubLeadingPi0GammaP";
-        TH1D *holay_TM = (TH1D*)lout->FindObject(TM_tmp);
-        TH1D *hRatio = (TH1D*)hh->Clone();
-        const int nx = hh->GetNbinsX();
-        //const double xmin = hh->GetXaxis()->GetBinLowEdge(1);
-        //const double xmax = hh->GetXaxis()->GetBinUpEdge(nx);
-        for(int ix=0; ix<=nx+1; ix++){
-          const double ientry = hh->GetBinContent(ix);
-          const double error = hh->GetBinError(ix);
-          const double ientry_demo = holay_TM->GetBinContent(ix);
-          const double error_demo = holay_TM->GetBinError(ix);
-          if(ientry_demo > 0 && ientry > 0){
-            const double ratio = ientry/ientry_demo;
-            const double error_bin = sqrt(ratio*ratio*(pow(error/ientry,2)+pow(error_demo/ientry_demo,2)));
-            hRatio->SetBinContent(ix, ratio);
-            hRatio->SetBinError(ix, error_bin);
-            cout << "ratio: " << ratio << endl;
-            cout << "error_bin: " << error_bin << endl;
-          }
-        }
-        hRatio->SetName(tag+"_ratio");
-        //hRatio->Divide(holay_TM);
-        lout->Add(hRatio);
+        const TString truth_tmp = "e013hTruthSubLeadingPi0GammaP";
+        TH1D *htrue = (TH1D*)lout->FindObject(truth_tmp);
+        TH1D *hEff = GetRecEfficiency(hh,htrue,tag);
+        lout->Add(hEff);
       }
-
       // OA eff.
       // Pi0 rec. efficiency
       if(tag.Contains("hMatchedTruthPi0OA") && kMC && !tag.Contains("_ratio")){
-        const TString TM_tmp = "e021hTruthPi0OA";
-        TH1D *holay_TM = (TH1D*)lout->FindObject(TM_tmp);
-        TH1D *hRatio = (TH1D*)hh->Clone();
-        const int nx = hh->GetNbinsX();
-        //const double xmin = hh->GetXaxis()->GetBinLowEdge(1);
-        //const double xmax = hh->GetXaxis()->GetBinUpEdge(nx);
-        for(int ix=0; ix<=nx+1; ix++){
-          const double ientry = hh->GetBinContent(ix);
-          const double error = hh->GetBinError(ix);
-          const double ientry_demo = holay_TM->GetBinContent(ix);
-          const double error_demo = holay_TM->GetBinError(ix);
-          if(ientry_demo > 0 && ientry > 0){
-            const double ratio = ientry/ientry_demo;
-            const double error_bin = sqrt(ratio*ratio*(pow(error/ientry,2)+pow(error_demo/ientry_demo,2)));
-            hRatio->SetBinContent(ix, ratio);
-            hRatio->SetBinError(ix, error_bin);
-            cout << "ratio: " << ratio << endl;
-            cout << "error_bin: " << error_bin << endl;
-          }
-        }
-        hRatio->SetName(tag+"_ratio");
-        //hRatio->Divide(holay_TM);
-        lout->Add(hRatio);
+        const TString truth_tmp = "e021hTruthPi0OA";
+        TH1D *htrue = (TH1D*)lout->FindObject(truth_tmp);
+        TH1D *hEff = GetRecEfficiency(hh,htrue,tag);
+        lout->Add(hEff);
       }
       // Leading photon rec. efficiency
       if(tag.Contains("hMatchedTruthldShowerOA") && kMC && !tag.Contains("_ratio")){
-        const TString TM_tmp = "e022hTruthLeadingPi0GammaOA";
-        TH1D *holay_TM = (TH1D*)lout->FindObject(TM_tmp);
-        TH1D *hRatio = (TH1D*)hh->Clone();
-        const int nx = hh->GetNbinsX();
-        //const double xmin = hh->GetXaxis()->GetBinLowEdge(1);
-        //const double xmax = hh->GetXaxis()->GetBinUpEdge(nx);
-        for(int ix=0; ix<=nx+1; ix++){
-          const double ientry = hh->GetBinContent(ix);
-          const double error = hh->GetBinError(ix);
-          const double ientry_demo = holay_TM->GetBinContent(ix);
-          const double error_demo = holay_TM->GetBinError(ix);
-          if(ientry_demo > 0 && ientry > 0){
-            const double ratio = ientry/ientry_demo;
-            const double error_bin = sqrt(ratio*ratio*(pow(error/ientry,2)+pow(error_demo/ientry_demo,2)));
-            hRatio->SetBinContent(ix, ratio);
-            hRatio->SetBinError(ix, error_bin);
-            cout << "ratio: " << ratio << endl;
-            cout << "error_bin: " << error_bin << endl;
-          }
-        }
-        hRatio->SetName(tag+"_ratio");
-        //hRatio->Divide(holay_TM);
-        lout->Add(hRatio);
+        const TString truth_tmp = "e022hTruthLeadingPi0GammaOA";
+        TH1D *htrue = (TH1D*)lout->FindObject(truth_tmp);
+        TH1D *hEff = GetRecEfficiency(hh,htrue,tag);
+        lout->Add(hEff);
       }
       // Leading photon rec. efficiency
       if(tag.Contains("hMatchedTruthslShowerOA") && kMC && !tag.Contains("_ratio")){
         const TString TM_tmp = "e023hTruthSubLeadingPi0GammaOA";
-        TH1D *holay_TM = (TH1D*)lout->FindObject(TM_tmp);
-        TH1D *hRatio = (TH1D*)hh->Clone();
-        const int nx = hh->GetNbinsX();
-        //const double xmin = hh->GetXaxis()->GetBinLowEdge(1);
-        //const double xmax = hh->GetXaxis()->GetBinUpEdge(nx);
-        for(int ix=0; ix<=nx+1; ix++){
-          const double ientry = hh->GetBinContent(ix);
-          const double error = hh->GetBinError(ix);
-          const double ientry_demo = holay_TM->GetBinContent(ix);
-          const double error_demo = holay_TM->GetBinError(ix);
-          if(ientry_demo > 0 && ientry > 0){
-            const double ratio = ientry/ientry_demo;
-            const double error_bin = sqrt(ratio*ratio*(pow(error/ientry,2)+pow(error_demo/ientry_demo,2)));
-            hRatio->SetBinContent(ix, ratio);
-            hRatio->SetBinError(ix, error_bin);
-            cout << "ratio: " << ratio << endl;
-            cout << "error_bin: " << error_bin << endl;
-          }
-        }
-        hRatio->SetName(tag+"_ratio");
-        //hRatio->Divide(holay_TM);
-        lout->Add(hRatio);
+        TH1D *htrue = (TH1D*)lout->FindObject(TM_tmp);
+        TH1D *hEff = GetRecEfficiency(hh,htrue,tag);
+        lout->Add(hEff);
       }
-
-      
     }
   } // End of for loop
 }
+
 void PlotUtils::DrawHist(TList *lout, const double plotscale, TList * overlayList, const TString outdir)
 {
   TLatex tt;
   tt.SetNDC();
+  // Setup gStyle
+  gStyleSetup();
   // Loop over all histograms inside Tlist
   for(int ii=0; ii<lout->GetSize(); ii++){
     // Create new canvas for drawing histogram
     TCanvas * c1 = new TCanvas(Form("c1_%i", ii), "", 1200, 800);
     // Setup Pad
     PadSetup(c1);
-    // Setup gStyle
-    gStyleSetup();
     // Get the name of the histogram
     const TString tag = lout->At(ii)->GetName();
     // Skip TTree object in the list
@@ -379,15 +256,7 @@ void PlotUtils::DrawHist(TList *lout, const double plotscale, TList * overlayLis
       h2d = dynamic_cast<TH2 *>(hh);
       // Check if h2d exist
       if(h2d){
-        h2d->SetTitle(" ");
-        h2d->GetYaxis()->CenterTitle();
-        h2d->GetYaxis()->SetTitleFont(22);
-        h2d->GetYaxis()->SetTitleSize(0.05);
-        h2d->GetYaxis()->SetTitleOffset(0.9);
-        h2d->GetXaxis()->CenterTitle();
-        h2d->GetXaxis()->SetTitleFont(22);
-        h2d->GetXaxis()->SetTitleSize(0.05);
-        h2d->GetXaxis()->SetTitleOffset(0.9);
+        SetTitleFormat(h2d);
         // Draw 2D histogram from its name (MC only)
         if(!tag.Contains("proj") && (tag.Contains("RES") || tag.Contains("REG"))) {
           h2d->Draw("colz");
@@ -409,20 +278,11 @@ void PlotUtils::DrawHist(TList *lout, const double plotscale, TList * overlayLis
       }
       // There is no h2d, we only have 1D histogram
       else {
-        hh->SetTitle(" ");
+        SetTitleFormat(hh);
         // Check if we have data overlay histogram
         if(holay){
           // Fracitonal plots
           if(tag.Contains("FCN")){
-            hh->GetYaxis()->CenterTitle();
-            hh->GetYaxis()->SetTitleFont(22);
-            hh->GetYaxis()->SetTitleSize(0.05);
-            hh->GetYaxis()->SetTitleOffset(0.9);
-            hh->GetXaxis()->CenterTitle();
-            hh->GetXaxis()->SetTitleFont(22);
-            hh->GetXaxis()->SetTitleSize(0.05);
-            hh->GetXaxis()->SetTitleOffset(0.9);
-
             auto lg = new TLegend(0.7,0.7,0.85,0.88);
             TF1 *fitfuncMC = 0x0;
             TF1 *fitfuncData = 0x0;
@@ -501,29 +361,19 @@ void PlotUtils::DrawHist(TList *lout, const double plotscale, TList * overlayLis
             lg->AddEntry(holay,"DATA","lp");
             lg->Draw("same");
 
-            
-
             c1->Update();
-
-            
-
           }
           else{
-
             TPad *pad1 = new TPad(Form("pad1_%d",ii), Form("pad1_%d",ii), 0, 0.2, 1, 1.);
             // Set 0.01 will hide axis label
-            pad1->SetBottomMargin(0.01);
+            pad1->SetBottomMargin(0.02);
             //  pad1->SetGridx();
             //  pad1->SetGridy();
             pad1->Draw();
             pad1->cd();
 
-            // Do the scaling for MC/Data
-            //if(plotscale!=1) hh->Scale(plotscale);
-            double mcScale = hh->Integral(0,10000);
-            double dataScale = holay->Integral(0,10000);
-            double plotscale_tmp = dataScale/mcScale;
-            hh->Scale(plotscale_tmp);
+            // Scale data to MC
+            hh->Scale(plotscale);
             hh->GetYaxis()->CenterTitle();
             hh->GetYaxis()->SetTitleFont(22);
             hh->GetYaxis()->SetTitleSize(0.06);
@@ -534,7 +384,7 @@ void PlotUtils::DrawHist(TList *lout, const double plotscale, TList * overlayLis
             c1->Update();
             c1->cd();
             TPad *pad2 = new TPad(Form("pad2_%d",ii), Form("pad2_%d",ii), 0, 0, 1, 0.2);
-            // Set 0.03 will hide axis label
+             
             pad2->SetTopMargin(0.03);
             pad2->SetBottomMargin(0.42);
             pad2->SetGridx();
@@ -545,38 +395,13 @@ void PlotUtils::DrawHist(TList *lout, const double plotscale, TList * overlayLis
             TH1D *hratio = (TH1D*)holay->Clone(Form("hratio_%d",ii));
             hratio->SetTitle(" ");
             hratio->Divide(hh);
-            hratio->GetYaxis()->SetTitle("Data/MC");
-            hratio->GetXaxis()->SetLabelSize(0.15);
-            hratio->GetXaxis()->SetTitleSize(0.15);
-            hratio->GetXaxis()->SetTitleOffset(1.);
-            hratio->GetYaxis()->SetLabelSize(0.1);
-            hratio->GetYaxis()->SetTitleSize(0.15);
-            hratio->GetYaxis()->SetTitleOffset(.3);
-            hratio->GetYaxis()->SetNdivisions(505);
-            hratio->GetYaxis()->SetRangeUser(0,2);
-            hratio->GetXaxis()->CenterTitle();
-            hratio->GetYaxis()->CenterTitle();
-
-            hratio->GetXaxis()->SetTitleFont(22);
-            hratio->GetYaxis()->SetTitleFont(22);
-            hratio->GetXaxis()->SetTitleOffset(0.6);
-            hratio->GetXaxis()->SetTitleSize(0.25);
-
-            hratio->Draw();
+            DrawDataMCRatio(hratio);
             c1->cd();
           }
 
         }
         // No data overlay histogram
         else{
-          hh->GetYaxis()->CenterTitle();
-          hh->GetYaxis()->SetTitleFont(22);
-          hh->GetYaxis()->SetTitleSize(0.05);
-          hh->GetYaxis()->SetTitleOffset(0.9);
-          hh->GetXaxis()->CenterTitle();
-          hh->GetXaxis()->SetTitleFont(22);
-          hh->GetXaxis()->SetTitleSize(0.05);
-          hh->GetXaxis()->SetTitleOffset(0.9);
 
           // Draw overlay for raw and corrected shower resolution
           if(tag.Contains("hPi0MomNorm")){
@@ -773,15 +598,7 @@ void PlotUtils::DrawHist(TList *lout, const double plotscale, TList * overlayLis
 
             hh->GetXaxis()->SetTitle("Energy (GeV)");
             hh->GetYaxis()->SetTitle("Efficiency");
-            hh->GetYaxis()->CenterTitle();
-            hh->GetYaxis()->SetTitleFont(22);
-            hh->GetYaxis()->SetTitleSize(0.05);
-            hh->GetYaxis()->SetTitleOffset(0.9);
-            hh->GetXaxis()->CenterTitle();
-            hh->GetXaxis()->SetTitleFont(22);
-            hh->GetXaxis()->SetTitleSize(0.05);
-            hh->GetXaxis()->SetTitleOffset(0.9);
-
+ 
             hh->SetMarkerStyle(8);
             hh->SetMarkerSize(1);
             hh->SetMarkerColor(kBlack);
@@ -868,14 +685,6 @@ void PlotUtils::DrawHist(TList *lout, const double plotscale, TList * overlayLis
 
           }
           else {
-            hh->GetYaxis()->CenterTitle();
-            hh->GetYaxis()->SetTitleFont(22);
-            hh->GetYaxis()->SetTitleSize(0.05);
-            hh->GetYaxis()->SetTitleOffset(0.9);
-            hh->GetXaxis()->CenterTitle();
-            hh->GetXaxis()->SetTitleFont(22);
-            hh->GetXaxis()->SetTitleSize(0.05);
-            hh->GetXaxis()->SetTitleOffset(0.9);
             hh->Draw("hist");
           }
         }
@@ -918,27 +727,27 @@ void PlotUtils::DrawHist(TList *lout, const double plotscale, TList * overlayLis
       }
 
       if(holay){
-        //TH1D * hfirst = dynamic_cast<TH1D*> (hstk->GetStack()->First());
-        //cout << "tag: " << hfirst->GetName() << " X title: " << hfirst->GetXaxis()->GetTitle() << endl;
-
+        const TString name = hstk->GetName();
+        /*
+        const TString name = hstk->GetName();
+        cout << "Test name: " << name << endl;
+        for(auto ie : typeMaps[name]){
+          cout << "Test!! : typeMaps: " << ie << endl;
+        }
+        */
         if(tag.Contains("COMPOSE") && !tag.Contains("LOG")){
           TPad *pad1 = new TPad(Form("pad1_%d",ii), Form("pad1_%d",ii), 0, 0.2, 1, 1.);
-          pad1->SetBottomMargin(0.01);
+          pad1->SetBottomMargin(0.02);
           //  pad1->SetGridx();
           //  pad1->SetGridy();
           pad1->Draw();
           pad1->cd();
 
-          double mcScale = GetStackedSum(hstk)->Integral(0,10000);
-          double dataScale = holay->Integral(0,10000);
-          double plotscale_tmp = dataScale/mcScale;
-          ScaleStack(hstk, plotscale_tmp);
+          // Scale data to MC
+          ScaleStack(hstk, plotscale);
 
           hstk->GetYaxis()->SetTitle(holay->GetYaxis()->GetTitle());
-          hstk->GetYaxis()->CenterTitle();
-          hstk->GetYaxis()->SetTitleFont(22);
-          hstk->GetYaxis()->SetTitleSize(0.06);
-          hstk->GetYaxis()->SetTitleOffset(0.8);
+          SetTitleFormat(hstk);
 
           TH1D * hsum = dynamic_cast<TH1D*> (hstk->GetStack()->Last());
           hstk->SetMaximum(hsum->GetMaximum()*1.2); 
@@ -961,16 +770,20 @@ void PlotUtils::DrawHist(TList *lout, const double plotscale, TList * overlayLis
           h1->SetFillColor(1505);h2->SetFillColor(1509);h1->SetLineColor(1505);h2->SetLineColor(1509);
           h3->SetFillColor(1502);h3->SetLineColor(1502);
 
-          legend->AddEntry(h1, "Two Gammas same Pi0", "f");
-          legend->AddEntry(h2, "Two Gammas diff Pi0", "f");
-          legend->AddEntry(h3, "One Gamma", "f");
+          double tot = 0;
+          for(auto ie : typeMaps[name]){
+            tot += ie;
+          }
+          legend->AddEntry(h1, Form("Two Gammas same Pi0 (%.1f%s)",(typeMaps[name][0])/tot*100,"%"), "f");
+          legend->AddEntry(h2, Form("Two Gammas diff Pi0 (%.1f%s)",(typeMaps[name][1])/tot*100,"%"), "f");
+          legend->AddEntry(h3, Form("One Gamma (%.2f%s)",(typeMaps[name][2])/tot*100,"%"), "f");
           legend->AddEntry(hsum, "MC", "f");
           legend->Draw("same");
 
           c1->Update();
           c1->cd();
           TPad *pad2 = new TPad(Form("pad2_%d",ii), Form("pad2_%d",ii), 0, 0, 1, 0.2);
-          // Set 0.03 will hide axis label
+           
           pad2->SetTopMargin(0.03);
           pad2->SetBottomMargin(0.42);
           pad2->SetGridx();
@@ -981,24 +794,7 @@ void PlotUtils::DrawHist(TList *lout, const double plotscale, TList * overlayLis
           TH1D *hratio = (TH1D*)holay->Clone(Form("hratio_%d",ii));
           hratio->SetTitle(" ");
           hratio->Divide(hsum);
-          hratio->GetYaxis()->SetTitle("Data/MC");
-          hratio->GetXaxis()->SetLabelSize(0.15);
-          hratio->GetXaxis()->SetTitleSize(0.15);
-          hratio->GetXaxis()->SetTitleOffset(1.);
-          hratio->GetYaxis()->SetLabelSize(0.1);
-          hratio->GetYaxis()->SetTitleSize(0.15);
-          hratio->GetYaxis()->SetTitleOffset(.3);
-          hratio->GetYaxis()->SetNdivisions(505);
-          hratio->GetYaxis()->SetRangeUser(0,2);
-          hratio->GetXaxis()->CenterTitle();
-          hratio->GetYaxis()->CenterTitle();
-
-          hratio->GetXaxis()->SetTitleFont(22);
-          hratio->GetYaxis()->SetTitleFont(22);
-          hratio->GetXaxis()->SetTitleOffset(0.7);
-          hratio->GetXaxis()->SetTitleSize(0.25);
-
-          hratio->Draw();
+          DrawDataMCRatio(hratio);
           c1->cd();
 
         }
@@ -1006,24 +802,18 @@ void PlotUtils::DrawHist(TList *lout, const double plotscale, TList * overlayLis
         else if(tag.Contains("COMPOSE") && tag.Contains("LOG")){
           
           TPad *pad1 = new TPad(Form("pad1_%d",ii), Form("pad1_%d",ii), 0, 0.2, 1, 1.);
-          pad1->SetBottomMargin(0.01);
+          pad1->SetBottomMargin(0.02);
           //  pad1->SetGridx();
           //  pad1->SetGridy();
           pad1->Draw();
           pad1->cd();
           pad1->SetLogy();
-
-          double mcScale = GetStackedSum(hstk)->Integral(0,10000);
-          double dataScale = holay->Integral(0,10000);
-          double plotscale_tmp = dataScale/mcScale;
-          cout << "plotscale_tmp LAI: " <<  plotscale_tmp << endl;
-          ScaleStack(hstk, plotscale_tmp);
+          // Scale data to MC
+          ScaleStack(hstk, plotscale);
 
           hstk->GetYaxis()->SetTitle(holay->GetYaxis()->GetTitle());
-          hstk->GetYaxis()->CenterTitle();
-          hstk->GetYaxis()->SetTitleFont(22);
-          hstk->GetYaxis()->SetTitleSize(0.06);
-          hstk->GetYaxis()->SetTitleOffset(0.8);
+          SetTitleFormat(hstk);
+
           TH1D * hsum = dynamic_cast<TH1D*> (hstk->GetStack()->Last());
           hstk->SetMaximum(hsum->GetMaximum()*10); 
           hstk->Draw("nostack HIST c");
@@ -1036,37 +826,9 @@ void PlotUtils::DrawHist(TList *lout, const double plotscale, TList * overlayLis
           hsum->Draw("same HIST c");
 
           // Cheat Legend
-          vector<TString> parType;
-          parType.push_back("p");
-          parType.push_back("#pi^{+}");
-          parType.push_back("#pi^{#minus}");
-          parType.push_back("#gamma");
+          vector<TString> parType = FillLegendType("parType",hstk->GetName());
 
-          parType.push_back("2ry p");
-          parType.push_back("2ry #pi^{+}");
-          parType.push_back("2ry #pi^{#minus}");
-          parType.push_back("2ry #gamma");
-          parType.push_back("2ry e^{#pm}");
-          parType.push_back("2ry #mu^{#pm}");
-
-          parType.push_back("others");
-          parType.push_back("data");
-
-          vector<TString> htype;//need to matcy parType
-          htype.push_back("l");
-          htype.push_back("l");
-          htype.push_back("l");
-          htype.push_back("l");
-
-          htype.push_back("l");
-          htype.push_back("l");
-          htype.push_back("l");
-          htype.push_back("l");
-          htype.push_back("l");
-          htype.push_back("l");
-
-          htype.push_back("l");
-          htype.push_back("pl");
+          vector<TString> htype = FillLegendStyle(1,"parType");//need to matcy parType
 
           const int mrks[]={1,1,1,1, 1,1,1,1,1,1, 1,6};
           int *cols=GetColorArray(parType.size());
@@ -1078,7 +840,7 @@ void PlotUtils::DrawHist(TList *lout, const double plotscale, TList * overlayLis
           c1->Update();
           c1->cd();
           TPad *pad2 = new TPad(Form("pad2_%d",ii), Form("pad2_%d",ii), 0, 0, 1, 0.2);
-          // Set 0.03 will hide axis label
+           
           pad2->SetTopMargin(0.03);
           pad2->SetBottomMargin(0.42);
           pad2->SetGridx();
@@ -1089,49 +851,24 @@ void PlotUtils::DrawHist(TList *lout, const double plotscale, TList * overlayLis
           TH1D *hratio = (TH1D*)holay->Clone(Form("hratio_%d",ii));
           hratio->SetTitle(" ");
           hratio->Divide(hsum);
-          hratio->GetYaxis()->SetTitle("Data/MC");
-          hratio->GetXaxis()->SetLabelSize(0.15);
-          hratio->GetXaxis()->SetTitleSize(0.15);
-          hratio->GetXaxis()->SetTitleOffset(1.);
-          hratio->GetYaxis()->SetLabelSize(0.1);
-          hratio->GetYaxis()->SetTitleSize(0.15);
-          hratio->GetYaxis()->SetTitleOffset(.3);
-          hratio->GetYaxis()->SetNdivisions(505);
-          hratio->GetYaxis()->SetRangeUser(0,2);
-          hratio->GetXaxis()->CenterTitle();
-          hratio->GetYaxis()->CenterTitle();
-
-          hratio->GetXaxis()->SetTitleFont(22);
-          hratio->GetYaxis()->SetTitleFont(22);
-          hratio->GetXaxis()->SetTitleOffset(0.7);
-          hratio->GetXaxis()->SetTitleSize(0.25);
-
-          hratio->Draw();
+          DrawDataMCRatio(hratio);
           c1->cd();
         }
 
         else{
           TPad *pad1 = new TPad(Form("pad1_%d",ii), Form("pad1_%d",ii), 0, 0.2, 1, 1.);
-          pad1->SetBottomMargin(0.01);
+          pad1->SetBottomMargin(0.02);
           //  pad1->SetGridx();
           //  pad1->SetGridy();
           pad1->Draw();
           pad1->cd();
 
-          //holay->Draw();//to generate statbox
-          //c1->Update();
-
-          double mcScale = GetStackedSum(hstk)->Integral(0,10000);
-          double dataScale = holay->Integral(0,10000);
-          double plotscale_tmp = dataScale/mcScale;
-          cout << "plotscale_tmp: " <<  plotscale_tmp << endl;
-          ScaleStack(hstk, plotscale_tmp);
+          // Scale data to MC
+          ScaleStack(hstk, plotscale);
           
           hstk->GetYaxis()->SetTitle(holay->GetYaxis()->GetTitle());
-          hstk->GetYaxis()->CenterTitle();
-          hstk->GetYaxis()->SetTitleFont(22);
-          hstk->GetYaxis()->SetTitleSize(0.06);
-          hstk->GetYaxis()->SetTitleOffset(0.8);
+          SetTitleFormat(hstk);
+
           TH1D * hsum = dynamic_cast<TH1D*> (hstk->GetStack()->Last());
           hstk->SetMaximum(holay->GetMaximum()*1.2);
           hstk->Draw("hist");
@@ -1142,17 +879,8 @@ void PlotUtils::DrawHist(TList *lout, const double plotscale, TList * overlayLis
 
           // Event type legend
           if(hstk->GetNhists() <= 3){
-            vector<TString> evtType;
-            evtType.push_back("signal");
-            evtType.push_back("background");
-            evtType.push_back("non-#pi^{+} beam");
-            evtType.push_back("data");
-
-            vector<TString> htype;
-            htype.push_back("f");
-            htype.push_back("f");
-            htype.push_back("f");
-            htype.push_back("ple");
+            vector<TString> evtType = FillLegendType("evtType",hstk->GetName());
+            vector<TString> htype = FillLegendStyle(2,"evtType");
 
             int *cols=GetColorArray(evtType.size());
             cols[3]=overlayColor;
@@ -1163,23 +891,8 @@ void PlotUtils::DrawHist(TList *lout, const double plotscale, TList * overlayLis
           }
           // Beam particle type
           else if(hstk->GetNhists() == 6){
-            vector<TString> beamType;
-            beamType.push_back("p");
-            beamType.push_back("#pi^{+}");
-            beamType.push_back("#mu^{#pm}");
-            beamType.push_back("e/#gamma");
-            beamType.push_back("#pi^{-}");
-            beamType.push_back("others");
-            beamType.push_back("data");
-
-            vector<TString> htype;
-            htype.push_back("f");
-            htype.push_back("f");
-            htype.push_back("f");
-            htype.push_back("f");
-            htype.push_back("f");
-            htype.push_back("f");
-            htype.push_back("ple");
+            vector<TString> beamType = FillLegendType("beamType",hstk->GetName());
+            vector<TString> htype = FillLegendStyle(2,"beamType");
 
             int *cols=GetColorArray(beamType.size());
             const int mrks[]={1,1,1,1,1,1,6};
@@ -1191,37 +904,9 @@ void PlotUtils::DrawHist(TList *lout, const double plotscale, TList * overlayLis
           }
           // Particle type legend
           else{
-            vector<TString> parType;
-            parType.push_back("p");
-            parType.push_back("#pi^{+}");
-            parType.push_back("#pi^{#minus}");
-            parType.push_back("#gamma");
+            vector<TString> parType = FillLegendType("parType",hstk->GetName());
 
-            parType.push_back("2ry p");
-            parType.push_back("2ry #pi^{+}");
-            parType.push_back("2ry #pi^{#minus}");
-            parType.push_back("2ry #gamma");
-            parType.push_back("2ry e^{#pm}");
-            parType.push_back("2ry #mu^{#pm}");
-
-            parType.push_back("others");
-            parType.push_back("data");
-
-            vector<TString> htype;//need to matcy parType
-            htype.push_back("f");
-            htype.push_back("f");
-            htype.push_back("f");
-            htype.push_back("f");
-
-            htype.push_back("f");
-            htype.push_back("f");
-            htype.push_back("f");
-            htype.push_back("f");
-            htype.push_back("f");
-            htype.push_back("f");
-
-            htype.push_back("f");
-            htype.push_back("pl");
+            vector<TString> htype = FillLegendStyle(2,"parType");//need to matcy parType         
 
             const int mrks[]={1,1,1,1, 1,1,1,1,1,1, 1,6};
             int *cols=GetColorArray(parType.size());
@@ -1234,7 +919,7 @@ void PlotUtils::DrawHist(TList *lout, const double plotscale, TList * overlayLis
           c1->Update();
           c1->cd();
           TPad *pad2 = new TPad(Form("pad2_%d",ii), Form("pad2_%d",ii), 0, 0, 1, 0.2);
-          // Set 0.03 will hide axis label
+           
           pad2->SetTopMargin(0.03);
           pad2->SetBottomMargin(0.42);
           pad2->SetGridx();
@@ -1245,24 +930,7 @@ void PlotUtils::DrawHist(TList *lout, const double plotscale, TList * overlayLis
           TH1D *hratio = (TH1D*)holay->Clone(Form("hratio_%d",ii));
           hratio->SetTitle(" ");
           hratio->Divide(hsum);
-          hratio->GetYaxis()->SetTitle("Data/MC");
-          hratio->GetXaxis()->SetLabelSize(0.15);
-          hratio->GetXaxis()->SetTitleSize(0.15);
-          hratio->GetXaxis()->SetTitleOffset(1.);
-          hratio->GetYaxis()->SetLabelSize(0.1);
-          hratio->GetYaxis()->SetTitleSize(0.15);
-          hratio->GetYaxis()->SetTitleOffset(.3);
-          hratio->GetYaxis()->SetNdivisions(505);
-          hratio->GetYaxis()->SetRangeUser(0,2);
-          hratio->GetXaxis()->CenterTitle();
-          hratio->GetYaxis()->CenterTitle();
-
-          hratio->GetXaxis()->SetTitleFont(22);
-          hratio->GetYaxis()->SetTitleFont(22);
-          hratio->GetXaxis()->SetTitleOffset(0.7);
-          hratio->GetXaxis()->SetTitleSize(0.25);
-
-          hratio->Draw();
+          DrawDataMCRatio(hratio);
           c1->cd();
         }
   
@@ -1275,14 +943,7 @@ void PlotUtils::DrawHist(TList *lout, const double plotscale, TList * overlayLis
 
         hstk->GetXaxis()->SetTitle("Energy (GeV)");
         hstk->GetYaxis()->SetTitle("Candidates");
-        hstk->GetYaxis()->CenterTitle();
-        hstk->GetYaxis()->SetTitleFont(22);
-        hstk->GetYaxis()->SetTitleSize(0.05);
-        hstk->GetYaxis()->SetTitleOffset(0.9);
-        hstk->GetXaxis()->CenterTitle();
-        hstk->GetXaxis()->SetTitleFont(22);
-        hstk->GetXaxis()->SetTitleSize(0.05);
-        hstk->GetXaxis()->SetTitleOffset(0.9);
+        SetTitleFormat(hstk,false);
 
         hstk->Draw("nostack");
         hsum->SetLineColor(kBlack);
@@ -1320,9 +981,10 @@ void PlotUtils::DrawHist(TList *lout, const double plotscale, TList * overlayLis
   } // End of for loop
 }
 
-THStack * PlotUtils::ConvertToStack(const TH2D * hh, const bool kMC)
+THStack * PlotUtils::ConvertToStack(const TH2D * hh, const bool kMC, std::map<TString, vector<double>> &typeMaps)
 {
-  const TString tag = hh->GetName();
+  TString tag = hh->GetName();
+  cout << "tag: " << tag << endl;
   const TString tit = hh->GetTitle();
   const char* Xtitle = hh->GetXaxis()->GetTitle();
   const char* Ytitle = hh->GetYaxis()->GetTitle();
@@ -1346,9 +1008,13 @@ THStack * PlotUtils::ConvertToStack(const TH2D * hh, const bool kMC)
   // Get color for each y value
   const int *col=GetColorArray(ny);
 
+  // Save info for each component
+  vector<double> TruthTypeVect;
   //need to take into account of overflow in y
   for(int iy = y0; iy<=y1; iy++){
     const double toty = hh->Integral(0, 100000, iy, iy);
+    TruthTypeVect.push_back(toty);
+    //cout << "iy: " << iy << " toty: " << toty << endl;
     if(toty<1E-12){
       continue;
     }
@@ -1381,12 +1047,18 @@ THStack * PlotUtils::ConvertToStack(const TH2D * hh, const bool kMC)
     printf("PlotUtils::ConvertToStack %s adding y %f with color %d\n", tag.Data(), hh->GetYaxis()->GetBinCenter(iy), icol);
     stk->Add(htmp);
   }
+  //cout << "newintegral: " << newintegral << endl;
+  for(double in : TruthTypeVect){
+    cout << "Type percent: " << in/newintegral*100 << "%" << endl;
+  }
   if(oldintegral!=newintegral){
     printf("PlotUtils::ConvertToStack integral not matched! %s old %f new %f\n", tag.Data(), oldintegral, newintegral); exit(1);
   }
-
+  if(kMC) typeMaps[tag] = TruthTypeVect;
+  
   return stk;
 }
+
 TH1D * PlotUtils::GetStackedSum(THStack *stk)
 {
   const TList * ll = stk->GetHists();
@@ -1493,23 +1165,24 @@ THStack * PlotUtils::NormalizeStack(THStack * hstk)
   const TString tag = hstk->GetName();
   THStack * hout = new THStack(tag+"_normalized", tag);
   
-  const TH1D * hsum = GetStackedSum(hstk); 
-  const double sumintegral = hsum->Integral(0,1000000);
-  if(sumintegral<EPSILON){
-    printf("PlotUtils::NormalizeStack sum integral 0 %e\n", sumintegral); exit(1);
-  }
-  const TList * ll = hstk->GetHists();
-  for(int ii=0; ii<ll->GetEntries(); ii++){
-    const TH1D * hold=(TH1D*) ll->At(ii);
-    TH1D * htmp=(TH1D*)hold->Clone(Form("%scopy", hold->GetName()));
-    
-    htmp->Sumw2();
-    htmp->Divide(hsum);
-    hout->Add(htmp);
-  }
+  const TH1D * hsum = GetStackedSum(hstk);
+  if(hsum){
+    const double sumintegral = hsum->Integral(0,1000000);
+    if(sumintegral<EPSILON){
+      printf("PlotUtils::NormalizeStack sum integral 0 %e\n", sumintegral); exit(1);
+    }
+    const TList * ll = hstk->GetHists();
+    for(int ii=0; ii<ll->GetEntries(); ii++){
+      const TH1D * hold=(TH1D*) ll->At(ii);
+      TH1D * htmp=(TH1D*)hold->Clone(Form("%scopy", hold->GetName()));
+      
+      htmp->Sumw2();
+      htmp->Divide(hsum);
+      hout->Add(htmp);
+    }
 
-  delete hsum;
-
+    delete hsum;
+  }
   return hout;
 }
 
@@ -1838,7 +1511,7 @@ TLegend *PlotUtils::DrawLegend(const vector<TString> &entries, const vector<TStr
 
   //SetGlobalStyle();
   TLegend * lg = 0x0;
-  lg = new TLegend(0.6, 0.6, 0.85, 0.85);
+  lg = new TLegend(0.5, 0.58, 0.88, 0.88);
   if(tag.Contains("COMPOSE")) lg = new TLegend(0.4, 0.65, 0.85, 0.85);
 
   for(int ii=0; ii<nent; ii++){
@@ -1860,3 +1533,193 @@ TLegend *PlotUtils::DrawLegend(const vector<TString> &entries, const vector<TStr
 
   return lg;
 }
+
+TH1D * PlotUtils::GetRecEfficiency(TH1 * hh, TH1D * htrue, const TString tag){
+
+  TH1D *hEff = (TH1D*)hh->Clone();
+  hEff->Scale(0);
+  const int nx = hh->GetNbinsX();
+  cout << tag.Data() << " rec Eff: " << hh->Integral(0,10000)/htrue->Integral(0,10000) << endl;
+  for(int ix=0; ix<=nx+1; ix++){
+    const double ientry = hh->GetBinContent(ix);
+    const double error = hh->GetBinError(ix);
+    const double ientry_demo = htrue->GetBinContent(ix);
+    const double error_demo = htrue->GetBinError(ix);
+    if(ientry_demo > 0 && ientry > 0){
+      const double ratio = ientry/ientry_demo;
+      const double error_bin = sqrt(ratio*ratio*(pow(error/ientry,2)+pow(error_demo/ientry_demo,2)));
+      hEff->SetBinContent(ix, ratio);
+      hEff->SetBinError(ix, error_bin);
+      //cout << "ratio: " << ratio << endl;
+      //cout << "error_bin: " << error_bin << endl;
+    }
+  }
+  hEff->SetName(tag+"_ratio");
+  return hEff;
+}
+
+void PlotUtils::SetTitleFormat(TH1 * hh){
+  hh->SetTitle(" ");
+  hh->GetYaxis()->CenterTitle();
+  hh->GetYaxis()->SetTitleFont(22);
+  hh->GetYaxis()->SetTitleSize(0.05);
+  hh->GetYaxis()->SetTitleOffset(0.9);
+  hh->GetXaxis()->CenterTitle();
+  hh->GetXaxis()->SetTitleFont(22);
+  hh->GetXaxis()->SetTitleSize(0.05);
+  hh->GetXaxis()->SetTitleOffset(0.9);
+  //hh->GetXaxis()->SetLabelOffset(999);
+  //hh->GetXaxis()->SetLabelSize(0);
+}
+
+void PlotUtils::SetTitleFormat(TH2 * h2d){
+  h2d->SetTitle(" ");
+  h2d->GetYaxis()->CenterTitle();
+  h2d->GetYaxis()->SetTitleFont(22);
+  h2d->GetYaxis()->SetTitleSize(0.05);
+  h2d->GetYaxis()->SetTitleOffset(0.9);
+  h2d->GetXaxis()->CenterTitle();
+  h2d->GetXaxis()->SetTitleFont(22);
+  h2d->GetXaxis()->SetTitleSize(0.05);
+  h2d->GetXaxis()->SetTitleOffset(0.9);
+}
+
+void PlotUtils::SetTitleFormat(THStack * stk, bool offSet){
+  stk->SetTitle(" ");
+  stk->GetYaxis()->CenterTitle();
+  stk->GetYaxis()->SetTitleFont(22);
+  stk->GetYaxis()->SetTitleSize(0.05);
+  stk->GetYaxis()->SetTitleOffset(0.9);
+  stk->GetXaxis()->CenterTitle();
+  stk->GetXaxis()->SetTitleFont(22);
+  stk->GetXaxis()->SetTitleSize(0.05);
+  stk->GetXaxis()->SetTitleOffset(0.9);
+  if(offSet) {
+    stk->GetXaxis()->SetLabelOffset(999);
+    stk->GetXaxis()->SetLabelSize(0);
+  }
+}
+
+void PlotUtils::DrawDataMCRatio(TH1D * hratio){
+  
+  hratio->GetYaxis()->SetTitle("Data/MC");
+  hratio->GetXaxis()->SetLabelSize(0.15);
+  hratio->GetXaxis()->SetTitleSize(0.15);
+  hratio->GetXaxis()->SetTitleOffset(1.);
+  hratio->GetYaxis()->SetLabelSize(0.1);
+  hratio->GetYaxis()->SetTitleSize(0.15);
+  hratio->GetYaxis()->SetTitleOffset(.3);
+  hratio->GetYaxis()->SetNdivisions(505);
+  hratio->GetYaxis()->SetRangeUser(0,2);
+  hratio->GetXaxis()->CenterTitle();
+  hratio->GetYaxis()->CenterTitle();
+
+  hratio->GetXaxis()->SetTitleFont(22);
+  hratio->GetYaxis()->SetTitleFont(22);
+  hratio->GetXaxis()->SetTitleOffset(0.7);
+  hratio->GetXaxis()->SetTitleSize(0.25);
+
+  hratio->Draw();
+}
+
+vector<TString> PlotUtils::FillLegendType(TString tag, TString name){
+  vector<TString> tmpType;
+  double tot = 0;
+  for(auto ie : typeMaps[name]){
+    tot += ie;
+  }
+  // Particle type
+  if(tag.Contains("parType")){
+    tmpType.push_back(Form("p (%.1f%s)",(typeMaps[name][0])/tot*100,"%"));
+    tmpType.push_back(Form("#pi^{+} (%.1f%s)",(typeMaps[name][1])/tot*100,"%"));
+    tmpType.push_back(Form("#pi^{#minus} (%.1f%s)",(typeMaps[name][2])/tot*100,"%"));
+    tmpType.push_back(Form("#gamma (%.1f%s)",(typeMaps[name][3])/tot*100,"%"));
+
+    tmpType.push_back(Form("2ry p (%.1f%s)",(typeMaps[name][4])/tot*100,"%"));
+    tmpType.push_back(Form("2ry #pi^{+} (%.1f%s)",(typeMaps[name][5])/tot*100,"%"));
+    tmpType.push_back(Form("2ry #pi^{#minus} (%.1f%s)",(typeMaps[name][6])/tot*100,"%"));
+    tmpType.push_back(Form("2ry #gamma (%.1f%s)",(typeMaps[name][7])/tot*100,"%"));
+    tmpType.push_back(Form("2ry e^{#pm} (%.1f%s)",(typeMaps[name][8])/tot*100,"%"));
+    tmpType.push_back(Form("2ry #mu^{#pm} (%.1f%s)",(typeMaps[name][9])/tot*100,"%"));
+
+    tmpType.push_back(Form("others (%.1f%s)",(typeMaps[name][10])/tot*100,"%"));
+    tmpType.push_back("data");
+  }
+
+  if(tag.Contains("evtType")){
+    tmpType.push_back(Form("signal (%.1f%s)",(typeMaps[name][0])/tot*100,"%"));
+    tmpType.push_back(Form("background (%.1f%s)",(typeMaps[name][1])/tot*100,"%"));
+    tmpType.push_back(Form("non-#pi^{+} beam (%.1f%s)",(typeMaps[name][2])/tot*100,"%"));
+    tmpType.push_back("data");
+  }
+
+  if(tag.Contains("beamType")){
+    tmpType.push_back(Form("p beam (%.1f%s)",(typeMaps[name][0])/tot*100,"%"));
+    tmpType.push_back(Form("#pi^{+} (%.1f%s)",(typeMaps[name][1])/tot*100,"%"));
+    tmpType.push_back(Form("#mu^{#pm} (%.1f%s)",(typeMaps[name][2])/tot*100,"%"));
+    tmpType.push_back(Form("e/#gamma (%.1f%s)",(typeMaps[name][3])/tot*100,"%"));
+    tmpType.push_back(Form("#pi^{-} (%.1f%s)",(typeMaps[name][4])/tot*100,"%"));
+    tmpType.push_back(Form("others (%.1f%s)",(typeMaps[name][5])/tot*100,"%"));
+    tmpType.push_back("data");
+  }
+
+  return tmpType;
+}
+
+vector<TString> PlotUtils::FillLegendStyle(int opt, TString tag){
+  vector<TString> tmpType;
+  // Particle type
+  if(tag.Contains("parType") && opt == 1){
+    tmpType.push_back("l");
+    tmpType.push_back("l");
+    tmpType.push_back("l");
+    tmpType.push_back("l");
+
+    tmpType.push_back("l");
+    tmpType.push_back("l");
+    tmpType.push_back("l");
+    tmpType.push_back("l");
+    tmpType.push_back("l");
+    tmpType.push_back("l");
+
+    tmpType.push_back("l");
+    tmpType.push_back("pl");
+  }
+
+  if(tag.Contains("parType") && opt == 2){
+    tmpType.push_back("f");
+    tmpType.push_back("f");
+    tmpType.push_back("f");
+    tmpType.push_back("f");
+
+    tmpType.push_back("f");
+    tmpType.push_back("f");
+    tmpType.push_back("f");
+    tmpType.push_back("f");
+    tmpType.push_back("f");
+    tmpType.push_back("f");
+
+    tmpType.push_back("f");
+    tmpType.push_back("pl");
+  }
+  if(tag.Contains("evtType") && opt == 2){
+    tmpType.push_back("f");
+    tmpType.push_back("f");
+    tmpType.push_back("f");
+    tmpType.push_back("ple");
+  }
+
+  if(tag.Contains("beamType") && opt == 2){
+    tmpType.push_back("f");
+    tmpType.push_back("f");
+    tmpType.push_back("f");
+    tmpType.push_back("f");
+    tmpType.push_back("f");
+    tmpType.push_back("f");
+    tmpType.push_back("ple");
+  }
+
+  return tmpType;
+}
+
+

@@ -66,9 +66,9 @@ class AnaUtils
     TLorentzVector GetRecShowerRefBeam(const bool isTruth, const int ii, bool DoCorrection = true);
 
     // Combine two showers to reconstruct pi0
-    TLorentzVector GetRecPiZeroFromShowers();
+    TLorentzVector GetRecPiZeroFromShowers(bool &IsPiZero, double &OA);
 
-    vector<TLorentzVector> GetTwoPi0Showers();
+    vector<TLorentzVector> GetTwoPi0Showers(double &separation);
 
     vector<TLorentzVector> GetTwoTruthMatchedPi0Showers(int &truthPi0Type);
 

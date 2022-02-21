@@ -74,7 +74,7 @@ class PlotUtils
   void FillHist(TH1 * hh,  double xx, const double yy);
   void ProcessHist(TList *lout, const bool kMC);
   void DrawHist(TList *lout, const double plotscale, TList * overlayList, const TString outdir);
-  THStack * ConvertToStack(const TH2D * hh, const bool kMC);
+  THStack * ConvertToStack(const TH2D * hh, const bool kMC, std::map<TString,vector<double>> &typeMaps);
   TH1D * GetStackedSum(THStack *stk);
   void ScaleStack(THStack *stk, const double scale);
   TH2D * NormalHist(const TH2D *hraw, const Double_t thres, const Bool_t kmax, TH1D * &hmean);
@@ -91,6 +91,13 @@ class PlotUtils
   TLegend * DrawLegend(const vector<TString> &entries, const vector<TString>& htype, const TString tag, const int *tmpcol=0x0, const int * tmpmkr=0x0, const int ncol = 1);
   void getSliceXDrawY(TH2D * h2d);
   void xSlicedEnergyCorrection(TH2D * h2d);
+  TH1D * GetRecEfficiency(TH1 * hh, TH1D * htrue, const TString tag);
+  void SetTitleFormat(TH1 * hh);
+  void SetTitleFormat(TH2 * h2d);
+  void SetTitleFormat(THStack * stk, bool offSet = true);
+  void DrawDataMCRatio(TH1D * hratio);
+  vector<TString> FillLegendType(TString tag, TString name);
+  vector<TString> FillLegendStyle(int opt, TString tag);
 
   static Double_t CauchyDens(Double_t *x, Double_t *par)
   {
@@ -112,7 +119,12 @@ class PlotUtils
     return par[3] + (par[0] - par[3])/(1 + pow((x[0]/par[2]),par[1]));
   }
 
+  // Truth type info for stack histogram
+  static std::map<TString,vector<double>> typeMaps;
 
   private:
 };
+
+std::map<TString,vector<double>> PlotUtils::typeMaps;
+
 #endif

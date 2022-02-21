@@ -1,14 +1,14 @@
-#define MC_Prod4a_cxx
-#include "MC_Prod4a.h"
+#define MC_Prod4a_ntuple_cxx
+#include "MC_Prod4a_ntuple.h"
 #include <TH2.h>
 #include <TStyle.h>
 #include <TCanvas.h>
 
-void MC_Prod4a::Loop()
+void MC_Prod4a_ntuple::Loop()
 {
 //   In a ROOT session, you can do:
-//      root> .L MC_Prod4a.C
-//      root> MC_Prod4a t
+//      root> .L MC_Prod4a_ntuple.C
+//      root> MC_Prod4a_ntuple t
 //      root> t.GetEntry(12); // Fill t data members with entry number 12
 //      root> t.Show();       // Show values of entry 12
 //      root> t.Show(16);     // Read and show values of entry 16

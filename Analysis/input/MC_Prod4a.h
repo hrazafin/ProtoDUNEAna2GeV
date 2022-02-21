@@ -1,12 +1,12 @@
 //////////////////////////////////////////////////////////
 // This class has been automatically generated on
-// Fri Jan 14 13:51:39 2022 by ROOT version 6.22/08
+// Sun Feb 20 02:15:16 2022 by ROOT version 6.22/08
 // from TTree beamana/beam analysis tree
-// found on file: protoDUNE_mc_reco_flattree_prod4a_whole.root
+// found on file: protoDUNE_mc_reco_flattree_prod4a_ntuple.root
 //////////////////////////////////////////////////////////
 
-#ifndef MC_Prod4a_h
-#define MC_Prod4a_h
+#ifndef MC_Prod4a_ntuple_h
+#define MC_Prod4a_ntuple_h
 
 #include <TROOT.h>
 #include <TChain.h>
@@ -21,7 +21,7 @@
 #include "string"
 #include "vector"
 
-class MC_Prod4a {
+class MC_Prod4a_ntuple {
 public :
    TTree          *fChain;   //!pointer to the analyzed TTree or TChain
    Int_t           fCurrent; //!current Tree number in a TChain
@@ -41,7 +41,9 @@ public :
    Double_t        reco_beam_endX;
    Double_t        reco_beam_endY;
    Double_t        reco_beam_endZ;
+   Double_t        true_beam_len;
    Double_t        reco_beam_len;
+   Int_t           test_branch;
    Double_t        reco_beam_alt_len;
    Double_t        reco_beam_alt_len_allTrack;
    Double_t        reco_beam_calo_startX;
@@ -72,6 +74,8 @@ public :
    Double_t        reco_beam_vertex_michel_score;
    Int_t           reco_beam_vertex_nHits_allTrack;
    Double_t        reco_beam_vertex_michel_score_allTrack;
+   Double_t        reco_beam_vertex_michel_score_weight_by_charge;
+   Double_t        reco_beam_vertex_michel_score_weight_by_charge_allTrack;
    Int_t           reco_beam_trackID;
    Int_t           n_beam_slices;
    Int_t           n_beam_particles;
@@ -116,6 +120,12 @@ public :
    Double_t        reco_beam_PFP_trackScore_collection;
    Double_t        reco_beam_PFP_emScore_collection;
    Double_t        reco_beam_PFP_michelScore_collection;
+   Double_t        reco_beam_PFP_trackScore_weight_by_charge;
+   Double_t        reco_beam_PFP_emScore_weight_by_charge;
+   Double_t        reco_beam_PFP_michelScore_weight_by_charge;
+   Double_t        reco_beam_PFP_trackScore_collection_weight_by_charge;
+   Double_t        reco_beam_PFP_emScore_collection_weight_by_charge;
+   Double_t        reco_beam_PFP_michelScore_collection_weight_by_charge;
    Int_t           reco_beam_allTrack_ID;
    Bool_t          reco_beam_allTrack_beam_cuts;
    Bool_t          reco_beam_allTrack_flipped;
@@ -143,6 +153,7 @@ public :
    vector<double>  *reco_track_endY;
    vector<double>  *reco_track_endZ;
    vector<double>  *reco_track_michel_score;
+   vector<double>  *reco_track_michel_score_weight_by_charge;
    vector<int>     *reco_track_ID;
    vector<int>     *reco_track_nHits;
    vector<int>     *reco_daughter_PFP_true_byHits_PDG;
@@ -195,6 +206,9 @@ public :
    vector<vector<double> > *reco_daughter_allTrack_resRange_plane1;
    vector<double>  *reco_daughter_allTrack_Theta;
    vector<double>  *reco_daughter_allTrack_Phi;
+   vector<double>  *reco_daughter_allTrack_startDirX;
+   vector<double>  *reco_daughter_allTrack_startDirY;
+   vector<double>  *reco_daughter_allTrack_startDirZ;
    vector<double>  *reco_daughter_allTrack_len;
    vector<double>  *reco_daughter_allTrack_alt_len;
    vector<double>  *reco_daughter_allTrack_startX;
@@ -445,6 +459,15 @@ public :
    vector<vector<double> > *g4rw_full_grid_kplus_coeffs;
    vector<vector<double> > *g4rw_primary_grid_weights;
    vector<double>  *g4rw_primary_grid_pair_weights;
+   vector<double>  *reco_beam_spacePts_X;
+   vector<double>  *reco_beam_spacePts_Y;
+   vector<double>  *reco_beam_spacePts_Z;
+   vector<vector<double> > *reco_daughter_spacePts_X;
+   vector<vector<double> > *reco_daughter_spacePts_Y;
+   vector<vector<double> > *reco_daughter_spacePts_Z;
+   vector<vector<double> > *reco_daughter_shower_spacePts_X;
+   vector<vector<double> > *reco_daughter_shower_spacePts_Y;
+   vector<vector<double> > *reco_daughter_shower_spacePts_Z;
 
    // List of branches
    TBranch        *b_run;   //!
@@ -459,7 +482,9 @@ public :
    TBranch        *b_reco_beam_endX;   //!
    TBranch        *b_reco_beam_endY;   //!
    TBranch        *b_reco_beam_endZ;   //!
+   TBranch        *b_true_beam_len;   //!
    TBranch        *b_reco_beam_len;   //!
+   TBranch        *b_test_branch;   //!
    TBranch        *b_reco_beam_alt_len;   //!
    TBranch        *b_reco_beam_alt_len_allTrack;   //!
    TBranch        *b_reco_beam_calo_startX;   //!
@@ -490,6 +515,8 @@ public :
    TBranch        *b_reco_beam_vertex_michel_score;   //!
    TBranch        *b_reco_beam_vertex_nHits_allTrack;   //!
    TBranch        *b_reco_beam_vertex_michel_score_allTrack;   //!
+   TBranch        *b_reco_beam_vertex_michel_score_weight_by_charge;   //!
+   TBranch        *b_reco_beam_vertex_michel_score_weight_by_charge_allTrack;   //!
    TBranch        *b_reco_beam_trackID;   //!
    TBranch        *b_n_beam_slices;   //!
    TBranch        *b_n_beam_particles;   //!
@@ -534,6 +561,12 @@ public :
    TBranch        *b_reco_beam_PFP_trackScore_collection;   //!
    TBranch        *b_reco_beam_PFP_emScore_collection;   //!
    TBranch        *b_reco_beam_PFP_michelScore_collection;   //!
+   TBranch        *b_reco_beam_PFP_trackScore_weight_by_charge;   //!
+   TBranch        *b_reco_beam_PFP_emScore_weight_by_charge;   //!
+   TBranch        *b_reco_beam_PFP_michelScore_weight_by_charge;   //!
+   TBranch        *b_reco_beam_PFP_trackScore_collection_weight_by_charge;   //!
+   TBranch        *b_reco_beam_PFP_emScore_collection_weight_by_charge;   //!
+   TBranch        *b_reco_beam_PFP_michelScore_collection_weight_by_charge;   //!
    TBranch        *b_reco_beam_allTrack_ID;   //!
    TBranch        *b_reco_beam_allTrack_beam_cuts;   //!
    TBranch        *b_reco_beam_allTrack_flipped;   //!
@@ -561,6 +594,7 @@ public :
    TBranch        *b_reco_track_endY;   //!
    TBranch        *b_reco_track_endZ;   //!
    TBranch        *b_reco_track_michel_score;   //!
+   TBranch        *b_reco_track_michel_score_weight_by_charge;   //!
    TBranch        *b_reco_track_ID;   //!
    TBranch        *b_reco_track_nHits;   //!
    TBranch        *b_reco_daughter_PFP_true_byHits_PDG;   //!
@@ -613,6 +647,9 @@ public :
    TBranch        *b_reco_daughter_allTrack_resRange_plane1;   //!
    TBranch        *b_reco_daughter_allTrack_Theta;   //!
    TBranch        *b_reco_daughter_allTrack_Phi;   //!
+   TBranch        *b_reco_daughter_allTrack_startDirX;   //!
+   TBranch        *b_reco_daughter_allTrack_startDirY;   //!
+   TBranch        *b_reco_daughter_allTrack_startDirZ;   //!
    TBranch        *b_reco_daughter_allTrack_len;   //!
    TBranch        *b_reco_daughter_allTrack_alt_len;   //!
    TBranch        *b_reco_daughter_allTrack_startX;   //!
@@ -863,9 +900,18 @@ public :
    TBranch        *b_g4rw_full_grid_kplus_coeffs;   //!
    TBranch        *b_g4rw_primary_grid_weights;   //!
    TBranch        *b_g4rw_primary_grid_pair_weights;   //!
+   TBranch        *b_reco_beam_spacePts_X;   //!
+   TBranch        *b_reco_beam_spacePts_Y;   //!
+   TBranch        *b_reco_beam_spacePts_Z;   //!
+   TBranch        *b_reco_daughter_spacePts_X;   //!
+   TBranch        *b_reco_daughter_spacePts_Y;   //!
+   TBranch        *b_reco_daughter_spacePts_Z;   //!
+   TBranch        *b_reco_daughter_shower_spacePts_X;   //!
+   TBranch        *b_reco_daughter_shower_spacePts_Y;   //!
+   TBranch        *b_reco_daughter_shower_spacePts_Z;   //!
 
-   MC_Prod4a(TTree *tree=0);
-   virtual ~MC_Prod4a();
+   MC_Prod4a_ntuple(TTree *tree=0);
+   virtual ~MC_Prod4a_ntuple();
    virtual Int_t    Cut(Long64_t entry);
    virtual Int_t    GetEntry(Long64_t entry);
    virtual Long64_t LoadTree(Long64_t entry);
@@ -877,36 +923,36 @@ public :
 
 #endif
 
-#ifdef MC_Prod4a_cxx
-MC_Prod4a::MC_Prod4a(TTree *tree) : fChain(0) 
+#ifdef MC_Prod4a_ntuple_cxx
+MC_Prod4a_ntuple::MC_Prod4a_ntuple(TTree *tree) : fChain(0) 
 {
 // if parameter tree is not specified (or zero), connect the file
 // used to generate this class and read the Tree.
    if (tree == 0) {
-      TFile *f = (TFile*)gROOT->GetListOfFiles()->FindObject("protoDUNE_mc_reco_flattree_prod4a_whole.root");
+      TFile *f = (TFile*)gROOT->GetListOfFiles()->FindObject("protoDUNE_mc_reco_flattree_prod4a_ntuple.root");
       if (!f || !f->IsOpen()) {
-         f = new TFile("protoDUNE_mc_reco_flattree_prod4a_whole.root");
+         f = new TFile("protoDUNE_mc_reco_flattree_prod4a_ntuple.root");
       }
-      TDirectory * dir = (TDirectory*)f->Get("protoDUNE_mc_reco_flattree_prod4a_whole.root:/pduneana");
+      TDirectory * dir = (TDirectory*)f->Get("protoDUNE_mc_reco_flattree_prod4a_ntuple.root:/pduneana");
       dir->GetObject("beamana",tree);
 
    }
    Init(tree);
 }
 
-MC_Prod4a::~MC_Prod4a()
+MC_Prod4a_ntuple::~MC_Prod4a_ntuple()
 {
    if (!fChain) return;
    delete fChain->GetCurrentFile();
 }
 
-Int_t MC_Prod4a::GetEntry(Long64_t entry)
+Int_t MC_Prod4a_ntuple::GetEntry(Long64_t entry)
 {
 // Read contents of entry.
    if (!fChain) return 0;
    return fChain->GetEntry(entry);
 }
-Long64_t MC_Prod4a::LoadTree(Long64_t entry)
+Long64_t MC_Prod4a_ntuple::LoadTree(Long64_t entry)
 {
 // Set the environment to read one entry
    if (!fChain) return -5;
@@ -919,7 +965,7 @@ Long64_t MC_Prod4a::LoadTree(Long64_t entry)
    return centry;
 }
 
-void MC_Prod4a::Init(TTree *tree)
+void MC_Prod4a_ntuple::Init(TTree *tree)
 {
    // The Init() function is called when the selector needs to initialize
    // a new tree or chain. Typically here the branch addresses and branch
@@ -976,6 +1022,7 @@ void MC_Prod4a::Init(TTree *tree)
    reco_track_endY = 0;
    reco_track_endZ = 0;
    reco_track_michel_score = 0;
+   reco_track_michel_score_weight_by_charge = 0;
    reco_track_ID = 0;
    reco_track_nHits = 0;
    reco_daughter_PFP_true_byHits_PDG = 0;
@@ -1028,6 +1075,9 @@ void MC_Prod4a::Init(TTree *tree)
    reco_daughter_allTrack_resRange_plane1 = 0;
    reco_daughter_allTrack_Theta = 0;
    reco_daughter_allTrack_Phi = 0;
+   reco_daughter_allTrack_startDirX = 0;
+   reco_daughter_allTrack_startDirY = 0;
+   reco_daughter_allTrack_startDirZ = 0;
    reco_daughter_allTrack_len = 0;
    reco_daughter_allTrack_alt_len = 0;
    reco_daughter_allTrack_startX = 0;
@@ -1186,6 +1236,15 @@ void MC_Prod4a::Init(TTree *tree)
    g4rw_full_grid_kplus_coeffs = 0;
    g4rw_primary_grid_weights = 0;
    g4rw_primary_grid_pair_weights = 0;
+   reco_beam_spacePts_X = 0;
+   reco_beam_spacePts_Y = 0;
+   reco_beam_spacePts_Z = 0;
+   reco_daughter_spacePts_X = 0;
+   reco_daughter_spacePts_Y = 0;
+   reco_daughter_spacePts_Z = 0;
+   reco_daughter_shower_spacePts_X = 0;
+   reco_daughter_shower_spacePts_Y = 0;
+   reco_daughter_shower_spacePts_Z = 0;
    // Set branch addresses and branch pointers
    if (!tree) return;
    fChain = tree;
@@ -1204,7 +1263,9 @@ void MC_Prod4a::Init(TTree *tree)
    fChain->SetBranchAddress("reco_beam_endX", &reco_beam_endX, &b_reco_beam_endX);
    fChain->SetBranchAddress("reco_beam_endY", &reco_beam_endY, &b_reco_beam_endY);
    fChain->SetBranchAddress("reco_beam_endZ", &reco_beam_endZ, &b_reco_beam_endZ);
+   fChain->SetBranchAddress("true_beam_len", &true_beam_len, &b_true_beam_len);
    fChain->SetBranchAddress("reco_beam_len", &reco_beam_len, &b_reco_beam_len);
+   fChain->SetBranchAddress("test_branch", &test_branch, &b_test_branch);
    fChain->SetBranchAddress("reco_beam_alt_len", &reco_beam_alt_len, &b_reco_beam_alt_len);
    fChain->SetBranchAddress("reco_beam_alt_len_allTrack", &reco_beam_alt_len_allTrack, &b_reco_beam_alt_len_allTrack);
    fChain->SetBranchAddress("reco_beam_calo_startX", &reco_beam_calo_startX, &b_reco_beam_calo_startX);
@@ -1235,6 +1296,8 @@ void MC_Prod4a::Init(TTree *tree)
    fChain->SetBranchAddress("reco_beam_vertex_michel_score", &reco_beam_vertex_michel_score, &b_reco_beam_vertex_michel_score);
    fChain->SetBranchAddress("reco_beam_vertex_nHits_allTrack", &reco_beam_vertex_nHits_allTrack, &b_reco_beam_vertex_nHits_allTrack);
    fChain->SetBranchAddress("reco_beam_vertex_michel_score_allTrack", &reco_beam_vertex_michel_score_allTrack, &b_reco_beam_vertex_michel_score_allTrack);
+   fChain->SetBranchAddress("reco_beam_vertex_michel_score_weight_by_charge", &reco_beam_vertex_michel_score_weight_by_charge, &b_reco_beam_vertex_michel_score_weight_by_charge);
+   fChain->SetBranchAddress("reco_beam_vertex_michel_score_weight_by_charge_allTrack", &reco_beam_vertex_michel_score_weight_by_charge_allTrack, &b_reco_beam_vertex_michel_score_weight_by_charge_allTrack);
    fChain->SetBranchAddress("reco_beam_trackID", &reco_beam_trackID, &b_reco_beam_trackID);
    fChain->SetBranchAddress("n_beam_slices", &n_beam_slices, &b_n_beam_slices);
    fChain->SetBranchAddress("n_beam_particles", &n_beam_particles, &b_n_beam_particles);
@@ -1279,6 +1342,12 @@ void MC_Prod4a::Init(TTree *tree)
    fChain->SetBranchAddress("reco_beam_PFP_trackScore_collection", &reco_beam_PFP_trackScore_collection, &b_reco_beam_PFP_trackScore_collection);
    fChain->SetBranchAddress("reco_beam_PFP_emScore_collection", &reco_beam_PFP_emScore_collection, &b_reco_beam_PFP_emScore_collection);
    fChain->SetBranchAddress("reco_beam_PFP_michelScore_collection", &reco_beam_PFP_michelScore_collection, &b_reco_beam_PFP_michelScore_collection);
+   fChain->SetBranchAddress("reco_beam_PFP_trackScore_weight_by_charge", &reco_beam_PFP_trackScore_weight_by_charge, &b_reco_beam_PFP_trackScore_weight_by_charge);
+   fChain->SetBranchAddress("reco_beam_PFP_emScore_weight_by_charge", &reco_beam_PFP_emScore_weight_by_charge, &b_reco_beam_PFP_emScore_weight_by_charge);
+   fChain->SetBranchAddress("reco_beam_PFP_michelScore_weight_by_charge", &reco_beam_PFP_michelScore_weight_by_charge, &b_reco_beam_PFP_michelScore_weight_by_charge);
+   fChain->SetBranchAddress("reco_beam_PFP_trackScore_collection_weight_by_charge", &reco_beam_PFP_trackScore_collection_weight_by_charge, &b_reco_beam_PFP_trackScore_collection_weight_by_charge);
+   fChain->SetBranchAddress("reco_beam_PFP_emScore_collection_weight_by_charge", &reco_beam_PFP_emScore_collection_weight_by_charge, &b_reco_beam_PFP_emScore_collection_weight_by_charge);
+   fChain->SetBranchAddress("reco_beam_PFP_michelScore_collection_weight_by_charge", &reco_beam_PFP_michelScore_collection_weight_by_charge, &b_reco_beam_PFP_michelScore_collection_weight_by_charge);
    fChain->SetBranchAddress("reco_beam_allTrack_ID", &reco_beam_allTrack_ID, &b_reco_beam_allTrack_ID);
    fChain->SetBranchAddress("reco_beam_allTrack_beam_cuts", &reco_beam_allTrack_beam_cuts, &b_reco_beam_allTrack_beam_cuts);
    fChain->SetBranchAddress("reco_beam_allTrack_flipped", &reco_beam_allTrack_flipped, &b_reco_beam_allTrack_flipped);
@@ -1306,6 +1375,7 @@ void MC_Prod4a::Init(TTree *tree)
    fChain->SetBranchAddress("reco_track_endY", &reco_track_endY, &b_reco_track_endY);
    fChain->SetBranchAddress("reco_track_endZ", &reco_track_endZ, &b_reco_track_endZ);
    fChain->SetBranchAddress("reco_track_michel_score", &reco_track_michel_score, &b_reco_track_michel_score);
+   fChain->SetBranchAddress("reco_track_michel_score_weight_by_charge", &reco_track_michel_score_weight_by_charge, &b_reco_track_michel_score_weight_by_charge);
    fChain->SetBranchAddress("reco_track_ID", &reco_track_ID, &b_reco_track_ID);
    fChain->SetBranchAddress("reco_track_nHits", &reco_track_nHits, &b_reco_track_nHits);
    fChain->SetBranchAddress("reco_daughter_PFP_true_byHits_PDG", &reco_daughter_PFP_true_byHits_PDG, &b_reco_daughter_PFP_true_byHits_PDG);
@@ -1358,6 +1428,9 @@ void MC_Prod4a::Init(TTree *tree)
    fChain->SetBranchAddress("reco_daughter_allTrack_resRange_plane1", &reco_daughter_allTrack_resRange_plane1, &b_reco_daughter_allTrack_resRange_plane1);
    fChain->SetBranchAddress("reco_daughter_allTrack_Theta", &reco_daughter_allTrack_Theta, &b_reco_daughter_allTrack_Theta);
    fChain->SetBranchAddress("reco_daughter_allTrack_Phi", &reco_daughter_allTrack_Phi, &b_reco_daughter_allTrack_Phi);
+   fChain->SetBranchAddress("reco_daughter_allTrack_startDirX", &reco_daughter_allTrack_startDirX, &b_reco_daughter_allTrack_startDirX);
+   fChain->SetBranchAddress("reco_daughter_allTrack_startDirY", &reco_daughter_allTrack_startDirY, &b_reco_daughter_allTrack_startDirY);
+   fChain->SetBranchAddress("reco_daughter_allTrack_startDirZ", &reco_daughter_allTrack_startDirZ, &b_reco_daughter_allTrack_startDirZ);
    fChain->SetBranchAddress("reco_daughter_allTrack_len", &reco_daughter_allTrack_len, &b_reco_daughter_allTrack_len);
    fChain->SetBranchAddress("reco_daughter_allTrack_alt_len", &reco_daughter_allTrack_alt_len, &b_reco_daughter_allTrack_alt_len);
    fChain->SetBranchAddress("reco_daughter_allTrack_startX", &reco_daughter_allTrack_startX, &b_reco_daughter_allTrack_startX);
@@ -1608,10 +1681,19 @@ void MC_Prod4a::Init(TTree *tree)
    fChain->SetBranchAddress("g4rw_full_grid_kplus_coeffs", &g4rw_full_grid_kplus_coeffs, &b_g4rw_full_grid_kplus_coeffs);
    fChain->SetBranchAddress("g4rw_primary_grid_weights", &g4rw_primary_grid_weights, &b_g4rw_primary_grid_weights);
    fChain->SetBranchAddress("g4rw_primary_grid_pair_weights", &g4rw_primary_grid_pair_weights, &b_g4rw_primary_grid_pair_weights);
+   fChain->SetBranchAddress("reco_beam_spacePts_X", &reco_beam_spacePts_X, &b_reco_beam_spacePts_X);
+   fChain->SetBranchAddress("reco_beam_spacePts_Y", &reco_beam_spacePts_Y, &b_reco_beam_spacePts_Y);
+   fChain->SetBranchAddress("reco_beam_spacePts_Z", &reco_beam_spacePts_Z, &b_reco_beam_spacePts_Z);
+   fChain->SetBranchAddress("reco_daughter_spacePts_X", &reco_daughter_spacePts_X, &b_reco_daughter_spacePts_X);
+   fChain->SetBranchAddress("reco_daughter_spacePts_Y", &reco_daughter_spacePts_Y, &b_reco_daughter_spacePts_Y);
+   fChain->SetBranchAddress("reco_daughter_spacePts_Z", &reco_daughter_spacePts_Z, &b_reco_daughter_spacePts_Z);
+   fChain->SetBranchAddress("reco_daughter_shower_spacePts_X", &reco_daughter_shower_spacePts_X, &b_reco_daughter_shower_spacePts_X);
+   fChain->SetBranchAddress("reco_daughter_shower_spacePts_Y", &reco_daughter_shower_spacePts_Y, &b_reco_daughter_shower_spacePts_Y);
+   fChain->SetBranchAddress("reco_daughter_shower_spacePts_Z", &reco_daughter_shower_spacePts_Z, &b_reco_daughter_shower_spacePts_Z);
    Notify();
 }
 
-Bool_t MC_Prod4a::Notify()
+Bool_t MC_Prod4a_ntuple::Notify()
 {
    // The Notify() function is called when a new file is opened. This
    // can be either for a new TTree in a TChain or when when a new TTree
@@ -1622,18 +1704,18 @@ Bool_t MC_Prod4a::Notify()
    return kTRUE;
 }
 
-void MC_Prod4a::Show(Long64_t entry)
+void MC_Prod4a_ntuple::Show(Long64_t entry)
 {
 // Print contents of entry.
 // If entry is not specified, print current entry
    if (!fChain) return;
    fChain->Show(entry);
 }
-Int_t MC_Prod4a::Cut(Long64_t entry)
+Int_t MC_Prod4a_ntuple::Cut(Long64_t entry)
 {
 // This function may be called from Loop.
 // returns  1 if entry is accepted.
 // returns -1 otherwise.
    return 1;
 }
-#endif // #ifdef MC_Prod4a_cxx
+#endif // #ifdef MC_Prod4a_ntuple_cxx
