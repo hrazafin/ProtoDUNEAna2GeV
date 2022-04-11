@@ -104,7 +104,8 @@ void PlotUtils::ProcessHist(TList *lout, const bool kMC)
       else if(tag.Contains("RES") && kMC){
         // Column normalise each bin to easily see the maximum
         TH1D * hmean = 0x0;
-        TH2D * hnor = NormalHist(htmp, 5, true, hmean);
+        TH1D * hcdf = 0x0;
+        TH2D * hnor = NormalHist(htmp, 5, true, hmean, hcdf);
         hnor->SetTitle(tag);
         lout->Add(hnor);
         // Get the 1D histogram resolution plot using projectY
@@ -119,14 +120,22 @@ void PlotUtils::ProcessHist(TList *lout, const bool kMC)
       else if(tag.Contains("REG") && kMC){
         // Column normalise each bin to easily see the maximum
         TH1D * hmean = 0x0;
-        TH2D * hnor = NormalHist(htmp, 5, true, hmean);
+        TH1D * hcdf = 0x0;
+        TH2D * hnor = NormalHist(htmp, 5, true, hmean, hcdf);
         hnor->SetTitle(tag);
         lout->Add(hnor);
         lout->Add(hmean);
+        lout->Add(hcdf);
+        TH1D * hprojX = htmp->ProjectionX(tag+"_projX");
+        hprojX->SetStats(1);
+        lout->Add(hprojX);
         // Do the corrections
         if (tag.Contains("Correction") && kMC){
           xSlicedEnergyCorrection(htmp);
         }
+      }
+      else if(tag.Contains("sigma")){   
+        xSlicedSigma(htmp,tag);
       }
       // Do nothing (You can add more else if to process more tags)
       else {}
@@ -147,6 +156,7 @@ void PlotUtils::ProcessHist(TList *lout, const bool kMC)
         TString nameNp0n = tmp+"Np0n";
         TString name1pMn = tmp+"1pMn";
         TString nameNpMn = tmp+"NpMn";
+
         // Find histograms in the list
         TH1D *hh1p0n = (TH1D*)lout->FindObject(name1p0n);
         TH1D *hhNp0n = (TH1D*)lout->FindObject(nameNp0n); 
@@ -179,7 +189,7 @@ void PlotUtils::ProcessHist(TList *lout, const bool kMC)
       const TString tag = hh->GetName();
       // Pi0 rec. efficiency
       if(tag.Contains("hMatchedTruthPi0Momentum") && kMC && !tag.Contains("_ratio")){
-        const TString truth_tmp = "e008hTruthLeadingPiZeroP";
+        const TString truth_tmp = "e008hTruthLeadingPiZeroE";
         TH1D *htrue = (TH1D*)lout->FindObject(truth_tmp);
         TH1D *hEff = GetRecEfficiency(hh,htrue,tag);
         lout->Add(hEff);
@@ -259,7 +269,7 @@ void PlotUtils::DrawHist(TList *lout, const double plotscale, TList * overlayLis
         SetTitleFormat(h2d);
         // Draw 2D histogram from its name (MC only)
         if(!tag.Contains("proj") && (tag.Contains("RES") || tag.Contains("REG"))) {
-          h2d->Draw("colz");
+          //h2d->Draw("colz");
           if(tag.Contains("DIAG")){
             // Draw the diagonal line for rec. VS true histogram
             double max = h2d->GetXaxis()->GetBinUpEdge(h2d->GetXaxis()->GetLast());
@@ -268,11 +278,93 @@ void PlotUtils::DrawHist(TList *lout, const double plotscale, TList * overlayLis
             line->SetLineColor(kBlack);
             line->SetLineWidth(2);
             line->Draw();
+            h2d->Draw("colz");
+          }
+          if((tag.Contains("REG") || tag.Contains("RES")) && tag.Contains("_nor")){
+            //TPad *h2_pad = new TPad("h2_pad", "h2_pad",0.0,0.0,1.0,1.0);
+            //h2_pad->Draw();
+
+            //TPad *proj1_pad = new TPad("proj1_pad", "proj1_pad",0.0,0.0,1.0,1.0);
+            //proj1_pad->Draw();
+            //h2_pad->cd();
+            //h2d->Draw("COL");
+            TPad *pad1 = new TPad(Form("pad1_%d",ii), Form("pad1_%d",ii), 0, 0.3, 1, 0.98);
+            // Set 0.01 will hide axis label
+            pad1->SetBottomMargin(0.02);
+            //  pad1->SetGridx();
+            //  pad1->SetGridy();
+            pad1->Draw();
+            pad1->cd();
+            h2d->GetXaxis()->SetLabelOffset(999);
+            h2d->GetXaxis()->SetLabelSize(0);
+            h2d->GetYaxis()->SetTitleSize(0.07);
+            h2d->GetYaxis()->SetTitleOffset(0.6);
+            h2d->Draw("Colz");
+            c1->Update();
+            c1->cd();
+
+            TRegexp re("_nor");
+            TString name = tag;
+            name(re) = "_projX";
+            cout << "name: " << name << endl;
+            TH1D *hcdf = (TH1D*)lout->FindObject(name);
+
+            TPad *pad2 = new TPad(Form("pad2_%d",ii), Form("pad2_%d",ii), 0, 0, 1, 0.3);
+             
+            pad2->SetTopMargin(0.03);
+            pad2->SetBottomMargin(0.42);
+            pad2->Draw();
+            pad2->cd();
+
+            //Float_t rightmax = 1.1*hcdf->GetMaximum();
+            //Float_t scale = abs(h2d->GetYaxis()->GetXmax()) + abs(h2d->GetYaxis()->GetXmin());
+            //cout << "scale: " << scale << endl;
+   
+            //hcdf->SetLineColor(kBlue);
+            //hcdf->SetFillStyle(3004);
+            hcdf->GetXaxis()->SetTitle(h2d->GetXaxis()->GetTitle());
+            hcdf->GetYaxis()->SetTitle("Event fraction");
+            hcdf->GetXaxis()->SetLabelSize(0.1);
+            hcdf->GetXaxis()->SetTitleSize(0.15);
+            hcdf->GetYaxis()->SetLabelSize(0.1);
+            hcdf->GetYaxis()->SetTitleSize(0.05);
+            hcdf->GetYaxis()->SetTitleSize(0.1);
+            hcdf->GetYaxis()->SetTitleOffset(0.4);
+            hcdf->GetYaxis()->SetNdivisions(505);
+            hcdf->GetXaxis()->CenterTitle();
+            hcdf->GetYaxis()->CenterTitle();
+
+            hcdf->GetXaxis()->SetTitleFont(22);
+            hcdf->GetYaxis()->SetTitleFont(22);
+            hcdf->GetXaxis()->SetTitleOffset(0.9);
+            hcdf->Scale(1/hcdf->Integral(0,10000));
+            //const Int_t x0 = hh->GetXaxis()->GetFirst();
+            //const Int_t x1 = hh->GetXaxis()->GetLast();
+
+            //for(Int_t ix=x0; ix<=x1; ix++){
+              //double binCont = hcdf->GetBinContent(ix) - abs(h2d->GetYaxis()->GetXmin());
+              //hcdf->SetBinContent(ix, binCont);
+            //}
+            
+            //proj1_pad->cd();
+            //proj1_pad->SetFillStyle(0);
+            //hcdf->SetFillColorAlpha(kGreen,0.3);
+            //hcdf->Draw("bar Y+");
+            hcdf->SetFillColorAlpha(kBlue,0.3);
+            //hcdf->Draw("bar Y+");
+            hcdf->Draw("hist");
+            c1->cd();
           }
         }
         if(!tag.Contains("proj") && tag.Contains("Bin")){
           h2d->SetMarkerSize(2);
           gStyle->SetPaintTextFormat("4.3f");
+          h2d->Draw("colz text");
+        }
+
+        if(tag.Contains("sigma")){
+          h2d->SetMarkerSize(2);
+          //gStyle->SetPaintTextFormat("4.3f");
           h2d->Draw("colz text");
         }
       }
@@ -379,6 +471,7 @@ void PlotUtils::DrawHist(TList *lout, const double plotscale, TList * overlayLis
             hh->GetYaxis()->SetTitleSize(0.06);
             hh->GetYaxis()->SetTitleOffset(0.8);
 
+            //hh->Draw("hist text");
             hh->Draw("hist");
             DrawOverlay(holay);
             c1->Update();
@@ -404,7 +497,7 @@ void PlotUtils::DrawHist(TList *lout, const double plotscale, TList * overlayLis
         else{
 
           // Draw overlay for raw and corrected shower resolution
-          if(tag.Contains("hPi0MomNorm")){
+          if(tag.Contains("Pi0MomNorm")){
             // Get the name of raw shower histogram
             TRegexp re("Norm");
             TString name = tag;
@@ -417,13 +510,13 @@ void PlotUtils::DrawHist(TList *lout, const double plotscale, TList * overlayLis
               if(holayRaw->GetMaximum() > hh->GetMaximum()) hh->SetMaximum(holayRaw->GetMaximum()*1.2);
               else hh->SetMaximum(hh->GetMaximum()*1.2);
               hh->SetFillStyle(4050);
-              hh->SetFillColor(24);
-              hh->SetLineColor(24);
+              hh->SetLineColor(kRed);
+              hh->SetFillColorAlpha(kRed, 0.35);
               hh->Draw("hist");
               c1->Update();
-	            holayRaw->SetFillStyle(3001);
-              holayRaw->SetFillColor(46);
-              holayRaw->SetLineColor(46);
+	            holayRaw->SetFillStyle(4050);
+              holayRaw->SetLineColor(kGreen);
+              holayRaw->SetFillColorAlpha(kGreen, 0.35);
               holayRaw->Draw("SAMES hist"); 
               c1->Update();
               if(holayFit){
@@ -431,7 +524,26 @@ void PlotUtils::DrawHist(TList *lout, const double plotscale, TList * overlayLis
                 holayFit->SetLineWidth(2);
                 holayFit->Draw("SAMES hist");
                 c1->Update();
+                cout << "E1E2 mean: " << hh->GetMean() << " RMS: " << hh->GetRMS() << endl;
+                cout << "E1OA mean: " << holayRaw->GetMean() << " RMS: " << holayRaw->GetRMS() << endl;
+                cout << "Asym mean: " << holayFit->GetMean() << " RMS: " << holayFit->GetRMS() << endl;
               }
+              auto lg = new TLegend(0.6,0.5,0.85,0.88);
+
+              lg->AddEntry(hh,"E1 + E2","f");
+              TLegendEntry* l1 = lg->AddEntry((TObject*)0, Form("( #mu: %.2f #sigma: %.2f )",hh->GetMean(),hh->GetRMS()), "");
+              l1->SetTextSize(0.03);
+              l1->SetTextColor(kRed);
+              lg->AddEntry(holayRaw,"E1 + #theta","f");
+              TLegendEntry* l2 = lg->AddEntry((TObject*)0, Form("( #mu: %.2f #sigma: %.2f )",holayRaw->GetMean(),holayRaw->GetRMS()), "");
+              l2->SetTextSize(0.03);
+              l2->SetTextColor(kGreen);
+              lg->AddEntry(holayFit,"Asymmetry","f");
+              TLegendEntry* l3 = lg->AddEntry((TObject*)0, Form("( #mu: %.2f #sigma: %.2f )",holayFit->GetMean(),holayFit->GetRMS()), "");
+              l3->SetTextSize(0.03);
+              l3->SetTextColor(kMagenta);
+              lg->Draw("same");
+
             }
             else hh->Draw("hist");
           }
@@ -452,18 +564,19 @@ void PlotUtils::DrawHist(TList *lout, const double plotscale, TList * overlayLis
           }
           
           // Compare fitted results
-          else if(tag.Contains("Compare") && !tag.Contains("Post") && !tag.Contains("Pre") && !tag.Contains("mean")){
+          else if(tag.Contains("Compare")){
             // Get the name of raw shower histogram
             TRegexp re("Compare");
             TString name = tag;
             name(re) = "ComparePost";
             TH1D *holay = (TH1D*)lout->FindObject(name);
+            if(holay){
             if(holay->GetMaximum() > hh->GetMaximum()) hh->SetMaximum(holay->GetMaximum()*1.2);
             else hh->SetMaximum(hh->GetMaximum()*1.2);
             //if(tag.Contains("E1")) hh->SetMaximum(350);
             //if(tag.Contains("E2")) hh->SetMaximum(200);
             //if(tag.Contains("OA")) hh->SetMaximum(200);
-            auto lg = new TLegend(0.7,0.7,0.85,0.88);
+            auto lg = new TLegend(0.6,0.5,0.85,0.88);
             //hh->SetStats(0);
             hh->SetFillStyle(4050);
             hh->SetFillColor(24);
@@ -471,13 +584,13 @@ void PlotUtils::DrawHist(TList *lout, const double plotscale, TList * overlayLis
             hh->Draw("hist");
             //hh->SetName("Pre Fit");
             gPad->Update();
-/*          
+/*        
             TPaveStats *st = (TPaveStats*)hh->GetListOfFunctions()->FindObject("stats");
             st->SetY1NDC(0.7); 
             st->SetY2NDC(0.9);
             st->SetX1NDC(0.7); 
             st->SetX2NDC(0.93);
-*/     
+*/    
             holay->SetFillStyle(3001);
             holay->SetFillColor(46);
             holay->SetLineColor(46);
@@ -485,7 +598,8 @@ void PlotUtils::DrawHist(TList *lout, const double plotscale, TList * overlayLis
             holay->Draw("SAMES hist");
             //holay->SetName("Post Fit");
             gPad->Update();
-/*            TPaveStats *st_holay = (TPaveStats*)holay->GetListOfFunctions()->FindObject("stats");
+/*            
+            TPaveStats *st_holay = (TPaveStats*)holay->GetListOfFunctions()->FindObject("stats");
             
             st_holay->SetY1NDC(0.47); 
             st_holay->SetY2NDC(0.67);
@@ -494,9 +608,14 @@ void PlotUtils::DrawHist(TList *lout, const double plotscale, TList * overlayLis
 */
 
             lg->AddEntry(hh,"Before Fitting","f");
+            TLegendEntry* l1 = lg->AddEntry((TObject*)0, Form("( #mu: %.2f #sigma: %.2f )",hh->GetMean(),hh->GetRMS()), "");
+            l1->SetTextSize(0.03);
             lg->AddEntry(holay,"After Fitting","f");
+            TLegendEntry* l2 = lg->AddEntry((TObject*)0, Form("( #mu: %.2f #sigma: %.2f )",holay->GetMean(),holay->GetRMS()), "");
+            l2->SetTextSize(0.03);
+            l2->SetTextColor(46);
             lg->Draw("same");
-
+            }
           }
           
           else if(tag.Contains("CorMean")){
@@ -647,7 +766,7 @@ void PlotUtils::DrawHist(TList *lout, const double plotscale, TList * overlayLis
               holay_sl->SetFillColorAlpha(kBlue, 0.35);
               holay_sl->Draw("e2same");
 
-              auto lg = new TLegend(0.68,0.68,0.85,0.88);
+              auto lg = new TLegend(0.54,0.54,0.85,0.88);
               lg->AddEntry(hh,"#pi^{0}-particle","l");
               lg->AddEntry(holay_ld,"Leanding Photon","l");
               lg->AddEntry(holay_sl,"SubLeanding Photon","l");
@@ -662,6 +781,7 @@ void PlotUtils::DrawHist(TList *lout, const double plotscale, TList * overlayLis
             TH1D *holay = (TH1D*)lout->FindObject(name);
             hh->SetMinimum(0);
             hh->SetMaximum(1.3);
+            if(tag.Contains("IP")) hh->SetMaximum(1.6);
             hh->SetLineColor(kRed);
             hh->SetLineWidth(2);
             hh->DrawCopy("HIST c");
@@ -679,10 +799,41 @@ void PlotUtils::DrawHist(TList *lout, const double plotscale, TList * overlayLis
             holay->Draw("e2same");
             
             auto lg = new TLegend(0.65,0.2,0.85,0.38);
+            if(tag.Contains("IP")) lg = new TLegend(0.65,0.7,0.85,0.88);
             lg->AddEntry(hh,"Purity","l");
             lg->AddEntry(holay,"Completeness","l");
             lg->Draw("same");
 
+          }
+
+          else if(tag.Contains("sigma11") && tag.Contains("Mean")){
+            // Get the name of raw shower histogram
+            TRegexp re("sigma11");
+            TString name = tag;
+            name(re) = "sigma22";
+            TH1D *holay = (TH1D*)lout->FindObject(name);
+            hh->SetMinimum(0);
+            hh->SetMaximum(0.5);
+            hh->SetLineColor(kRed);
+            hh->SetLineWidth(2);
+            hh->DrawCopy("HIST c");
+            hh->SetFillColor(kRed);
+            hh->SetFillStyle(3001);
+            hh->SetFillColorAlpha(kRed, 0.35);
+            hh->Draw("e2same");
+            
+            holay->SetLineColor(kBlue);
+            holay->SetLineWidth(2);
+            holay->DrawCopy("SAME HIST c"); 
+            holay->SetFillColor(kBlue);
+            holay->SetFillStyle(3001);
+            holay->SetFillColorAlpha(kBlue, 0.35);
+            holay->Draw("e2same");
+            
+            auto lg = new TLegend(0.65,0.7,0.85,0.88);
+            lg->AddEntry(hh,"Leading #gamma","l");
+            lg->AddEntry(holay,"Subleading #gamma","l");
+            lg->Draw("same");
           }
           else {
             hh->Draw("hist");
@@ -700,6 +851,12 @@ void PlotUtils::DrawHist(TList *lout, const double plotscale, TList * overlayLis
       // Draw legend if needed
       if(tag.Contains("stkTruth")){
         const TString tag = hstk->GetName();
+        hstk->GetYaxis()->SetTitle("Candidates");
+        hstk->GetXaxis()->SetTitle("#delta#alpha_{T} (deg)");
+        if(tag.Contains("stkTruthPn")){
+          hstk->GetXaxis()->SetTitle("p_{n} (GeV/c)");
+        }
+        
         // Get the name of raw shower histogram
         TRegexp re("stk");
         TString tmp = tag;
@@ -714,10 +871,11 @@ void PlotUtils::DrawHist(TList *lout, const double plotscale, TList * overlayLis
         TH1D *hhNp0n = (TH1D*)lout->FindObject(nameNp0n); 
         TH1D *hh1pMn = (TH1D*)lout->FindObject(name1pMn); 
         TH1D *hhNpMn = (TH1D*)lout->FindObject(nameNpMn); 
-        double lxoff = 0.5;
-        if(tmp.Contains("Dalphat") || tmp.Contains("MomIniPi") || tmp.Contains("ThetaIniPi")) lxoff = 0.05;
-        TLegend * lg = new TLegend(lxoff+0.15, 0.65, lxoff+0.35, 0.85);
-        TString lheader("signal phase space");
+        SetTitleFormat(hstk,false);
+        double lxoff = 0.45;
+        if(tmp.Contains("Dalphat") || tmp.Contains("MomIniPi") || tmp.Contains("ThetaIniPi")) lxoff = 0.03;
+        TLegend * lg = new TLegend(lxoff+0.15, 0.58, lxoff+0.38, 0.88);
+        TString lheader("0.45<p_{p}<1, p^{s.l.}_{p}<0.45");
         lg->SetHeader(lheader);
         lg->AddEntry(hh1p0n, "1p0n", "f");
         lg->AddEntry(hhNp0n, "Np0n", "f");
@@ -742,7 +900,7 @@ void PlotUtils::DrawHist(TList *lout, const double plotscale, TList * overlayLis
           //  pad1->SetGridy();
           pad1->Draw();
           pad1->cd();
-
+        
           // Scale data to MC
           ScaleStack(hstk, plotscale);
 
@@ -750,15 +908,23 @@ void PlotUtils::DrawHist(TList *lout, const double plotscale, TList * overlayLis
           SetTitleFormat(hstk);
 
           TH1D * hsum = dynamic_cast<TH1D*> (hstk->GetStack()->Last());
-          hstk->SetMaximum(hsum->GetMaximum()*1.2); 
+          hstk->SetMaximum(hsum->GetMaximum()*1.2);
+          if(tag.Contains("Pi0Energy_COMPOSE")) hstk->SetMaximum(hsum->GetMaximum()*1.7);
           hstk->Draw("nostack HIST");
           DrawOverlay(holay);
+          if(tag.Contains("Mass")){
+            double ymax = hsum->GetMaximum()*1.2;
+            TLine *line = new TLine(0.134977,0,0.134977,ymax);
+            line->SetLineColor(kGray+3);
+            line->SetLineStyle(2);
+            line->Draw("sames");
+          }
 
           hsum->SetLineColor(9);
           hsum->SetLineWidth(3);
           hsum->SetFillStyle(0);
           hsum->Draw("same HIST");
-          auto* legend = new TLegend(0.65, 0.6, 0.89, 0.88);
+          auto* legend = new TLegend(0.55, 0.55, 0.89, 0.88);
           // Cheat Legend
           TH1D * h1 = 0x0;
           TH1D * h2 = 0x0;
@@ -955,7 +1121,7 @@ void PlotUtils::DrawHist(TList *lout, const double plotscale, TList * overlayLis
         holay_Pi0->SetLineColor(kRed);
         holay_Pi0->SetLineWidth(3);
         holay_Pi0->Draw("same");
-        auto* legend = new TLegend(0.65, 0.65, 0.85, 0.85);
+        auto* legend = new TLegend(0.55, 0.55, 0.85, 0.85);
         // Cheat Legend
         TH1D * E1 = 0x0;
         TH1D * E2 = 0x0;
@@ -1087,8 +1253,10 @@ void PlotUtils::ScaleStack(THStack *stk, const double scale)
   }
 }
 
-TH2D * PlotUtils::NormalHist(const TH2D *hraw, const Double_t thres, const Bool_t kmax, TH1D * &hmean)
+TH2D * PlotUtils::NormalHist(const TH2D *hraw, const Double_t thres, const Bool_t kmax, TH1D * &hmean, TH1D * &hcdf)
 {
+  hcdf = GetCDF(hraw, Form("%s_cdf",hraw->GetName()));
+
   TH2D *hh=(TH2D*)hraw->Clone(Form("%s_nor",hraw->GetName()));
   hh->Scale(0);
 
@@ -1340,6 +1508,36 @@ void PlotUtils::getProfileFit(TH2D * h2d)
   cctmp->Print("output/hprof_withP.png");
 }
 
+TH1D * PlotUtils::GetCDF(const TH2D *hraw, const TString hname){
+
+  TH1D * hcdf = hraw->ProjectionX(hname);
+  TH1D * hold = (TH1D*) hcdf->Clone("hold");
+
+  hcdf->Scale(0);
+
+  const Int_t n2 = hold->GetNbinsX()+1;
+  const Double_t ntot = hold->Integral(0, n2);
+
+  for(Int_t ii=0; ii<= n2; ii++){
+    const Double_t num = hold->Integral(0, ii);
+    if(num<EPSILON){
+      continue;
+    }
+
+    const Double_t nee = TMath::Sqrt(num);
+
+    const Double_t fra = num/(ntot+EPSILON);
+    const Double_t fee = nee/(ntot+EPSILON);
+
+    hcdf->SetBinContent(ii, fra);
+    hcdf->SetBinError(ii, fee);
+  }
+
+  delete hold;
+
+  return hcdf;
+}
+
 void PlotUtils::DrawOverlay(TH1D *holay)
 {
   holay->SetMarkerStyle(8);
@@ -1368,6 +1566,29 @@ void PlotUtils::getSliceXDrawY(TH2D * h2d)
     hpj->Draw();
   }  
     cc->Print("output/hSliceXDrawY.png");
+}
+
+
+void PlotUtils::xSlicedSigma(TH2D * h2d, TString tag)
+{ 
+  const TString name = h2d->GetName();
+  for(int ii=1; ii<=h2d->GetNbinsX(); ii++){
+    TH1D * hpj= h2d->ProjectionY(Form("ftmp%d",ii), ii, ii);
+    if (hpj->GetEntries() != 0) {
+      //double bin_center = hpj->GetBinCenter(ii);
+      //cout << "bin_center: " << bin_center << " mean: " << mean << endl;
+      if(tag.Contains("11")){
+        AnaIO::hsigma11Mean->SetBinContent(ii,hpj->GetMean());
+        AnaIO::hsigma11Mean->SetBinError(ii,hpj->GetMeanError());
+      }
+      if(tag.Contains("22")){
+        AnaIO::hsigma22Mean->SetBinContent(ii,hpj->GetMean());
+        AnaIO::hsigma22Mean->SetBinError(ii,hpj->GetMeanError());
+      }
+      
+    }
+    
+  }
 }
 
 void PlotUtils::xSlicedEnergyCorrection(TH2D * h2d)
@@ -1511,8 +1732,13 @@ TLegend *PlotUtils::DrawLegend(const vector<TString> &entries, const vector<TStr
 
   //SetGlobalStyle();
   TLegend * lg = 0x0;
-  lg = new TLegend(0.5, 0.58, 0.88, 0.88);
-  if(tag.Contains("COMPOSE")) lg = new TLegend(0.4, 0.65, 0.85, 0.85);
+  // Larger legend box
+  //lg = new TLegend(0.55, 0.58, 0.88, 0.88);
+  lg = new TLegend(0.65, 0.68, 0.88, 0.88);
+  if(tag.Contains("COMPOSE")){
+    lg = new TLegend(0.4, 0.55, 0.88, 0.88);
+    if(tag.Contains("LOG")) lg = new TLegend(0.4, 0.6, 0.88, 0.9);
+  }
 
   for(int ii=0; ii<nent; ii++){
     TH1D * hh=new TH1D(Form("h%d%s",ii,tag.Data()),"",1,0,1);
@@ -1540,6 +1766,8 @@ TH1D * PlotUtils::GetRecEfficiency(TH1 * hh, TH1D * htrue, const TString tag){
   hEff->Scale(0);
   const int nx = hh->GetNbinsX();
   cout << tag.Data() << " rec Eff: " << hh->Integral(0,10000)/htrue->Integral(0,10000) << endl;
+  cout << "num: " << hh->Integral(0,10000) << endl;
+  cout << "demo: " << htrue->Integral(0,10000) << endl;
   for(int ix=0; ix<=nx+1; ix++){
     const double ientry = hh->GetBinContent(ix);
     const double error = hh->GetBinError(ix);

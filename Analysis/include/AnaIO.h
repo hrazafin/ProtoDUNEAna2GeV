@@ -40,6 +40,7 @@ namespace AnaIO
   //====================== Reco Beam ======================//
   // Declare variables
   Int_t           event = -999;
+  Bool_t          reco_reconstructable_beam_event;
   Int_t           reco_beam_type = -999;
   Double_t        reco_beam_startX;
   Double_t        reco_beam_startY;
@@ -54,6 +55,8 @@ namespace AnaIO
   Double_t        reco_beam_trackEndDirY;
   Double_t        reco_beam_trackEndDirZ;
   Double_t        reco_beam_interactingEnergy;
+  Double_t        reco_beam_Chi2_proton;
+  Int_t           reco_beam_Chi2_ndof;
   vector<double>  *reco_beam_calibrated_dEdX_SCE = 0x0;
 
   // Beam new variables with possible SCE correction
@@ -63,6 +66,8 @@ namespace AnaIO
   Double_t        reco_beam_calo_endX;
   Double_t        reco_beam_calo_endY;
   Double_t        reco_beam_calo_endZ;
+  Double_t        reco_beam_momByRange_alt_muon;
+  Double_t        reco_beam_momByRange_muon;
   vector<double>  *reco_beam_calo_startDirX;
   vector<double>  *reco_beam_calo_startDirY;
   vector<double>  *reco_beam_calo_startDirZ;
@@ -74,8 +79,10 @@ namespace AnaIO
   Double_t        reco_beam_vertex_michel_score;
   Int_t           reco_beam_vertex_nHits;
 
+  Int_t           reco_beam_PFP_nHits;;
   Double_t        reco_beam_PFP_emScore_collection;
   Double_t        reco_beam_PFP_emScore_collection_weight_by_charge;
+  Double_t        reco_beam_vertex_michel_score_weight_by_charge;
 
   Int_t           reco_beam_true_byHits_PDG;
   Double_t        reco_beam_true_byHits_startPx;
@@ -95,6 +102,7 @@ namespace AnaIO
   vector<int>             *reco_daughter_PFP_nHits = 0x0; 
   vector<int>             *reco_daughter_PFP_nHits_collection = 0x0; 
   vector<double>          *reco_daughter_PFP_trackScore_collection = 0x0;
+  vector<double>          *reco_daughter_PFP_emScore = 0x0;
   vector<double>          *reco_daughter_PFP_emScore_collection = 0x0;
   vector<double>          *reco_daughter_PFP_michelScore_collection =0x0;
   vector<int>             *reco_daughter_allTrack_ID = 0x0;
@@ -118,6 +126,8 @@ namespace AnaIO
   vector<double>          *reco_daughter_allShower_dirZ=0x0;
   vector<double>          *reco_daughter_allShower_energy=0x0;
 
+  vector<int>             *reco_daughter_pandora_type = 0x0;
+
   // Declare histograms
   // Class A - beam cut related
   TH1I * hCutBeamPDGPass = 0x0;
@@ -126,7 +136,7 @@ namespace AnaIO
   TH1I * hCutBeamQualityPass = 0x0;
   TH1I * hCutAPA3EndZPass = 0x0;
   TH1I * hCutMichelScorePass = 0x0;
-  TH1I * hCutMediandEdxPass = 0x0;
+  TH1I * hCutProtonChi2Pass = 0x0;
 
   TH1D * hRecBeamStartX = 0x0;
   TH1D * hRecBeamStartY = 0x0;
@@ -138,16 +148,19 @@ namespace AnaIO
   TH1D * hCutBeamDeltaZSigma = 0x0;
   TH1D * hCutBeamCosTheta = 0x0;
   TH2D * hCutBeamMichelScoreNhits = 0x0;
-  TH2D * hCutBeamMediandEdx = 0x0;
-  TH1D * hCutBeamMedianType = 0x0;
+  TH2D * hCutBeamProtonChi2DOF = 0x0;
+  TH1D * hCutBeamProtonChi2DOFType = 0x0;
   TH2D * hCutBeamQualityXY = 0x0;
   TH2D * hCutBeamQualityX = 0x0;
   TH2D * hCutBeamQualityY = 0x0;
   TH2D * hCutBeamQualityZ = 0x0;
   TH2D * hCutBeamQualityTheta = 0x0;
+  TH2D * hCutAPA3EndZ = 0x0;
 
   TH2D * hBeamemScore = 0x0;
   TH2D * hBeamemScore_wbc = 0x0;
+  TH2D * hBeamDaughterNumbers = 0x0;
+  TH2D * hBeamGrandDaughterNumbers = 0x0;
 
 
   // Class B - reconstructed beam/FS particles
@@ -174,9 +187,20 @@ namespace AnaIO
   TH2D * hRecPi0MomentumRaw = 0x0;
 
   TH2D * hRecPi0Mass_OVERLAY = 0x0;
+  TH2D * hRecPi0MassRaw_OVERLAY = 0x0;
   TH2D * hRecPi0Momentum_OVERLAY = 0x0;
+  TH2D * hRecPi0MomentumRaw_OVERLAY = 0x0;
   TH2D * hRecPi0OA_OVERLAY = 0x0;
+  TH2D * hRecPi0OARaw_OVERLAY = 0x0;
   TH2D * hRecPi0Energy_OVERLAY = 0x0;
+
+  TH2D * hRecPi0Theta_OVERLAY = 0x0;
+  TH2D * hRecPi0Phi_OVERLAY = 0x0;
+
+  TH2D * hRecPi0ThetaRaw_OVERLAY = 0x0;
+  TH2D * hRecPi0PhiRaw_OVERLAY = 0x0;
+
+  TH2D * hRecPi0Energy_OVERLAY_After = 0x0;
 
   TH1D * hPi0MassLowE1 = 0x0;
   TH1D * hPi0MassHighE1 = 0x0;
@@ -203,6 +227,7 @@ namespace AnaIO
   TH2D * hpn_RES = 0x0;
 
   // FS particle cut
+  TH1I * hCutDaughterPandoraShowerPass = 0x0;
   TH1I * hCutDaughterShowerScorePass = 0x0;
   TH1I * hCutDaughterShowernHitsPass = 0x0;
   TH1I * hCutDaughterShowerNonEmptyEPass = 0x0;
@@ -225,7 +250,18 @@ namespace AnaIO
   TH2D * hCutnmichel = 0x0;
   TH2D * hCutnpi0 = 0x0;
 
+  TH2D * hCutShowerStartX = 0x0;
+  TH2D * hCutShowerStartY = 0x0;
+  TH2D * hCutShowerStartZ = 0x0;
+  TH2D * hShowernHitsColl = 0x0;
+
   TH2D * hNhitsCollection = 0x0;
+
+  TH2D * htrackScoreCollection = 0x0;
+  TH2D * hemScoreCollection = 0x0;
+  TH2D * hmichelScoreCollection = 0x0;
+
+  TH2D * hShowerAngleOffset = 0x0;
   
   //====================== Reco (Data only)======================//
   // Declare variables
@@ -234,9 +270,10 @@ namespace AnaIO
   Double_t        beam_inst_dirX;
   Double_t        beam_inst_dirY;
   Double_t        beam_inst_dirZ;
+  Int_t           beam_inst_trigger;
   Int_t           beam_inst_nMomenta;
   Int_t           beam_inst_nTracks;
-  vector<int> *beam_inst_PDG_candidates = 0x0;
+  vector<int> *   beam_inst_PDG_candidates = 0x0;
   
   //====================== Truth (MC only)======================//
   // Declare variables
@@ -262,6 +299,9 @@ namespace AnaIO
   vector<double> *true_beam_daughter_startX = 0x0;
   vector<double> *true_beam_daughter_startY = 0x0;
   vector<double> *true_beam_daughter_startZ = 0x0;
+  vector<double> *true_beam_daughter_endX = 0x0;
+  vector<double> *true_beam_daughter_endY = 0x0;
+  vector<double> *true_beam_daughter_endZ = 0x0;
 
   vector<int> *true_beam_daughter_ID = 0x0;  
   vector<int> *true_beam_daughter_PDG = 0x0;
@@ -309,6 +349,9 @@ namespace AnaIO
   TH1D * hTruthPi0OA = 0x0;
   TH1D * hTruthLeadingPi0GammaOA = 0x0;
   TH1D * hTruthSubLeadingPi0GammaOA = 0x0;
+
+  TH1D * hTruthLeadingPiZeroGammaDist = 0x0;
+  TH1D * hTruthSubLeadingPiZeroGammaDist = 0x0;
 
   TH2D * hTruthPi0GammaEnergy = 0x0;
   TH1D * hTruthRarePi0GammaP = 0x0;
@@ -478,6 +521,11 @@ namespace AnaIO
   TH2D * hPi0MomentumResFit = 0x0;
   TH2D * hPi0MassResFit = 0x0;
 
+  TH2D * hPi0ThetaRes = 0x0;
+  TH2D * hPi0ThetaResRaw = 0x0;
+  TH2D * hPi0PhiRes = 0x0;
+  TH2D * hPi0PhiResRaw = 0x0;
+
   TH1D * hMatchedTruthPi0Momentum = 0x0;
   TH1D * hMatchedTruthldShowerTheta = 0x0;
   TH1D * hMatchedTruthslShowerTheta = 0x0;
@@ -489,8 +537,8 @@ namespace AnaIO
   TH1D * hMatchedTruthldShowerOA = 0x0;
   TH1D * hMatchedTruthslShowerOA = 0x0;
 
-  TH2D * hPi0ThetaRes = 0x0;
-  TH2D * hPi0PhiRes = 0x0;
+  TH2D * hPi0ThetaResFit = 0x0;
+  TH2D * hPi0PhiResFit = 0x0;
   TH2D * hPi0MomRes = 0x0;
   TH2D * hPi0MomPreRes = 0x0;
 
@@ -517,6 +565,12 @@ namespace AnaIO
   TH2D * hBinSize_4x4 = 0x0;
 
   TH2D * hCVM = 0x0;
+
+  TH2D * hsigma11 = 0x0;
+  TH1D * hsigma11Mean = 0x0;
+
+  TH2D * hsigma22 = 0x0;
+  TH1D * hsigma22Mean = 0x0;
 
   TH2D * hShowerE1PreFitRes = 0x0;
   TH2D * hShowerE1PostFitRes = 0x0;
@@ -555,9 +609,17 @@ namespace AnaIO
   TH1D * hPi0MomEOA = 0x0;
   TH1D * hPi0MomAsym = 0x0;
 
+  TH1D * hPrePi0MomNorm = 0x0;
+  TH1D * hPrePi0MomEOA = 0x0;
+  TH1D * hPrePi0MomAsym = 0x0;
+
   TH1D * hPi0MomComparePaper = 0x0;
   TH1D * hPi0MomComparePostPaper = 0x0;
   TH1D * hPi0MomComparePrePaper = 0x0;
+
+  TH1D * hPi0MomCompareStandard = 0x0;
+  TH1D * hPi0MomComparePostStandard = 0x0;
+  TH1D * hPi0MomComparePreStandard = 0x0;
 
   TH2D * hShowerE1Compare_REG = 0x0;
   TH2D * hShowerE2Compare_REG = 0x0;
@@ -565,10 +627,13 @@ namespace AnaIO
   TH2D * hPi0MomCompare_REG = 0x0;
 
   TH2D * hPi0MomCompare_REGPaper = 0x0;
+  TH2D * hPi0MomCompare_REGStand = 0x0;
 
   TH1D * hLDShowerE = 0x0;
   TH1D * hSLShowerE = 0x0;
   TH1D * hOAShower = 0x0;
+
+  TH1D * hKFPassRate = 0x0;
 
   // Completeness and Purity
   TH2D * hTrackPurityVSnHits = 0x0;
@@ -605,6 +670,7 @@ namespace AnaIO
     // Set Branch values
     //====================== Reco (MC and Data)======================// 
     tree->SetBranchAddress("event", &event); 
+    tree->SetBranchAddress("reco_reconstructable_beam_event", &reco_reconstructable_beam_event);
     tree->SetBranchAddress("reco_beam_type", &reco_beam_type);  
     tree->SetBranchAddress("reco_beam_startX", &reco_beam_startX);
     tree->SetBranchAddress("reco_beam_startY", &reco_beam_startY);
@@ -620,6 +686,8 @@ namespace AnaIO
     tree->SetBranchAddress("reco_beam_trackEndDirZ", &reco_beam_trackEndDirZ);
     tree->SetBranchAddress("reco_beam_interactingEnergy", &reco_beam_interactingEnergy);
     tree->SetBranchAddress("reco_beam_calibrated_dEdX_SCE", &reco_beam_calibrated_dEdX_SCE);
+    tree->SetBranchAddress("reco_beam_Chi2_proton",&reco_beam_Chi2_proton);
+    tree->SetBranchAddress("reco_beam_Chi2_ndof",&reco_beam_Chi2_ndof);
 
     tree->SetBranchAddress("reco_beam_calo_startX", &reco_beam_calo_startX);
     tree->SetBranchAddress("reco_beam_calo_startY", &reco_beam_calo_startY);
@@ -627,6 +695,9 @@ namespace AnaIO
     tree->SetBranchAddress("reco_beam_calo_endX", &reco_beam_calo_endX);
     tree->SetBranchAddress("reco_beam_calo_endY", &reco_beam_calo_endY);
     tree->SetBranchAddress("reco_beam_calo_endZ", &reco_beam_calo_endZ);
+    tree->SetBranchAddress("reco_beam_momByRange_muon", &reco_beam_momByRange_muon);
+    tree->SetBranchAddress("reco_beam_momByRange_alt_muon", &reco_beam_momByRange_alt_muon);
+
     tree->SetBranchAddress("reco_beam_calo_startDirX", &reco_beam_calo_startDirX);
     tree->SetBranchAddress("reco_beam_calo_startDirY", &reco_beam_calo_startDirY);
     tree->SetBranchAddress("reco_beam_calo_startDirZ", &reco_beam_calo_startDirZ);
@@ -636,8 +707,10 @@ namespace AnaIO
     tree->SetBranchAddress("reco_beam_calo_wire", &reco_beam_calo_wire);
     tree->SetBranchAddress("reco_beam_vertex_michel_score", &reco_beam_vertex_michel_score);
     tree->SetBranchAddress("reco_beam_vertex_nHits", &reco_beam_vertex_nHits);
+    tree->SetBranchAddress("reco_beam_PFP_nHits", &reco_beam_PFP_nHits);  
     tree->SetBranchAddress("reco_beam_PFP_emScore_collection",&reco_beam_PFP_emScore_collection);
     tree->SetBranchAddress("reco_beam_PFP_emScore_collection_weight_by_charge",&reco_beam_PFP_emScore_collection_weight_by_charge);
+    tree->SetBranchAddress("reco_beam_vertex_michel_score_weight_by_charge",&reco_beam_vertex_michel_score_weight_by_charge);
 
     tree->SetBranchAddress("reco_beam_true_byHits_PDG", &reco_beam_true_byHits_PDG);
     tree->SetBranchAddress("reco_beam_true_byHits_endPx", &reco_beam_true_byHits_endPx);
@@ -656,6 +729,7 @@ namespace AnaIO
     tree->SetBranchAddress("reco_daughter_PFP_nHits", &reco_daughter_PFP_nHits);
     tree->SetBranchAddress("reco_daughter_PFP_nHits_collection", &reco_daughter_PFP_nHits_collection);
     tree->SetBranchAddress("reco_daughter_PFP_trackScore_collection", &reco_daughter_PFP_trackScore_collection);
+    tree->SetBranchAddress("reco_daughter_PFP_emScore", &reco_daughter_PFP_emScore);
     tree->SetBranchAddress("reco_daughter_PFP_emScore_collection", &reco_daughter_PFP_emScore_collection);
     tree->SetBranchAddress("reco_daughter_PFP_michelScore_collection", &reco_daughter_PFP_michelScore_collection);
     tree->SetBranchAddress("reco_daughter_allTrack_ID", &reco_daughter_allTrack_ID);
@@ -679,6 +753,8 @@ namespace AnaIO
     tree->SetBranchAddress("reco_daughter_allShower_dirZ", &reco_daughter_allShower_dirZ);
     tree->SetBranchAddress("reco_daughter_allShower_energy", &reco_daughter_allShower_energy);
 
+    tree->SetBranchAddress("reco_daughter_pandora_type", &reco_daughter_pandora_type);
+
     //====================== Reco (Data only)======================//
     tree->SetBranchAddress("beam_inst_PDG_candidates", &beam_inst_PDG_candidates);
     tree->SetBranchAddress("beam_inst_X", &beam_inst_X);
@@ -686,6 +762,7 @@ namespace AnaIO
     tree->SetBranchAddress("beam_inst_dirX", &beam_inst_dirX);
     tree->SetBranchAddress("beam_inst_dirY", &beam_inst_dirY);
     tree->SetBranchAddress("beam_inst_dirZ", &beam_inst_dirZ);
+    tree->SetBranchAddress("beam_inst_trigger", &beam_inst_trigger); 
     tree->SetBranchAddress("beam_inst_nMomenta", &beam_inst_nMomenta);
     tree->SetBranchAddress("beam_inst_nTracks", &beam_inst_nTracks);
 
@@ -712,6 +789,9 @@ namespace AnaIO
     tree->SetBranchAddress("true_beam_daughter_startX", &true_beam_daughter_startX);
     tree->SetBranchAddress("true_beam_daughter_startY", &true_beam_daughter_startY);
     tree->SetBranchAddress("true_beam_daughter_startZ", &true_beam_daughter_startZ);
+    tree->SetBranchAddress("true_beam_daughter_endX", &true_beam_daughter_endX);
+    tree->SetBranchAddress("true_beam_daughter_endY", &true_beam_daughter_endY);
+    tree->SetBranchAddress("true_beam_daughter_endZ", &true_beam_daughter_endZ);
    
     tree->SetBranchAddress("true_beam_daughter_ID", &true_beam_daughter_ID); 
     tree->SetBranchAddress("true_beam_daughter_PDG", &true_beam_daughter_PDG);
@@ -799,8 +879,8 @@ namespace AnaIO
     lout->Add(hCutAPA3EndZPass);
     hCutMichelScorePass = new TH1I("a006hCutMichelScorePass",";Fail/Pass;Candidates", nPass, Passmin, Passmax);
     lout->Add(hCutMichelScorePass);
-    hCutMediandEdxPass = new TH1I("a007hCutMediandEdxPass",";Fail/Pass;Candidates", nPass, Passmin, Passmax);
-    lout->Add(hCutMediandEdxPass);
+    hCutProtonChi2Pass = new TH1I("a007hCutProtonChi2Pass",";Fail/Pass;Candidates", nPass, Passmin, Passmax);
+    lout->Add(hCutProtonChi2Pass);
     hRecBeamStartX = new TH1D("a008hRecBeamStartX_FCN",";StartX (cm);Area Normalised",100, -80, 20);
     lout->Add(hRecBeamStartX);
     hRecBeamStartY = new TH1D("a009hRecBeamStartY_FCN",";StartY (cm);Area Normalised",100, 350, 500);
@@ -813,7 +893,7 @@ namespace AnaIO
     lout->Add(hRecBeamThetaY);
     hRecBeamThetaZ = new TH1D("a013hRecBeamThetaZ_FCN",";Angle #theta_{z} (deg);Area Normalised",100, 5, 45);
     lout->Add(hRecBeamThetaZ);
-    hCutBeamDeltaXYSigma = new TH1D("a014hCutBeamDeltaXYSigma","",100, -10, 10);
+    hCutBeamDeltaXYSigma = new TH1D("a014hCutBeamDeltaXYSigma","",100, 0, 20);
     lout->Add(hCutBeamDeltaXYSigma);
     hCutBeamDeltaZSigma = new TH1D("a015hCutBeamDeltaZSigma","",100, -10, 10);
     lout->Add(hCutBeamDeltaZSigma);
@@ -821,10 +901,10 @@ namespace AnaIO
     lout->Add(hCutBeamCosTheta);
     hCutBeamMichelScoreNhits = new TH2D("a017hCutBeamMichelScoreNhits_STK","",100, 0, 1, 8, 0.5, 8.5);
     lout->Add(hCutBeamMichelScoreNhits);
-    hCutBeamMediandEdx = new TH2D("a018hCutBeamMediandEdx_STK","", 100, 1, 11, 8, 0.5, 8.5); 
-    lout->Add(hCutBeamMediandEdx);
-    hCutBeamMedianType = new TH1D("a019hCutBeamMedianType","",23, -0.5, 22.5);
-    lout->Add(hCutBeamMedianType);
+    hCutBeamProtonChi2DOF = new TH2D("a018hCutBeamProtonChi2DOF_STK","", 100, 0, 350, 8, 0.5, 8.5); 
+    lout->Add(hCutBeamProtonChi2DOF);
+    hCutBeamProtonChi2DOFType = new TH1D("a019hCutBeamProtonChi2DOFType","",23, -0.5, 22.5);
+    lout->Add(hCutBeamProtonChi2DOFType);
     hCutBeamQualityXY = new TH2D("a020hCutBeamQualityXY_STK","", 100, 0, 20, 8, 0.5, 8.5); 
     lout->Add(hCutBeamQualityXY);
     hCutBeamQualityX = new TH2D("a021hCutBeamQualityX_STK","", 100, -10, 10, 8, 0.5, 8.5); 
@@ -836,11 +916,19 @@ namespace AnaIO
     hCutBeamQualityTheta = new TH2D("a024hCutBeamQualityTheta_STK","", 100, 0.9, 1, 8, 0.5, 8.5); 
     lout->Add(hCutBeamQualityTheta);
 
+    hCutAPA3EndZ = new TH2D("a025hCutAPA3EndZ_STK",";End Z (cm);Candidates", 100, 0, 500, 8, 0.5, 8.5); 
+    lout->Add(hCutAPA3EndZ);
+
     hBeamemScore = new TH2D("a025hBeamemScore_STK",";Beam EM Shower Score;Candidates", 50, 0, 1, 8, 0.5, 8.5); 
     lout->Add(hBeamemScore);
 
     hBeamemScore_wbc = new TH2D("a026hBeamemScore_wbc_STK",";Beam EM Shower Score;Candidates", 50, 0, 1, 8, 0.5, 8.5); 
     lout->Add(hBeamemScore_wbc);
+
+    hBeamDaughterNumbers = new TH2D("a027hBeamDaughterNumbers_STK",";Number of Daughter Particles;Candidates", 15, 0, 15, 8, 0.5, 8.5); 
+    lout->Add(hBeamDaughterNumbers);
+    hBeamGrandDaughterNumbers = new TH2D("a028hBeamGrandDaughterNumbers_STK",";Number of Grand Daughter Particles;Candidates", 15, 0, 15, 8, 0.5, 8.5); 
+    lout->Add(hBeamGrandDaughterNumbers);
 
     // Class B - reconstructed beam/FS particles
     hRecBeamTheta = new TH2D("b001hRecBeamTheta_STK",";Beam #theta (deg);Candidates", 80 , 0, 60, 3, -0.5, 2.5); 
@@ -849,11 +937,11 @@ namespace AnaIO
     lout->Add(hRecBeamMomentum);
     hRecProtonTheta = new TH2D("b003hRecProtonTheta_STK",";Proton #theta (deg);Candidates",  20, 0, 180, nparType, parTypemin, parTypemax);
     lout->Add(hRecProtonTheta);
-    hRecProtonMomentum = new TH2D("b004hRecProtonMomentum_STK",";Beam Momentum (GeV/c);Candidates",  20, 0.1, 1.3, nparType, parTypemin, parTypemax); 
+    hRecProtonMomentum = new TH2D("b004hRecProtonMomentum_STK",";Proton Momentum (GeV/c);Candidates",  20, 0.1, 1.3, nparType, parTypemin, parTypemax); 
     lout->Add(hRecProtonMomentum);
-    hRecPiPlusTheta = new TH2D("b005hRecPiPlusTheta_STK",";#pi^+ #theta (deg);Candidates", 30, 0, 180, nparType, parTypemin, parTypemax); 
+    hRecPiPlusTheta = new TH2D("b005hRecPiPlusTheta_STK",";#pi^{+} #theta (deg);Candidates", 30, 0, 180, nparType, parTypemin, parTypemax); 
     lout->Add(hRecPiPlusTheta);
-    hRecPiPlusMomentum = new TH2D("b006hRecPiPlusMomentum_STK",";#pi^+ Momentum (GeV/c);Candidates",  20, 0, 1.2, nparType, parTypemin, parTypemax); 
+    hRecPiPlusMomentum = new TH2D("b006hRecPiPlusMomentum_STK",";#pi^{+} Momentum (GeV/c);Candidates",  20, 0, 1.2, nparType, parTypemin, parTypemax); 
     lout->Add(hRecPiPlusMomentum);
     hRecShowerEnergy = new TH2D("b007hRecShowerEnergy_STK",";Shower Energy (GeV);Candidates", 20, 0, 0.5, nparType, parTypemin, parTypemax); 
     lout->Add(hRecShowerEnergy);
@@ -904,7 +992,34 @@ namespace AnaIO
     hRecPi0ShowerSep_OVERLAY = new TH2D("b024hRecPi0ShowerSep_COMPOSE",";Shower Separation (cm);Candidates", 20, 0, 150, 3, -0.5, 3.5);
     lout->Add(hRecPi0ShowerSep_OVERLAY);
 
+    hRecPi0MassRaw_OVERLAY = new TH2D("b025hRecPi0MassRaw_COMPOSE",";#pi^{0} Mass (GeV/c^{2});Candidates", 20, 0, 0.5, 3, -0.5, 3.5); 
+    lout->Add(hRecPi0MassRaw_OVERLAY);
+
+    hRecPi0MomentumRaw_OVERLAY = new TH2D("b026hRecPi0MomentumRaw_COMPOSE",";#pi^{0} Momentum (GeV/c);Candidates", 20, 0, 1, 3, -0.5, 3.5); 
+    lout->Add(hRecPi0MomentumRaw_OVERLAY);
+
+    hRecPi0OARaw_OVERLAY = new TH2D("b024hRecPi0OARaw_COMPOSE",";Shower Opening Angle (deg);Candidates", 20, 0, 180, 3, -0.5, 3.5); 
+    lout->Add(hRecPi0OARaw_OVERLAY);
+
+    hRecPi0Theta_OVERLAY = new TH2D("b027hRecPi0Theta_COMPOSE",";#pi^{0} #theta Angle (deg);Candidates", 20, 0, 180, 3, -0.5, 3.5); 
+    lout->Add(hRecPi0Theta_OVERLAY);
+
+    hRecPi0Phi_OVERLAY = new TH2D("b028hRecPi0Phi_COMPOSE",";#pi^{0} #phi Angle (deg);Candidates", 20, -180, 180, 3, -0.5, 3.5); 
+    lout->Add(hRecPi0Phi_OVERLAY);
+
+    hRecPi0ThetaRaw_OVERLAY = new TH2D("b029hRecPi0Theta_COMPOSE",";#pi^{0} #theta Angle Raw (deg);Candidates", 20, 0, 180, 3, -0.5, 3.5); 
+    lout->Add(hRecPi0ThetaRaw_OVERLAY);
+
+    hRecPi0PhiRaw_OVERLAY = new TH2D("b030hRecPi0Phi_COMPOSE",";#pi^{0} #phi Angle Raw (deg);Candidates", 20, -180, 180, 3, -0.5, 3.5); 
+    lout->Add(hRecPi0PhiRaw_OVERLAY);
+
+
+    hRecPi0Energy_OVERLAY_After = new TH2D("b0233hRecPi0Energy_COMPOSE_After",";#pi^{0} Energy (GeV);Candidates", 20, 0, 1, 3, -0.5, 3.5); 
+    lout->Add(hRecPi0Energy_OVERLAY_After);
+
     // Class C - event topoplogy cut related
+    hCutDaughterPandoraShowerPass = new TH1I("c000hCutDaughterPandoraShowerPass",";Fail/Pass;Candidates", nPass, Passmin, Passmax); 
+    lout->Add(hCutDaughterPandoraShowerPass);
     hCutDaughterShowerScorePass = new TH1I("c001hCutDaughterShowerScorePass",";Fail/Pass;Candidates", nPass, Passmin, Passmax); 
     lout->Add(hCutDaughterShowerScorePass);
     hCutDaughterShowernHitsPass = new TH1I("c002hCutDaughterShowernHitsPass",";Fail/Pass;Candidates", nPass, Passmin, Passmax); 
@@ -947,6 +1062,28 @@ namespace AnaIO
     hCutnpi0 = new TH2D("c012hCutnpi0_STK",";Number of #pi^{0};Candidates", ncounter, countermin, countermax, nevtType, evtTypemin, evtTypemax); 
     lout->Add(hCutnpi0);
 
+    hCutShowerStartX = new TH2D("c015hCutShowerStartX_STK",";StartX (cm);Candidates", 30, -100, 20, nparType, parTypemin, parTypemax); 
+    lout->Add(hCutShowerStartX);
+    hCutShowerStartY = new TH2D("c016hCutShowerStartY_STK",";StartY (cm);Candidates", 30, 340, 460, nparType, parTypemin, parTypemax); 
+    lout->Add(hCutShowerStartY);
+    hCutShowerStartZ = new TH2D("c017hCutShowerStartZ_STK",";StartZ (cm);Candidates", 30, 0, 240, nparType, parTypemin, parTypemax); 
+    lout->Add(hCutShowerStartZ);
+    hShowernHitsColl = new TH2D("c018hShowernHitsColl_STK",";Number of Hits -coll.;Candidates", 50, 0, 200, nparType, parTypemin, parTypemax); 
+    lout->Add(hShowernHitsColl);
+
+    htrackScoreCollection = new TH2D("c019htrackScoreCollection_STK",";Track Score -coll.;Candidates", 50, 0, 1, nparType, parTypemin, parTypemax); 
+    lout->Add(htrackScoreCollection);
+    hemScoreCollection = new TH2D("c019hemScoreCollection_STK",";EM Score -coll.;Candidates", 50, 0, 1, nparType, parTypemin, parTypemax); 
+    lout->Add(hemScoreCollection);
+    hmichelScoreCollection = new TH2D("c019hmichelScoreCollection_STK",";Michel Score -coll.;Candidates", 50, 0, 0.3, nparType, parTypemin, parTypemax); 
+    lout->Add(hmichelScoreCollection);
+
+    hShowerAngleOffset = new TH2D("c020hShowerAngleOffset_STK",";Shower Angle Offset;Candidates", 30, 0, 180, nparType, parTypemin, parTypemax); 
+    lout->Add(hShowerAngleOffset);
+
+    hKFPassRate = new TH1D("k001hKFPassRate","",  nPass, Passmin, Passmax); 
+    lout->Add(hKFPassRate); 
+
     // Class D - reconstructed TKI variables
     hRecdalphat = new TH2D("d001Recdalphat_STK","", 9, 0, 180,nevtType, evtTypemin, evtTypemax); 
     lout->Add(hRecdalphat);
@@ -985,9 +1122,9 @@ namespace AnaIO
       lout->Add(hTruthLeadingProtonP);
       hTruthSubLeadingProtonP = new TH1D("e007hTruthSubLeadingProtonP", ";Truth SubLeading Proton Mom.(GeV/c);Candidates", 20, 0, 1);
       lout->Add(hTruthSubLeadingProtonP);
-      hTruthLeadingPiZeroP = new TH1D("e008hTruthLeadingPiZeroP", ";Truth Leading #pi^{0} Mom.(GeV/c);Candidates", 20, 0, 1.1);
+      hTruthLeadingPiZeroP = new TH1D("e008hTruthLeadingPiZeroP", ";Truth Leading #pi^{0} Mom.(GeV/c);Candidates", 20, 0, 1);
       lout->Add(hTruthLeadingPiZeroP);
-      hTruthLeadingPiZeroE = new TH1D("e008hTruthLeadingPiZeroE", ";Truth Leading #pi^{0} Energy(GeV);Candidates", 20, 0, 1.1);
+      hTruthLeadingPiZeroE = new TH1D("e008hTruthLeadingPiZeroE", ";Truth Leading #pi^{0} Energy(GeV);Candidates", 20, 0, 1);
       lout->Add(hTruthLeadingPiZeroE);
       hTruthSubLeadingPiZeroP = new TH1D("e009hTruthSubLeadingPiZeroP", ";Truth SubLeading #pi^{0} Mom.(GeV/c);Candidates", 20, 0, 1);
       lout->Add(hTruthSubLeadingPiZeroP);
@@ -995,9 +1132,9 @@ namespace AnaIO
       lout->Add(hTruthGammaMaxE);
       hTruthPi0DecayParticleNumber = new TH1D("e011hTruthPi0DecayParticleNumber", ";Truth #pi^{0} Decay Particle Number;Candidates", 10, -0.5, 9.5);
       lout->Add(hTruthPi0DecayParticleNumber);
-      hTruthLeadingPi0GammaP = new TH1D("e012hTruthLeadingPi0GammaP", ";Truth Leading #gamma Energy (GeV);Candidates", 20, 0, 1.1);
+      hTruthLeadingPi0GammaP = new TH1D("e012hTruthLeadingPi0GammaP", ";Truth Leading #gamma Energy (GeV);Candidates", 20, 0, 1);
       lout->Add(hTruthLeadingPi0GammaP);
-      hTruthSubLeadingPi0GammaP = new TH1D("e013hTruthSubLeadingPi0GammaP", ";Truth SubLeading #gamma Energy (GeV);Candidates", 20, 0, 1.1);
+      hTruthSubLeadingPi0GammaP = new TH1D("e013hTruthSubLeadingPi0GammaP", ";Truth SubLeading #gamma Energy (GeV);Candidates", 20, 0, 1);
       lout->Add(hTruthSubLeadingPi0GammaP);
       hTruthPi0GammaEnergy = new TH2D("e014hTruthPi0GammaEnergy_OVERLAY", ";Truth #gamma Energy (GeV);Candidates", 20, 0, 1, 3, -0.5, 2.5);
       lout->Add(hTruthPi0GammaEnergy);
@@ -1019,6 +1156,11 @@ namespace AnaIO
       lout->Add(hTruthLeadingPi0GammaOA);
       hTruthSubLeadingPi0GammaOA = new TH1D("e023hTruthSubLeadingPi0GammaOA", ";Truth SL Opening Angle;Candidates", 20, 0, 180);
       lout->Add(hTruthSubLeadingPi0GammaOA);
+
+      hTruthLeadingPiZeroGammaDist = new TH1D("e024hTruthLeadingPiZeroGammaDist", ";Truth LD #pi^{0} #gamma Distance (cm);Candidates", 20, 0, 1);
+      lout->Add(hTruthLeadingPiZeroGammaDist);
+      hTruthSubLeadingPiZeroGammaDist = new TH1D("e025hTruthSubLeadingPiZeroGammaDist", ";Truth LD #pi^{0} #gamma Distance (cm);Candidates", 20, 0, 1);
+      lout->Add(hTruthSubLeadingPiZeroGammaDist);
 
       // Class F - truth TKI related 
       hTruthNproton = new TH1I("f001hTruthNproton","",11, -0.5, 10.5); 
@@ -1050,15 +1192,15 @@ namespace AnaIO
       hTruthPn = new TH1D("f014hTruthPn","", 30, 0, 1.2); 
       lout->Add(hTruthPn);
 
-      stkTruthDalphat = new THStack("f100stkTruthDalphat",""); 
+      stkTruthDalphat = new THStack("f100stkTruthDalphat",";#delta#alpha_T (deg);Candidates"); 
       lout->Add(stkTruthDalphat);
-      hTruthDalphat1p0n = new TH1D("f100hTruthDalphat1p0n","", 18, 0, 180); 
+      hTruthDalphat1p0n = new TH1D("f100hTruthDalphat1p0n",";#delta#alpha_T (deg);Candidates", 18, 0, 180); 
       lout->Add(hTruthDalphat1p0n);
-      hTruthDalphatNp0n = new TH1D("f100hTruthDalphatNp0n","", 18, 0, 180); 
+      hTruthDalphatNp0n = new TH1D("f100hTruthDalphatNp0n",";#delta#alpha_T (deg);Candidates", 18, 0, 180); 
       lout->Add(hTruthDalphatNp0n);
-      hTruthDalphat1pMn = new TH1D("f100hTruthDalphat1pMn","", 18, 0, 180); 
+      hTruthDalphat1pMn = new TH1D("f100hTruthDalphat1pMn",";#delta#alpha_T (deg);Candidates", 18, 0, 180); 
       lout->Add(hTruthDalphat1pMn);
-      hTruthDalphatNpMn = new TH1D("f100hTruthDalphatNpMn","", 18, 0, 180); 
+      hTruthDalphatNpMn = new TH1D("f100hTruthDalphatNpMn",";#delta#alpha_T (deg);Candidates", 18, 0, 180); 
       lout->Add(hTruthDalphatNpMn);
       stkTruthDphit = new THStack("f101stkTruthDphit",""); 
       lout->Add(stkTruthDphit);
@@ -1080,15 +1222,15 @@ namespace AnaIO
       lout->Add(hTruthDpt1pMn);
       hTruthDptNpMn = new TH1D("f102hTruthDptNpMn","", 30, 0, 1.2); 
       lout->Add(hTruthDptNpMn);
-      stkTruthPn = new THStack("f103stkTruthPn",""); 
+      stkTruthPn = new THStack("f103stkTruthPn",";#p_n (GeV/c);Candidates"); 
       lout->Add(stkTruthPn);
-      hTruthPn1p0n = new TH1D("f103hTruthPn1p0n","", 30, 0, 1.2); 
+      hTruthPn1p0n = new TH1D("f103hTruthPn1p0n",";#p_n (GeV/c);Candidates", 30, 0, 1.2); 
       lout->Add(hTruthPn1p0n);
-      hTruthPnNp0n = new TH1D("f103hTruthPnNp0n","", 30, 0, 1.2); 
+      hTruthPnNp0n = new TH1D("f103hTruthPnNp0n",";#p_n (GeV/c);Candidates", 30, 0, 1.2); 
       lout->Add(hTruthPnNp0n);
-      hTruthPn1pMn = new TH1D("f103hTruthPn1pMn","", 30, 0, 1.2); 
+      hTruthPn1pMn = new TH1D("f103hTruthPn1pMn",";#p_n (GeV/c);Candidates", 30, 0, 1.2); 
       lout->Add(hTruthPn1pMn);
-      hTruthPnNpMn = new TH1D("f103hTruthPnNpMn","", 30, 0, 1.2); 
+      hTruthPnNpMn = new TH1D("f103hTruthPnNpMn",";#p_n (GeV/c);Candidates", 30, 0, 1.2); 
       lout->Add(hTruthPnNpMn);
       stkTruthMomIniPi = new THStack("f200stkTruthMomIniPi",""); 
       lout->Add(stkTruthMomIniPi);
@@ -1184,9 +1326,9 @@ namespace AnaIO
       lout->Add(hShowerThetaRes);
       hShowerThetaResRaw = new TH2D("g011hShowerThetaRes_RES_RAW",";Shower Theta Raw (deg);Rec. - Truth (deg)", 15, 0, 180, 50, -20, 30);
       lout->Add(hShowerThetaResRaw);
-      hShowerEnergyRes = new TH2D("g012hShowerEnergy_RES",";Shower Energy (GeV);Rec./Truth - 1", 20, 0, 1.2, 50, -1.1, 1.1);
+      hShowerEnergyRes = new TH2D("g012hShowerEnergy_RES",";Truth Photon Energy (GeV);Rec./Truth - 1", 20, 0, 0.8, 50, -1.1, 1.1);
       lout->Add(hShowerEnergyRes);
-      hShowerEnergyResRaw = new TH2D("g013hShowerEnergy_RES_RAW",";Shower Energy Raw (GeV);Rec./Truth - 1", 20, 0, 1.2, 50, -1.1, 1.1);
+      hShowerEnergyResRaw = new TH2D("g013hShowerEnergy_RES_RAW",";Truth Photon Energy(GeV);Rec./Truth - 1", 20, 0, 0.8, 50, -1.1, 1.1);
       lout->Add(hShowerEnergyResRaw);
       hShowerPhiRes = new TH2D("g014hShowerPhiRes_RES",";Shower Phi (deg);Rec. - Truth (deg)", 15, -180, 180, 50, -20, 30);
       lout->Add(hShowerPhiRes);
@@ -1288,26 +1430,26 @@ namespace AnaIO
       // Treat Leading and SubLeading showers differently
       
       // Class M - Pi0 shower related (rec/trurh matched)
-      hLeadingShowerEnergyRes = new TH2D("m001hLeadingShowerEnergy_RES","", 10, 0, 1.5, 20, -1.1, 1.1);
+      hLeadingShowerEnergyRes = new TH2D("m001hLeadingShowerEnergy_RES","", 20, 0, 0.8, 20, -1.1, 1.1);
       lout->Add(hLeadingShowerEnergyRes);
-      hSubLeadingShowerEnergyRes = new TH2D("m002hSubLeadingShowerEnergy_RES","", 10, 0, 1.5, 20, -1.1, 1.1);
+      hSubLeadingShowerEnergyRes = new TH2D("m002hSubLeadingShowerEnergy_RES","", 20, 0, 0.5, 20, -1.1, 1.1);
       lout->Add(hSubLeadingShowerEnergyRes);  
-      hLeadingShowerEnergyResRaw = new TH2D("m003hLeadingShowerEnergy_RES_RAW","", 10, 0, 1.5, 20, -1.1, 1.1);
+      hLeadingShowerEnergyResRaw = new TH2D("m003hLeadingShowerEnergy_RES_RAW","", 20, 0, 0.8, 20, -1.1, 1.1);
       lout->Add(hLeadingShowerEnergyResRaw);
-      hSubLeadingShowerEnergyResRaw = new TH2D("m004hSubLeadingShowerEnergy_RES_RAW","", 10, 0, 1.5, 20, -1.1, 1.1);
+      hSubLeadingShowerEnergyResRaw = new TH2D("m004hSubLeadingShowerEnergy_RES_RAW","", 20, 0, 0.5, 20, -1.1, 1.1);
       lout->Add(hSubLeadingShowerEnergyResRaw);
       hShowerOpenAngleRes = new TH2D("m005hShowerOpenAngle_RES","", 20, 0, 180, 20, -50, 50);
       lout->Add(hShowerOpenAngleRes); 
-      hPi0MomentumResRaw = new TH2D("m006Pi0Momentum_RES_RAW","", 20, 0, 1, 10, -0.5, 0.5);
+      hPi0MomentumResRaw = new TH2D("m006Pi0MomentumFitRes_RES_RAW",";Truth #pi^{0} Energy Raw (GeV);Rec./Truth - 1", 25, 0, 1, 40, -1, 1);
       lout->Add(hPi0MomentumResRaw);
-      hPi0MomentumRes = new TH2D("m007hPi0Momentum_RES","", 20, 0, 1, 10, -0.5, 0.5);
+      hPi0MomentumRes = new TH2D("m007hPi0MomentumFitRes_RES",";Truth #pi^{0} Energy (GeV);Rec./Truth - 1", 25, 0, 1, 40, -1, 1);
       lout->Add(hPi0MomentumRes);
       hPi0MassResRaw = new TH2D("m008Pi0Mass_RES_RAW","", 20, 0, 0.5, 20, -0.5, 0.5);
       lout->Add(hPi0MassResRaw);
       hPi0MassRes = new TH2D("m009Pi0Mass_RES","", 20, 0, 0.5, 20, -0.5, 0.5); 
       lout->Add(hPi0MassRes);
 
-      hMatchedTruthPi0Momentum = new TH1D("m010hMatchedTruthPi0Momentum","", 20, 0, 1.1);
+      hMatchedTruthPi0Momentum = new TH1D("m010hMatchedTruthPi0Momentum","", 20, 0, 1);
       lout->Add(hMatchedTruthPi0Momentum);
       hMatchedTruthldShowerTheta = new TH1D("m011hMatchedTruthldShowerTheta","", 30, 0, 180);
       lout->Add(hMatchedTruthldShowerTheta);
@@ -1316,18 +1458,18 @@ namespace AnaIO
       hMatchedTruthPi0Mass = new TH1D("m013hMatchedTruthPi0Mass","", 20, 0, 0.4);
       lout->Add(hMatchedTruthPi0Mass);
 
-      hPi0ThetaRes = new TH2D("m014hPi0ThetaFitRes_RES","", 30, 0, 180, 40, -50, 50);
-      lout->Add(hPi0ThetaRes);
-      hPi0PhiRes = new TH2D("m015hPi0PhiFitRes_RES","", 30, -180, 180, 40, -50, 50);
-      lout->Add(hPi0PhiRes);
-      hPi0MomRes = new TH2D("m016hPi0MomFitRes_RES","", 25, 0, 1, 40, -1, 1);
+      hPi0ThetaResFit = new TH2D("m014hPi0ThetaFitRes_RES",";Truth #pi^{0} #theta Angle (deg);Rec.- Truth (deg)", 30, 0, 180, 40, -50, 50);
+      lout->Add(hPi0ThetaResFit);
+      hPi0PhiResFit = new TH2D("m015hPi0PhiFitRes_RES",";Truth #pi^{0} #phi Angle (deg);Rec.- Truth (deg)", 30, -180, 180, 40, -50, 50);
+      lout->Add(hPi0PhiResFit);
+      hPi0MomRes = new TH2D("m016hPi0MomFitRes_RES",";Truth #pi^{0} Energy (GeV);Rec.(post fit)/Truth - 1", 25, 0, 1, 40, -1, 1);
       lout->Add(hPi0MomRes);
-      hPi0MomPreRes = new TH2D("m017hPi0MomPreFitRes_RES","", 25, 0, 1, 40, -1, 1);
+      hPi0MomPreRes = new TH2D("m017hPi0MomPreFitRes_RES",";Truth #pi^{0} Energy (GeV);Rec.(pre fit)/Truth - 1", 25, 0, 1, 40, -1, 1);
       lout->Add(hPi0MomPreRes);
 
-      hMatchedTruthldShowerEnergy = new TH1D("m011hMatchedTruthldShowerEnergy","", 20, 0, 1.1);
+      hMatchedTruthldShowerEnergy = new TH1D("m011hMatchedTruthldShowerEnergy","", 20, 0, 1);
       lout->Add(hMatchedTruthldShowerEnergy);
-      hMatchedTruthslShowerEnergy = new TH1D("m012hMatchedTruthslShowerEnergy","", 20, 0, 1.1);
+      hMatchedTruthslShowerEnergy = new TH1D("m012hMatchedTruthslShowerEnergy","", 20, 0, 1);
       lout->Add(hMatchedTruthslShowerEnergy);
 
       hMatchedTruthPi0OA = new TH1D("m013hMatchedTruthPi0OA","", 20, 0, 180);
@@ -1336,6 +1478,16 @@ namespace AnaIO
       lout->Add(hMatchedTruthldShowerOA);
       hMatchedTruthslShowerOA = new TH1D("m015hMatchedTruthslShowerOA","", 20, 0, 180);
       lout->Add(hMatchedTruthslShowerOA);
+
+      hPi0ThetaRes = new TH2D("m018hPi0ThetaFitRes_RES",";Truth #pi^{0} #theta Angle (deg);Rec.- Truth (deg)", 30, 0, 180, 40, -50, 50);
+      lout->Add(hPi0ThetaRes);
+      hPi0PhiRes = new TH2D("m019hPi0PhiFitRes_RES",";Truth #pi^{0} #phi Angle (deg);Rec.- Truth (deg)", 30, -180, 180, 40, -50, 50);
+      lout->Add(hPi0PhiRes);
+
+      hPi0ThetaResRaw = new TH2D("m018hPi0ThetaFitRes_RES_RAW",";Truth #pi^{0} #theta Angle (deg);Rec.(raw) - Truth (deg)", 30, 0, 180, 40, -50, 50);
+      lout->Add(hPi0ThetaResRaw);
+      hPi0PhiResRaw = new TH2D("m019hPi0PhiFitRes_RES_RAW",";Truth #pi^{0} #phi Angle (deg);Rec.(raw) - Truth (deg)", 30, -180, 180, 40, -50, 50);
+      lout->Add(hPi0PhiResRaw);
 
       //hPi0MomentumResFit = new TH2D("i008Pi0Momentum_RES_FIT","", 20, 0, 1, 10, -0.5, 0.5);
       //lout->Add(hPi0MomentumResFit);
@@ -1404,6 +1556,17 @@ namespace AnaIO
       hCVM = new TH2D("hCVM_Bin", "", 3, 0, 3, 3, 0, 3);
       lout->Add(hCVM);
 
+      hsigma11 = new TH2D("hsigma11", "", 6, 0.1, 0.9, 10, 0, 1);
+      lout->Add(hsigma11);
+      hsigma11Mean = new TH1D("hsigma11Mean", "", 6, 0.1, 0.9);
+      lout->Add(hsigma11Mean);
+
+      hsigma22 = new TH2D("hsigma22", "", 6, 0.05, 0.4, 10, 0, 1);
+      lout->Add(hsigma22);
+      hsigma22Mean = new TH1D("hsigma22Mean", "", 6, 0.05, 0.4);
+      lout->Add(hsigma22Mean);
+
+
 
       hShowerE1PreFitRes = new TH2D("x001hShowerE1Pre_RES","",20, 0, 0.8, 20, -1.1, 1.1);
       lout->Add(hShowerE1PreFitRes);
@@ -1455,6 +1618,18 @@ namespace AnaIO
       hPi0MomComparePrePaper = new TH1D("y005hPi0MomComparePrePaper",";Rec./Truth - 1;Candidates", 40, -1, 1);
       lout->Add(hPi0MomComparePrePaper);
 
+      hPi0MomComparePostPaper = new TH1D("y005hPi0MomComparePostPaper",";Rec./Truth - 1;Candidates", 40, -1, 1);
+      lout->Add(hPi0MomComparePostPaper);
+
+      hPi0MomCompareStandard = new TH1D("y005hPi0MomCompareStandard",";Rec./Truth - 1;Candidates", 40, -1, 1);
+      lout->Add(hPi0MomCompareStandard);
+
+      hPi0MomComparePreStandard = new TH1D("y005hPi0MomComparePreStandard",";Rec./Truth - 1;Candidates", 40, -1, 1);
+      lout->Add(hPi0MomComparePreStandard);
+
+      hPi0MomComparePostStandard = new TH1D("y005hPi0MomComparePostStandard",";Rec./Truth - 1;Candidates", 40, -1, 1);
+      lout->Add(hPi0MomComparePostStandard);
+
 
       hLDShowerE = new TH1D("y006hLDShowerE","", 40, -1, 1);
       lout->Add(hLDShowerE);
@@ -1474,15 +1649,22 @@ namespace AnaIO
       hPi0MomComparePost = new TH1D("y005hPi0MomComparePost",";Rec./Truth - 1;Candidates", 40, -1, 1);
       lout->Add(hPi0MomComparePost);
 
-      hPi0MomComparePostPaper = new TH1D("y005hPi0MomComparePostPaper",";Rec./Truth - 1;Candidates", 40, -1, 1);
-      lout->Add(hPi0MomComparePostPaper);
+      
 
-      hPi0MomNorm = new TH1D("y006hPi0MomNorm","", 40, -1, 1);
+      hPi0MomNorm = new TH1D("y006hPi0MomNorm",";Rec./Truth - 1;Candidates", 40, -1, 1);
       lout->Add(hPi0MomNorm);
-      hPi0MomEOA = new TH1D("y006hPi0MomEOA","", 40, -1, 1);
+      hPi0MomEOA = new TH1D("y006hPi0MomEOA",";Rec./Truth - 1;Candidates", 40, -1, 1);
       lout->Add(hPi0MomEOA);
-      hPi0MomAsym = new TH1D("y006hPi0MomAsym","", 40, -1, 1);
+      hPi0MomAsym = new TH1D("y006hPi0MomAsym",";Rec./Truth - 1;Candidates", 40, -1, 1);
       lout->Add(hPi0MomAsym);
+
+      hPrePi0MomNorm = new TH1D("y007hPrePi0MomNorm",";Rec./Truth - 1;Candidates", 40, -1, 1);
+      lout->Add(hPrePi0MomNorm);
+      hPrePi0MomEOA = new TH1D("y007hPrePi0MomEOA",";Rec./Truth - 1;Candidates", 40, -1, 1);
+      lout->Add(hPrePi0MomEOA);
+      hPrePi0MomAsym = new TH1D("y007hPrePi0MomAsym",";Rec./Truth - 1;Candidates", 40, -1, 1);
+      lout->Add(hPrePi0MomAsym);
+      
 
       hShowerE1Compare_REG = new TH2D("y010hShowerE1Compare_REG",";Rec./Truth - 1 (Pre Fit);Rec./Truth - 1 (Post Fit)", 40, -1.1, 1.1, 40, -1.1, 1.1);
       lout->Add(hShowerE1Compare_REG);
@@ -1495,6 +1677,9 @@ namespace AnaIO
 
       hPi0MomCompare_REGPaper = new TH2D("y013hPi0MomCompare_REG_Paper",";Rec./Truth - 1 (Pre Fit);Rec./Truth - 1 (Post Fit)", 40, -1, 1, 40, -1, 1);
       lout->Add(hPi0MomCompare_REGPaper);
+
+      hPi0MomCompare_REGStand = new TH2D("y013hPi0MomCompare_REG_Stand",";Rec./Truth - 1 (Pre Fit);Rec./Truth - 1 (Post Fit)", 40, -1, 1, 40, -1, 1);
+      lout->Add(hPi0MomCompare_REGStand);
 
       hTrackPurityVSnHits = new TH2D("z001hTrackPurityVSnHits_REG",";Number of Hits -total;Track Purity", 50, 0, 1000, 20, 0, 1.2);
       lout->Add(hTrackPurityVSnHits);

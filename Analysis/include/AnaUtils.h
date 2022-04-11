@@ -66,11 +66,11 @@ class AnaUtils
     TLorentzVector GetRecShowerRefBeam(const bool isTruth, const int ii, bool DoCorrection = true);
 
     // Combine two showers to reconstruct pi0
-    TLorentzVector GetRecPiZeroFromShowers(bool &IsPiZero, double &OA);
+    TLorentzVector GetRecPiZeroFromShowers(double &OA, bool kMC, bool kFill, bool kBefore, int &truthPi0Type);
 
-    vector<TLorentzVector> GetTwoPi0Showers(double &separation);
+    vector<TLorentzVector> GetTwoPi0Showers(double &separation, bool kMC, bool kFill, bool kBefore);
 
-    vector<TLorentzVector> GetTwoTruthMatchedPi0Showers(int &truthPi0Type);
+    vector<TLorentzVector> GetTwoTruthMatchedPi0Showers(int &truthPi0Type, const bool &kFill);
 
     // Get the info for Fitting
     void SavePi0ShowersForKF();
@@ -79,6 +79,8 @@ class AnaUtils
 
     // Do Kinematic Fitting
     void DoKinematicFitting();
+
+    void KF(const TLorentzVector &ldShower, const TLorentzVector &slShower, vector<double> &FittedVars);
 
     // Set the value of CVM
     void SetCVM();
@@ -124,8 +126,11 @@ class AnaUtils
       
       //21
       gkNucleus,
-      
+
       //22
+      gkMesons,
+      
+      //23
       gkNoTruth
     }; // End of parType
 
@@ -227,10 +232,20 @@ class AnaUtils
 
     double GetShowerCorrectedE(double rawE){
       TF1 *fpCor = new TF1("fpCor",CorrectionFCN,0,1,4);
-      fpCor->SetParameter(0,-0.9257); 
+      /*fpCor->SetParameter(0,-0.9257); // Old
       fpCor->SetParameter(1,1.591); 
       fpCor->SetParameter(2,0.06717);
       fpCor->SetParameter(3,-0.1116);
+
+      fpCor->SetParameter(0,-0.8409); // Pandora Type
+      fpCor->SetParameter(1,1.442); 
+      fpCor->SetParameter(2,0.06301);
+      fpCor->SetParameter(3,-0.1096);
+*/
+      fpCor->SetParameter(0,-0.8995); 
+      fpCor->SetParameter(1,1.442); 
+      fpCor->SetParameter(2,0.06068);
+      fpCor->SetParameter(3,-0.1096);
 
       const double factor = fpCor->Eval(rawE);
       return rawE/(1+factor);
@@ -238,23 +253,51 @@ class AnaUtils
 
     double GetShowerCorrectedTheta(double rawTheta){
       TF1 *fpCor = new TF1("fpCor","gaus",0,180);
-      fpCor->SetParameter(0,5.163);
+      /*fpCor->SetParameter(0,5.163);
       fpCor->SetParameter(1,66.37);
-      fpCor->SetParameter(2,26.14);  
+      fpCor->SetParameter(2,26.14); 
+
+      fpCor->SetParameter(0,5.169);
+      fpCor->SetParameter(1,66.9);
+      fpCor->SetParameter(2,28.14);  
+*/
+      fpCor->SetParameter(0,5.102);
+      fpCor->SetParameter(1,65.83);
+      fpCor->SetParameter(2,26.4); 
+
       const double factor = fpCor->Eval(rawTheta);
       return rawTheta - factor;
     }
 
     double GetShowerCorrectedPhi(double rawPhi){
       TF1 *fpCor = new TF1("fpCor","pol7",0,180);
-      fpCor->SetParameter(0,-0.0635279);
+      /*fpCor->SetParameter(0,-0.0635279);
       fpCor->SetParameter(1,0.0941388);
       fpCor->SetParameter(2,-4.78192e-05);
       fpCor->SetParameter(3,-2.0647e-05);
       fpCor->SetParameter(4,7.65803e-09);
       fpCor->SetParameter(5,1.12047e-09);
       fpCor->SetParameter(6,-1.93702e-13); 
-      fpCor->SetParameter(7,-1.76401e-14);    
+      fpCor->SetParameter(7,-1.76401e-14);
+
+      fpCor->SetParameter(0,-0.298625);
+      fpCor->SetParameter(1,0.100689);
+      fpCor->SetParameter(2,6.19076e-05);
+      fpCor->SetParameter(3,-2.20382e-05);
+      fpCor->SetParameter(4,-2.50278e-09);
+      fpCor->SetParameter(5,1.20338e-09);
+      fpCor->SetParameter(6,5.23649e-14); 
+      fpCor->SetParameter(7,-1.9246e-14);
+*/
+      fpCor->SetParameter(0,-0.0942805);
+      fpCor->SetParameter(1,0.0915092);
+      fpCor->SetParameter(2,-3.00198e-05);
+      fpCor->SetParameter(3,-2.01208e-05);
+      fpCor->SetParameter(4,5.16471e-09);
+      fpCor->SetParameter(5,1.0919e-09);
+      fpCor->SetParameter(6,-1.19572e-13); 
+      fpCor->SetParameter(7,-1.72078e-14);
+
       const double factor = fpCor->Eval(rawPhi);
       return rawPhi - factor;
     }

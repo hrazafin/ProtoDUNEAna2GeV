@@ -21,11 +21,13 @@ class AnaCut
     // Cut on beam quality
     bool CutBeamQuality(const bool kMC, bool DoAngleCut = true);
     // Cut on end Z APA3
-    bool CutAPA3EndZ();
+    bool CutAPA3EndZ(const bool kMC);
     // Cut on Michel Score (remove muons)
     bool CutMichelScore(const bool kMC);
     // Cut on median dE/dx (remove protons)
     bool CutMediandEdx(const bool kMC);
+    // Cut on median dE/dx (remove protons)
+    bool CutProtonChi2DOF(const bool kMC);
 
     
     // --------------------------------- Legacy Cuts (not used anymore) ----------------------- //
@@ -62,6 +64,7 @@ class AnaCut
     bool IsShower(const int ii, const bool kMC);
     bool IsMichel(const int ii, const bool kMC);
     bool IsPiZeroShower(const int ii, const bool kMC); 
+    bool IsPizero(const bool kMC, const bool kFill);
 
 
   private:

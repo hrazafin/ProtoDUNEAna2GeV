@@ -77,7 +77,7 @@ class PlotUtils
   THStack * ConvertToStack(const TH2D * hh, const bool kMC, std::map<TString,vector<double>> &typeMaps);
   TH1D * GetStackedSum(THStack *stk);
   void ScaleStack(THStack *stk, const double scale);
-  TH2D * NormalHist(const TH2D *hraw, const Double_t thres, const Bool_t kmax, TH1D * &hmean);
+  TH2D * NormalHist(const TH2D *hraw, const Double_t thres, const Bool_t kmax, TH1D * &hmean, TH1D * &hcdf);
   THStack * NormalizeStack(THStack * hstk);
   void getProfileFit(TH2D * h2d);
   TH1D * GetCDF(const TH2D *hraw, const TString hname);
@@ -91,6 +91,7 @@ class PlotUtils
   TLegend * DrawLegend(const vector<TString> &entries, const vector<TString>& htype, const TString tag, const int *tmpcol=0x0, const int * tmpmkr=0x0, const int ncol = 1);
   void getSliceXDrawY(TH2D * h2d);
   void xSlicedEnergyCorrection(TH2D * h2d);
+  void xSlicedSigma(TH2D * h2d, TString tag);
   TH1D * GetRecEfficiency(TH1 * hh, TH1D * htrue, const TString tag);
   void SetTitleFormat(TH1 * hh);
   void SetTitleFormat(TH2 * h2d);
