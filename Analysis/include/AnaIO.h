@@ -634,6 +634,8 @@ namespace AnaIO
   TH1D * hOAShower = 0x0;
 
   TH1D * hKFPassRate = 0x0;
+  TH1D * hPi0Total = 0x0;
+  TH1D * hPi0Selected = 0x0;
 
   // Completeness and Purity
   TH2D * hTrackPurityVSnHits = 0x0;
@@ -1083,6 +1085,10 @@ namespace AnaIO
 
     hKFPassRate = new TH1D("k001hKFPassRate","",  nPass, Passmin, Passmax); 
     lout->Add(hKFPassRate); 
+    hPi0Total = new TH1D("k002hPi0Total","",  30, 0, 3); 
+    lout->Add(hPi0Total);
+    hPi0Selected = new TH1D("k003hPi0Selected","",  30, 0, 3);  
+    lout->Add(hPi0Selected);
 
     // Class D - reconstructed TKI variables
     hRecdalphat = new TH2D("d001Recdalphat_STK","", 9, 0, 180,nevtType, evtTypemin, evtTypemax); 

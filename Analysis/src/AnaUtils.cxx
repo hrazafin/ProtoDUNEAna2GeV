@@ -414,10 +414,6 @@ TVector3 AnaUtils::GetRecBeamFull(){
                  (*AnaIO::reco_beam_calo_endDirZ)[1] );
   // Get the beam end kinetic energy
   double ke = AnaIO::reco_beam_interactingEnergy/1E3;
-  cout << "ke: " << ke << endl;
-  cout << "muon: " << AnaIO::reco_beam_momByRange_muon << endl;
-  cout << "muon alt: " << AnaIO::reco_beam_momByRange_alt_muon << endl;
-  cout << "nhits: " << AnaIO::reco_beam_PFP_nHits << endl;
   if(ke<0) ke = 1E-10;
   // Get pion mass since signal is pion beam
   const double mpi = AnaFunctions::PionMass();
@@ -454,13 +450,11 @@ void AnaUtils::FillBeamKinematics(const int kMC)
 
     plotUtils.FillHist(AnaIO::hBeamThetaRes,    truthBeamFull.Theta()*TMath::RadToDeg(), beamthetaRes);
     plotUtils.FillHist(AnaIO::hBeamMomentumRes, truthBeamFull.Mag(),                     beammomentumRes);
-    cout << "kMC:" << kMC << "beam Mom truth: " << truthBeamFull.Mag() << endl;
   }
   // This evtType only works for MC, data will not have this info but fill it anyway
   plotUtils.FillHist(AnaIO::hRecBeamTheta,    recBeamFull.Theta()*TMath::RadToDeg(), evtType);
   plotUtils.FillHist(AnaIO::hRecBeamMomentum, recBeamFull.Mag(),                     evtType);
 
-  cout << "kMC:" << kMC << "beam Mom: " << recBeamFull.Mag() << endl;
 }
 
 vector<double> AnaUtils::GetdEdxVector(const vector<double> &arraydEdx, const bool kForward)
@@ -861,6 +855,8 @@ TLorentzVector AnaUtils::GetRecPiZeroFromShowers(double &OA, bool kMC, bool kFil
     // Without KF correction
     PiZeroVec_MassCal = RecPi0Showers[4] + RecPi0Showers[5];
 
+    if(kFill) AnaIO::hPi0Total->Fill(PiZeroVec.P());
+
     // TKI analysis pi0 vector
     RecPi0LTVet = PiZeroVec;
     // Save the truth type of two reco showers
@@ -934,6 +930,7 @@ TLorentzVector AnaUtils::GetRecPiZeroFromShowers(double &OA, bool kMC, bool kFil
     
         if(PiZeroTruthVec.M() > 0.134 && PiZeroTruthVec.M() < 0.135){
           selected++;
+          if(kFill) AnaIO::hPi0Selected->Fill(PiZeroVec.P());
           AnaIO::hMatchedTruthPi0Momentum->Fill(PiZeroTruthVec.E());
           
           AnaIO::hMatchedTruthPi0OA->Fill(openingAngleTruth);

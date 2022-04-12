@@ -626,7 +626,7 @@ void AnaCut::CountPFP(const bool kMC, const bool kFill)
     double OA = -999;
     int truthPi0Type = 2;
     TLorentzVector PiZeroVec;
-    PiZeroVec = anaUtils.GetRecPiZeroFromShowers(OA,kMC,false,false,truthPi0Type);
+    PiZeroVec = anaUtils.GetRecPiZeroFromShowers(OA,kMC,false,true,truthPi0Type);
 
     plotUtils.FillHist(AnaIO::hRecPi0Energy_OVERLAY_After, PiZeroVec.E(), truthPi0Type);
   } 

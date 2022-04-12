@@ -129,7 +129,7 @@ int anaRec(const TString finName, TList *lout, const TString tag, const int nEnt
   printf("End of %d cuts: %.1f selected\n", icut, nsel);
 
   printf("End of %d shower cuts: %.1f selected\n", icut_shower, nsel_shower);
-
+/*
   // Print signal/background info MC
   const double nsig = AnaIO::hTruthSignal->GetBinContent(2);
   const double nbk = AnaIO::hTruthSignal->GetBinContent(1);
@@ -137,6 +137,13 @@ int anaRec(const TString finName, TList *lout, const TString tag, const int nEnt
   const double purity = nsig/nall;
 
   cout << "nAll: " << nall << " nSignal: " << nsig << " nBackground: " << nbk << endl;
+  cout << "purity: " << purity << endl;
+*/
+  const double ntotal = AnaIO::hPi0Total->Integral(0,10000);
+  const double nselected = AnaIO::hPi0Selected->Integral(0,10000);
+  const double purity = nselected/ntotal;
+
+  cout << "nAll: " << ntotal << " nSignal: " << nselected << endl;
   cout << "purity: " << purity << endl;
 
   return BeamCount;
