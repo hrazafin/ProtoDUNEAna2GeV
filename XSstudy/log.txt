@@ -1,0 +1,133 @@
+/data/dune/users/yangk/workdir/pduneAnalysis/bin/mkexe.sh
+================== Compiling XSstudy with XSstudy -lRooUnfold -I/data/dune/users/yangk/workdir/pduneAnalysis/RooUnfold/build -L/data/dune/users/yangk/workdir/pduneAnalysis/RooUnfold/build =================
+
+g++ XSstudy.cxx -g -O3 -Wall -Werror -std=c++17 -I/cvmfs/larsoft.opensciencegrid.org/products/root/v6_22_06a/Linux64bit+3.10-2.17-e20-p383b-prof/include -Wl,--no-as-needed -L./ -L/cvmfs/larsoft.opensciencegrid.org/products/root/v6_22_06a/Linux64bit+3.10-2.17-e20-p383b-prof/lib -lCore -lImt -lRIO -lNet -lHist -lGraf -lGraf3d -lGpad -lROOTVecOps -lTree -lTreePlayer -lRint -lPostscript -lMatrix -lPhysics -lMathCore -lThread -lMultiProc -lROOTDataFrame -pthread -lm -ldl -rdynamic -lTree -lMinuit -lASImage -o XSstudy -lRooUnfold -I/data/dune/users/yangk/workdir/pduneAnalysis/RooUnfold/build -L/data/dune/users/yangk/workdir/pduneAnalysis/RooUnfold/build
+
+
+checked: /data/dune/users/yangk/workdir/pduneAnalysis/bin/mkexe.sh XSstudy done!
+
+
+[1mRooFit v3.60 -- Developed by Wouter Verkerke and David Kirkby[0m 
+                Copyright (C) 2000-2013 NIKHEF, University of California & Stanford University
+                All rights reserved, please read http://roofit.sourceforge.net/license.txt
+
+Now unfolding...
+Iteration : 0
+Chi^2 of change 1792.82
+Iteration : 1
+Chi^2 of change 47.5874
+Iteration : 2
+Chi^2 of change 33.3554
+Iteration : 3
+Chi^2 of change 26.6196
+Calculating covariances due to number of measured events
+Now unfolding...
+Iteration : 0
+Chi^2 of change 1834.76
+Iteration : 1
+Chi^2 of change 36.7642
+Iteration : 2
+Chi^2 of change 26.903
+Iteration : 3
+Chi^2 of change 21.6685
+Calculating covariances due to number of measured events
+Now unfolding...
+Iteration : 0
+Chi^2 of change 1183.39
+Iteration : 1
+Chi^2 of change 142.697
+Iteration : 2
+Chi^2 of change 84.7303
+Iteration : 3
+Chi^2 of change 58.7806
+Calculating covariances due to number of measured events
+Now unfolding...
+Iteration : 0
+Chi^2 of change 1100.37
+Iteration : 1
+Chi^2 of change 112.931
+Iteration : 2
+Chi^2 of change 72.057
+Iteration : 3
+Chi^2 of change 52.6001
+Calculating covariances due to number of measured events
+Now unfolding...
+Iteration : 0
+Chi^2 of change 237.276
+Iteration : 1
+Chi^2 of change 0.116971
+Iteration : 2
+Chi^2 of change 0.046484
+Iteration : 3
+Chi^2 of change 0.0313239
+Calculating covariances due to number of measured events
+Now unfolding...
+Iteration : 0
+Chi^2 of change 167.264
+Iteration : 1
+Chi^2 of change 4.7575
+Iteration : 2
+Chi^2 of change 2.08566
+Iteration : 3
+Chi^2 of change 1.42381
+Calculating covariances due to number of measured events
+Now unfolding...
+Iteration : 0
+Chi^2 of change 1.32461e-28
+Iteration : 1
+Chi^2 of change 7.02045e-28
+Iteration : 2
+Chi^2 of change 1.46613e-29
+Iteration : 3
+Chi^2 of change 6.71501e-29
+Calculating covariances due to number of measured events
+Now unfolding...
+Iteration : 0
+Chi^2 of change 90.0981
+Iteration : 1
+Chi^2 of change 16.7726
+Iteration : 2
+Chi^2 of change 6.31327
+Iteration : 3
+Chi^2 of change 3.28954
+Calculating covariances due to number of measured events
+Now unfolding...
+Iteration : 0
+Chi^2 of change 3.85423e-29
+Iteration : 1
+Chi^2 of change 3.43419e-29
+Iteration : 2
+Chi^2 of change 3.61938e-29
+Iteration : 3
+Chi^2 of change 2.02143e-28
+Calculating covariances due to number of measured events
+Now unfolding...
+Iteration : 0
+Chi^2 of change 45.6429
+Iteration : 1
+Chi^2 of change 7.88546
+Iteration : 2
+Chi^2 of change 3.06357
+Iteration : 3
+Chi^2 of change 1.68244
+Calculating covariances due to number of measured events
+Now unfolding...
+Iteration : 0
+Chi^2 of change 1.83014e-28
+Iteration : 1
+Chi^2 of change 1.55806e-28
+Iteration : 2
+Chi^2 of change 6.5889e-29
+Iteration : 3
+Chi^2 of change 8.17259e-29
+Calculating covariances due to number of measured events
+Now unfolding...
+Iteration : 0
+Chi^2 of change 59.016
+Iteration : 1
+Chi^2 of change 3.92415
+Iteration : 2
+Chi^2 of change 2.25444
+Iteration : 3
+Chi^2 of change 1.45201
+Calculating covariances due to number of measured events

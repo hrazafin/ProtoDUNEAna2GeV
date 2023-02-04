@@ -11,18 +11,46 @@ class AnaUtils
     ~AnaUtils() {};
 
     int GetBeamParticleType(const int pdg);
+    int GetChannelType(const TString beamEndprocess, const int beamPDG, const int npi0Daughters, const int npiplusDaughters, const int npiminusDaughters);
+
+    int GetFillXSEventType();
+
     // Tell you the particle type from pdg (only primary particle type)
     int GetParticleType(const int pdg);
     // Set if event is a signal based on phase space cuts on protons 
     void SetFullSignal();
     // Get a vector of true Final-State(FS) particles 4 vector with Pi0 + leading + subleading proton 
-    vector<TLorentzVector> GetFSParticlesTruth(); 
+    vector<TLorentzVector> GetFSParticlesTruth(bool kFill = true); 
     // Get a vector of true pi0 showers 4 vector 
-    vector<TLorentzVector> GetFSPiZeroDecayDaughterTruth(); 
+    vector<TLorentzVector> GetFSPiZeroDecayDaughterTruth(bool kFill = true); 
+    // Get truth interacting histogram for xsec calculation
+    double MakeTrueIncidentEnergies(vector<double> *true_beam_traj_Z, vector<double> *true_beam_traj_KE, vector<double> *true_beam_new_incidentEnergies);
+    double MakeRecoIncidentEnergies(vector<double> *reco_beam_traj_Z, vector<double> *reco_beam_traj_KE, vector<double> *reco_beam_new_incidentEnergies);
+    
+    // Get reco track length from the space points
+    double GetRecoTrackLength();
+    // Get true track length from caloXYZ
+    double GetTrueTrackLength();
+
+    int GetInitialSliceID();
+    int GetInteractionSliceID();
+
+    bool IsFakeData(){
+      // Add fake data type for xsec study
+      const int event = AnaIO::event;
+      if(event%2) return false;
+      else return true;
+    }
+    
+
     // Check event topology for signal
-    bool IsSignal(const int nProton, const int nPiZero, const int nPiPlus, const int nParticleBkg);
+    //bool IsSignal(const int nProton, const int nPiZero, const int nPiPlus, const int nPiMinus, const int nParticleBkg);
+    bool IsSignal(const int nProton, const int nPiZero, const int nPiPlus, const int nPiMinus, const int nParticleBkg, const int nPionAboveThreshold);
+
     // Check if event is Signal/EvtBkg/BmBkg(beamBkg) using Truth info
     int GetFillEventType();
+    // Decompose events into NpMn etc. for TKI analysis
+    int GetFillTKIEventType();
     // Fill reco beam theta and momentum and truth-matched resolution
     void FillBeamKinematics(const int kMC);
     // Get the truth beam momentum directly at the end point 
@@ -48,7 +76,7 @@ class AnaUtils
     // Return a Pi0 LT vector relative to beam direction (only consider theta)
     TLorentzVector GetPi0MomentumRefBeam(const TLorentzVector RecPi0, const TLorentzVector TruthPi0, const bool isTruth);
 
-    void TruthMatchingTKI(TLorentzVector dummypi0, TLorentzVector dummyproton, TLorentzVector dummypi0Truth, TLorentzVector dummyprotonTruth, const bool kMC);
+    void TruthMatchingTKI(TLorentzVector dummypi0, TLorentzVector dummyproton, TLorentzVector dummypi0Truth, TLorentzVector dummyprotonTruth, const bool kMC,  const bool GoodTruthMatch);
 
     // Fill different reco FS particle theta and momentum and truth-matched resolution
     void FillFSParticleKinematics(const int recIndex, const int truthParticleType, const int recParticleType);      
@@ -81,6 +109,52 @@ class AnaUtils
     void DoKinematicFitting();
 
     void KF(const TLorentzVector &ldShower, const TLorentzVector &slShower, vector<double> &FittedVars);
+
+    double CalWeight(const bool & kMC);
+    double CalBckWeight(const bool & kMC);
+    double CalXSEvtWeight(const bool & kMC, const double & intE, const int & evtXStype);
+    double CalBeamIniWeight(const double & iniE);
+    double CalBeamIntWeight(const double & intE);
+    double CalCEXIntWeight(const double & intE);
+    double CalCEXPi0KEWeight(const double & intE);
+
+    double GetUpStreamEnergyLoss(const bool & kMC, const double & InstE);
+
+    // Get truth particle PDG from it's ID
+    int GetTruthPDGFromID(const int inID, const vector<int> * idarray, const vector<int> * pdgarray);
+    string GetTruthProcessFromID(const int inID, const vector<int> * idarray, const vector<string> * processarray);
+    string GetTruthEndProcessFromID(const int inID, const vector<int> * idarray, const vector<string> * Endprocessarray);
+    // Get truth-matched particle info using reco particle index
+    int GetTruthParticleInfoFromRec(const int recidx);
+
+    // Used in AnaCut beam energy related
+    // Fill beam quality cuts histograms (use fitted value for beam quality cut latter)
+    void FillBeamQualityHist();
+    // Set beam energy for upstream energy loss study
+    void SetBeamInstKEandFrontFaceKE(double &beam_inst_KE, double &true_ffKE, bool kFill = false);
+    void FillUpStreamEnergyLossHistBeforeCut(double beam_inst_KE, double true_ffKE);
+    void FillUpStreamEnergyLossHistAfterCut(double beam_inst_KE, double true_ffKE);
+    void FillBeamVariablesAfterAllCuts(int parType, int channelType);
+
+    double GetLoss(double InstE){
+      TF1 *fpCor = new TF1("fpCor","pol2",-400,1400);
+      fpCor->SetParameter(0,170.777);
+      fpCor->SetParameter(1,-0.595308);
+      fpCor->SetParameter(2,0.000456932);
+      const double factor = fpCor->Eval(InstE);
+      return factor;
+    }
+
+
+    void FillXSTrueHistograms();
+    void FillXSRecoHistograms();
+
+    //void FillEsliceHistograms(double KE_init, double KE_end, double KE_int, double weight, const vector<double> binning, int N_bin, bool fill_int);
+    void FillEsliceHistograms(TH1D* hinit, TH1D* hend, TH1D* hinc, TH1D* hint, double KE_init, double KE_end, double KE_int, double weight, const vector<double> binning, int N_bin, bool fill_int);
+
+    //vector<vector<double>> ComputeTrueIncidentHist(const double & initialE, const double & interactingE, const double & ffe, const double & intE);
+    vector<vector<double>> ComputeTrueIncidentHist(const double & initialE, const double & interactingE, const double & ffe, const double & intE, vector<double> *true_beam_incidentEnergies);
+
 
     // Set the value of CVM
     void SetCVM();
@@ -135,18 +209,31 @@ class AnaUtils
     }; // End of parType
 
     enum BeamparType{
-
       //1-5
-      gkBeamProton=1,
-      gkBeamPiPlus,
-      gkBeamMuPlus,
-      gkBeamElectronGamma,
-      gkBeamPiMinus,
-
-      //6
+      gkBeamPiPlus=0,
+      gkBeamMuon,
+      gkMisIDProton,
+      gkMisIDPion,
+      gkMisIDMuon,
+      gkMisIDElectronGamma,
+      gkCosmicMuon,
       gkBeamOthers,
       
-    }; // End of parType
+    }; // End of BeamparType
+
+
+    enum ChannelType{
+
+      //1-4
+      gkChargeExchange=0,
+      gkInelastic,
+      gkAbsorption,
+      gkPionDecays,
+      gkOtherChannels,
+      gkBeamMuons,
+      gkBackground,
+      
+    }; // End of ChannelType
 
 
     // Define event types (signal/eventBk/BeamBk)
@@ -156,11 +243,30 @@ class AnaUtils
       gkBmBkg
     };
 
+    enum evtXSType{
+      gkXSSignal = 0,
+      gkXSEvtBkgAbs,
+      gkXSEvtBkgInel,
+      gkXSEvtBkgSinglePi0,
+      gkXSEvtBkgMultiPi0,
+      //gkXSEvtBkgOthers,
+      gkXSBmBkg
+    };
+
     enum truthPi0Type{
       gkTwoGammasSamePi0 = 0,
       gkTwoGammasDiffPi0,
       gkOneGamma,
       gkNoGammas
+    };
+
+    enum TKIevtType{
+      gk1p0n = 0,
+      gk1pMn,
+      //gkNp0n,
+      gkNpMn,
+      gkEvtTKIBkg,
+      gkBmTKIBkg
     };
     // Save good shower candidates info for pi0 reco
     void SavePiZeroShower(TLorentzVector shower, TLorentzVector showerRaw, TLorentzVector showerTruth, double showerE, double showerTruthE, TVector3 pos, int showerType)
@@ -190,6 +296,22 @@ class AnaUtils
       return NParList;
     }
 
+    vector<double> GetRecoTrackLengthAccumVect(){
+      return reco_trklen_accum;
+    }
+
+    vector<double> GetTrueTrackLengthAccumVect(){
+      return true_trklen_accum;
+    }
+
+    double GetTrueFrontFaceEnergy(){
+      return true_ffKE;
+    }
+
+    double GetTrueIntEnergy(){
+      return int_energy_true;
+    }
+    
     static Double_t CauchyDens(Double_t *x, Double_t *par)
     {
       Double_t pi   = TMath::Pi();
@@ -221,10 +343,10 @@ class AnaUtils
     double GetProtonCorrectedMom(double rawMom){
       TF1 *fpCor = new TF1("fpCor",CorrectionFCN,0,2,4);
       //TF1 *fpCor = new TF1("fpCor","pol5",0,2);
-      fpCor->SetParameter(0,-3.815e4);
-      fpCor->SetParameter(1,7.181);
-      fpCor->SetParameter(2,0.07183);
-      fpCor->SetParameter(3,-0.005464);
+      fpCor->SetParameter(0,-8.35387e+04);
+      fpCor->SetParameter(1,7.79370e+00);
+      fpCor->SetParameter(2,7.67495e-02);
+      fpCor->SetParameter(3,-5.68081e-03);
 
       const double factor = fpCor->Eval(rawMom);
       return rawMom/(1+factor);
@@ -232,20 +354,10 @@ class AnaUtils
 
     double GetShowerCorrectedE(double rawE){
       TF1 *fpCor = new TF1("fpCor",CorrectionFCN,0,1,4);
-      /*fpCor->SetParameter(0,-0.9257); // Old
-      fpCor->SetParameter(1,1.591); 
-      fpCor->SetParameter(2,0.06717);
-      fpCor->SetParameter(3,-0.1116);
-
-      fpCor->SetParameter(0,-0.8409); // Pandora Type
-      fpCor->SetParameter(1,1.442); 
-      fpCor->SetParameter(2,0.06301);
-      fpCor->SetParameter(3,-0.1096);
-*/
-      fpCor->SetParameter(0,-0.8995); 
-      fpCor->SetParameter(1,1.442); 
-      fpCor->SetParameter(2,0.06068);
-      fpCor->SetParameter(3,-0.1096);
+      fpCor->SetParameter(0,-0.8323); 
+      fpCor->SetParameter(1,1.665); 
+      fpCor->SetParameter(2,0.06923);
+      fpCor->SetParameter(3,-0.1219);
 
       const double factor = fpCor->Eval(rawE);
       return rawE/(1+factor);
@@ -253,17 +365,9 @@ class AnaUtils
 
     double GetShowerCorrectedTheta(double rawTheta){
       TF1 *fpCor = new TF1("fpCor","gaus",0,180);
-      /*fpCor->SetParameter(0,5.163);
-      fpCor->SetParameter(1,66.37);
-      fpCor->SetParameter(2,26.14); 
-
-      fpCor->SetParameter(0,5.169);
-      fpCor->SetParameter(1,66.9);
-      fpCor->SetParameter(2,28.14);  
-*/
-      fpCor->SetParameter(0,5.102);
-      fpCor->SetParameter(1,65.83);
-      fpCor->SetParameter(2,26.4); 
+      fpCor->SetParameter(0,5.033);
+      fpCor->SetParameter(1,66.61);
+      fpCor->SetParameter(2,26.44); 
 
       const double factor = fpCor->Eval(rawTheta);
       return rawTheta - factor;
@@ -271,32 +375,14 @@ class AnaUtils
 
     double GetShowerCorrectedPhi(double rawPhi){
       TF1 *fpCor = new TF1("fpCor","pol7",0,180);
-      /*fpCor->SetParameter(0,-0.0635279);
-      fpCor->SetParameter(1,0.0941388);
-      fpCor->SetParameter(2,-4.78192e-05);
-      fpCor->SetParameter(3,-2.0647e-05);
-      fpCor->SetParameter(4,7.65803e-09);
-      fpCor->SetParameter(5,1.12047e-09);
-      fpCor->SetParameter(6,-1.93702e-13); 
-      fpCor->SetParameter(7,-1.76401e-14);
-
-      fpCor->SetParameter(0,-0.298625);
-      fpCor->SetParameter(1,0.100689);
-      fpCor->SetParameter(2,6.19076e-05);
-      fpCor->SetParameter(3,-2.20382e-05);
-      fpCor->SetParameter(4,-2.50278e-09);
-      fpCor->SetParameter(5,1.20338e-09);
-      fpCor->SetParameter(6,5.23649e-14); 
-      fpCor->SetParameter(7,-1.9246e-14);
-*/
-      fpCor->SetParameter(0,-0.0942805);
-      fpCor->SetParameter(1,0.0915092);
-      fpCor->SetParameter(2,-3.00198e-05);
-      fpCor->SetParameter(3,-2.01208e-05);
-      fpCor->SetParameter(4,5.16471e-09);
-      fpCor->SetParameter(5,1.0919e-09);
-      fpCor->SetParameter(6,-1.19572e-13); 
-      fpCor->SetParameter(7,-1.72078e-14);
+      fpCor->SetParameter(0,-0.00806448);
+      fpCor->SetParameter(1,0.0978646);
+      fpCor->SetParameter(2,-0.000136381);
+      fpCor->SetParameter(3,-2.12771e-05);
+      fpCor->SetParameter(4,1.61586e-08);
+      fpCor->SetParameter(5,1.14406e-09);
+      fpCor->SetParameter(6,-3.82649e-13); 
+      fpCor->SetParameter(7,-1.78852e-14);
 
       const double factor = fpCor->Eval(rawPhi);
       return rawPhi - factor;
@@ -304,21 +390,21 @@ class AnaUtils
 
     double GetProtonCorrectedTheta(double rawTheta){
       TF1 *fpCor = new TF1("fpCor","gaus",0,180);
-      fpCor->SetParameter(0,4.601);
-      fpCor->SetParameter(1,50.44);
-      fpCor->SetParameter(2,24.42);  
+      fpCor->SetParameter(0,4.329);
+      fpCor->SetParameter(1,50.98);
+      fpCor->SetParameter(2,25.21);  
       const double factor = fpCor->Eval(rawTheta);
       return rawTheta - factor;
     }
 
     double GetProtonCorrectedPhi(double rawPhi){
       TF1 *fpCor = new TF1("fpCor","pol5",0,180);
-      fpCor->SetParameter(0,-1.16553);
-      fpCor->SetParameter(1,-0.00766996);
-      fpCor->SetParameter(2,0.00019561);
-      fpCor->SetParameter(3,1.012e-07);
-      fpCor->SetParameter(4,-4.78252e-09);
-      fpCor->SetParameter(5,6.90576e-12);   
+      fpCor->SetParameter(0,-1.12529);
+      fpCor->SetParameter(1,-0.00592945);
+      fpCor->SetParameter(2,0.000186931);
+      fpCor->SetParameter(3,-1.4181e-07);
+      fpCor->SetParameter(4,-4.49753e-09);
+      fpCor->SetParameter(5,1.38988e-11);   
       const double factor = fpCor->Eval(rawPhi);
       return rawPhi - factor;
     }
@@ -345,6 +431,41 @@ class AnaUtils
       return rawE/(1+factor);
     }
 
+    double GetBeamCorrectedPhi(double rawPhi){
+      TF1 *fpCor = new TF1("fpCor","pol3",-180,-50);
+      fpCor->SetParameter(0,494.8);
+      fpCor->SetParameter(1,10.18);
+      fpCor->SetParameter(2,0.07259);
+      fpCor->SetParameter(3,0.0001799);   
+      const double factor = fpCor->Eval(rawPhi);
+      return rawPhi - factor;
+    }
+
+    double GetBeamCorrectedTheta(double rawTheta){
+      TF1 *fpCor = new TF1("fpCor","pol3",0,80);
+      fpCor->SetParameter(0,1.865);
+      fpCor->SetParameter(1,-0.6969);
+      fpCor->SetParameter(2,0.04245);
+      fpCor->SetParameter(3,-0.0003842);  
+      const double factor = fpCor->Eval(rawTheta);
+      return rawTheta - factor;
+    }
+
+    double GetBeamCorrectedE(double rawE){
+      TF1 *fpCor = new TF1("fpCor",CorrectionFCN,0,1,4);
+      fpCor->SetParameter(0,5.443e6); 
+      fpCor->SetParameter(1,10.64); 
+      fpCor->SetParameter(2,0.009267);
+      fpCor->SetParameter(3,0.02225);
+
+      const double factor = fpCor->Eval(rawE);
+      return rawE/(1+factor);
+    }
+
+    double GetSliceWidth(){
+      return slice_width;
+    }
+
     static vector<double> LdShowerEnergyTruth;
     static vector<double> SlShowerEnergyTruth; 
     static vector<double> OpenAngleTruth; 
@@ -366,6 +487,9 @@ class AnaUtils
     static TLorentzVector RecProtonLTVet;
     static TLorentzVector TruthProtonLTVet;
 
+    static bool GoodTruthMatch;
+    static bool GoodFit;
+
     // KF CVM 
     static std::map<std::pair <int,int>,vector<double>> CVM;
     static int selected;
@@ -376,9 +500,12 @@ class AnaUtils
     int nProton;
     int nNeutron;
     int nPiPlus;
+    int nPiMinus;
     int nPiZero;
     int nGamma;
     int nParticleBkg;
+    // for xs analysis
+    int nPionAboveThreshold;
     
     vector<int> bufferType;
 
@@ -393,6 +520,20 @@ class AnaUtils
     vector<double> showerEarr;
     vector<double> showerTruthEarr;
     vector<TVector3> showerPos;
+
+    vector<double> reco_trklen_accum;
+    vector<double> true_trklen_accum;
+
+    double true_ffKE;
+    double int_energy_true;
+
+    // E-slice parameters
+    const double Eslicewidth = 50; //MeV
+    const double Eklim = 1000; //MeV
+    const int nthinslices = 20;
+
+    const double slice_width = 1.0;
+
 };
 
 vector<double> AnaUtils::LdShowerEnergyTruth;
@@ -420,5 +561,8 @@ std::map<std::pair <int,int>,vector<double>> AnaUtils::CVM;
 
 int AnaUtils::selected = 0;
 int AnaUtils::total = 0;
+
+bool AnaUtils::GoodTruthMatch = false;
+bool AnaUtils::GoodFit = false;
 
 #endif

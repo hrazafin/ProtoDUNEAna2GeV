@@ -1,0 +1,5092 @@
+/data/dune/users/yangk/workdir/pduneAnalysis/bin/mkexe.sh
+================== Compiling SystStudy with SystStudy =================
+
+g++ SystStudy.cxx -g -O3 -Wall -Werror -std=c++17 -I/cvmfs/larsoft.opensciencegrid.org/products/root/v6_22_06a/Linux64bit+3.10-2.17-e20-p383b-prof/include -Wl,--no-as-needed -L./ -L/cvmfs/larsoft.opensciencegrid.org/products/root/v6_22_06a/Linux64bit+3.10-2.17-e20-p383b-prof/lib -lCore -lImt -lRIO -lNet -lHist -lGraf -lGraf3d -lGpad -lROOTVecOps -lTree -lTreePlayer -lRint -lPostscript -lMatrix -lPhysics -lMathCore -lThread -lMultiProc -lROOTDataFrame -pthread -lm -ldl -rdynamic -lTree -lMinuit -lASImage -o SystStudy
+
+
+checked: /data/dune/users/yangk/workdir/pduneAnalysis/bin/mkexe.sh SystStudy done!
+
+
+[1mRooFit v3.60 -- Developed by Wouter Verkerke and David Kirkby[0m 
+                Copyright (C) 2000-2013 NIKHEF, University of California & Stanford University
+                All rights reserved, please read http://roofit.sourceforge.net/license.txt
+
+ix: 1
+bin_cv: 0
+bin_upper: 0
+bin_lower: 0
+ix: 2
+bin_cv: 0
+bin_upper: 0
+bin_lower: 0
+ix: 3
+bin_cv: 0
+bin_upper: 0
+bin_lower: 0
+ix: 4
+bin_cv: 0
+bin_upper: 0
+bin_lower: 0
+ix: 5
+bin_cv: 0
+bin_upper: 0
+bin_lower: 0
+ix: 6
+bin_cv: 0
+bin_upper: 0
+bin_lower: 0
+ix: 7
+bin_cv: 13108.6
+bin_upper: 809.278
+bin_lower: 0
+ix: 8
+bin_cv: 198.999
+bin_upper: 141.4
+bin_lower: 229.825
+ix: 9
+bin_cv: 118.842
+bin_upper: 107.703
+bin_lower: 123.735
+ix: 10
+bin_cv: 91.4952
+bin_upper: 85.784
+bin_lower: 93.5711
+ix: 11
+bin_cv: 91.8748
+bin_upper: 88.102
+bin_lower: 93.2205
+ix: 12
+bin_cv: 90.3512
+bin_upper: 87.5692
+bin_lower: 91.1605
+ix: 13
+bin_cv: 95.89
+bin_upper: 93.6124
+bin_lower: 96.462
+ix: 14
+bin_cv: 94.0452
+bin_upper: 92.6748
+bin_lower: 94.6321
+ix: 15
+bin_cv: 87.8825
+bin_upper: 86.8895
+bin_lower: 88.279
+ix: 16
+bin_cv: 93.6569
+bin_upper: 92.6893
+bin_lower: 93.9232
+ix: 17
+bin_cv: 95.0199
+bin_upper: 93.4832
+bin_lower: 94.7733
+ix: 18
+bin_cv: 98.0729
+bin_upper: 97.3129
+bin_lower: 98.9356
+ix: 19
+bin_cv: 103.979
+bin_upper: 102.589
+bin_lower: 107.813
+ix: 20
+bin_cv: 0
+bin_upper: 92.9235
+bin_lower: 0
+ix: 1 jx: 1
+ent: 1
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 1 jx: 1
+ent: 2
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 1 jx: 1
+ent: 3
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 1 jx: 2
+ent: 1
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 1 jx: 2
+ent: 2
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 1 jx: 2
+ent: 3
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 1 jx: 3
+ent: 1
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 1 jx: 3
+ent: 2
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 1 jx: 3
+ent: 3
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 1 jx: 4
+ent: 1
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 1 jx: 4
+ent: 2
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 1 jx: 4
+ent: 3
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 1 jx: 5
+ent: 1
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 1 jx: 5
+ent: 2
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 1 jx: 5
+ent: 3
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 1 jx: 6
+ent: 1
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 13108.6xbar_vect[jx]: 4639.29
+ix: 1 jx: 6
+ent: 2
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 809.278xbar_vect[jx]: 4639.29
+ix: 1 jx: 6
+ent: 3
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 0xbar_vect[jx]: 4639.29
+ix: 1 jx: 7
+ent: 1
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 198.999xbar_vect[jx]: 190.075
+ix: 1 jx: 7
+ent: 2
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 141.4xbar_vect[jx]: 190.075
+ix: 1 jx: 7
+ent: 3
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 229.825xbar_vect[jx]: 190.075
+ix: 1 jx: 8
+ent: 1
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 118.842xbar_vect[jx]: 116.76
+ix: 1 jx: 8
+ent: 2
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 107.703xbar_vect[jx]: 116.76
+ix: 1 jx: 8
+ent: 3
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 123.735xbar_vect[jx]: 116.76
+ix: 1 jx: 9
+ent: 1
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 91.4952xbar_vect[jx]: 90.2834
+ix: 1 jx: 9
+ent: 2
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 85.784xbar_vect[jx]: 90.2834
+ix: 1 jx: 9
+ent: 3
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 93.5711xbar_vect[jx]: 90.2834
+ix: 1 jx: 10
+ent: 1
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 91.8748xbar_vect[jx]: 91.0658
+ix: 1 jx: 10
+ent: 2
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 88.102xbar_vect[jx]: 91.0658
+ix: 1 jx: 10
+ent: 3
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 93.2205xbar_vect[jx]: 91.0658
+ix: 1 jx: 11
+ent: 1
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 90.3512xbar_vect[jx]: 89.6936
+ix: 1 jx: 11
+ent: 2
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 87.5692xbar_vect[jx]: 89.6936
+ix: 1 jx: 11
+ent: 3
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 91.1605xbar_vect[jx]: 89.6936
+ix: 1 jx: 12
+ent: 1
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 95.89xbar_vect[jx]: 95.3215
+ix: 1 jx: 12
+ent: 2
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 93.6124xbar_vect[jx]: 95.3215
+ix: 1 jx: 12
+ent: 3
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 96.462xbar_vect[jx]: 95.3215
+ix: 1 jx: 13
+ent: 1
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 94.0452xbar_vect[jx]: 93.784
+ix: 1 jx: 13
+ent: 2
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 92.6748xbar_vect[jx]: 93.784
+ix: 1 jx: 13
+ent: 3
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 94.6321xbar_vect[jx]: 93.784
+ix: 1 jx: 14
+ent: 1
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 87.8825xbar_vect[jx]: 87.6837
+ix: 1 jx: 14
+ent: 2
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 86.8895xbar_vect[jx]: 87.6837
+ix: 1 jx: 14
+ent: 3
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 88.279xbar_vect[jx]: 87.6837
+ix: 1 jx: 15
+ent: 1
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 93.6569xbar_vect[jx]: 93.4231
+ix: 1 jx: 15
+ent: 2
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 92.6893xbar_vect[jx]: 93.4231
+ix: 1 jx: 15
+ent: 3
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 93.9232xbar_vect[jx]: 93.4231
+ix: 1 jx: 16
+ent: 1
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 95.0199xbar_vect[jx]: 94.4255
+ix: 1 jx: 16
+ent: 2
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 93.4832xbar_vect[jx]: 94.4255
+ix: 1 jx: 16
+ent: 3
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 94.7733xbar_vect[jx]: 94.4255
+ix: 1 jx: 17
+ent: 1
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 98.0729xbar_vect[jx]: 98.1071
+ix: 1 jx: 17
+ent: 2
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 97.3129xbar_vect[jx]: 98.1071
+ix: 1 jx: 17
+ent: 3
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 98.9356xbar_vect[jx]: 98.1071
+ix: 1 jx: 18
+ent: 1
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 103.979xbar_vect[jx]: 104.794
+ix: 1 jx: 18
+ent: 2
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 102.589xbar_vect[jx]: 104.794
+ix: 1 jx: 18
+ent: 3
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 107.813xbar_vect[jx]: 104.794
+ix: 1 jx: 19
+ent: 1
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 0xbar_vect[jx]: 30.9745
+ix: 1 jx: 19
+ent: 2
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 92.9235xbar_vect[jx]: 30.9745
+ix: 1 jx: 19
+ent: 3
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 0xbar_vect[jx]: 30.9745
+ix: 1 jx: 20
+ent: 1
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 1 jx: 20
+ent: 2
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 1 jx: 20
+ent: 3
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 2 jx: 1
+ent: 1
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 2 jx: 1
+ent: 2
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 2 jx: 1
+ent: 3
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 2 jx: 2
+ent: 1
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 2 jx: 2
+ent: 2
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 2 jx: 2
+ent: 3
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 2 jx: 3
+ent: 1
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 2 jx: 3
+ent: 2
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 2 jx: 3
+ent: 3
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 2 jx: 4
+ent: 1
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 2 jx: 4
+ent: 2
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 2 jx: 4
+ent: 3
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 2 jx: 5
+ent: 1
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 2 jx: 5
+ent: 2
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 2 jx: 5
+ent: 3
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 2 jx: 6
+ent: 1
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 13108.6xbar_vect[jx]: 4639.29
+ix: 2 jx: 6
+ent: 2
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 809.278xbar_vect[jx]: 4639.29
+ix: 2 jx: 6
+ent: 3
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 0xbar_vect[jx]: 4639.29
+ix: 2 jx: 7
+ent: 1
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 198.999xbar_vect[jx]: 190.075
+ix: 2 jx: 7
+ent: 2
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 141.4xbar_vect[jx]: 190.075
+ix: 2 jx: 7
+ent: 3
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 229.825xbar_vect[jx]: 190.075
+ix: 2 jx: 8
+ent: 1
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 118.842xbar_vect[jx]: 116.76
+ix: 2 jx: 8
+ent: 2
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 107.703xbar_vect[jx]: 116.76
+ix: 2 jx: 8
+ent: 3
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 123.735xbar_vect[jx]: 116.76
+ix: 2 jx: 9
+ent: 1
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 91.4952xbar_vect[jx]: 90.2834
+ix: 2 jx: 9
+ent: 2
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 85.784xbar_vect[jx]: 90.2834
+ix: 2 jx: 9
+ent: 3
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 93.5711xbar_vect[jx]: 90.2834
+ix: 2 jx: 10
+ent: 1
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 91.8748xbar_vect[jx]: 91.0658
+ix: 2 jx: 10
+ent: 2
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 88.102xbar_vect[jx]: 91.0658
+ix: 2 jx: 10
+ent: 3
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 93.2205xbar_vect[jx]: 91.0658
+ix: 2 jx: 11
+ent: 1
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 90.3512xbar_vect[jx]: 89.6936
+ix: 2 jx: 11
+ent: 2
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 87.5692xbar_vect[jx]: 89.6936
+ix: 2 jx: 11
+ent: 3
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 91.1605xbar_vect[jx]: 89.6936
+ix: 2 jx: 12
+ent: 1
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 95.89xbar_vect[jx]: 95.3215
+ix: 2 jx: 12
+ent: 2
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 93.6124xbar_vect[jx]: 95.3215
+ix: 2 jx: 12
+ent: 3
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 96.462xbar_vect[jx]: 95.3215
+ix: 2 jx: 13
+ent: 1
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 94.0452xbar_vect[jx]: 93.784
+ix: 2 jx: 13
+ent: 2
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 92.6748xbar_vect[jx]: 93.784
+ix: 2 jx: 13
+ent: 3
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 94.6321xbar_vect[jx]: 93.784
+ix: 2 jx: 14
+ent: 1
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 87.8825xbar_vect[jx]: 87.6837
+ix: 2 jx: 14
+ent: 2
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 86.8895xbar_vect[jx]: 87.6837
+ix: 2 jx: 14
+ent: 3
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 88.279xbar_vect[jx]: 87.6837
+ix: 2 jx: 15
+ent: 1
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 93.6569xbar_vect[jx]: 93.4231
+ix: 2 jx: 15
+ent: 2
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 92.6893xbar_vect[jx]: 93.4231
+ix: 2 jx: 15
+ent: 3
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 93.9232xbar_vect[jx]: 93.4231
+ix: 2 jx: 16
+ent: 1
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 95.0199xbar_vect[jx]: 94.4255
+ix: 2 jx: 16
+ent: 2
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 93.4832xbar_vect[jx]: 94.4255
+ix: 2 jx: 16
+ent: 3
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 94.7733xbar_vect[jx]: 94.4255
+ix: 2 jx: 17
+ent: 1
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 98.0729xbar_vect[jx]: 98.1071
+ix: 2 jx: 17
+ent: 2
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 97.3129xbar_vect[jx]: 98.1071
+ix: 2 jx: 17
+ent: 3
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 98.9356xbar_vect[jx]: 98.1071
+ix: 2 jx: 18
+ent: 1
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 103.979xbar_vect[jx]: 104.794
+ix: 2 jx: 18
+ent: 2
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 102.589xbar_vect[jx]: 104.794
+ix: 2 jx: 18
+ent: 3
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 107.813xbar_vect[jx]: 104.794
+ix: 2 jx: 19
+ent: 1
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 0xbar_vect[jx]: 30.9745
+ix: 2 jx: 19
+ent: 2
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 92.9235xbar_vect[jx]: 30.9745
+ix: 2 jx: 19
+ent: 3
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 0xbar_vect[jx]: 30.9745
+ix: 2 jx: 20
+ent: 1
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 2 jx: 20
+ent: 2
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 2 jx: 20
+ent: 3
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 3 jx: 1
+ent: 1
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 3 jx: 1
+ent: 2
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 3 jx: 1
+ent: 3
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 3 jx: 2
+ent: 1
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 3 jx: 2
+ent: 2
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 3 jx: 2
+ent: 3
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 3 jx: 3
+ent: 1
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 3 jx: 3
+ent: 2
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 3 jx: 3
+ent: 3
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 3 jx: 4
+ent: 1
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 3 jx: 4
+ent: 2
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 3 jx: 4
+ent: 3
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 3 jx: 5
+ent: 1
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 3 jx: 5
+ent: 2
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 3 jx: 5
+ent: 3
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 3 jx: 6
+ent: 1
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 13108.6xbar_vect[jx]: 4639.29
+ix: 3 jx: 6
+ent: 2
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 809.278xbar_vect[jx]: 4639.29
+ix: 3 jx: 6
+ent: 3
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 0xbar_vect[jx]: 4639.29
+ix: 3 jx: 7
+ent: 1
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 198.999xbar_vect[jx]: 190.075
+ix: 3 jx: 7
+ent: 2
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 141.4xbar_vect[jx]: 190.075
+ix: 3 jx: 7
+ent: 3
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 229.825xbar_vect[jx]: 190.075
+ix: 3 jx: 8
+ent: 1
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 118.842xbar_vect[jx]: 116.76
+ix: 3 jx: 8
+ent: 2
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 107.703xbar_vect[jx]: 116.76
+ix: 3 jx: 8
+ent: 3
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 123.735xbar_vect[jx]: 116.76
+ix: 3 jx: 9
+ent: 1
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 91.4952xbar_vect[jx]: 90.2834
+ix: 3 jx: 9
+ent: 2
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 85.784xbar_vect[jx]: 90.2834
+ix: 3 jx: 9
+ent: 3
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 93.5711xbar_vect[jx]: 90.2834
+ix: 3 jx: 10
+ent: 1
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 91.8748xbar_vect[jx]: 91.0658
+ix: 3 jx: 10
+ent: 2
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 88.102xbar_vect[jx]: 91.0658
+ix: 3 jx: 10
+ent: 3
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 93.2205xbar_vect[jx]: 91.0658
+ix: 3 jx: 11
+ent: 1
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 90.3512xbar_vect[jx]: 89.6936
+ix: 3 jx: 11
+ent: 2
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 87.5692xbar_vect[jx]: 89.6936
+ix: 3 jx: 11
+ent: 3
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 91.1605xbar_vect[jx]: 89.6936
+ix: 3 jx: 12
+ent: 1
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 95.89xbar_vect[jx]: 95.3215
+ix: 3 jx: 12
+ent: 2
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 93.6124xbar_vect[jx]: 95.3215
+ix: 3 jx: 12
+ent: 3
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 96.462xbar_vect[jx]: 95.3215
+ix: 3 jx: 13
+ent: 1
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 94.0452xbar_vect[jx]: 93.784
+ix: 3 jx: 13
+ent: 2
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 92.6748xbar_vect[jx]: 93.784
+ix: 3 jx: 13
+ent: 3
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 94.6321xbar_vect[jx]: 93.784
+ix: 3 jx: 14
+ent: 1
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 87.8825xbar_vect[jx]: 87.6837
+ix: 3 jx: 14
+ent: 2
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 86.8895xbar_vect[jx]: 87.6837
+ix: 3 jx: 14
+ent: 3
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 88.279xbar_vect[jx]: 87.6837
+ix: 3 jx: 15
+ent: 1
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 93.6569xbar_vect[jx]: 93.4231
+ix: 3 jx: 15
+ent: 2
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 92.6893xbar_vect[jx]: 93.4231
+ix: 3 jx: 15
+ent: 3
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 93.9232xbar_vect[jx]: 93.4231
+ix: 3 jx: 16
+ent: 1
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 95.0199xbar_vect[jx]: 94.4255
+ix: 3 jx: 16
+ent: 2
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 93.4832xbar_vect[jx]: 94.4255
+ix: 3 jx: 16
+ent: 3
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 94.7733xbar_vect[jx]: 94.4255
+ix: 3 jx: 17
+ent: 1
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 98.0729xbar_vect[jx]: 98.1071
+ix: 3 jx: 17
+ent: 2
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 97.3129xbar_vect[jx]: 98.1071
+ix: 3 jx: 17
+ent: 3
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 98.9356xbar_vect[jx]: 98.1071
+ix: 3 jx: 18
+ent: 1
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 103.979xbar_vect[jx]: 104.794
+ix: 3 jx: 18
+ent: 2
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 102.589xbar_vect[jx]: 104.794
+ix: 3 jx: 18
+ent: 3
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 107.813xbar_vect[jx]: 104.794
+ix: 3 jx: 19
+ent: 1
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 0xbar_vect[jx]: 30.9745
+ix: 3 jx: 19
+ent: 2
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 92.9235xbar_vect[jx]: 30.9745
+ix: 3 jx: 19
+ent: 3
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 0xbar_vect[jx]: 30.9745
+ix: 3 jx: 20
+ent: 1
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 3 jx: 20
+ent: 2
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 3 jx: 20
+ent: 3
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 4 jx: 1
+ent: 1
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 4 jx: 1
+ent: 2
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 4 jx: 1
+ent: 3
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 4 jx: 2
+ent: 1
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 4 jx: 2
+ent: 2
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 4 jx: 2
+ent: 3
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 4 jx: 3
+ent: 1
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 4 jx: 3
+ent: 2
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 4 jx: 3
+ent: 3
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 4 jx: 4
+ent: 1
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 4 jx: 4
+ent: 2
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 4 jx: 4
+ent: 3
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 4 jx: 5
+ent: 1
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 4 jx: 5
+ent: 2
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 4 jx: 5
+ent: 3
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 4 jx: 6
+ent: 1
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 13108.6xbar_vect[jx]: 4639.29
+ix: 4 jx: 6
+ent: 2
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 809.278xbar_vect[jx]: 4639.29
+ix: 4 jx: 6
+ent: 3
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 0xbar_vect[jx]: 4639.29
+ix: 4 jx: 7
+ent: 1
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 198.999xbar_vect[jx]: 190.075
+ix: 4 jx: 7
+ent: 2
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 141.4xbar_vect[jx]: 190.075
+ix: 4 jx: 7
+ent: 3
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 229.825xbar_vect[jx]: 190.075
+ix: 4 jx: 8
+ent: 1
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 118.842xbar_vect[jx]: 116.76
+ix: 4 jx: 8
+ent: 2
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 107.703xbar_vect[jx]: 116.76
+ix: 4 jx: 8
+ent: 3
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 123.735xbar_vect[jx]: 116.76
+ix: 4 jx: 9
+ent: 1
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 91.4952xbar_vect[jx]: 90.2834
+ix: 4 jx: 9
+ent: 2
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 85.784xbar_vect[jx]: 90.2834
+ix: 4 jx: 9
+ent: 3
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 93.5711xbar_vect[jx]: 90.2834
+ix: 4 jx: 10
+ent: 1
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 91.8748xbar_vect[jx]: 91.0658
+ix: 4 jx: 10
+ent: 2
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 88.102xbar_vect[jx]: 91.0658
+ix: 4 jx: 10
+ent: 3
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 93.2205xbar_vect[jx]: 91.0658
+ix: 4 jx: 11
+ent: 1
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 90.3512xbar_vect[jx]: 89.6936
+ix: 4 jx: 11
+ent: 2
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 87.5692xbar_vect[jx]: 89.6936
+ix: 4 jx: 11
+ent: 3
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 91.1605xbar_vect[jx]: 89.6936
+ix: 4 jx: 12
+ent: 1
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 95.89xbar_vect[jx]: 95.3215
+ix: 4 jx: 12
+ent: 2
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 93.6124xbar_vect[jx]: 95.3215
+ix: 4 jx: 12
+ent: 3
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 96.462xbar_vect[jx]: 95.3215
+ix: 4 jx: 13
+ent: 1
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 94.0452xbar_vect[jx]: 93.784
+ix: 4 jx: 13
+ent: 2
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 92.6748xbar_vect[jx]: 93.784
+ix: 4 jx: 13
+ent: 3
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 94.6321xbar_vect[jx]: 93.784
+ix: 4 jx: 14
+ent: 1
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 87.8825xbar_vect[jx]: 87.6837
+ix: 4 jx: 14
+ent: 2
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 86.8895xbar_vect[jx]: 87.6837
+ix: 4 jx: 14
+ent: 3
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 88.279xbar_vect[jx]: 87.6837
+ix: 4 jx: 15
+ent: 1
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 93.6569xbar_vect[jx]: 93.4231
+ix: 4 jx: 15
+ent: 2
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 92.6893xbar_vect[jx]: 93.4231
+ix: 4 jx: 15
+ent: 3
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 93.9232xbar_vect[jx]: 93.4231
+ix: 4 jx: 16
+ent: 1
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 95.0199xbar_vect[jx]: 94.4255
+ix: 4 jx: 16
+ent: 2
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 93.4832xbar_vect[jx]: 94.4255
+ix: 4 jx: 16
+ent: 3
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 94.7733xbar_vect[jx]: 94.4255
+ix: 4 jx: 17
+ent: 1
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 98.0729xbar_vect[jx]: 98.1071
+ix: 4 jx: 17
+ent: 2
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 97.3129xbar_vect[jx]: 98.1071
+ix: 4 jx: 17
+ent: 3
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 98.9356xbar_vect[jx]: 98.1071
+ix: 4 jx: 18
+ent: 1
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 103.979xbar_vect[jx]: 104.794
+ix: 4 jx: 18
+ent: 2
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 102.589xbar_vect[jx]: 104.794
+ix: 4 jx: 18
+ent: 3
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 107.813xbar_vect[jx]: 104.794
+ix: 4 jx: 19
+ent: 1
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 0xbar_vect[jx]: 30.9745
+ix: 4 jx: 19
+ent: 2
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 92.9235xbar_vect[jx]: 30.9745
+ix: 4 jx: 19
+ent: 3
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 0xbar_vect[jx]: 30.9745
+ix: 4 jx: 20
+ent: 1
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 4 jx: 20
+ent: 2
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 4 jx: 20
+ent: 3
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 5 jx: 1
+ent: 1
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 5 jx: 1
+ent: 2
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 5 jx: 1
+ent: 3
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 5 jx: 2
+ent: 1
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 5 jx: 2
+ent: 2
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 5 jx: 2
+ent: 3
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 5 jx: 3
+ent: 1
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 5 jx: 3
+ent: 2
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 5 jx: 3
+ent: 3
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 5 jx: 4
+ent: 1
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 5 jx: 4
+ent: 2
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 5 jx: 4
+ent: 3
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 5 jx: 5
+ent: 1
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 5 jx: 5
+ent: 2
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 5 jx: 5
+ent: 3
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 5 jx: 6
+ent: 1
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 13108.6xbar_vect[jx]: 4639.29
+ix: 5 jx: 6
+ent: 2
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 809.278xbar_vect[jx]: 4639.29
+ix: 5 jx: 6
+ent: 3
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 0xbar_vect[jx]: 4639.29
+ix: 5 jx: 7
+ent: 1
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 198.999xbar_vect[jx]: 190.075
+ix: 5 jx: 7
+ent: 2
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 141.4xbar_vect[jx]: 190.075
+ix: 5 jx: 7
+ent: 3
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 229.825xbar_vect[jx]: 190.075
+ix: 5 jx: 8
+ent: 1
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 118.842xbar_vect[jx]: 116.76
+ix: 5 jx: 8
+ent: 2
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 107.703xbar_vect[jx]: 116.76
+ix: 5 jx: 8
+ent: 3
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 123.735xbar_vect[jx]: 116.76
+ix: 5 jx: 9
+ent: 1
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 91.4952xbar_vect[jx]: 90.2834
+ix: 5 jx: 9
+ent: 2
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 85.784xbar_vect[jx]: 90.2834
+ix: 5 jx: 9
+ent: 3
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 93.5711xbar_vect[jx]: 90.2834
+ix: 5 jx: 10
+ent: 1
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 91.8748xbar_vect[jx]: 91.0658
+ix: 5 jx: 10
+ent: 2
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 88.102xbar_vect[jx]: 91.0658
+ix: 5 jx: 10
+ent: 3
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 93.2205xbar_vect[jx]: 91.0658
+ix: 5 jx: 11
+ent: 1
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 90.3512xbar_vect[jx]: 89.6936
+ix: 5 jx: 11
+ent: 2
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 87.5692xbar_vect[jx]: 89.6936
+ix: 5 jx: 11
+ent: 3
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 91.1605xbar_vect[jx]: 89.6936
+ix: 5 jx: 12
+ent: 1
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 95.89xbar_vect[jx]: 95.3215
+ix: 5 jx: 12
+ent: 2
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 93.6124xbar_vect[jx]: 95.3215
+ix: 5 jx: 12
+ent: 3
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 96.462xbar_vect[jx]: 95.3215
+ix: 5 jx: 13
+ent: 1
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 94.0452xbar_vect[jx]: 93.784
+ix: 5 jx: 13
+ent: 2
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 92.6748xbar_vect[jx]: 93.784
+ix: 5 jx: 13
+ent: 3
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 94.6321xbar_vect[jx]: 93.784
+ix: 5 jx: 14
+ent: 1
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 87.8825xbar_vect[jx]: 87.6837
+ix: 5 jx: 14
+ent: 2
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 86.8895xbar_vect[jx]: 87.6837
+ix: 5 jx: 14
+ent: 3
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 88.279xbar_vect[jx]: 87.6837
+ix: 5 jx: 15
+ent: 1
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 93.6569xbar_vect[jx]: 93.4231
+ix: 5 jx: 15
+ent: 2
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 92.6893xbar_vect[jx]: 93.4231
+ix: 5 jx: 15
+ent: 3
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 93.9232xbar_vect[jx]: 93.4231
+ix: 5 jx: 16
+ent: 1
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 95.0199xbar_vect[jx]: 94.4255
+ix: 5 jx: 16
+ent: 2
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 93.4832xbar_vect[jx]: 94.4255
+ix: 5 jx: 16
+ent: 3
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 94.7733xbar_vect[jx]: 94.4255
+ix: 5 jx: 17
+ent: 1
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 98.0729xbar_vect[jx]: 98.1071
+ix: 5 jx: 17
+ent: 2
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 97.3129xbar_vect[jx]: 98.1071
+ix: 5 jx: 17
+ent: 3
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 98.9356xbar_vect[jx]: 98.1071
+ix: 5 jx: 18
+ent: 1
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 103.979xbar_vect[jx]: 104.794
+ix: 5 jx: 18
+ent: 2
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 102.589xbar_vect[jx]: 104.794
+ix: 5 jx: 18
+ent: 3
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 107.813xbar_vect[jx]: 104.794
+ix: 5 jx: 19
+ent: 1
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 0xbar_vect[jx]: 30.9745
+ix: 5 jx: 19
+ent: 2
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 92.9235xbar_vect[jx]: 30.9745
+ix: 5 jx: 19
+ent: 3
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 0xbar_vect[jx]: 30.9745
+ix: 5 jx: 20
+ent: 1
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 5 jx: 20
+ent: 2
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 5 jx: 20
+ent: 3
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 6 jx: 1
+ent: 1
+uni[ix]: 13108.6xbar_vect[ix]: 4639.29
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 6 jx: 1
+ent: 2
+uni[ix]: 809.278xbar_vect[ix]: 4639.29
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 6 jx: 1
+ent: 3
+uni[ix]: 0xbar_vect[ix]: 4639.29
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 6 jx: 2
+ent: 1
+uni[ix]: 13108.6xbar_vect[ix]: 4639.29
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 6 jx: 2
+ent: 2
+uni[ix]: 809.278xbar_vect[ix]: 4639.29
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 6 jx: 2
+ent: 3
+uni[ix]: 0xbar_vect[ix]: 4639.29
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 6 jx: 3
+ent: 1
+uni[ix]: 13108.6xbar_vect[ix]: 4639.29
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 6 jx: 3
+ent: 2
+uni[ix]: 809.278xbar_vect[ix]: 4639.29
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 6 jx: 3
+ent: 3
+uni[ix]: 0xbar_vect[ix]: 4639.29
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 6 jx: 4
+ent: 1
+uni[ix]: 13108.6xbar_vect[ix]: 4639.29
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 6 jx: 4
+ent: 2
+uni[ix]: 809.278xbar_vect[ix]: 4639.29
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 6 jx: 4
+ent: 3
+uni[ix]: 0xbar_vect[ix]: 4639.29
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 6 jx: 5
+ent: 1
+uni[ix]: 13108.6xbar_vect[ix]: 4639.29
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 6 jx: 5
+ent: 2
+uni[ix]: 809.278xbar_vect[ix]: 4639.29
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 6 jx: 5
+ent: 3
+uni[ix]: 0xbar_vect[ix]: 4639.29
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 6 jx: 6
+ent: 1
+uni[ix]: 13108.6xbar_vect[ix]: 4639.29
+uni[jx]: 13108.6xbar_vect[jx]: 4639.29
+ix: 6 jx: 6
+ent: 2
+uni[ix]: 809.278xbar_vect[ix]: 4639.29
+uni[jx]: 809.278xbar_vect[jx]: 4639.29
+ix: 6 jx: 6
+ent: 3
+uni[ix]: 0xbar_vect[ix]: 4639.29
+uni[jx]: 0xbar_vect[jx]: 4639.29
+ix: 6 jx: 7
+ent: 1
+uni[ix]: 13108.6xbar_vect[ix]: 4639.29
+uni[jx]: 198.999xbar_vect[jx]: 190.075
+ix: 6 jx: 7
+ent: 2
+uni[ix]: 809.278xbar_vect[ix]: 4639.29
+uni[jx]: 141.4xbar_vect[jx]: 190.075
+ix: 6 jx: 7
+ent: 3
+uni[ix]: 0xbar_vect[ix]: 4639.29
+uni[jx]: 229.825xbar_vect[jx]: 190.075
+ix: 6 jx: 8
+ent: 1
+uni[ix]: 13108.6xbar_vect[ix]: 4639.29
+uni[jx]: 118.842xbar_vect[jx]: 116.76
+ix: 6 jx: 8
+ent: 2
+uni[ix]: 809.278xbar_vect[ix]: 4639.29
+uni[jx]: 107.703xbar_vect[jx]: 116.76
+ix: 6 jx: 8
+ent: 3
+uni[ix]: 0xbar_vect[ix]: 4639.29
+uni[jx]: 123.735xbar_vect[jx]: 116.76
+ix: 6 jx: 9
+ent: 1
+uni[ix]: 13108.6xbar_vect[ix]: 4639.29
+uni[jx]: 91.4952xbar_vect[jx]: 90.2834
+ix: 6 jx: 9
+ent: 2
+uni[ix]: 809.278xbar_vect[ix]: 4639.29
+uni[jx]: 85.784xbar_vect[jx]: 90.2834
+ix: 6 jx: 9
+ent: 3
+uni[ix]: 0xbar_vect[ix]: 4639.29
+uni[jx]: 93.5711xbar_vect[jx]: 90.2834
+ix: 6 jx: 10
+ent: 1
+uni[ix]: 13108.6xbar_vect[ix]: 4639.29
+uni[jx]: 91.8748xbar_vect[jx]: 91.0658
+ix: 6 jx: 10
+ent: 2
+uni[ix]: 809.278xbar_vect[ix]: 4639.29
+uni[jx]: 88.102xbar_vect[jx]: 91.0658
+ix: 6 jx: 10
+ent: 3
+uni[ix]: 0xbar_vect[ix]: 4639.29
+uni[jx]: 93.2205xbar_vect[jx]: 91.0658
+ix: 6 jx: 11
+ent: 1
+uni[ix]: 13108.6xbar_vect[ix]: 4639.29
+uni[jx]: 90.3512xbar_vect[jx]: 89.6936
+ix: 6 jx: 11
+ent: 2
+uni[ix]: 809.278xbar_vect[ix]: 4639.29
+uni[jx]: 87.5692xbar_vect[jx]: 89.6936
+ix: 6 jx: 11
+ent: 3
+uni[ix]: 0xbar_vect[ix]: 4639.29
+uni[jx]: 91.1605xbar_vect[jx]: 89.6936
+ix: 6 jx: 12
+ent: 1
+uni[ix]: 13108.6xbar_vect[ix]: 4639.29
+uni[jx]: 95.89xbar_vect[jx]: 95.3215
+ix: 6 jx: 12
+ent: 2
+uni[ix]: 809.278xbar_vect[ix]: 4639.29
+uni[jx]: 93.6124xbar_vect[jx]: 95.3215
+ix: 6 jx: 12
+ent: 3
+uni[ix]: 0xbar_vect[ix]: 4639.29
+uni[jx]: 96.462xbar_vect[jx]: 95.3215
+ix: 6 jx: 13
+ent: 1
+uni[ix]: 13108.6xbar_vect[ix]: 4639.29
+uni[jx]: 94.0452xbar_vect[jx]: 93.784
+ix: 6 jx: 13
+ent: 2
+uni[ix]: 809.278xbar_vect[ix]: 4639.29
+uni[jx]: 92.6748xbar_vect[jx]: 93.784
+ix: 6 jx: 13
+ent: 3
+uni[ix]: 0xbar_vect[ix]: 4639.29
+uni[jx]: 94.6321xbar_vect[jx]: 93.784
+ix: 6 jx: 14
+ent: 1
+uni[ix]: 13108.6xbar_vect[ix]: 4639.29
+uni[jx]: 87.8825xbar_vect[jx]: 87.6837
+ix: 6 jx: 14
+ent: 2
+uni[ix]: 809.278xbar_vect[ix]: 4639.29
+uni[jx]: 86.8895xbar_vect[jx]: 87.6837
+ix: 6 jx: 14
+ent: 3
+uni[ix]: 0xbar_vect[ix]: 4639.29
+uni[jx]: 88.279xbar_vect[jx]: 87.6837
+ix: 6 jx: 15
+ent: 1
+uni[ix]: 13108.6xbar_vect[ix]: 4639.29
+uni[jx]: 93.6569xbar_vect[jx]: 93.4231
+ix: 6 jx: 15
+ent: 2
+uni[ix]: 809.278xbar_vect[ix]: 4639.29
+uni[jx]: 92.6893xbar_vect[jx]: 93.4231
+ix: 6 jx: 15
+ent: 3
+uni[ix]: 0xbar_vect[ix]: 4639.29
+uni[jx]: 93.9232xbar_vect[jx]: 93.4231
+ix: 6 jx: 16
+ent: 1
+uni[ix]: 13108.6xbar_vect[ix]: 4639.29
+uni[jx]: 95.0199xbar_vect[jx]: 94.4255
+ix: 6 jx: 16
+ent: 2
+uni[ix]: 809.278xbar_vect[ix]: 4639.29
+uni[jx]: 93.4832xbar_vect[jx]: 94.4255
+ix: 6 jx: 16
+ent: 3
+uni[ix]: 0xbar_vect[ix]: 4639.29
+uni[jx]: 94.7733xbar_vect[jx]: 94.4255
+ix: 6 jx: 17
+ent: 1
+uni[ix]: 13108.6xbar_vect[ix]: 4639.29
+uni[jx]: 98.0729xbar_vect[jx]: 98.1071
+ix: 6 jx: 17
+ent: 2
+uni[ix]: 809.278xbar_vect[ix]: 4639.29
+uni[jx]: 97.3129xbar_vect[jx]: 98.1071
+ix: 6 jx: 17
+ent: 3
+uni[ix]: 0xbar_vect[ix]: 4639.29
+uni[jx]: 98.9356xbar_vect[jx]: 98.1071
+ix: 6 jx: 18
+ent: 1
+uni[ix]: 13108.6xbar_vect[ix]: 4639.29
+uni[jx]: 103.979xbar_vect[jx]: 104.794
+ix: 6 jx: 18
+ent: 2
+uni[ix]: 809.278xbar_vect[ix]: 4639.29
+uni[jx]: 102.589xbar_vect[jx]: 104.794
+ix: 6 jx: 18
+ent: 3
+uni[ix]: 0xbar_vect[ix]: 4639.29
+uni[jx]: 107.813xbar_vect[jx]: 104.794
+ix: 6 jx: 19
+ent: 1
+uni[ix]: 13108.6xbar_vect[ix]: 4639.29
+uni[jx]: 0xbar_vect[jx]: 30.9745
+ix: 6 jx: 19
+ent: 2
+uni[ix]: 809.278xbar_vect[ix]: 4639.29
+uni[jx]: 92.9235xbar_vect[jx]: 30.9745
+ix: 6 jx: 19
+ent: 3
+uni[ix]: 0xbar_vect[ix]: 4639.29
+uni[jx]: 0xbar_vect[jx]: 30.9745
+ix: 6 jx: 20
+ent: 1
+uni[ix]: 13108.6xbar_vect[ix]: 4639.29
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 6 jx: 20
+ent: 2
+uni[ix]: 809.278xbar_vect[ix]: 4639.29
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 6 jx: 20
+ent: 3
+uni[ix]: 0xbar_vect[ix]: 4639.29
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 7 jx: 1
+ent: 1
+uni[ix]: 198.999xbar_vect[ix]: 190.075
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 7 jx: 1
+ent: 2
+uni[ix]: 141.4xbar_vect[ix]: 190.075
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 7 jx: 1
+ent: 3
+uni[ix]: 229.825xbar_vect[ix]: 190.075
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 7 jx: 2
+ent: 1
+uni[ix]: 198.999xbar_vect[ix]: 190.075
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 7 jx: 2
+ent: 2
+uni[ix]: 141.4xbar_vect[ix]: 190.075
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 7 jx: 2
+ent: 3
+uni[ix]: 229.825xbar_vect[ix]: 190.075
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 7 jx: 3
+ent: 1
+uni[ix]: 198.999xbar_vect[ix]: 190.075
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 7 jx: 3
+ent: 2
+uni[ix]: 141.4xbar_vect[ix]: 190.075
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 7 jx: 3
+ent: 3
+uni[ix]: 229.825xbar_vect[ix]: 190.075
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 7 jx: 4
+ent: 1
+uni[ix]: 198.999xbar_vect[ix]: 190.075
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 7 jx: 4
+ent: 2
+uni[ix]: 141.4xbar_vect[ix]: 190.075
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 7 jx: 4
+ent: 3
+uni[ix]: 229.825xbar_vect[ix]: 190.075
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 7 jx: 5
+ent: 1
+uni[ix]: 198.999xbar_vect[ix]: 190.075
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 7 jx: 5
+ent: 2
+uni[ix]: 141.4xbar_vect[ix]: 190.075
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 7 jx: 5
+ent: 3
+uni[ix]: 229.825xbar_vect[ix]: 190.075
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 7 jx: 6
+ent: 1
+uni[ix]: 198.999xbar_vect[ix]: 190.075
+uni[jx]: 13108.6xbar_vect[jx]: 4639.29
+ix: 7 jx: 6
+ent: 2
+uni[ix]: 141.4xbar_vect[ix]: 190.075
+uni[jx]: 809.278xbar_vect[jx]: 4639.29
+ix: 7 jx: 6
+ent: 3
+uni[ix]: 229.825xbar_vect[ix]: 190.075
+uni[jx]: 0xbar_vect[jx]: 4639.29
+ix: 7 jx: 7
+ent: 1
+uni[ix]: 198.999xbar_vect[ix]: 190.075
+uni[jx]: 198.999xbar_vect[jx]: 190.075
+ix: 7 jx: 7
+ent: 2
+uni[ix]: 141.4xbar_vect[ix]: 190.075
+uni[jx]: 141.4xbar_vect[jx]: 190.075
+ix: 7 jx: 7
+ent: 3
+uni[ix]: 229.825xbar_vect[ix]: 190.075
+uni[jx]: 229.825xbar_vect[jx]: 190.075
+ix: 7 jx: 8
+ent: 1
+uni[ix]: 198.999xbar_vect[ix]: 190.075
+uni[jx]: 118.842xbar_vect[jx]: 116.76
+ix: 7 jx: 8
+ent: 2
+uni[ix]: 141.4xbar_vect[ix]: 190.075
+uni[jx]: 107.703xbar_vect[jx]: 116.76
+ix: 7 jx: 8
+ent: 3
+uni[ix]: 229.825xbar_vect[ix]: 190.075
+uni[jx]: 123.735xbar_vect[jx]: 116.76
+ix: 7 jx: 9
+ent: 1
+uni[ix]: 198.999xbar_vect[ix]: 190.075
+uni[jx]: 91.4952xbar_vect[jx]: 90.2834
+ix: 7 jx: 9
+ent: 2
+uni[ix]: 141.4xbar_vect[ix]: 190.075
+uni[jx]: 85.784xbar_vect[jx]: 90.2834
+ix: 7 jx: 9
+ent: 3
+uni[ix]: 229.825xbar_vect[ix]: 190.075
+uni[jx]: 93.5711xbar_vect[jx]: 90.2834
+ix: 7 jx: 10
+ent: 1
+uni[ix]: 198.999xbar_vect[ix]: 190.075
+uni[jx]: 91.8748xbar_vect[jx]: 91.0658
+ix: 7 jx: 10
+ent: 2
+uni[ix]: 141.4xbar_vect[ix]: 190.075
+uni[jx]: 88.102xbar_vect[jx]: 91.0658
+ix: 7 jx: 10
+ent: 3
+uni[ix]: 229.825xbar_vect[ix]: 190.075
+uni[jx]: 93.2205xbar_vect[jx]: 91.0658
+ix: 7 jx: 11
+ent: 1
+uni[ix]: 198.999xbar_vect[ix]: 190.075
+uni[jx]: 90.3512xbar_vect[jx]: 89.6936
+ix: 7 jx: 11
+ent: 2
+uni[ix]: 141.4xbar_vect[ix]: 190.075
+uni[jx]: 87.5692xbar_vect[jx]: 89.6936
+ix: 7 jx: 11
+ent: 3
+uni[ix]: 229.825xbar_vect[ix]: 190.075
+uni[jx]: 91.1605xbar_vect[jx]: 89.6936
+ix: 7 jx: 12
+ent: 1
+uni[ix]: 198.999xbar_vect[ix]: 190.075
+uni[jx]: 95.89xbar_vect[jx]: 95.3215
+ix: 7 jx: 12
+ent: 2
+uni[ix]: 141.4xbar_vect[ix]: 190.075
+uni[jx]: 93.6124xbar_vect[jx]: 95.3215
+ix: 7 jx: 12
+ent: 3
+uni[ix]: 229.825xbar_vect[ix]: 190.075
+uni[jx]: 96.462xbar_vect[jx]: 95.3215
+ix: 7 jx: 13
+ent: 1
+uni[ix]: 198.999xbar_vect[ix]: 190.075
+uni[jx]: 94.0452xbar_vect[jx]: 93.784
+ix: 7 jx: 13
+ent: 2
+uni[ix]: 141.4xbar_vect[ix]: 190.075
+uni[jx]: 92.6748xbar_vect[jx]: 93.784
+ix: 7 jx: 13
+ent: 3
+uni[ix]: 229.825xbar_vect[ix]: 190.075
+uni[jx]: 94.6321xbar_vect[jx]: 93.784
+ix: 7 jx: 14
+ent: 1
+uni[ix]: 198.999xbar_vect[ix]: 190.075
+uni[jx]: 87.8825xbar_vect[jx]: 87.6837
+ix: 7 jx: 14
+ent: 2
+uni[ix]: 141.4xbar_vect[ix]: 190.075
+uni[jx]: 86.8895xbar_vect[jx]: 87.6837
+ix: 7 jx: 14
+ent: 3
+uni[ix]: 229.825xbar_vect[ix]: 190.075
+uni[jx]: 88.279xbar_vect[jx]: 87.6837
+ix: 7 jx: 15
+ent: 1
+uni[ix]: 198.999xbar_vect[ix]: 190.075
+uni[jx]: 93.6569xbar_vect[jx]: 93.4231
+ix: 7 jx: 15
+ent: 2
+uni[ix]: 141.4xbar_vect[ix]: 190.075
+uni[jx]: 92.6893xbar_vect[jx]: 93.4231
+ix: 7 jx: 15
+ent: 3
+uni[ix]: 229.825xbar_vect[ix]: 190.075
+uni[jx]: 93.9232xbar_vect[jx]: 93.4231
+ix: 7 jx: 16
+ent: 1
+uni[ix]: 198.999xbar_vect[ix]: 190.075
+uni[jx]: 95.0199xbar_vect[jx]: 94.4255
+ix: 7 jx: 16
+ent: 2
+uni[ix]: 141.4xbar_vect[ix]: 190.075
+uni[jx]: 93.4832xbar_vect[jx]: 94.4255
+ix: 7 jx: 16
+ent: 3
+uni[ix]: 229.825xbar_vect[ix]: 190.075
+uni[jx]: 94.7733xbar_vect[jx]: 94.4255
+ix: 7 jx: 17
+ent: 1
+uni[ix]: 198.999xbar_vect[ix]: 190.075
+uni[jx]: 98.0729xbar_vect[jx]: 98.1071
+ix: 7 jx: 17
+ent: 2
+uni[ix]: 141.4xbar_vect[ix]: 190.075
+uni[jx]: 97.3129xbar_vect[jx]: 98.1071
+ix: 7 jx: 17
+ent: 3
+uni[ix]: 229.825xbar_vect[ix]: 190.075
+uni[jx]: 98.9356xbar_vect[jx]: 98.1071
+ix: 7 jx: 18
+ent: 1
+uni[ix]: 198.999xbar_vect[ix]: 190.075
+uni[jx]: 103.979xbar_vect[jx]: 104.794
+ix: 7 jx: 18
+ent: 2
+uni[ix]: 141.4xbar_vect[ix]: 190.075
+uni[jx]: 102.589xbar_vect[jx]: 104.794
+ix: 7 jx: 18
+ent: 3
+uni[ix]: 229.825xbar_vect[ix]: 190.075
+uni[jx]: 107.813xbar_vect[jx]: 104.794
+ix: 7 jx: 19
+ent: 1
+uni[ix]: 198.999xbar_vect[ix]: 190.075
+uni[jx]: 0xbar_vect[jx]: 30.9745
+ix: 7 jx: 19
+ent: 2
+uni[ix]: 141.4xbar_vect[ix]: 190.075
+uni[jx]: 92.9235xbar_vect[jx]: 30.9745
+ix: 7 jx: 19
+ent: 3
+uni[ix]: 229.825xbar_vect[ix]: 190.075
+uni[jx]: 0xbar_vect[jx]: 30.9745
+ix: 7 jx: 20
+ent: 1
+uni[ix]: 198.999xbar_vect[ix]: 190.075
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 7 jx: 20
+ent: 2
+uni[ix]: 141.4xbar_vect[ix]: 190.075
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 7 jx: 20
+ent: 3
+uni[ix]: 229.825xbar_vect[ix]: 190.075
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 8 jx: 1
+ent: 1
+uni[ix]: 118.842xbar_vect[ix]: 116.76
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 8 jx: 1
+ent: 2
+uni[ix]: 107.703xbar_vect[ix]: 116.76
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 8 jx: 1
+ent: 3
+uni[ix]: 123.735xbar_vect[ix]: 116.76
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 8 jx: 2
+ent: 1
+uni[ix]: 118.842xbar_vect[ix]: 116.76
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 8 jx: 2
+ent: 2
+uni[ix]: 107.703xbar_vect[ix]: 116.76
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 8 jx: 2
+ent: 3
+uni[ix]: 123.735xbar_vect[ix]: 116.76
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 8 jx: 3
+ent: 1
+uni[ix]: 118.842xbar_vect[ix]: 116.76
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 8 jx: 3
+ent: 2
+uni[ix]: 107.703xbar_vect[ix]: 116.76
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 8 jx: 3
+ent: 3
+uni[ix]: 123.735xbar_vect[ix]: 116.76
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 8 jx: 4
+ent: 1
+uni[ix]: 118.842xbar_vect[ix]: 116.76
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 8 jx: 4
+ent: 2
+uni[ix]: 107.703xbar_vect[ix]: 116.76
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 8 jx: 4
+ent: 3
+uni[ix]: 123.735xbar_vect[ix]: 116.76
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 8 jx: 5
+ent: 1
+uni[ix]: 118.842xbar_vect[ix]: 116.76
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 8 jx: 5
+ent: 2
+uni[ix]: 107.703xbar_vect[ix]: 116.76
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 8 jx: 5
+ent: 3
+uni[ix]: 123.735xbar_vect[ix]: 116.76
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 8 jx: 6
+ent: 1
+uni[ix]: 118.842xbar_vect[ix]: 116.76
+uni[jx]: 13108.6xbar_vect[jx]: 4639.29
+ix: 8 jx: 6
+ent: 2
+uni[ix]: 107.703xbar_vect[ix]: 116.76
+uni[jx]: 809.278xbar_vect[jx]: 4639.29
+ix: 8 jx: 6
+ent: 3
+uni[ix]: 123.735xbar_vect[ix]: 116.76
+uni[jx]: 0xbar_vect[jx]: 4639.29
+ix: 8 jx: 7
+ent: 1
+uni[ix]: 118.842xbar_vect[ix]: 116.76
+uni[jx]: 198.999xbar_vect[jx]: 190.075
+ix: 8 jx: 7
+ent: 2
+uni[ix]: 107.703xbar_vect[ix]: 116.76
+uni[jx]: 141.4xbar_vect[jx]: 190.075
+ix: 8 jx: 7
+ent: 3
+uni[ix]: 123.735xbar_vect[ix]: 116.76
+uni[jx]: 229.825xbar_vect[jx]: 190.075
+ix: 8 jx: 8
+ent: 1
+uni[ix]: 118.842xbar_vect[ix]: 116.76
+uni[jx]: 118.842xbar_vect[jx]: 116.76
+ix: 8 jx: 8
+ent: 2
+uni[ix]: 107.703xbar_vect[ix]: 116.76
+uni[jx]: 107.703xbar_vect[jx]: 116.76
+ix: 8 jx: 8
+ent: 3
+uni[ix]: 123.735xbar_vect[ix]: 116.76
+uni[jx]: 123.735xbar_vect[jx]: 116.76
+ix: 8 jx: 9
+ent: 1
+uni[ix]: 118.842xbar_vect[ix]: 116.76
+uni[jx]: 91.4952xbar_vect[jx]: 90.2834
+ix: 8 jx: 9
+ent: 2
+uni[ix]: 107.703xbar_vect[ix]: 116.76
+uni[jx]: 85.784xbar_vect[jx]: 90.2834
+ix: 8 jx: 9
+ent: 3
+uni[ix]: 123.735xbar_vect[ix]: 116.76
+uni[jx]: 93.5711xbar_vect[jx]: 90.2834
+ix: 8 jx: 10
+ent: 1
+uni[ix]: 118.842xbar_vect[ix]: 116.76
+uni[jx]: 91.8748xbar_vect[jx]: 91.0658
+ix: 8 jx: 10
+ent: 2
+uni[ix]: 107.703xbar_vect[ix]: 116.76
+uni[jx]: 88.102xbar_vect[jx]: 91.0658
+ix: 8 jx: 10
+ent: 3
+uni[ix]: 123.735xbar_vect[ix]: 116.76
+uni[jx]: 93.2205xbar_vect[jx]: 91.0658
+ix: 8 jx: 11
+ent: 1
+uni[ix]: 118.842xbar_vect[ix]: 116.76
+uni[jx]: 90.3512xbar_vect[jx]: 89.6936
+ix: 8 jx: 11
+ent: 2
+uni[ix]: 107.703xbar_vect[ix]: 116.76
+uni[jx]: 87.5692xbar_vect[jx]: 89.6936
+ix: 8 jx: 11
+ent: 3
+uni[ix]: 123.735xbar_vect[ix]: 116.76
+uni[jx]: 91.1605xbar_vect[jx]: 89.6936
+ix: 8 jx: 12
+ent: 1
+uni[ix]: 118.842xbar_vect[ix]: 116.76
+uni[jx]: 95.89xbar_vect[jx]: 95.3215
+ix: 8 jx: 12
+ent: 2
+uni[ix]: 107.703xbar_vect[ix]: 116.76
+uni[jx]: 93.6124xbar_vect[jx]: 95.3215
+ix: 8 jx: 12
+ent: 3
+uni[ix]: 123.735xbar_vect[ix]: 116.76
+uni[jx]: 96.462xbar_vect[jx]: 95.3215
+ix: 8 jx: 13
+ent: 1
+uni[ix]: 118.842xbar_vect[ix]: 116.76
+uni[jx]: 94.0452xbar_vect[jx]: 93.784
+ix: 8 jx: 13
+ent: 2
+uni[ix]: 107.703xbar_vect[ix]: 116.76
+uni[jx]: 92.6748xbar_vect[jx]: 93.784
+ix: 8 jx: 13
+ent: 3
+uni[ix]: 123.735xbar_vect[ix]: 116.76
+uni[jx]: 94.6321xbar_vect[jx]: 93.784
+ix: 8 jx: 14
+ent: 1
+uni[ix]: 118.842xbar_vect[ix]: 116.76
+uni[jx]: 87.8825xbar_vect[jx]: 87.6837
+ix: 8 jx: 14
+ent: 2
+uni[ix]: 107.703xbar_vect[ix]: 116.76
+uni[jx]: 86.8895xbar_vect[jx]: 87.6837
+ix: 8 jx: 14
+ent: 3
+uni[ix]: 123.735xbar_vect[ix]: 116.76
+uni[jx]: 88.279xbar_vect[jx]: 87.6837
+ix: 8 jx: 15
+ent: 1
+uni[ix]: 118.842xbar_vect[ix]: 116.76
+uni[jx]: 93.6569xbar_vect[jx]: 93.4231
+ix: 8 jx: 15
+ent: 2
+uni[ix]: 107.703xbar_vect[ix]: 116.76
+uni[jx]: 92.6893xbar_vect[jx]: 93.4231
+ix: 8 jx: 15
+ent: 3
+uni[ix]: 123.735xbar_vect[ix]: 116.76
+uni[jx]: 93.9232xbar_vect[jx]: 93.4231
+ix: 8 jx: 16
+ent: 1
+uni[ix]: 118.842xbar_vect[ix]: 116.76
+uni[jx]: 95.0199xbar_vect[jx]: 94.4255
+ix: 8 jx: 16
+ent: 2
+uni[ix]: 107.703xbar_vect[ix]: 116.76
+uni[jx]: 93.4832xbar_vect[jx]: 94.4255
+ix: 8 jx: 16
+ent: 3
+uni[ix]: 123.735xbar_vect[ix]: 116.76
+uni[jx]: 94.7733xbar_vect[jx]: 94.4255
+ix: 8 jx: 17
+ent: 1
+uni[ix]: 118.842xbar_vect[ix]: 116.76
+uni[jx]: 98.0729xbar_vect[jx]: 98.1071
+ix: 8 jx: 17
+ent: 2
+uni[ix]: 107.703xbar_vect[ix]: 116.76
+uni[jx]: 97.3129xbar_vect[jx]: 98.1071
+ix: 8 jx: 17
+ent: 3
+uni[ix]: 123.735xbar_vect[ix]: 116.76
+uni[jx]: 98.9356xbar_vect[jx]: 98.1071
+ix: 8 jx: 18
+ent: 1
+uni[ix]: 118.842xbar_vect[ix]: 116.76
+uni[jx]: 103.979xbar_vect[jx]: 104.794
+ix: 8 jx: 18
+ent: 2
+uni[ix]: 107.703xbar_vect[ix]: 116.76
+uni[jx]: 102.589xbar_vect[jx]: 104.794
+ix: 8 jx: 18
+ent: 3
+uni[ix]: 123.735xbar_vect[ix]: 116.76
+uni[jx]: 107.813xbar_vect[jx]: 104.794
+ix: 8 jx: 19
+ent: 1
+uni[ix]: 118.842xbar_vect[ix]: 116.76
+uni[jx]: 0xbar_vect[jx]: 30.9745
+ix: 8 jx: 19
+ent: 2
+uni[ix]: 107.703xbar_vect[ix]: 116.76
+uni[jx]: 92.9235xbar_vect[jx]: 30.9745
+ix: 8 jx: 19
+ent: 3
+uni[ix]: 123.735xbar_vect[ix]: 116.76
+uni[jx]: 0xbar_vect[jx]: 30.9745
+ix: 8 jx: 20
+ent: 1
+uni[ix]: 118.842xbar_vect[ix]: 116.76
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 8 jx: 20
+ent: 2
+uni[ix]: 107.703xbar_vect[ix]: 116.76
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 8 jx: 20
+ent: 3
+uni[ix]: 123.735xbar_vect[ix]: 116.76
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 9 jx: 1
+ent: 1
+uni[ix]: 91.4952xbar_vect[ix]: 90.2834
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 9 jx: 1
+ent: 2
+uni[ix]: 85.784xbar_vect[ix]: 90.2834
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 9 jx: 1
+ent: 3
+uni[ix]: 93.5711xbar_vect[ix]: 90.2834
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 9 jx: 2
+ent: 1
+uni[ix]: 91.4952xbar_vect[ix]: 90.2834
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 9 jx: 2
+ent: 2
+uni[ix]: 85.784xbar_vect[ix]: 90.2834
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 9 jx: 2
+ent: 3
+uni[ix]: 93.5711xbar_vect[ix]: 90.2834
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 9 jx: 3
+ent: 1
+uni[ix]: 91.4952xbar_vect[ix]: 90.2834
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 9 jx: 3
+ent: 2
+uni[ix]: 85.784xbar_vect[ix]: 90.2834
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 9 jx: 3
+ent: 3
+uni[ix]: 93.5711xbar_vect[ix]: 90.2834
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 9 jx: 4
+ent: 1
+uni[ix]: 91.4952xbar_vect[ix]: 90.2834
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 9 jx: 4
+ent: 2
+uni[ix]: 85.784xbar_vect[ix]: 90.2834
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 9 jx: 4
+ent: 3
+uni[ix]: 93.5711xbar_vect[ix]: 90.2834
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 9 jx: 5
+ent: 1
+uni[ix]: 91.4952xbar_vect[ix]: 90.2834
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 9 jx: 5
+ent: 2
+uni[ix]: 85.784xbar_vect[ix]: 90.2834
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 9 jx: 5
+ent: 3
+uni[ix]: 93.5711xbar_vect[ix]: 90.2834
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 9 jx: 6
+ent: 1
+uni[ix]: 91.4952xbar_vect[ix]: 90.2834
+uni[jx]: 13108.6xbar_vect[jx]: 4639.29
+ix: 9 jx: 6
+ent: 2
+uni[ix]: 85.784xbar_vect[ix]: 90.2834
+uni[jx]: 809.278xbar_vect[jx]: 4639.29
+ix: 9 jx: 6
+ent: 3
+uni[ix]: 93.5711xbar_vect[ix]: 90.2834
+uni[jx]: 0xbar_vect[jx]: 4639.29
+ix: 9 jx: 7
+ent: 1
+uni[ix]: 91.4952xbar_vect[ix]: 90.2834
+uni[jx]: 198.999xbar_vect[jx]: 190.075
+ix: 9 jx: 7
+ent: 2
+uni[ix]: 85.784xbar_vect[ix]: 90.2834
+uni[jx]: 141.4xbar_vect[jx]: 190.075
+ix: 9 jx: 7
+ent: 3
+uni[ix]: 93.5711xbar_vect[ix]: 90.2834
+uni[jx]: 229.825xbar_vect[jx]: 190.075
+ix: 9 jx: 8
+ent: 1
+uni[ix]: 91.4952xbar_vect[ix]: 90.2834
+uni[jx]: 118.842xbar_vect[jx]: 116.76
+ix: 9 jx: 8
+ent: 2
+uni[ix]: 85.784xbar_vect[ix]: 90.2834
+uni[jx]: 107.703xbar_vect[jx]: 116.76
+ix: 9 jx: 8
+ent: 3
+uni[ix]: 93.5711xbar_vect[ix]: 90.2834
+uni[jx]: 123.735xbar_vect[jx]: 116.76
+ix: 9 jx: 9
+ent: 1
+uni[ix]: 91.4952xbar_vect[ix]: 90.2834
+uni[jx]: 91.4952xbar_vect[jx]: 90.2834
+ix: 9 jx: 9
+ent: 2
+uni[ix]: 85.784xbar_vect[ix]: 90.2834
+uni[jx]: 85.784xbar_vect[jx]: 90.2834
+ix: 9 jx: 9
+ent: 3
+uni[ix]: 93.5711xbar_vect[ix]: 90.2834
+uni[jx]: 93.5711xbar_vect[jx]: 90.2834
+ix: 9 jx: 10
+ent: 1
+uni[ix]: 91.4952xbar_vect[ix]: 90.2834
+uni[jx]: 91.8748xbar_vect[jx]: 91.0658
+ix: 9 jx: 10
+ent: 2
+uni[ix]: 85.784xbar_vect[ix]: 90.2834
+uni[jx]: 88.102xbar_vect[jx]: 91.0658
+ix: 9 jx: 10
+ent: 3
+uni[ix]: 93.5711xbar_vect[ix]: 90.2834
+uni[jx]: 93.2205xbar_vect[jx]: 91.0658
+ix: 9 jx: 11
+ent: 1
+uni[ix]: 91.4952xbar_vect[ix]: 90.2834
+uni[jx]: 90.3512xbar_vect[jx]: 89.6936
+ix: 9 jx: 11
+ent: 2
+uni[ix]: 85.784xbar_vect[ix]: 90.2834
+uni[jx]: 87.5692xbar_vect[jx]: 89.6936
+ix: 9 jx: 11
+ent: 3
+uni[ix]: 93.5711xbar_vect[ix]: 90.2834
+uni[jx]: 91.1605xbar_vect[jx]: 89.6936
+ix: 9 jx: 12
+ent: 1
+uni[ix]: 91.4952xbar_vect[ix]: 90.2834
+uni[jx]: 95.89xbar_vect[jx]: 95.3215
+ix: 9 jx: 12
+ent: 2
+uni[ix]: 85.784xbar_vect[ix]: 90.2834
+uni[jx]: 93.6124xbar_vect[jx]: 95.3215
+ix: 9 jx: 12
+ent: 3
+uni[ix]: 93.5711xbar_vect[ix]: 90.2834
+uni[jx]: 96.462xbar_vect[jx]: 95.3215
+ix: 9 jx: 13
+ent: 1
+uni[ix]: 91.4952xbar_vect[ix]: 90.2834
+uni[jx]: 94.0452xbar_vect[jx]: 93.784
+ix: 9 jx: 13
+ent: 2
+uni[ix]: 85.784xbar_vect[ix]: 90.2834
+uni[jx]: 92.6748xbar_vect[jx]: 93.784
+ix: 9 jx: 13
+ent: 3
+uni[ix]: 93.5711xbar_vect[ix]: 90.2834
+uni[jx]: 94.6321xbar_vect[jx]: 93.784
+ix: 9 jx: 14
+ent: 1
+uni[ix]: 91.4952xbar_vect[ix]: 90.2834
+uni[jx]: 87.8825xbar_vect[jx]: 87.6837
+ix: 9 jx: 14
+ent: 2
+uni[ix]: 85.784xbar_vect[ix]: 90.2834
+uni[jx]: 86.8895xbar_vect[jx]: 87.6837
+ix: 9 jx: 14
+ent: 3
+uni[ix]: 93.5711xbar_vect[ix]: 90.2834
+uni[jx]: 88.279xbar_vect[jx]: 87.6837
+ix: 9 jx: 15
+ent: 1
+uni[ix]: 91.4952xbar_vect[ix]: 90.2834
+uni[jx]: 93.6569xbar_vect[jx]: 93.4231
+ix: 9 jx: 15
+ent: 2
+uni[ix]: 85.784xbar_vect[ix]: 90.2834
+uni[jx]: 92.6893xbar_vect[jx]: 93.4231
+ix: 9 jx: 15
+ent: 3
+uni[ix]: 93.5711xbar_vect[ix]: 90.2834
+uni[jx]: 93.9232xbar_vect[jx]: 93.4231
+ix: 9 jx: 16
+ent: 1
+uni[ix]: 91.4952xbar_vect[ix]: 90.2834
+uni[jx]: 95.0199xbar_vect[jx]: 94.4255
+ix: 9 jx: 16
+ent: 2
+uni[ix]: 85.784xbar_vect[ix]: 90.2834
+uni[jx]: 93.4832xbar_vect[jx]: 94.4255
+ix: 9 jx: 16
+ent: 3
+uni[ix]: 93.5711xbar_vect[ix]: 90.2834
+uni[jx]: 94.7733xbar_vect[jx]: 94.4255
+ix: 9 jx: 17
+ent: 1
+uni[ix]: 91.4952xbar_vect[ix]: 90.2834
+uni[jx]: 98.0729xbar_vect[jx]: 98.1071
+ix: 9 jx: 17
+ent: 2
+uni[ix]: 85.784xbar_vect[ix]: 90.2834
+uni[jx]: 97.3129xbar_vect[jx]: 98.1071
+ix: 9 jx: 17
+ent: 3
+uni[ix]: 93.5711xbar_vect[ix]: 90.2834
+uni[jx]: 98.9356xbar_vect[jx]: 98.1071
+ix: 9 jx: 18
+ent: 1
+uni[ix]: 91.4952xbar_vect[ix]: 90.2834
+uni[jx]: 103.979xbar_vect[jx]: 104.794
+ix: 9 jx: 18
+ent: 2
+uni[ix]: 85.784xbar_vect[ix]: 90.2834
+uni[jx]: 102.589xbar_vect[jx]: 104.794
+ix: 9 jx: 18
+ent: 3
+uni[ix]: 93.5711xbar_vect[ix]: 90.2834
+uni[jx]: 107.813xbar_vect[jx]: 104.794
+ix: 9 jx: 19
+ent: 1
+uni[ix]: 91.4952xbar_vect[ix]: 90.2834
+uni[jx]: 0xbar_vect[jx]: 30.9745
+ix: 9 jx: 19
+ent: 2
+uni[ix]: 85.784xbar_vect[ix]: 90.2834
+uni[jx]: 92.9235xbar_vect[jx]: 30.9745
+ix: 9 jx: 19
+ent: 3
+uni[ix]: 93.5711xbar_vect[ix]: 90.2834
+uni[jx]: 0xbar_vect[jx]: 30.9745
+ix: 9 jx: 20
+ent: 1
+uni[ix]: 91.4952xbar_vect[ix]: 90.2834
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 9 jx: 20
+ent: 2
+uni[ix]: 85.784xbar_vect[ix]: 90.2834
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 9 jx: 20
+ent: 3
+uni[ix]: 93.5711xbar_vect[ix]: 90.2834
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 10 jx: 1
+ent: 1
+uni[ix]: 91.8748xbar_vect[ix]: 91.0658
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 10 jx: 1
+ent: 2
+uni[ix]: 88.102xbar_vect[ix]: 91.0658
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 10 jx: 1
+ent: 3
+uni[ix]: 93.2205xbar_vect[ix]: 91.0658
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 10 jx: 2
+ent: 1
+uni[ix]: 91.8748xbar_vect[ix]: 91.0658
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 10 jx: 2
+ent: 2
+uni[ix]: 88.102xbar_vect[ix]: 91.0658
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 10 jx: 2
+ent: 3
+uni[ix]: 93.2205xbar_vect[ix]: 91.0658
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 10 jx: 3
+ent: 1
+uni[ix]: 91.8748xbar_vect[ix]: 91.0658
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 10 jx: 3
+ent: 2
+uni[ix]: 88.102xbar_vect[ix]: 91.0658
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 10 jx: 3
+ent: 3
+uni[ix]: 93.2205xbar_vect[ix]: 91.0658
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 10 jx: 4
+ent: 1
+uni[ix]: 91.8748xbar_vect[ix]: 91.0658
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 10 jx: 4
+ent: 2
+uni[ix]: 88.102xbar_vect[ix]: 91.0658
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 10 jx: 4
+ent: 3
+uni[ix]: 93.2205xbar_vect[ix]: 91.0658
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 10 jx: 5
+ent: 1
+uni[ix]: 91.8748xbar_vect[ix]: 91.0658
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 10 jx: 5
+ent: 2
+uni[ix]: 88.102xbar_vect[ix]: 91.0658
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 10 jx: 5
+ent: 3
+uni[ix]: 93.2205xbar_vect[ix]: 91.0658
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 10 jx: 6
+ent: 1
+uni[ix]: 91.8748xbar_vect[ix]: 91.0658
+uni[jx]: 13108.6xbar_vect[jx]: 4639.29
+ix: 10 jx: 6
+ent: 2
+uni[ix]: 88.102xbar_vect[ix]: 91.0658
+uni[jx]: 809.278xbar_vect[jx]: 4639.29
+ix: 10 jx: 6
+ent: 3
+uni[ix]: 93.2205xbar_vect[ix]: 91.0658
+uni[jx]: 0xbar_vect[jx]: 4639.29
+ix: 10 jx: 7
+ent: 1
+uni[ix]: 91.8748xbar_vect[ix]: 91.0658
+uni[jx]: 198.999xbar_vect[jx]: 190.075
+ix: 10 jx: 7
+ent: 2
+uni[ix]: 88.102xbar_vect[ix]: 91.0658
+uni[jx]: 141.4xbar_vect[jx]: 190.075
+ix: 10 jx: 7
+ent: 3
+uni[ix]: 93.2205xbar_vect[ix]: 91.0658
+uni[jx]: 229.825xbar_vect[jx]: 190.075
+ix: 10 jx: 8
+ent: 1
+uni[ix]: 91.8748xbar_vect[ix]: 91.0658
+uni[jx]: 118.842xbar_vect[jx]: 116.76
+ix: 10 jx: 8
+ent: 2
+uni[ix]: 88.102xbar_vect[ix]: 91.0658
+uni[jx]: 107.703xbar_vect[jx]: 116.76
+ix: 10 jx: 8
+ent: 3
+uni[ix]: 93.2205xbar_vect[ix]: 91.0658
+uni[jx]: 123.735xbar_vect[jx]: 116.76
+ix: 10 jx: 9
+ent: 1
+uni[ix]: 91.8748xbar_vect[ix]: 91.0658
+uni[jx]: 91.4952xbar_vect[jx]: 90.2834
+ix: 10 jx: 9
+ent: 2
+uni[ix]: 88.102xbar_vect[ix]: 91.0658
+uni[jx]: 85.784xbar_vect[jx]: 90.2834
+ix: 10 jx: 9
+ent: 3
+uni[ix]: 93.2205xbar_vect[ix]: 91.0658
+uni[jx]: 93.5711xbar_vect[jx]: 90.2834
+ix: 10 jx: 10
+ent: 1
+uni[ix]: 91.8748xbar_vect[ix]: 91.0658
+uni[jx]: 91.8748xbar_vect[jx]: 91.0658
+ix: 10 jx: 10
+ent: 2
+uni[ix]: 88.102xbar_vect[ix]: 91.0658
+uni[jx]: 88.102xbar_vect[jx]: 91.0658
+ix: 10 jx: 10
+ent: 3
+uni[ix]: 93.2205xbar_vect[ix]: 91.0658
+uni[jx]: 93.2205xbar_vect[jx]: 91.0658
+ix: 10 jx: 11
+ent: 1
+uni[ix]: 91.8748xbar_vect[ix]: 91.0658
+uni[jx]: 90.3512xbar_vect[jx]: 89.6936
+ix: 10 jx: 11
+ent: 2
+uni[ix]: 88.102xbar_vect[ix]: 91.0658
+uni[jx]: 87.5692xbar_vect[jx]: 89.6936
+ix: 10 jx: 11
+ent: 3
+uni[ix]: 93.2205xbar_vect[ix]: 91.0658
+uni[jx]: 91.1605xbar_vect[jx]: 89.6936
+ix: 10 jx: 12
+ent: 1
+uni[ix]: 91.8748xbar_vect[ix]: 91.0658
+uni[jx]: 95.89xbar_vect[jx]: 95.3215
+ix: 10 jx: 12
+ent: 2
+uni[ix]: 88.102xbar_vect[ix]: 91.0658
+uni[jx]: 93.6124xbar_vect[jx]: 95.3215
+ix: 10 jx: 12
+ent: 3
+uni[ix]: 93.2205xbar_vect[ix]: 91.0658
+uni[jx]: 96.462xbar_vect[jx]: 95.3215
+ix: 10 jx: 13
+ent: 1
+uni[ix]: 91.8748xbar_vect[ix]: 91.0658
+uni[jx]: 94.0452xbar_vect[jx]: 93.784
+ix: 10 jx: 13
+ent: 2
+uni[ix]: 88.102xbar_vect[ix]: 91.0658
+uni[jx]: 92.6748xbar_vect[jx]: 93.784
+ix: 10 jx: 13
+ent: 3
+uni[ix]: 93.2205xbar_vect[ix]: 91.0658
+uni[jx]: 94.6321xbar_vect[jx]: 93.784
+ix: 10 jx: 14
+ent: 1
+uni[ix]: 91.8748xbar_vect[ix]: 91.0658
+uni[jx]: 87.8825xbar_vect[jx]: 87.6837
+ix: 10 jx: 14
+ent: 2
+uni[ix]: 88.102xbar_vect[ix]: 91.0658
+uni[jx]: 86.8895xbar_vect[jx]: 87.6837
+ix: 10 jx: 14
+ent: 3
+uni[ix]: 93.2205xbar_vect[ix]: 91.0658
+uni[jx]: 88.279xbar_vect[jx]: 87.6837
+ix: 10 jx: 15
+ent: 1
+uni[ix]: 91.8748xbar_vect[ix]: 91.0658
+uni[jx]: 93.6569xbar_vect[jx]: 93.4231
+ix: 10 jx: 15
+ent: 2
+uni[ix]: 88.102xbar_vect[ix]: 91.0658
+uni[jx]: 92.6893xbar_vect[jx]: 93.4231
+ix: 10 jx: 15
+ent: 3
+uni[ix]: 93.2205xbar_vect[ix]: 91.0658
+uni[jx]: 93.9232xbar_vect[jx]: 93.4231
+ix: 10 jx: 16
+ent: 1
+uni[ix]: 91.8748xbar_vect[ix]: 91.0658
+uni[jx]: 95.0199xbar_vect[jx]: 94.4255
+ix: 10 jx: 16
+ent: 2
+uni[ix]: 88.102xbar_vect[ix]: 91.0658
+uni[jx]: 93.4832xbar_vect[jx]: 94.4255
+ix: 10 jx: 16
+ent: 3
+uni[ix]: 93.2205xbar_vect[ix]: 91.0658
+uni[jx]: 94.7733xbar_vect[jx]: 94.4255
+ix: 10 jx: 17
+ent: 1
+uni[ix]: 91.8748xbar_vect[ix]: 91.0658
+uni[jx]: 98.0729xbar_vect[jx]: 98.1071
+ix: 10 jx: 17
+ent: 2
+uni[ix]: 88.102xbar_vect[ix]: 91.0658
+uni[jx]: 97.3129xbar_vect[jx]: 98.1071
+ix: 10 jx: 17
+ent: 3
+uni[ix]: 93.2205xbar_vect[ix]: 91.0658
+uni[jx]: 98.9356xbar_vect[jx]: 98.1071
+ix: 10 jx: 18
+ent: 1
+uni[ix]: 91.8748xbar_vect[ix]: 91.0658
+uni[jx]: 103.979xbar_vect[jx]: 104.794
+ix: 10 jx: 18
+ent: 2
+uni[ix]: 88.102xbar_vect[ix]: 91.0658
+uni[jx]: 102.589xbar_vect[jx]: 104.794
+ix: 10 jx: 18
+ent: 3
+uni[ix]: 93.2205xbar_vect[ix]: 91.0658
+uni[jx]: 107.813xbar_vect[jx]: 104.794
+ix: 10 jx: 19
+ent: 1
+uni[ix]: 91.8748xbar_vect[ix]: 91.0658
+uni[jx]: 0xbar_vect[jx]: 30.9745
+ix: 10 jx: 19
+ent: 2
+uni[ix]: 88.102xbar_vect[ix]: 91.0658
+uni[jx]: 92.9235xbar_vect[jx]: 30.9745
+ix: 10 jx: 19
+ent: 3
+uni[ix]: 93.2205xbar_vect[ix]: 91.0658
+uni[jx]: 0xbar_vect[jx]: 30.9745
+ix: 10 jx: 20
+ent: 1
+uni[ix]: 91.8748xbar_vect[ix]: 91.0658
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 10 jx: 20
+ent: 2
+uni[ix]: 88.102xbar_vect[ix]: 91.0658
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 10 jx: 20
+ent: 3
+uni[ix]: 93.2205xbar_vect[ix]: 91.0658
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 11 jx: 1
+ent: 1
+uni[ix]: 90.3512xbar_vect[ix]: 89.6936
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 11 jx: 1
+ent: 2
+uni[ix]: 87.5692xbar_vect[ix]: 89.6936
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 11 jx: 1
+ent: 3
+uni[ix]: 91.1605xbar_vect[ix]: 89.6936
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 11 jx: 2
+ent: 1
+uni[ix]: 90.3512xbar_vect[ix]: 89.6936
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 11 jx: 2
+ent: 2
+uni[ix]: 87.5692xbar_vect[ix]: 89.6936
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 11 jx: 2
+ent: 3
+uni[ix]: 91.1605xbar_vect[ix]: 89.6936
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 11 jx: 3
+ent: 1
+uni[ix]: 90.3512xbar_vect[ix]: 89.6936
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 11 jx: 3
+ent: 2
+uni[ix]: 87.5692xbar_vect[ix]: 89.6936
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 11 jx: 3
+ent: 3
+uni[ix]: 91.1605xbar_vect[ix]: 89.6936
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 11 jx: 4
+ent: 1
+uni[ix]: 90.3512xbar_vect[ix]: 89.6936
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 11 jx: 4
+ent: 2
+uni[ix]: 87.5692xbar_vect[ix]: 89.6936
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 11 jx: 4
+ent: 3
+uni[ix]: 91.1605xbar_vect[ix]: 89.6936
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 11 jx: 5
+ent: 1
+uni[ix]: 90.3512xbar_vect[ix]: 89.6936
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 11 jx: 5
+ent: 2
+uni[ix]: 87.5692xbar_vect[ix]: 89.6936
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 11 jx: 5
+ent: 3
+uni[ix]: 91.1605xbar_vect[ix]: 89.6936
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 11 jx: 6
+ent: 1
+uni[ix]: 90.3512xbar_vect[ix]: 89.6936
+uni[jx]: 13108.6xbar_vect[jx]: 4639.29
+ix: 11 jx: 6
+ent: 2
+uni[ix]: 87.5692xbar_vect[ix]: 89.6936
+uni[jx]: 809.278xbar_vect[jx]: 4639.29
+ix: 11 jx: 6
+ent: 3
+uni[ix]: 91.1605xbar_vect[ix]: 89.6936
+uni[jx]: 0xbar_vect[jx]: 4639.29
+ix: 11 jx: 7
+ent: 1
+uni[ix]: 90.3512xbar_vect[ix]: 89.6936
+uni[jx]: 198.999xbar_vect[jx]: 190.075
+ix: 11 jx: 7
+ent: 2
+uni[ix]: 87.5692xbar_vect[ix]: 89.6936
+uni[jx]: 141.4xbar_vect[jx]: 190.075
+ix: 11 jx: 7
+ent: 3
+uni[ix]: 91.1605xbar_vect[ix]: 89.6936
+uni[jx]: 229.825xbar_vect[jx]: 190.075
+ix: 11 jx: 8
+ent: 1
+uni[ix]: 90.3512xbar_vect[ix]: 89.6936
+uni[jx]: 118.842xbar_vect[jx]: 116.76
+ix: 11 jx: 8
+ent: 2
+uni[ix]: 87.5692xbar_vect[ix]: 89.6936
+uni[jx]: 107.703xbar_vect[jx]: 116.76
+ix: 11 jx: 8
+ent: 3
+uni[ix]: 91.1605xbar_vect[ix]: 89.6936
+uni[jx]: 123.735xbar_vect[jx]: 116.76
+ix: 11 jx: 9
+ent: 1
+uni[ix]: 90.3512xbar_vect[ix]: 89.6936
+uni[jx]: 91.4952xbar_vect[jx]: 90.2834
+ix: 11 jx: 9
+ent: 2
+uni[ix]: 87.5692xbar_vect[ix]: 89.6936
+uni[jx]: 85.784xbar_vect[jx]: 90.2834
+ix: 11 jx: 9
+ent: 3
+uni[ix]: 91.1605xbar_vect[ix]: 89.6936
+uni[jx]: 93.5711xbar_vect[jx]: 90.2834
+ix: 11 jx: 10
+ent: 1
+uni[ix]: 90.3512xbar_vect[ix]: 89.6936
+uni[jx]: 91.8748xbar_vect[jx]: 91.0658
+ix: 11 jx: 10
+ent: 2
+uni[ix]: 87.5692xbar_vect[ix]: 89.6936
+uni[jx]: 88.102xbar_vect[jx]: 91.0658
+ix: 11 jx: 10
+ent: 3
+uni[ix]: 91.1605xbar_vect[ix]: 89.6936
+uni[jx]: 93.2205xbar_vect[jx]: 91.0658
+ix: 11 jx: 11
+ent: 1
+uni[ix]: 90.3512xbar_vect[ix]: 89.6936
+uni[jx]: 90.3512xbar_vect[jx]: 89.6936
+ix: 11 jx: 11
+ent: 2
+uni[ix]: 87.5692xbar_vect[ix]: 89.6936
+uni[jx]: 87.5692xbar_vect[jx]: 89.6936
+ix: 11 jx: 11
+ent: 3
+uni[ix]: 91.1605xbar_vect[ix]: 89.6936
+uni[jx]: 91.1605xbar_vect[jx]: 89.6936
+ix: 11 jx: 12
+ent: 1
+uni[ix]: 90.3512xbar_vect[ix]: 89.6936
+uni[jx]: 95.89xbar_vect[jx]: 95.3215
+ix: 11 jx: 12
+ent: 2
+uni[ix]: 87.5692xbar_vect[ix]: 89.6936
+uni[jx]: 93.6124xbar_vect[jx]: 95.3215
+ix: 11 jx: 12
+ent: 3
+uni[ix]: 91.1605xbar_vect[ix]: 89.6936
+uni[jx]: 96.462xbar_vect[jx]: 95.3215
+ix: 11 jx: 13
+ent: 1
+uni[ix]: 90.3512xbar_vect[ix]: 89.6936
+uni[jx]: 94.0452xbar_vect[jx]: 93.784
+ix: 11 jx: 13
+ent: 2
+uni[ix]: 87.5692xbar_vect[ix]: 89.6936
+uni[jx]: 92.6748xbar_vect[jx]: 93.784
+ix: 11 jx: 13
+ent: 3
+uni[ix]: 91.1605xbar_vect[ix]: 89.6936
+uni[jx]: 94.6321xbar_vect[jx]: 93.784
+ix: 11 jx: 14
+ent: 1
+uni[ix]: 90.3512xbar_vect[ix]: 89.6936
+uni[jx]: 87.8825xbar_vect[jx]: 87.6837
+ix: 11 jx: 14
+ent: 2
+uni[ix]: 87.5692xbar_vect[ix]: 89.6936
+uni[jx]: 86.8895xbar_vect[jx]: 87.6837
+ix: 11 jx: 14
+ent: 3
+uni[ix]: 91.1605xbar_vect[ix]: 89.6936
+uni[jx]: 88.279xbar_vect[jx]: 87.6837
+ix: 11 jx: 15
+ent: 1
+uni[ix]: 90.3512xbar_vect[ix]: 89.6936
+uni[jx]: 93.6569xbar_vect[jx]: 93.4231
+ix: 11 jx: 15
+ent: 2
+uni[ix]: 87.5692xbar_vect[ix]: 89.6936
+uni[jx]: 92.6893xbar_vect[jx]: 93.4231
+ix: 11 jx: 15
+ent: 3
+uni[ix]: 91.1605xbar_vect[ix]: 89.6936
+uni[jx]: 93.9232xbar_vect[jx]: 93.4231
+ix: 11 jx: 16
+ent: 1
+uni[ix]: 90.3512xbar_vect[ix]: 89.6936
+uni[jx]: 95.0199xbar_vect[jx]: 94.4255
+ix: 11 jx: 16
+ent: 2
+uni[ix]: 87.5692xbar_vect[ix]: 89.6936
+uni[jx]: 93.4832xbar_vect[jx]: 94.4255
+ix: 11 jx: 16
+ent: 3
+uni[ix]: 91.1605xbar_vect[ix]: 89.6936
+uni[jx]: 94.7733xbar_vect[jx]: 94.4255
+ix: 11 jx: 17
+ent: 1
+uni[ix]: 90.3512xbar_vect[ix]: 89.6936
+uni[jx]: 98.0729xbar_vect[jx]: 98.1071
+ix: 11 jx: 17
+ent: 2
+uni[ix]: 87.5692xbar_vect[ix]: 89.6936
+uni[jx]: 97.3129xbar_vect[jx]: 98.1071
+ix: 11 jx: 17
+ent: 3
+uni[ix]: 91.1605xbar_vect[ix]: 89.6936
+uni[jx]: 98.9356xbar_vect[jx]: 98.1071
+ix: 11 jx: 18
+ent: 1
+uni[ix]: 90.3512xbar_vect[ix]: 89.6936
+uni[jx]: 103.979xbar_vect[jx]: 104.794
+ix: 11 jx: 18
+ent: 2
+uni[ix]: 87.5692xbar_vect[ix]: 89.6936
+uni[jx]: 102.589xbar_vect[jx]: 104.794
+ix: 11 jx: 18
+ent: 3
+uni[ix]: 91.1605xbar_vect[ix]: 89.6936
+uni[jx]: 107.813xbar_vect[jx]: 104.794
+ix: 11 jx: 19
+ent: 1
+uni[ix]: 90.3512xbar_vect[ix]: 89.6936
+uni[jx]: 0xbar_vect[jx]: 30.9745
+ix: 11 jx: 19
+ent: 2
+uni[ix]: 87.5692xbar_vect[ix]: 89.6936
+uni[jx]: 92.9235xbar_vect[jx]: 30.9745
+ix: 11 jx: 19
+ent: 3
+uni[ix]: 91.1605xbar_vect[ix]: 89.6936
+uni[jx]: 0xbar_vect[jx]: 30.9745
+ix: 11 jx: 20
+ent: 1
+uni[ix]: 90.3512xbar_vect[ix]: 89.6936
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 11 jx: 20
+ent: 2
+uni[ix]: 87.5692xbar_vect[ix]: 89.6936
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 11 jx: 20
+ent: 3
+uni[ix]: 91.1605xbar_vect[ix]: 89.6936
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 12 jx: 1
+ent: 1
+uni[ix]: 95.89xbar_vect[ix]: 95.3215
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 12 jx: 1
+ent: 2
+uni[ix]: 93.6124xbar_vect[ix]: 95.3215
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 12 jx: 1
+ent: 3
+uni[ix]: 96.462xbar_vect[ix]: 95.3215
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 12 jx: 2
+ent: 1
+uni[ix]: 95.89xbar_vect[ix]: 95.3215
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 12 jx: 2
+ent: 2
+uni[ix]: 93.6124xbar_vect[ix]: 95.3215
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 12 jx: 2
+ent: 3
+uni[ix]: 96.462xbar_vect[ix]: 95.3215
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 12 jx: 3
+ent: 1
+uni[ix]: 95.89xbar_vect[ix]: 95.3215
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 12 jx: 3
+ent: 2
+uni[ix]: 93.6124xbar_vect[ix]: 95.3215
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 12 jx: 3
+ent: 3
+uni[ix]: 96.462xbar_vect[ix]: 95.3215
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 12 jx: 4
+ent: 1
+uni[ix]: 95.89xbar_vect[ix]: 95.3215
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 12 jx: 4
+ent: 2
+uni[ix]: 93.6124xbar_vect[ix]: 95.3215
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 12 jx: 4
+ent: 3
+uni[ix]: 96.462xbar_vect[ix]: 95.3215
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 12 jx: 5
+ent: 1
+uni[ix]: 95.89xbar_vect[ix]: 95.3215
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 12 jx: 5
+ent: 2
+uni[ix]: 93.6124xbar_vect[ix]: 95.3215
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 12 jx: 5
+ent: 3
+uni[ix]: 96.462xbar_vect[ix]: 95.3215
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 12 jx: 6
+ent: 1
+uni[ix]: 95.89xbar_vect[ix]: 95.3215
+uni[jx]: 13108.6xbar_vect[jx]: 4639.29
+ix: 12 jx: 6
+ent: 2
+uni[ix]: 93.6124xbar_vect[ix]: 95.3215
+uni[jx]: 809.278xbar_vect[jx]: 4639.29
+ix: 12 jx: 6
+ent: 3
+uni[ix]: 96.462xbar_vect[ix]: 95.3215
+uni[jx]: 0xbar_vect[jx]: 4639.29
+ix: 12 jx: 7
+ent: 1
+uni[ix]: 95.89xbar_vect[ix]: 95.3215
+uni[jx]: 198.999xbar_vect[jx]: 190.075
+ix: 12 jx: 7
+ent: 2
+uni[ix]: 93.6124xbar_vect[ix]: 95.3215
+uni[jx]: 141.4xbar_vect[jx]: 190.075
+ix: 12 jx: 7
+ent: 3
+uni[ix]: 96.462xbar_vect[ix]: 95.3215
+uni[jx]: 229.825xbar_vect[jx]: 190.075
+ix: 12 jx: 8
+ent: 1
+uni[ix]: 95.89xbar_vect[ix]: 95.3215
+uni[jx]: 118.842xbar_vect[jx]: 116.76
+ix: 12 jx: 8
+ent: 2
+uni[ix]: 93.6124xbar_vect[ix]: 95.3215
+uni[jx]: 107.703xbar_vect[jx]: 116.76
+ix: 12 jx: 8
+ent: 3
+uni[ix]: 96.462xbar_vect[ix]: 95.3215
+uni[jx]: 123.735xbar_vect[jx]: 116.76
+ix: 12 jx: 9
+ent: 1
+uni[ix]: 95.89xbar_vect[ix]: 95.3215
+uni[jx]: 91.4952xbar_vect[jx]: 90.2834
+ix: 12 jx: 9
+ent: 2
+uni[ix]: 93.6124xbar_vect[ix]: 95.3215
+uni[jx]: 85.784xbar_vect[jx]: 90.2834
+ix: 12 jx: 9
+ent: 3
+uni[ix]: 96.462xbar_vect[ix]: 95.3215
+uni[jx]: 93.5711xbar_vect[jx]: 90.2834
+ix: 12 jx: 10
+ent: 1
+uni[ix]: 95.89xbar_vect[ix]: 95.3215
+uni[jx]: 91.8748xbar_vect[jx]: 91.0658
+ix: 12 jx: 10
+ent: 2
+uni[ix]: 93.6124xbar_vect[ix]: 95.3215
+uni[jx]: 88.102xbar_vect[jx]: 91.0658
+ix: 12 jx: 10
+ent: 3
+uni[ix]: 96.462xbar_vect[ix]: 95.3215
+uni[jx]: 93.2205xbar_vect[jx]: 91.0658
+ix: 12 jx: 11
+ent: 1
+uni[ix]: 95.89xbar_vect[ix]: 95.3215
+uni[jx]: 90.3512xbar_vect[jx]: 89.6936
+ix: 12 jx: 11
+ent: 2
+uni[ix]: 93.6124xbar_vect[ix]: 95.3215
+uni[jx]: 87.5692xbar_vect[jx]: 89.6936
+ix: 12 jx: 11
+ent: 3
+uni[ix]: 96.462xbar_vect[ix]: 95.3215
+uni[jx]: 91.1605xbar_vect[jx]: 89.6936
+ix: 12 jx: 12
+ent: 1
+uni[ix]: 95.89xbar_vect[ix]: 95.3215
+uni[jx]: 95.89xbar_vect[jx]: 95.3215
+ix: 12 jx: 12
+ent: 2
+uni[ix]: 93.6124xbar_vect[ix]: 95.3215
+uni[jx]: 93.6124xbar_vect[jx]: 95.3215
+ix: 12 jx: 12
+ent: 3
+uni[ix]: 96.462xbar_vect[ix]: 95.3215
+uni[jx]: 96.462xbar_vect[jx]: 95.3215
+ix: 12 jx: 13
+ent: 1
+uni[ix]: 95.89xbar_vect[ix]: 95.3215
+uni[jx]: 94.0452xbar_vect[jx]: 93.784
+ix: 12 jx: 13
+ent: 2
+uni[ix]: 93.6124xbar_vect[ix]: 95.3215
+uni[jx]: 92.6748xbar_vect[jx]: 93.784
+ix: 12 jx: 13
+ent: 3
+uni[ix]: 96.462xbar_vect[ix]: 95.3215
+uni[jx]: 94.6321xbar_vect[jx]: 93.784
+ix: 12 jx: 14
+ent: 1
+uni[ix]: 95.89xbar_vect[ix]: 95.3215
+uni[jx]: 87.8825xbar_vect[jx]: 87.6837
+ix: 12 jx: 14
+ent: 2
+uni[ix]: 93.6124xbar_vect[ix]: 95.3215
+uni[jx]: 86.8895xbar_vect[jx]: 87.6837
+ix: 12 jx: 14
+ent: 3
+uni[ix]: 96.462xbar_vect[ix]: 95.3215
+uni[jx]: 88.279xbar_vect[jx]: 87.6837
+ix: 12 jx: 15
+ent: 1
+uni[ix]: 95.89xbar_vect[ix]: 95.3215
+uni[jx]: 93.6569xbar_vect[jx]: 93.4231
+ix: 12 jx: 15
+ent: 2
+uni[ix]: 93.6124xbar_vect[ix]: 95.3215
+uni[jx]: 92.6893xbar_vect[jx]: 93.4231
+ix: 12 jx: 15
+ent: 3
+uni[ix]: 96.462xbar_vect[ix]: 95.3215
+uni[jx]: 93.9232xbar_vect[jx]: 93.4231
+ix: 12 jx: 16
+ent: 1
+uni[ix]: 95.89xbar_vect[ix]: 95.3215
+uni[jx]: 95.0199xbar_vect[jx]: 94.4255
+ix: 12 jx: 16
+ent: 2
+uni[ix]: 93.6124xbar_vect[ix]: 95.3215
+uni[jx]: 93.4832xbar_vect[jx]: 94.4255
+ix: 12 jx: 16
+ent: 3
+uni[ix]: 96.462xbar_vect[ix]: 95.3215
+uni[jx]: 94.7733xbar_vect[jx]: 94.4255
+ix: 12 jx: 17
+ent: 1
+uni[ix]: 95.89xbar_vect[ix]: 95.3215
+uni[jx]: 98.0729xbar_vect[jx]: 98.1071
+ix: 12 jx: 17
+ent: 2
+uni[ix]: 93.6124xbar_vect[ix]: 95.3215
+uni[jx]: 97.3129xbar_vect[jx]: 98.1071
+ix: 12 jx: 17
+ent: 3
+uni[ix]: 96.462xbar_vect[ix]: 95.3215
+uni[jx]: 98.9356xbar_vect[jx]: 98.1071
+ix: 12 jx: 18
+ent: 1
+uni[ix]: 95.89xbar_vect[ix]: 95.3215
+uni[jx]: 103.979xbar_vect[jx]: 104.794
+ix: 12 jx: 18
+ent: 2
+uni[ix]: 93.6124xbar_vect[ix]: 95.3215
+uni[jx]: 102.589xbar_vect[jx]: 104.794
+ix: 12 jx: 18
+ent: 3
+uni[ix]: 96.462xbar_vect[ix]: 95.3215
+uni[jx]: 107.813xbar_vect[jx]: 104.794
+ix: 12 jx: 19
+ent: 1
+uni[ix]: 95.89xbar_vect[ix]: 95.3215
+uni[jx]: 0xbar_vect[jx]: 30.9745
+ix: 12 jx: 19
+ent: 2
+uni[ix]: 93.6124xbar_vect[ix]: 95.3215
+uni[jx]: 92.9235xbar_vect[jx]: 30.9745
+ix: 12 jx: 19
+ent: 3
+uni[ix]: 96.462xbar_vect[ix]: 95.3215
+uni[jx]: 0xbar_vect[jx]: 30.9745
+ix: 12 jx: 20
+ent: 1
+uni[ix]: 95.89xbar_vect[ix]: 95.3215
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 12 jx: 20
+ent: 2
+uni[ix]: 93.6124xbar_vect[ix]: 95.3215
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 12 jx: 20
+ent: 3
+uni[ix]: 96.462xbar_vect[ix]: 95.3215
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 13 jx: 1
+ent: 1
+uni[ix]: 94.0452xbar_vect[ix]: 93.784
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 13 jx: 1
+ent: 2
+uni[ix]: 92.6748xbar_vect[ix]: 93.784
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 13 jx: 1
+ent: 3
+uni[ix]: 94.6321xbar_vect[ix]: 93.784
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 13 jx: 2
+ent: 1
+uni[ix]: 94.0452xbar_vect[ix]: 93.784
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 13 jx: 2
+ent: 2
+uni[ix]: 92.6748xbar_vect[ix]: 93.784
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 13 jx: 2
+ent: 3
+uni[ix]: 94.6321xbar_vect[ix]: 93.784
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 13 jx: 3
+ent: 1
+uni[ix]: 94.0452xbar_vect[ix]: 93.784
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 13 jx: 3
+ent: 2
+uni[ix]: 92.6748xbar_vect[ix]: 93.784
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 13 jx: 3
+ent: 3
+uni[ix]: 94.6321xbar_vect[ix]: 93.784
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 13 jx: 4
+ent: 1
+uni[ix]: 94.0452xbar_vect[ix]: 93.784
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 13 jx: 4
+ent: 2
+uni[ix]: 92.6748xbar_vect[ix]: 93.784
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 13 jx: 4
+ent: 3
+uni[ix]: 94.6321xbar_vect[ix]: 93.784
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 13 jx: 5
+ent: 1
+uni[ix]: 94.0452xbar_vect[ix]: 93.784
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 13 jx: 5
+ent: 2
+uni[ix]: 92.6748xbar_vect[ix]: 93.784
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 13 jx: 5
+ent: 3
+uni[ix]: 94.6321xbar_vect[ix]: 93.784
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 13 jx: 6
+ent: 1
+uni[ix]: 94.0452xbar_vect[ix]: 93.784
+uni[jx]: 13108.6xbar_vect[jx]: 4639.29
+ix: 13 jx: 6
+ent: 2
+uni[ix]: 92.6748xbar_vect[ix]: 93.784
+uni[jx]: 809.278xbar_vect[jx]: 4639.29
+ix: 13 jx: 6
+ent: 3
+uni[ix]: 94.6321xbar_vect[ix]: 93.784
+uni[jx]: 0xbar_vect[jx]: 4639.29
+ix: 13 jx: 7
+ent: 1
+uni[ix]: 94.0452xbar_vect[ix]: 93.784
+uni[jx]: 198.999xbar_vect[jx]: 190.075
+ix: 13 jx: 7
+ent: 2
+uni[ix]: 92.6748xbar_vect[ix]: 93.784
+uni[jx]: 141.4xbar_vect[jx]: 190.075
+ix: 13 jx: 7
+ent: 3
+uni[ix]: 94.6321xbar_vect[ix]: 93.784
+uni[jx]: 229.825xbar_vect[jx]: 190.075
+ix: 13 jx: 8
+ent: 1
+uni[ix]: 94.0452xbar_vect[ix]: 93.784
+uni[jx]: 118.842xbar_vect[jx]: 116.76
+ix: 13 jx: 8
+ent: 2
+uni[ix]: 92.6748xbar_vect[ix]: 93.784
+uni[jx]: 107.703xbar_vect[jx]: 116.76
+ix: 13 jx: 8
+ent: 3
+uni[ix]: 94.6321xbar_vect[ix]: 93.784
+uni[jx]: 123.735xbar_vect[jx]: 116.76
+ix: 13 jx: 9
+ent: 1
+uni[ix]: 94.0452xbar_vect[ix]: 93.784
+uni[jx]: 91.4952xbar_vect[jx]: 90.2834
+ix: 13 jx: 9
+ent: 2
+uni[ix]: 92.6748xbar_vect[ix]: 93.784
+uni[jx]: 85.784xbar_vect[jx]: 90.2834
+ix: 13 jx: 9
+ent: 3
+uni[ix]: 94.6321xbar_vect[ix]: 93.784
+uni[jx]: 93.5711xbar_vect[jx]: 90.2834
+ix: 13 jx: 10
+ent: 1
+uni[ix]: 94.0452xbar_vect[ix]: 93.784
+uni[jx]: 91.8748xbar_vect[jx]: 91.0658
+ix: 13 jx: 10
+ent: 2
+uni[ix]: 92.6748xbar_vect[ix]: 93.784
+uni[jx]: 88.102xbar_vect[jx]: 91.0658
+ix: 13 jx: 10
+ent: 3
+uni[ix]: 94.6321xbar_vect[ix]: 93.784
+uni[jx]: 93.2205xbar_vect[jx]: 91.0658
+ix: 13 jx: 11
+ent: 1
+uni[ix]: 94.0452xbar_vect[ix]: 93.784
+uni[jx]: 90.3512xbar_vect[jx]: 89.6936
+ix: 13 jx: 11
+ent: 2
+uni[ix]: 92.6748xbar_vect[ix]: 93.784
+uni[jx]: 87.5692xbar_vect[jx]: 89.6936
+ix: 13 jx: 11
+ent: 3
+uni[ix]: 94.6321xbar_vect[ix]: 93.784
+uni[jx]: 91.1605xbar_vect[jx]: 89.6936
+ix: 13 jx: 12
+ent: 1
+uni[ix]: 94.0452xbar_vect[ix]: 93.784
+uni[jx]: 95.89xbar_vect[jx]: 95.3215
+ix: 13 jx: 12
+ent: 2
+uni[ix]: 92.6748xbar_vect[ix]: 93.784
+uni[jx]: 93.6124xbar_vect[jx]: 95.3215
+ix: 13 jx: 12
+ent: 3
+uni[ix]: 94.6321xbar_vect[ix]: 93.784
+uni[jx]: 96.462xbar_vect[jx]: 95.3215
+ix: 13 jx: 13
+ent: 1
+uni[ix]: 94.0452xbar_vect[ix]: 93.784
+uni[jx]: 94.0452xbar_vect[jx]: 93.784
+ix: 13 jx: 13
+ent: 2
+uni[ix]: 92.6748xbar_vect[ix]: 93.784
+uni[jx]: 92.6748xbar_vect[jx]: 93.784
+ix: 13 jx: 13
+ent: 3
+uni[ix]: 94.6321xbar_vect[ix]: 93.784
+uni[jx]: 94.6321xbar_vect[jx]: 93.784
+ix: 13 jx: 14
+ent: 1
+uni[ix]: 94.0452xbar_vect[ix]: 93.784
+uni[jx]: 87.8825xbar_vect[jx]: 87.6837
+ix: 13 jx: 14
+ent: 2
+uni[ix]: 92.6748xbar_vect[ix]: 93.784
+uni[jx]: 86.8895xbar_vect[jx]: 87.6837
+ix: 13 jx: 14
+ent: 3
+uni[ix]: 94.6321xbar_vect[ix]: 93.784
+uni[jx]: 88.279xbar_vect[jx]: 87.6837
+ix: 13 jx: 15
+ent: 1
+uni[ix]: 94.0452xbar_vect[ix]: 93.784
+uni[jx]: 93.6569xbar_vect[jx]: 93.4231
+ix: 13 jx: 15
+ent: 2
+uni[ix]: 92.6748xbar_vect[ix]: 93.784
+uni[jx]: 92.6893xbar_vect[jx]: 93.4231
+ix: 13 jx: 15
+ent: 3
+uni[ix]: 94.6321xbar_vect[ix]: 93.784
+uni[jx]: 93.9232xbar_vect[jx]: 93.4231
+ix: 13 jx: 16
+ent: 1
+uni[ix]: 94.0452xbar_vect[ix]: 93.784
+uni[jx]: 95.0199xbar_vect[jx]: 94.4255
+ix: 13 jx: 16
+ent: 2
+uni[ix]: 92.6748xbar_vect[ix]: 93.784
+uni[jx]: 93.4832xbar_vect[jx]: 94.4255
+ix: 13 jx: 16
+ent: 3
+uni[ix]: 94.6321xbar_vect[ix]: 93.784
+uni[jx]: 94.7733xbar_vect[jx]: 94.4255
+ix: 13 jx: 17
+ent: 1
+uni[ix]: 94.0452xbar_vect[ix]: 93.784
+uni[jx]: 98.0729xbar_vect[jx]: 98.1071
+ix: 13 jx: 17
+ent: 2
+uni[ix]: 92.6748xbar_vect[ix]: 93.784
+uni[jx]: 97.3129xbar_vect[jx]: 98.1071
+ix: 13 jx: 17
+ent: 3
+uni[ix]: 94.6321xbar_vect[ix]: 93.784
+uni[jx]: 98.9356xbar_vect[jx]: 98.1071
+ix: 13 jx: 18
+ent: 1
+uni[ix]: 94.0452xbar_vect[ix]: 93.784
+uni[jx]: 103.979xbar_vect[jx]: 104.794
+ix: 13 jx: 18
+ent: 2
+uni[ix]: 92.6748xbar_vect[ix]: 93.784
+uni[jx]: 102.589xbar_vect[jx]: 104.794
+ix: 13 jx: 18
+ent: 3
+uni[ix]: 94.6321xbar_vect[ix]: 93.784
+uni[jx]: 107.813xbar_vect[jx]: 104.794
+ix: 13 jx: 19
+ent: 1
+uni[ix]: 94.0452xbar_vect[ix]: 93.784
+uni[jx]: 0xbar_vect[jx]: 30.9745
+ix: 13 jx: 19
+ent: 2
+uni[ix]: 92.6748xbar_vect[ix]: 93.784
+uni[jx]: 92.9235xbar_vect[jx]: 30.9745
+ix: 13 jx: 19
+ent: 3
+uni[ix]: 94.6321xbar_vect[ix]: 93.784
+uni[jx]: 0xbar_vect[jx]: 30.9745
+ix: 13 jx: 20
+ent: 1
+uni[ix]: 94.0452xbar_vect[ix]: 93.784
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 13 jx: 20
+ent: 2
+uni[ix]: 92.6748xbar_vect[ix]: 93.784
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 13 jx: 20
+ent: 3
+uni[ix]: 94.6321xbar_vect[ix]: 93.784
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 14 jx: 1
+ent: 1
+uni[ix]: 87.8825xbar_vect[ix]: 87.6837
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 14 jx: 1
+ent: 2
+uni[ix]: 86.8895xbar_vect[ix]: 87.6837
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 14 jx: 1
+ent: 3
+uni[ix]: 88.279xbar_vect[ix]: 87.6837
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 14 jx: 2
+ent: 1
+uni[ix]: 87.8825xbar_vect[ix]: 87.6837
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 14 jx: 2
+ent: 2
+uni[ix]: 86.8895xbar_vect[ix]: 87.6837
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 14 jx: 2
+ent: 3
+uni[ix]: 88.279xbar_vect[ix]: 87.6837
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 14 jx: 3
+ent: 1
+uni[ix]: 87.8825xbar_vect[ix]: 87.6837
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 14 jx: 3
+ent: 2
+uni[ix]: 86.8895xbar_vect[ix]: 87.6837
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 14 jx: 3
+ent: 3
+uni[ix]: 88.279xbar_vect[ix]: 87.6837
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 14 jx: 4
+ent: 1
+uni[ix]: 87.8825xbar_vect[ix]: 87.6837
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 14 jx: 4
+ent: 2
+uni[ix]: 86.8895xbar_vect[ix]: 87.6837
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 14 jx: 4
+ent: 3
+uni[ix]: 88.279xbar_vect[ix]: 87.6837
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 14 jx: 5
+ent: 1
+uni[ix]: 87.8825xbar_vect[ix]: 87.6837
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 14 jx: 5
+ent: 2
+uni[ix]: 86.8895xbar_vect[ix]: 87.6837
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 14 jx: 5
+ent: 3
+uni[ix]: 88.279xbar_vect[ix]: 87.6837
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 14 jx: 6
+ent: 1
+uni[ix]: 87.8825xbar_vect[ix]: 87.6837
+uni[jx]: 13108.6xbar_vect[jx]: 4639.29
+ix: 14 jx: 6
+ent: 2
+uni[ix]: 86.8895xbar_vect[ix]: 87.6837
+uni[jx]: 809.278xbar_vect[jx]: 4639.29
+ix: 14 jx: 6
+ent: 3
+uni[ix]: 88.279xbar_vect[ix]: 87.6837
+uni[jx]: 0xbar_vect[jx]: 4639.29
+ix: 14 jx: 7
+ent: 1
+uni[ix]: 87.8825xbar_vect[ix]: 87.6837
+uni[jx]: 198.999xbar_vect[jx]: 190.075
+ix: 14 jx: 7
+ent: 2
+uni[ix]: 86.8895xbar_vect[ix]: 87.6837
+uni[jx]: 141.4xbar_vect[jx]: 190.075
+ix: 14 jx: 7
+ent: 3
+uni[ix]: 88.279xbar_vect[ix]: 87.6837
+uni[jx]: 229.825xbar_vect[jx]: 190.075
+ix: 14 jx: 8
+ent: 1
+uni[ix]: 87.8825xbar_vect[ix]: 87.6837
+uni[jx]: 118.842xbar_vect[jx]: 116.76
+ix: 14 jx: 8
+ent: 2
+uni[ix]: 86.8895xbar_vect[ix]: 87.6837
+uni[jx]: 107.703xbar_vect[jx]: 116.76
+ix: 14 jx: 8
+ent: 3
+uni[ix]: 88.279xbar_vect[ix]: 87.6837
+uni[jx]: 123.735xbar_vect[jx]: 116.76
+ix: 14 jx: 9
+ent: 1
+uni[ix]: 87.8825xbar_vect[ix]: 87.6837
+uni[jx]: 91.4952xbar_vect[jx]: 90.2834
+ix: 14 jx: 9
+ent: 2
+uni[ix]: 86.8895xbar_vect[ix]: 87.6837
+uni[jx]: 85.784xbar_vect[jx]: 90.2834
+ix: 14 jx: 9
+ent: 3
+uni[ix]: 88.279xbar_vect[ix]: 87.6837
+uni[jx]: 93.5711xbar_vect[jx]: 90.2834
+ix: 14 jx: 10
+ent: 1
+uni[ix]: 87.8825xbar_vect[ix]: 87.6837
+uni[jx]: 91.8748xbar_vect[jx]: 91.0658
+ix: 14 jx: 10
+ent: 2
+uni[ix]: 86.8895xbar_vect[ix]: 87.6837
+uni[jx]: 88.102xbar_vect[jx]: 91.0658
+ix: 14 jx: 10
+ent: 3
+uni[ix]: 88.279xbar_vect[ix]: 87.6837
+uni[jx]: 93.2205xbar_vect[jx]: 91.0658
+ix: 14 jx: 11
+ent: 1
+uni[ix]: 87.8825xbar_vect[ix]: 87.6837
+uni[jx]: 90.3512xbar_vect[jx]: 89.6936
+ix: 14 jx: 11
+ent: 2
+uni[ix]: 86.8895xbar_vect[ix]: 87.6837
+uni[jx]: 87.5692xbar_vect[jx]: 89.6936
+ix: 14 jx: 11
+ent: 3
+uni[ix]: 88.279xbar_vect[ix]: 87.6837
+uni[jx]: 91.1605xbar_vect[jx]: 89.6936
+ix: 14 jx: 12
+ent: 1
+uni[ix]: 87.8825xbar_vect[ix]: 87.6837
+uni[jx]: 95.89xbar_vect[jx]: 95.3215
+ix: 14 jx: 12
+ent: 2
+uni[ix]: 86.8895xbar_vect[ix]: 87.6837
+uni[jx]: 93.6124xbar_vect[jx]: 95.3215
+ix: 14 jx: 12
+ent: 3
+uni[ix]: 88.279xbar_vect[ix]: 87.6837
+uni[jx]: 96.462xbar_vect[jx]: 95.3215
+ix: 14 jx: 13
+ent: 1
+uni[ix]: 87.8825xbar_vect[ix]: 87.6837
+uni[jx]: 94.0452xbar_vect[jx]: 93.784
+ix: 14 jx: 13
+ent: 2
+uni[ix]: 86.8895xbar_vect[ix]: 87.6837
+uni[jx]: 92.6748xbar_vect[jx]: 93.784
+ix: 14 jx: 13
+ent: 3
+uni[ix]: 88.279xbar_vect[ix]: 87.6837
+uni[jx]: 94.6321xbar_vect[jx]: 93.784
+ix: 14 jx: 14
+ent: 1
+uni[ix]: 87.8825xbar_vect[ix]: 87.6837
+uni[jx]: 87.8825xbar_vect[jx]: 87.6837
+ix: 14 jx: 14
+ent: 2
+uni[ix]: 86.8895xbar_vect[ix]: 87.6837
+uni[jx]: 86.8895xbar_vect[jx]: 87.6837
+ix: 14 jx: 14
+ent: 3
+uni[ix]: 88.279xbar_vect[ix]: 87.6837
+uni[jx]: 88.279xbar_vect[jx]: 87.6837
+ix: 14 jx: 15
+ent: 1
+uni[ix]: 87.8825xbar_vect[ix]: 87.6837
+uni[jx]: 93.6569xbar_vect[jx]: 93.4231
+ix: 14 jx: 15
+ent: 2
+uni[ix]: 86.8895xbar_vect[ix]: 87.6837
+uni[jx]: 92.6893xbar_vect[jx]: 93.4231
+ix: 14 jx: 15
+ent: 3
+uni[ix]: 88.279xbar_vect[ix]: 87.6837
+uni[jx]: 93.9232xbar_vect[jx]: 93.4231
+ix: 14 jx: 16
+ent: 1
+uni[ix]: 87.8825xbar_vect[ix]: 87.6837
+uni[jx]: 95.0199xbar_vect[jx]: 94.4255
+ix: 14 jx: 16
+ent: 2
+uni[ix]: 86.8895xbar_vect[ix]: 87.6837
+uni[jx]: 93.4832xbar_vect[jx]: 94.4255
+ix: 14 jx: 16
+ent: 3
+uni[ix]: 88.279xbar_vect[ix]: 87.6837
+uni[jx]: 94.7733xbar_vect[jx]: 94.4255
+ix: 14 jx: 17
+ent: 1
+uni[ix]: 87.8825xbar_vect[ix]: 87.6837
+uni[jx]: 98.0729xbar_vect[jx]: 98.1071
+ix: 14 jx: 17
+ent: 2
+uni[ix]: 86.8895xbar_vect[ix]: 87.6837
+uni[jx]: 97.3129xbar_vect[jx]: 98.1071
+ix: 14 jx: 17
+ent: 3
+uni[ix]: 88.279xbar_vect[ix]: 87.6837
+uni[jx]: 98.9356xbar_vect[jx]: 98.1071
+ix: 14 jx: 18
+ent: 1
+uni[ix]: 87.8825xbar_vect[ix]: 87.6837
+uni[jx]: 103.979xbar_vect[jx]: 104.794
+ix: 14 jx: 18
+ent: 2
+uni[ix]: 86.8895xbar_vect[ix]: 87.6837
+uni[jx]: 102.589xbar_vect[jx]: 104.794
+ix: 14 jx: 18
+ent: 3
+uni[ix]: 88.279xbar_vect[ix]: 87.6837
+uni[jx]: 107.813xbar_vect[jx]: 104.794
+ix: 14 jx: 19
+ent: 1
+uni[ix]: 87.8825xbar_vect[ix]: 87.6837
+uni[jx]: 0xbar_vect[jx]: 30.9745
+ix: 14 jx: 19
+ent: 2
+uni[ix]: 86.8895xbar_vect[ix]: 87.6837
+uni[jx]: 92.9235xbar_vect[jx]: 30.9745
+ix: 14 jx: 19
+ent: 3
+uni[ix]: 88.279xbar_vect[ix]: 87.6837
+uni[jx]: 0xbar_vect[jx]: 30.9745
+ix: 14 jx: 20
+ent: 1
+uni[ix]: 87.8825xbar_vect[ix]: 87.6837
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 14 jx: 20
+ent: 2
+uni[ix]: 86.8895xbar_vect[ix]: 87.6837
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 14 jx: 20
+ent: 3
+uni[ix]: 88.279xbar_vect[ix]: 87.6837
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 15 jx: 1
+ent: 1
+uni[ix]: 93.6569xbar_vect[ix]: 93.4231
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 15 jx: 1
+ent: 2
+uni[ix]: 92.6893xbar_vect[ix]: 93.4231
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 15 jx: 1
+ent: 3
+uni[ix]: 93.9232xbar_vect[ix]: 93.4231
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 15 jx: 2
+ent: 1
+uni[ix]: 93.6569xbar_vect[ix]: 93.4231
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 15 jx: 2
+ent: 2
+uni[ix]: 92.6893xbar_vect[ix]: 93.4231
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 15 jx: 2
+ent: 3
+uni[ix]: 93.9232xbar_vect[ix]: 93.4231
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 15 jx: 3
+ent: 1
+uni[ix]: 93.6569xbar_vect[ix]: 93.4231
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 15 jx: 3
+ent: 2
+uni[ix]: 92.6893xbar_vect[ix]: 93.4231
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 15 jx: 3
+ent: 3
+uni[ix]: 93.9232xbar_vect[ix]: 93.4231
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 15 jx: 4
+ent: 1
+uni[ix]: 93.6569xbar_vect[ix]: 93.4231
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 15 jx: 4
+ent: 2
+uni[ix]: 92.6893xbar_vect[ix]: 93.4231
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 15 jx: 4
+ent: 3
+uni[ix]: 93.9232xbar_vect[ix]: 93.4231
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 15 jx: 5
+ent: 1
+uni[ix]: 93.6569xbar_vect[ix]: 93.4231
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 15 jx: 5
+ent: 2
+uni[ix]: 92.6893xbar_vect[ix]: 93.4231
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 15 jx: 5
+ent: 3
+uni[ix]: 93.9232xbar_vect[ix]: 93.4231
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 15 jx: 6
+ent: 1
+uni[ix]: 93.6569xbar_vect[ix]: 93.4231
+uni[jx]: 13108.6xbar_vect[jx]: 4639.29
+ix: 15 jx: 6
+ent: 2
+uni[ix]: 92.6893xbar_vect[ix]: 93.4231
+uni[jx]: 809.278xbar_vect[jx]: 4639.29
+ix: 15 jx: 6
+ent: 3
+uni[ix]: 93.9232xbar_vect[ix]: 93.4231
+uni[jx]: 0xbar_vect[jx]: 4639.29
+ix: 15 jx: 7
+ent: 1
+uni[ix]: 93.6569xbar_vect[ix]: 93.4231
+uni[jx]: 198.999xbar_vect[jx]: 190.075
+ix: 15 jx: 7
+ent: 2
+uni[ix]: 92.6893xbar_vect[ix]: 93.4231
+uni[jx]: 141.4xbar_vect[jx]: 190.075
+ix: 15 jx: 7
+ent: 3
+uni[ix]: 93.9232xbar_vect[ix]: 93.4231
+uni[jx]: 229.825xbar_vect[jx]: 190.075
+ix: 15 jx: 8
+ent: 1
+uni[ix]: 93.6569xbar_vect[ix]: 93.4231
+uni[jx]: 118.842xbar_vect[jx]: 116.76
+ix: 15 jx: 8
+ent: 2
+uni[ix]: 92.6893xbar_vect[ix]: 93.4231
+uni[jx]: 107.703xbar_vect[jx]: 116.76
+ix: 15 jx: 8
+ent: 3
+uni[ix]: 93.9232xbar_vect[ix]: 93.4231
+uni[jx]: 123.735xbar_vect[jx]: 116.76
+ix: 15 jx: 9
+ent: 1
+uni[ix]: 93.6569xbar_vect[ix]: 93.4231
+uni[jx]: 91.4952xbar_vect[jx]: 90.2834
+ix: 15 jx: 9
+ent: 2
+uni[ix]: 92.6893xbar_vect[ix]: 93.4231
+uni[jx]: 85.784xbar_vect[jx]: 90.2834
+ix: 15 jx: 9
+ent: 3
+uni[ix]: 93.9232xbar_vect[ix]: 93.4231
+uni[jx]: 93.5711xbar_vect[jx]: 90.2834
+ix: 15 jx: 10
+ent: 1
+uni[ix]: 93.6569xbar_vect[ix]: 93.4231
+uni[jx]: 91.8748xbar_vect[jx]: 91.0658
+ix: 15 jx: 10
+ent: 2
+uni[ix]: 92.6893xbar_vect[ix]: 93.4231
+uni[jx]: 88.102xbar_vect[jx]: 91.0658
+ix: 15 jx: 10
+ent: 3
+uni[ix]: 93.9232xbar_vect[ix]: 93.4231
+uni[jx]: 93.2205xbar_vect[jx]: 91.0658
+ix: 15 jx: 11
+ent: 1
+uni[ix]: 93.6569xbar_vect[ix]: 93.4231
+uni[jx]: 90.3512xbar_vect[jx]: 89.6936
+ix: 15 jx: 11
+ent: 2
+uni[ix]: 92.6893xbar_vect[ix]: 93.4231
+uni[jx]: 87.5692xbar_vect[jx]: 89.6936
+ix: 15 jx: 11
+ent: 3
+uni[ix]: 93.9232xbar_vect[ix]: 93.4231
+uni[jx]: 91.1605xbar_vect[jx]: 89.6936
+ix: 15 jx: 12
+ent: 1
+uni[ix]: 93.6569xbar_vect[ix]: 93.4231
+uni[jx]: 95.89xbar_vect[jx]: 95.3215
+ix: 15 jx: 12
+ent: 2
+uni[ix]: 92.6893xbar_vect[ix]: 93.4231
+uni[jx]: 93.6124xbar_vect[jx]: 95.3215
+ix: 15 jx: 12
+ent: 3
+uni[ix]: 93.9232xbar_vect[ix]: 93.4231
+uni[jx]: 96.462xbar_vect[jx]: 95.3215
+ix: 15 jx: 13
+ent: 1
+uni[ix]: 93.6569xbar_vect[ix]: 93.4231
+uni[jx]: 94.0452xbar_vect[jx]: 93.784
+ix: 15 jx: 13
+ent: 2
+uni[ix]: 92.6893xbar_vect[ix]: 93.4231
+uni[jx]: 92.6748xbar_vect[jx]: 93.784
+ix: 15 jx: 13
+ent: 3
+uni[ix]: 93.9232xbar_vect[ix]: 93.4231
+uni[jx]: 94.6321xbar_vect[jx]: 93.784
+ix: 15 jx: 14
+ent: 1
+uni[ix]: 93.6569xbar_vect[ix]: 93.4231
+uni[jx]: 87.8825xbar_vect[jx]: 87.6837
+ix: 15 jx: 14
+ent: 2
+uni[ix]: 92.6893xbar_vect[ix]: 93.4231
+uni[jx]: 86.8895xbar_vect[jx]: 87.6837
+ix: 15 jx: 14
+ent: 3
+uni[ix]: 93.9232xbar_vect[ix]: 93.4231
+uni[jx]: 88.279xbar_vect[jx]: 87.6837
+ix: 15 jx: 15
+ent: 1
+uni[ix]: 93.6569xbar_vect[ix]: 93.4231
+uni[jx]: 93.6569xbar_vect[jx]: 93.4231
+ix: 15 jx: 15
+ent: 2
+uni[ix]: 92.6893xbar_vect[ix]: 93.4231
+uni[jx]: 92.6893xbar_vect[jx]: 93.4231
+ix: 15 jx: 15
+ent: 3
+uni[ix]: 93.9232xbar_vect[ix]: 93.4231
+uni[jx]: 93.9232xbar_vect[jx]: 93.4231
+ix: 15 jx: 16
+ent: 1
+uni[ix]: 93.6569xbar_vect[ix]: 93.4231
+uni[jx]: 95.0199xbar_vect[jx]: 94.4255
+ix: 15 jx: 16
+ent: 2
+uni[ix]: 92.6893xbar_vect[ix]: 93.4231
+uni[jx]: 93.4832xbar_vect[jx]: 94.4255
+ix: 15 jx: 16
+ent: 3
+uni[ix]: 93.9232xbar_vect[ix]: 93.4231
+uni[jx]: 94.7733xbar_vect[jx]: 94.4255
+ix: 15 jx: 17
+ent: 1
+uni[ix]: 93.6569xbar_vect[ix]: 93.4231
+uni[jx]: 98.0729xbar_vect[jx]: 98.1071
+ix: 15 jx: 17
+ent: 2
+uni[ix]: 92.6893xbar_vect[ix]: 93.4231
+uni[jx]: 97.3129xbar_vect[jx]: 98.1071
+ix: 15 jx: 17
+ent: 3
+uni[ix]: 93.9232xbar_vect[ix]: 93.4231
+uni[jx]: 98.9356xbar_vect[jx]: 98.1071
+ix: 15 jx: 18
+ent: 1
+uni[ix]: 93.6569xbar_vect[ix]: 93.4231
+uni[jx]: 103.979xbar_vect[jx]: 104.794
+ix: 15 jx: 18
+ent: 2
+uni[ix]: 92.6893xbar_vect[ix]: 93.4231
+uni[jx]: 102.589xbar_vect[jx]: 104.794
+ix: 15 jx: 18
+ent: 3
+uni[ix]: 93.9232xbar_vect[ix]: 93.4231
+uni[jx]: 107.813xbar_vect[jx]: 104.794
+ix: 15 jx: 19
+ent: 1
+uni[ix]: 93.6569xbar_vect[ix]: 93.4231
+uni[jx]: 0xbar_vect[jx]: 30.9745
+ix: 15 jx: 19
+ent: 2
+uni[ix]: 92.6893xbar_vect[ix]: 93.4231
+uni[jx]: 92.9235xbar_vect[jx]: 30.9745
+ix: 15 jx: 19
+ent: 3
+uni[ix]: 93.9232xbar_vect[ix]: 93.4231
+uni[jx]: 0xbar_vect[jx]: 30.9745
+ix: 15 jx: 20
+ent: 1
+uni[ix]: 93.6569xbar_vect[ix]: 93.4231
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 15 jx: 20
+ent: 2
+uni[ix]: 92.6893xbar_vect[ix]: 93.4231
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 15 jx: 20
+ent: 3
+uni[ix]: 93.9232xbar_vect[ix]: 93.4231
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 16 jx: 1
+ent: 1
+uni[ix]: 95.0199xbar_vect[ix]: 94.4255
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 16 jx: 1
+ent: 2
+uni[ix]: 93.4832xbar_vect[ix]: 94.4255
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 16 jx: 1
+ent: 3
+uni[ix]: 94.7733xbar_vect[ix]: 94.4255
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 16 jx: 2
+ent: 1
+uni[ix]: 95.0199xbar_vect[ix]: 94.4255
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 16 jx: 2
+ent: 2
+uni[ix]: 93.4832xbar_vect[ix]: 94.4255
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 16 jx: 2
+ent: 3
+uni[ix]: 94.7733xbar_vect[ix]: 94.4255
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 16 jx: 3
+ent: 1
+uni[ix]: 95.0199xbar_vect[ix]: 94.4255
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 16 jx: 3
+ent: 2
+uni[ix]: 93.4832xbar_vect[ix]: 94.4255
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 16 jx: 3
+ent: 3
+uni[ix]: 94.7733xbar_vect[ix]: 94.4255
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 16 jx: 4
+ent: 1
+uni[ix]: 95.0199xbar_vect[ix]: 94.4255
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 16 jx: 4
+ent: 2
+uni[ix]: 93.4832xbar_vect[ix]: 94.4255
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 16 jx: 4
+ent: 3
+uni[ix]: 94.7733xbar_vect[ix]: 94.4255
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 16 jx: 5
+ent: 1
+uni[ix]: 95.0199xbar_vect[ix]: 94.4255
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 16 jx: 5
+ent: 2
+uni[ix]: 93.4832xbar_vect[ix]: 94.4255
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 16 jx: 5
+ent: 3
+uni[ix]: 94.7733xbar_vect[ix]: 94.4255
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 16 jx: 6
+ent: 1
+uni[ix]: 95.0199xbar_vect[ix]: 94.4255
+uni[jx]: 13108.6xbar_vect[jx]: 4639.29
+ix: 16 jx: 6
+ent: 2
+uni[ix]: 93.4832xbar_vect[ix]: 94.4255
+uni[jx]: 809.278xbar_vect[jx]: 4639.29
+ix: 16 jx: 6
+ent: 3
+uni[ix]: 94.7733xbar_vect[ix]: 94.4255
+uni[jx]: 0xbar_vect[jx]: 4639.29
+ix: 16 jx: 7
+ent: 1
+uni[ix]: 95.0199xbar_vect[ix]: 94.4255
+uni[jx]: 198.999xbar_vect[jx]: 190.075
+ix: 16 jx: 7
+ent: 2
+uni[ix]: 93.4832xbar_vect[ix]: 94.4255
+uni[jx]: 141.4xbar_vect[jx]: 190.075
+ix: 16 jx: 7
+ent: 3
+uni[ix]: 94.7733xbar_vect[ix]: 94.4255
+uni[jx]: 229.825xbar_vect[jx]: 190.075
+ix: 16 jx: 8
+ent: 1
+uni[ix]: 95.0199xbar_vect[ix]: 94.4255
+uni[jx]: 118.842xbar_vect[jx]: 116.76
+ix: 16 jx: 8
+ent: 2
+uni[ix]: 93.4832xbar_vect[ix]: 94.4255
+uni[jx]: 107.703xbar_vect[jx]: 116.76
+ix: 16 jx: 8
+ent: 3
+uni[ix]: 94.7733xbar_vect[ix]: 94.4255
+uni[jx]: 123.735xbar_vect[jx]: 116.76
+ix: 16 jx: 9
+ent: 1
+uni[ix]: 95.0199xbar_vect[ix]: 94.4255
+uni[jx]: 91.4952xbar_vect[jx]: 90.2834
+ix: 16 jx: 9
+ent: 2
+uni[ix]: 93.4832xbar_vect[ix]: 94.4255
+uni[jx]: 85.784xbar_vect[jx]: 90.2834
+ix: 16 jx: 9
+ent: 3
+uni[ix]: 94.7733xbar_vect[ix]: 94.4255
+uni[jx]: 93.5711xbar_vect[jx]: 90.2834
+ix: 16 jx: 10
+ent: 1
+uni[ix]: 95.0199xbar_vect[ix]: 94.4255
+uni[jx]: 91.8748xbar_vect[jx]: 91.0658
+ix: 16 jx: 10
+ent: 2
+uni[ix]: 93.4832xbar_vect[ix]: 94.4255
+uni[jx]: 88.102xbar_vect[jx]: 91.0658
+ix: 16 jx: 10
+ent: 3
+uni[ix]: 94.7733xbar_vect[ix]: 94.4255
+uni[jx]: 93.2205xbar_vect[jx]: 91.0658
+ix: 16 jx: 11
+ent: 1
+uni[ix]: 95.0199xbar_vect[ix]: 94.4255
+uni[jx]: 90.3512xbar_vect[jx]: 89.6936
+ix: 16 jx: 11
+ent: 2
+uni[ix]: 93.4832xbar_vect[ix]: 94.4255
+uni[jx]: 87.5692xbar_vect[jx]: 89.6936
+ix: 16 jx: 11
+ent: 3
+uni[ix]: 94.7733xbar_vect[ix]: 94.4255
+uni[jx]: 91.1605xbar_vect[jx]: 89.6936
+ix: 16 jx: 12
+ent: 1
+uni[ix]: 95.0199xbar_vect[ix]: 94.4255
+uni[jx]: 95.89xbar_vect[jx]: 95.3215
+ix: 16 jx: 12
+ent: 2
+uni[ix]: 93.4832xbar_vect[ix]: 94.4255
+uni[jx]: 93.6124xbar_vect[jx]: 95.3215
+ix: 16 jx: 12
+ent: 3
+uni[ix]: 94.7733xbar_vect[ix]: 94.4255
+uni[jx]: 96.462xbar_vect[jx]: 95.3215
+ix: 16 jx: 13
+ent: 1
+uni[ix]: 95.0199xbar_vect[ix]: 94.4255
+uni[jx]: 94.0452xbar_vect[jx]: 93.784
+ix: 16 jx: 13
+ent: 2
+uni[ix]: 93.4832xbar_vect[ix]: 94.4255
+uni[jx]: 92.6748xbar_vect[jx]: 93.784
+ix: 16 jx: 13
+ent: 3
+uni[ix]: 94.7733xbar_vect[ix]: 94.4255
+uni[jx]: 94.6321xbar_vect[jx]: 93.784
+ix: 16 jx: 14
+ent: 1
+uni[ix]: 95.0199xbar_vect[ix]: 94.4255
+uni[jx]: 87.8825xbar_vect[jx]: 87.6837
+ix: 16 jx: 14
+ent: 2
+uni[ix]: 93.4832xbar_vect[ix]: 94.4255
+uni[jx]: 86.8895xbar_vect[jx]: 87.6837
+ix: 16 jx: 14
+ent: 3
+uni[ix]: 94.7733xbar_vect[ix]: 94.4255
+uni[jx]: 88.279xbar_vect[jx]: 87.6837
+ix: 16 jx: 15
+ent: 1
+uni[ix]: 95.0199xbar_vect[ix]: 94.4255
+uni[jx]: 93.6569xbar_vect[jx]: 93.4231
+ix: 16 jx: 15
+ent: 2
+uni[ix]: 93.4832xbar_vect[ix]: 94.4255
+uni[jx]: 92.6893xbar_vect[jx]: 93.4231
+ix: 16 jx: 15
+ent: 3
+uni[ix]: 94.7733xbar_vect[ix]: 94.4255
+uni[jx]: 93.9232xbar_vect[jx]: 93.4231
+ix: 16 jx: 16
+ent: 1
+uni[ix]: 95.0199xbar_vect[ix]: 94.4255
+uni[jx]: 95.0199xbar_vect[jx]: 94.4255
+ix: 16 jx: 16
+ent: 2
+uni[ix]: 93.4832xbar_vect[ix]: 94.4255
+uni[jx]: 93.4832xbar_vect[jx]: 94.4255
+ix: 16 jx: 16
+ent: 3
+uni[ix]: 94.7733xbar_vect[ix]: 94.4255
+uni[jx]: 94.7733xbar_vect[jx]: 94.4255
+ix: 16 jx: 17
+ent: 1
+uni[ix]: 95.0199xbar_vect[ix]: 94.4255
+uni[jx]: 98.0729xbar_vect[jx]: 98.1071
+ix: 16 jx: 17
+ent: 2
+uni[ix]: 93.4832xbar_vect[ix]: 94.4255
+uni[jx]: 97.3129xbar_vect[jx]: 98.1071
+ix: 16 jx: 17
+ent: 3
+uni[ix]: 94.7733xbar_vect[ix]: 94.4255
+uni[jx]: 98.9356xbar_vect[jx]: 98.1071
+ix: 16 jx: 18
+ent: 1
+uni[ix]: 95.0199xbar_vect[ix]: 94.4255
+uni[jx]: 103.979xbar_vect[jx]: 104.794
+ix: 16 jx: 18
+ent: 2
+uni[ix]: 93.4832xbar_vect[ix]: 94.4255
+uni[jx]: 102.589xbar_vect[jx]: 104.794
+ix: 16 jx: 18
+ent: 3
+uni[ix]: 94.7733xbar_vect[ix]: 94.4255
+uni[jx]: 107.813xbar_vect[jx]: 104.794
+ix: 16 jx: 19
+ent: 1
+uni[ix]: 95.0199xbar_vect[ix]: 94.4255
+uni[jx]: 0xbar_vect[jx]: 30.9745
+ix: 16 jx: 19
+ent: 2
+uni[ix]: 93.4832xbar_vect[ix]: 94.4255
+uni[jx]: 92.9235xbar_vect[jx]: 30.9745
+ix: 16 jx: 19
+ent: 3
+uni[ix]: 94.7733xbar_vect[ix]: 94.4255
+uni[jx]: 0xbar_vect[jx]: 30.9745
+ix: 16 jx: 20
+ent: 1
+uni[ix]: 95.0199xbar_vect[ix]: 94.4255
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 16 jx: 20
+ent: 2
+uni[ix]: 93.4832xbar_vect[ix]: 94.4255
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 16 jx: 20
+ent: 3
+uni[ix]: 94.7733xbar_vect[ix]: 94.4255
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 17 jx: 1
+ent: 1
+uni[ix]: 98.0729xbar_vect[ix]: 98.1071
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 17 jx: 1
+ent: 2
+uni[ix]: 97.3129xbar_vect[ix]: 98.1071
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 17 jx: 1
+ent: 3
+uni[ix]: 98.9356xbar_vect[ix]: 98.1071
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 17 jx: 2
+ent: 1
+uni[ix]: 98.0729xbar_vect[ix]: 98.1071
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 17 jx: 2
+ent: 2
+uni[ix]: 97.3129xbar_vect[ix]: 98.1071
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 17 jx: 2
+ent: 3
+uni[ix]: 98.9356xbar_vect[ix]: 98.1071
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 17 jx: 3
+ent: 1
+uni[ix]: 98.0729xbar_vect[ix]: 98.1071
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 17 jx: 3
+ent: 2
+uni[ix]: 97.3129xbar_vect[ix]: 98.1071
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 17 jx: 3
+ent: 3
+uni[ix]: 98.9356xbar_vect[ix]: 98.1071
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 17 jx: 4
+ent: 1
+uni[ix]: 98.0729xbar_vect[ix]: 98.1071
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 17 jx: 4
+ent: 2
+uni[ix]: 97.3129xbar_vect[ix]: 98.1071
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 17 jx: 4
+ent: 3
+uni[ix]: 98.9356xbar_vect[ix]: 98.1071
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 17 jx: 5
+ent: 1
+uni[ix]: 98.0729xbar_vect[ix]: 98.1071
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 17 jx: 5
+ent: 2
+uni[ix]: 97.3129xbar_vect[ix]: 98.1071
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 17 jx: 5
+ent: 3
+uni[ix]: 98.9356xbar_vect[ix]: 98.1071
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 17 jx: 6
+ent: 1
+uni[ix]: 98.0729xbar_vect[ix]: 98.1071
+uni[jx]: 13108.6xbar_vect[jx]: 4639.29
+ix: 17 jx: 6
+ent: 2
+uni[ix]: 97.3129xbar_vect[ix]: 98.1071
+uni[jx]: 809.278xbar_vect[jx]: 4639.29
+ix: 17 jx: 6
+ent: 3
+uni[ix]: 98.9356xbar_vect[ix]: 98.1071
+uni[jx]: 0xbar_vect[jx]: 4639.29
+ix: 17 jx: 7
+ent: 1
+uni[ix]: 98.0729xbar_vect[ix]: 98.1071
+uni[jx]: 198.999xbar_vect[jx]: 190.075
+ix: 17 jx: 7
+ent: 2
+uni[ix]: 97.3129xbar_vect[ix]: 98.1071
+uni[jx]: 141.4xbar_vect[jx]: 190.075
+ix: 17 jx: 7
+ent: 3
+uni[ix]: 98.9356xbar_vect[ix]: 98.1071
+uni[jx]: 229.825xbar_vect[jx]: 190.075
+ix: 17 jx: 8
+ent: 1
+uni[ix]: 98.0729xbar_vect[ix]: 98.1071
+uni[jx]: 118.842xbar_vect[jx]: 116.76
+ix: 17 jx: 8
+ent: 2
+uni[ix]: 97.3129xbar_vect[ix]: 98.1071
+uni[jx]: 107.703xbar_vect[jx]: 116.76
+ix: 17 jx: 8
+ent: 3
+uni[ix]: 98.9356xbar_vect[ix]: 98.1071
+uni[jx]: 123.735xbar_vect[jx]: 116.76
+ix: 17 jx: 9
+ent: 1
+uni[ix]: 98.0729xbar_vect[ix]: 98.1071
+uni[jx]: 91.4952xbar_vect[jx]: 90.2834
+ix: 17 jx: 9
+ent: 2
+uni[ix]: 97.3129xbar_vect[ix]: 98.1071
+uni[jx]: 85.784xbar_vect[jx]: 90.2834
+ix: 17 jx: 9
+ent: 3
+uni[ix]: 98.9356xbar_vect[ix]: 98.1071
+uni[jx]: 93.5711xbar_vect[jx]: 90.2834
+ix: 17 jx: 10
+ent: 1
+uni[ix]: 98.0729xbar_vect[ix]: 98.1071
+uni[jx]: 91.8748xbar_vect[jx]: 91.0658
+ix: 17 jx: 10
+ent: 2
+uni[ix]: 97.3129xbar_vect[ix]: 98.1071
+uni[jx]: 88.102xbar_vect[jx]: 91.0658
+ix: 17 jx: 10
+ent: 3
+uni[ix]: 98.9356xbar_vect[ix]: 98.1071
+uni[jx]: 93.2205xbar_vect[jx]: 91.0658
+ix: 17 jx: 11
+ent: 1
+uni[ix]: 98.0729xbar_vect[ix]: 98.1071
+uni[jx]: 90.3512xbar_vect[jx]: 89.6936
+ix: 17 jx: 11
+ent: 2
+uni[ix]: 97.3129xbar_vect[ix]: 98.1071
+uni[jx]: 87.5692xbar_vect[jx]: 89.6936
+ix: 17 jx: 11
+ent: 3
+uni[ix]: 98.9356xbar_vect[ix]: 98.1071
+uni[jx]: 91.1605xbar_vect[jx]: 89.6936
+ix: 17 jx: 12
+ent: 1
+uni[ix]: 98.0729xbar_vect[ix]: 98.1071
+uni[jx]: 95.89xbar_vect[jx]: 95.3215
+ix: 17 jx: 12
+ent: 2
+uni[ix]: 97.3129xbar_vect[ix]: 98.1071
+uni[jx]: 93.6124xbar_vect[jx]: 95.3215
+ix: 17 jx: 12
+ent: 3
+uni[ix]: 98.9356xbar_vect[ix]: 98.1071
+uni[jx]: 96.462xbar_vect[jx]: 95.3215
+ix: 17 jx: 13
+ent: 1
+uni[ix]: 98.0729xbar_vect[ix]: 98.1071
+uni[jx]: 94.0452xbar_vect[jx]: 93.784
+ix: 17 jx: 13
+ent: 2
+uni[ix]: 97.3129xbar_vect[ix]: 98.1071
+uni[jx]: 92.6748xbar_vect[jx]: 93.784
+ix: 17 jx: 13
+ent: 3
+uni[ix]: 98.9356xbar_vect[ix]: 98.1071
+uni[jx]: 94.6321xbar_vect[jx]: 93.784
+ix: 17 jx: 14
+ent: 1
+uni[ix]: 98.0729xbar_vect[ix]: 98.1071
+uni[jx]: 87.8825xbar_vect[jx]: 87.6837
+ix: 17 jx: 14
+ent: 2
+uni[ix]: 97.3129xbar_vect[ix]: 98.1071
+uni[jx]: 86.8895xbar_vect[jx]: 87.6837
+ix: 17 jx: 14
+ent: 3
+uni[ix]: 98.9356xbar_vect[ix]: 98.1071
+uni[jx]: 88.279xbar_vect[jx]: 87.6837
+ix: 17 jx: 15
+ent: 1
+uni[ix]: 98.0729xbar_vect[ix]: 98.1071
+uni[jx]: 93.6569xbar_vect[jx]: 93.4231
+ix: 17 jx: 15
+ent: 2
+uni[ix]: 97.3129xbar_vect[ix]: 98.1071
+uni[jx]: 92.6893xbar_vect[jx]: 93.4231
+ix: 17 jx: 15
+ent: 3
+uni[ix]: 98.9356xbar_vect[ix]: 98.1071
+uni[jx]: 93.9232xbar_vect[jx]: 93.4231
+ix: 17 jx: 16
+ent: 1
+uni[ix]: 98.0729xbar_vect[ix]: 98.1071
+uni[jx]: 95.0199xbar_vect[jx]: 94.4255
+ix: 17 jx: 16
+ent: 2
+uni[ix]: 97.3129xbar_vect[ix]: 98.1071
+uni[jx]: 93.4832xbar_vect[jx]: 94.4255
+ix: 17 jx: 16
+ent: 3
+uni[ix]: 98.9356xbar_vect[ix]: 98.1071
+uni[jx]: 94.7733xbar_vect[jx]: 94.4255
+ix: 17 jx: 17
+ent: 1
+uni[ix]: 98.0729xbar_vect[ix]: 98.1071
+uni[jx]: 98.0729xbar_vect[jx]: 98.1071
+ix: 17 jx: 17
+ent: 2
+uni[ix]: 97.3129xbar_vect[ix]: 98.1071
+uni[jx]: 97.3129xbar_vect[jx]: 98.1071
+ix: 17 jx: 17
+ent: 3
+uni[ix]: 98.9356xbar_vect[ix]: 98.1071
+uni[jx]: 98.9356xbar_vect[jx]: 98.1071
+ix: 17 jx: 18
+ent: 1
+uni[ix]: 98.0729xbar_vect[ix]: 98.1071
+uni[jx]: 103.979xbar_vect[jx]: 104.794
+ix: 17 jx: 18
+ent: 2
+uni[ix]: 97.3129xbar_vect[ix]: 98.1071
+uni[jx]: 102.589xbar_vect[jx]: 104.794
+ix: 17 jx: 18
+ent: 3
+uni[ix]: 98.9356xbar_vect[ix]: 98.1071
+uni[jx]: 107.813xbar_vect[jx]: 104.794
+ix: 17 jx: 19
+ent: 1
+uni[ix]: 98.0729xbar_vect[ix]: 98.1071
+uni[jx]: 0xbar_vect[jx]: 30.9745
+ix: 17 jx: 19
+ent: 2
+uni[ix]: 97.3129xbar_vect[ix]: 98.1071
+uni[jx]: 92.9235xbar_vect[jx]: 30.9745
+ix: 17 jx: 19
+ent: 3
+uni[ix]: 98.9356xbar_vect[ix]: 98.1071
+uni[jx]: 0xbar_vect[jx]: 30.9745
+ix: 17 jx: 20
+ent: 1
+uni[ix]: 98.0729xbar_vect[ix]: 98.1071
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 17 jx: 20
+ent: 2
+uni[ix]: 97.3129xbar_vect[ix]: 98.1071
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 17 jx: 20
+ent: 3
+uni[ix]: 98.9356xbar_vect[ix]: 98.1071
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 18 jx: 1
+ent: 1
+uni[ix]: 103.979xbar_vect[ix]: 104.794
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 18 jx: 1
+ent: 2
+uni[ix]: 102.589xbar_vect[ix]: 104.794
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 18 jx: 1
+ent: 3
+uni[ix]: 107.813xbar_vect[ix]: 104.794
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 18 jx: 2
+ent: 1
+uni[ix]: 103.979xbar_vect[ix]: 104.794
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 18 jx: 2
+ent: 2
+uni[ix]: 102.589xbar_vect[ix]: 104.794
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 18 jx: 2
+ent: 3
+uni[ix]: 107.813xbar_vect[ix]: 104.794
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 18 jx: 3
+ent: 1
+uni[ix]: 103.979xbar_vect[ix]: 104.794
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 18 jx: 3
+ent: 2
+uni[ix]: 102.589xbar_vect[ix]: 104.794
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 18 jx: 3
+ent: 3
+uni[ix]: 107.813xbar_vect[ix]: 104.794
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 18 jx: 4
+ent: 1
+uni[ix]: 103.979xbar_vect[ix]: 104.794
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 18 jx: 4
+ent: 2
+uni[ix]: 102.589xbar_vect[ix]: 104.794
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 18 jx: 4
+ent: 3
+uni[ix]: 107.813xbar_vect[ix]: 104.794
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 18 jx: 5
+ent: 1
+uni[ix]: 103.979xbar_vect[ix]: 104.794
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 18 jx: 5
+ent: 2
+uni[ix]: 102.589xbar_vect[ix]: 104.794
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 18 jx: 5
+ent: 3
+uni[ix]: 107.813xbar_vect[ix]: 104.794
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 18 jx: 6
+ent: 1
+uni[ix]: 103.979xbar_vect[ix]: 104.794
+uni[jx]: 13108.6xbar_vect[jx]: 4639.29
+ix: 18 jx: 6
+ent: 2
+uni[ix]: 102.589xbar_vect[ix]: 104.794
+uni[jx]: 809.278xbar_vect[jx]: 4639.29
+ix: 18 jx: 6
+ent: 3
+uni[ix]: 107.813xbar_vect[ix]: 104.794
+uni[jx]: 0xbar_vect[jx]: 4639.29
+ix: 18 jx: 7
+ent: 1
+uni[ix]: 103.979xbar_vect[ix]: 104.794
+uni[jx]: 198.999xbar_vect[jx]: 190.075
+ix: 18 jx: 7
+ent: 2
+uni[ix]: 102.589xbar_vect[ix]: 104.794
+uni[jx]: 141.4xbar_vect[jx]: 190.075
+ix: 18 jx: 7
+ent: 3
+uni[ix]: 107.813xbar_vect[ix]: 104.794
+uni[jx]: 229.825xbar_vect[jx]: 190.075
+ix: 18 jx: 8
+ent: 1
+uni[ix]: 103.979xbar_vect[ix]: 104.794
+uni[jx]: 118.842xbar_vect[jx]: 116.76
+ix: 18 jx: 8
+ent: 2
+uni[ix]: 102.589xbar_vect[ix]: 104.794
+uni[jx]: 107.703xbar_vect[jx]: 116.76
+ix: 18 jx: 8
+ent: 3
+uni[ix]: 107.813xbar_vect[ix]: 104.794
+uni[jx]: 123.735xbar_vect[jx]: 116.76
+ix: 18 jx: 9
+ent: 1
+uni[ix]: 103.979xbar_vect[ix]: 104.794
+uni[jx]: 91.4952xbar_vect[jx]: 90.2834
+ix: 18 jx: 9
+ent: 2
+uni[ix]: 102.589xbar_vect[ix]: 104.794
+uni[jx]: 85.784xbar_vect[jx]: 90.2834
+ix: 18 jx: 9
+ent: 3
+uni[ix]: 107.813xbar_vect[ix]: 104.794
+uni[jx]: 93.5711xbar_vect[jx]: 90.2834
+ix: 18 jx: 10
+ent: 1
+uni[ix]: 103.979xbar_vect[ix]: 104.794
+uni[jx]: 91.8748xbar_vect[jx]: 91.0658
+ix: 18 jx: 10
+ent: 2
+uni[ix]: 102.589xbar_vect[ix]: 104.794
+uni[jx]: 88.102xbar_vect[jx]: 91.0658
+ix: 18 jx: 10
+ent: 3
+uni[ix]: 107.813xbar_vect[ix]: 104.794
+uni[jx]: 93.2205xbar_vect[jx]: 91.0658
+ix: 18 jx: 11
+ent: 1
+uni[ix]: 103.979xbar_vect[ix]: 104.794
+uni[jx]: 90.3512xbar_vect[jx]: 89.6936
+ix: 18 jx: 11
+ent: 2
+uni[ix]: 102.589xbar_vect[ix]: 104.794
+uni[jx]: 87.5692xbar_vect[jx]: 89.6936
+ix: 18 jx: 11
+ent: 3
+uni[ix]: 107.813xbar_vect[ix]: 104.794
+uni[jx]: 91.1605xbar_vect[jx]: 89.6936
+ix: 18 jx: 12
+ent: 1
+uni[ix]: 103.979xbar_vect[ix]: 104.794
+uni[jx]: 95.89xbar_vect[jx]: 95.3215
+ix: 18 jx: 12
+ent: 2
+uni[ix]: 102.589xbar_vect[ix]: 104.794
+uni[jx]: 93.6124xbar_vect[jx]: 95.3215
+ix: 18 jx: 12
+ent: 3
+uni[ix]: 107.813xbar_vect[ix]: 104.794
+uni[jx]: 96.462xbar_vect[jx]: 95.3215
+ix: 18 jx: 13
+ent: 1
+uni[ix]: 103.979xbar_vect[ix]: 104.794
+uni[jx]: 94.0452xbar_vect[jx]: 93.784
+ix: 18 jx: 13
+ent: 2
+uni[ix]: 102.589xbar_vect[ix]: 104.794
+uni[jx]: 92.6748xbar_vect[jx]: 93.784
+ix: 18 jx: 13
+ent: 3
+uni[ix]: 107.813xbar_vect[ix]: 104.794
+uni[jx]: 94.6321xbar_vect[jx]: 93.784
+ix: 18 jx: 14
+ent: 1
+uni[ix]: 103.979xbar_vect[ix]: 104.794
+uni[jx]: 87.8825xbar_vect[jx]: 87.6837
+ix: 18 jx: 14
+ent: 2
+uni[ix]: 102.589xbar_vect[ix]: 104.794
+uni[jx]: 86.8895xbar_vect[jx]: 87.6837
+ix: 18 jx: 14
+ent: 3
+uni[ix]: 107.813xbar_vect[ix]: 104.794
+uni[jx]: 88.279xbar_vect[jx]: 87.6837
+ix: 18 jx: 15
+ent: 1
+uni[ix]: 103.979xbar_vect[ix]: 104.794
+uni[jx]: 93.6569xbar_vect[jx]: 93.4231
+ix: 18 jx: 15
+ent: 2
+uni[ix]: 102.589xbar_vect[ix]: 104.794
+uni[jx]: 92.6893xbar_vect[jx]: 93.4231
+ix: 18 jx: 15
+ent: 3
+uni[ix]: 107.813xbar_vect[ix]: 104.794
+uni[jx]: 93.9232xbar_vect[jx]: 93.4231
+ix: 18 jx: 16
+ent: 1
+uni[ix]: 103.979xbar_vect[ix]: 104.794
+uni[jx]: 95.0199xbar_vect[jx]: 94.4255
+ix: 18 jx: 16
+ent: 2
+uni[ix]: 102.589xbar_vect[ix]: 104.794
+uni[jx]: 93.4832xbar_vect[jx]: 94.4255
+ix: 18 jx: 16
+ent: 3
+uni[ix]: 107.813xbar_vect[ix]: 104.794
+uni[jx]: 94.7733xbar_vect[jx]: 94.4255
+ix: 18 jx: 17
+ent: 1
+uni[ix]: 103.979xbar_vect[ix]: 104.794
+uni[jx]: 98.0729xbar_vect[jx]: 98.1071
+ix: 18 jx: 17
+ent: 2
+uni[ix]: 102.589xbar_vect[ix]: 104.794
+uni[jx]: 97.3129xbar_vect[jx]: 98.1071
+ix: 18 jx: 17
+ent: 3
+uni[ix]: 107.813xbar_vect[ix]: 104.794
+uni[jx]: 98.9356xbar_vect[jx]: 98.1071
+ix: 18 jx: 18
+ent: 1
+uni[ix]: 103.979xbar_vect[ix]: 104.794
+uni[jx]: 103.979xbar_vect[jx]: 104.794
+ix: 18 jx: 18
+ent: 2
+uni[ix]: 102.589xbar_vect[ix]: 104.794
+uni[jx]: 102.589xbar_vect[jx]: 104.794
+ix: 18 jx: 18
+ent: 3
+uni[ix]: 107.813xbar_vect[ix]: 104.794
+uni[jx]: 107.813xbar_vect[jx]: 104.794
+ix: 18 jx: 19
+ent: 1
+uni[ix]: 103.979xbar_vect[ix]: 104.794
+uni[jx]: 0xbar_vect[jx]: 30.9745
+ix: 18 jx: 19
+ent: 2
+uni[ix]: 102.589xbar_vect[ix]: 104.794
+uni[jx]: 92.9235xbar_vect[jx]: 30.9745
+ix: 18 jx: 19
+ent: 3
+uni[ix]: 107.813xbar_vect[ix]: 104.794
+uni[jx]: 0xbar_vect[jx]: 30.9745
+ix: 18 jx: 20
+ent: 1
+uni[ix]: 103.979xbar_vect[ix]: 104.794
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 18 jx: 20
+ent: 2
+uni[ix]: 102.589xbar_vect[ix]: 104.794
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 18 jx: 20
+ent: 3
+uni[ix]: 107.813xbar_vect[ix]: 104.794
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 19 jx: 1
+ent: 1
+uni[ix]: 0xbar_vect[ix]: 30.9745
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 19 jx: 1
+ent: 2
+uni[ix]: 92.9235xbar_vect[ix]: 30.9745
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 19 jx: 1
+ent: 3
+uni[ix]: 0xbar_vect[ix]: 30.9745
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 19 jx: 2
+ent: 1
+uni[ix]: 0xbar_vect[ix]: 30.9745
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 19 jx: 2
+ent: 2
+uni[ix]: 92.9235xbar_vect[ix]: 30.9745
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 19 jx: 2
+ent: 3
+uni[ix]: 0xbar_vect[ix]: 30.9745
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 19 jx: 3
+ent: 1
+uni[ix]: 0xbar_vect[ix]: 30.9745
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 19 jx: 3
+ent: 2
+uni[ix]: 92.9235xbar_vect[ix]: 30.9745
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 19 jx: 3
+ent: 3
+uni[ix]: 0xbar_vect[ix]: 30.9745
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 19 jx: 4
+ent: 1
+uni[ix]: 0xbar_vect[ix]: 30.9745
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 19 jx: 4
+ent: 2
+uni[ix]: 92.9235xbar_vect[ix]: 30.9745
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 19 jx: 4
+ent: 3
+uni[ix]: 0xbar_vect[ix]: 30.9745
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 19 jx: 5
+ent: 1
+uni[ix]: 0xbar_vect[ix]: 30.9745
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 19 jx: 5
+ent: 2
+uni[ix]: 92.9235xbar_vect[ix]: 30.9745
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 19 jx: 5
+ent: 3
+uni[ix]: 0xbar_vect[ix]: 30.9745
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 19 jx: 6
+ent: 1
+uni[ix]: 0xbar_vect[ix]: 30.9745
+uni[jx]: 13108.6xbar_vect[jx]: 4639.29
+ix: 19 jx: 6
+ent: 2
+uni[ix]: 92.9235xbar_vect[ix]: 30.9745
+uni[jx]: 809.278xbar_vect[jx]: 4639.29
+ix: 19 jx: 6
+ent: 3
+uni[ix]: 0xbar_vect[ix]: 30.9745
+uni[jx]: 0xbar_vect[jx]: 4639.29
+ix: 19 jx: 7
+ent: 1
+uni[ix]: 0xbar_vect[ix]: 30.9745
+uni[jx]: 198.999xbar_vect[jx]: 190.075
+ix: 19 jx: 7
+ent: 2
+uni[ix]: 92.9235xbar_vect[ix]: 30.9745
+uni[jx]: 141.4xbar_vect[jx]: 190.075
+ix: 19 jx: 7
+ent: 3
+uni[ix]: 0xbar_vect[ix]: 30.9745
+uni[jx]: 229.825xbar_vect[jx]: 190.075
+ix: 19 jx: 8
+ent: 1
+uni[ix]: 0xbar_vect[ix]: 30.9745
+uni[jx]: 118.842xbar_vect[jx]: 116.76
+ix: 19 jx: 8
+ent: 2
+uni[ix]: 92.9235xbar_vect[ix]: 30.9745
+uni[jx]: 107.703xbar_vect[jx]: 116.76
+ix: 19 jx: 8
+ent: 3
+uni[ix]: 0xbar_vect[ix]: 30.9745
+uni[jx]: 123.735xbar_vect[jx]: 116.76
+ix: 19 jx: 9
+ent: 1
+uni[ix]: 0xbar_vect[ix]: 30.9745
+uni[jx]: 91.4952xbar_vect[jx]: 90.2834
+ix: 19 jx: 9
+ent: 2
+uni[ix]: 92.9235xbar_vect[ix]: 30.9745
+uni[jx]: 85.784xbar_vect[jx]: 90.2834
+ix: 19 jx: 9
+ent: 3
+uni[ix]: 0xbar_vect[ix]: 30.9745
+uni[jx]: 93.5711xbar_vect[jx]: 90.2834
+ix: 19 jx: 10
+ent: 1
+uni[ix]: 0xbar_vect[ix]: 30.9745
+uni[jx]: 91.8748xbar_vect[jx]: 91.0658
+ix: 19 jx: 10
+ent: 2
+uni[ix]: 92.9235xbar_vect[ix]: 30.9745
+uni[jx]: 88.102xbar_vect[jx]: 91.0658
+ix: 19 jx: 10
+ent: 3
+uni[ix]: 0xbar_vect[ix]: 30.9745
+uni[jx]: 93.2205xbar_vect[jx]: 91.0658
+ix: 19 jx: 11
+ent: 1
+uni[ix]: 0xbar_vect[ix]: 30.9745
+uni[jx]: 90.3512xbar_vect[jx]: 89.6936
+ix: 19 jx: 11
+ent: 2
+uni[ix]: 92.9235xbar_vect[ix]: 30.9745
+uni[jx]: 87.5692xbar_vect[jx]: 89.6936
+ix: 19 jx: 11
+ent: 3
+uni[ix]: 0xbar_vect[ix]: 30.9745
+uni[jx]: 91.1605xbar_vect[jx]: 89.6936
+ix: 19 jx: 12
+ent: 1
+uni[ix]: 0xbar_vect[ix]: 30.9745
+uni[jx]: 95.89xbar_vect[jx]: 95.3215
+ix: 19 jx: 12
+ent: 2
+uni[ix]: 92.9235xbar_vect[ix]: 30.9745
+uni[jx]: 93.6124xbar_vect[jx]: 95.3215
+ix: 19 jx: 12
+ent: 3
+uni[ix]: 0xbar_vect[ix]: 30.9745
+uni[jx]: 96.462xbar_vect[jx]: 95.3215
+ix: 19 jx: 13
+ent: 1
+uni[ix]: 0xbar_vect[ix]: 30.9745
+uni[jx]: 94.0452xbar_vect[jx]: 93.784
+ix: 19 jx: 13
+ent: 2
+uni[ix]: 92.9235xbar_vect[ix]: 30.9745
+uni[jx]: 92.6748xbar_vect[jx]: 93.784
+ix: 19 jx: 13
+ent: 3
+uni[ix]: 0xbar_vect[ix]: 30.9745
+uni[jx]: 94.6321xbar_vect[jx]: 93.784
+ix: 19 jx: 14
+ent: 1
+uni[ix]: 0xbar_vect[ix]: 30.9745
+uni[jx]: 87.8825xbar_vect[jx]: 87.6837
+ix: 19 jx: 14
+ent: 2
+uni[ix]: 92.9235xbar_vect[ix]: 30.9745
+uni[jx]: 86.8895xbar_vect[jx]: 87.6837
+ix: 19 jx: 14
+ent: 3
+uni[ix]: 0xbar_vect[ix]: 30.9745
+uni[jx]: 88.279xbar_vect[jx]: 87.6837
+ix: 19 jx: 15
+ent: 1
+uni[ix]: 0xbar_vect[ix]: 30.9745
+uni[jx]: 93.6569xbar_vect[jx]: 93.4231
+ix: 19 jx: 15
+ent: 2
+uni[ix]: 92.9235xbar_vect[ix]: 30.9745
+uni[jx]: 92.6893xbar_vect[jx]: 93.4231
+ix: 19 jx: 15
+ent: 3
+uni[ix]: 0xbar_vect[ix]: 30.9745
+uni[jx]: 93.9232xbar_vect[jx]: 93.4231
+ix: 19 jx: 16
+ent: 1
+uni[ix]: 0xbar_vect[ix]: 30.9745
+uni[jx]: 95.0199xbar_vect[jx]: 94.4255
+ix: 19 jx: 16
+ent: 2
+uni[ix]: 92.9235xbar_vect[ix]: 30.9745
+uni[jx]: 93.4832xbar_vect[jx]: 94.4255
+ix: 19 jx: 16
+ent: 3
+uni[ix]: 0xbar_vect[ix]: 30.9745
+uni[jx]: 94.7733xbar_vect[jx]: 94.4255
+ix: 19 jx: 17
+ent: 1
+uni[ix]: 0xbar_vect[ix]: 30.9745
+uni[jx]: 98.0729xbar_vect[jx]: 98.1071
+ix: 19 jx: 17
+ent: 2
+uni[ix]: 92.9235xbar_vect[ix]: 30.9745
+uni[jx]: 97.3129xbar_vect[jx]: 98.1071
+ix: 19 jx: 17
+ent: 3
+uni[ix]: 0xbar_vect[ix]: 30.9745
+uni[jx]: 98.9356xbar_vect[jx]: 98.1071
+ix: 19 jx: 18
+ent: 1
+uni[ix]: 0xbar_vect[ix]: 30.9745
+uni[jx]: 103.979xbar_vect[jx]: 104.794
+ix: 19 jx: 18
+ent: 2
+uni[ix]: 92.9235xbar_vect[ix]: 30.9745
+uni[jx]: 102.589xbar_vect[jx]: 104.794
+ix: 19 jx: 18
+ent: 3
+uni[ix]: 0xbar_vect[ix]: 30.9745
+uni[jx]: 107.813xbar_vect[jx]: 104.794
+ix: 19 jx: 19
+ent: 1
+uni[ix]: 0xbar_vect[ix]: 30.9745
+uni[jx]: 0xbar_vect[jx]: 30.9745
+ix: 19 jx: 19
+ent: 2
+uni[ix]: 92.9235xbar_vect[ix]: 30.9745
+uni[jx]: 92.9235xbar_vect[jx]: 30.9745
+ix: 19 jx: 19
+ent: 3
+uni[ix]: 0xbar_vect[ix]: 30.9745
+uni[jx]: 0xbar_vect[jx]: 30.9745
+ix: 19 jx: 20
+ent: 1
+uni[ix]: 0xbar_vect[ix]: 30.9745
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 19 jx: 20
+ent: 2
+uni[ix]: 92.9235xbar_vect[ix]: 30.9745
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 19 jx: 20
+ent: 3
+uni[ix]: 0xbar_vect[ix]: 30.9745
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 20 jx: 1
+ent: 1
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 20 jx: 1
+ent: 2
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 20 jx: 1
+ent: 3
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 20 jx: 2
+ent: 1
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 20 jx: 2
+ent: 2
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 20 jx: 2
+ent: 3
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 20 jx: 3
+ent: 1
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 20 jx: 3
+ent: 2
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 20 jx: 3
+ent: 3
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 20 jx: 4
+ent: 1
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 20 jx: 4
+ent: 2
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 20 jx: 4
+ent: 3
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 20 jx: 5
+ent: 1
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 20 jx: 5
+ent: 2
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 20 jx: 5
+ent: 3
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 20 jx: 6
+ent: 1
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 13108.6xbar_vect[jx]: 4639.29
+ix: 20 jx: 6
+ent: 2
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 809.278xbar_vect[jx]: 4639.29
+ix: 20 jx: 6
+ent: 3
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 0xbar_vect[jx]: 4639.29
+ix: 20 jx: 7
+ent: 1
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 198.999xbar_vect[jx]: 190.075
+ix: 20 jx: 7
+ent: 2
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 141.4xbar_vect[jx]: 190.075
+ix: 20 jx: 7
+ent: 3
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 229.825xbar_vect[jx]: 190.075
+ix: 20 jx: 8
+ent: 1
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 118.842xbar_vect[jx]: 116.76
+ix: 20 jx: 8
+ent: 2
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 107.703xbar_vect[jx]: 116.76
+ix: 20 jx: 8
+ent: 3
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 123.735xbar_vect[jx]: 116.76
+ix: 20 jx: 9
+ent: 1
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 91.4952xbar_vect[jx]: 90.2834
+ix: 20 jx: 9
+ent: 2
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 85.784xbar_vect[jx]: 90.2834
+ix: 20 jx: 9
+ent: 3
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 93.5711xbar_vect[jx]: 90.2834
+ix: 20 jx: 10
+ent: 1
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 91.8748xbar_vect[jx]: 91.0658
+ix: 20 jx: 10
+ent: 2
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 88.102xbar_vect[jx]: 91.0658
+ix: 20 jx: 10
+ent: 3
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 93.2205xbar_vect[jx]: 91.0658
+ix: 20 jx: 11
+ent: 1
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 90.3512xbar_vect[jx]: 89.6936
+ix: 20 jx: 11
+ent: 2
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 87.5692xbar_vect[jx]: 89.6936
+ix: 20 jx: 11
+ent: 3
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 91.1605xbar_vect[jx]: 89.6936
+ix: 20 jx: 12
+ent: 1
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 95.89xbar_vect[jx]: 95.3215
+ix: 20 jx: 12
+ent: 2
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 93.6124xbar_vect[jx]: 95.3215
+ix: 20 jx: 12
+ent: 3
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 96.462xbar_vect[jx]: 95.3215
+ix: 20 jx: 13
+ent: 1
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 94.0452xbar_vect[jx]: 93.784
+ix: 20 jx: 13
+ent: 2
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 92.6748xbar_vect[jx]: 93.784
+ix: 20 jx: 13
+ent: 3
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 94.6321xbar_vect[jx]: 93.784
+ix: 20 jx: 14
+ent: 1
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 87.8825xbar_vect[jx]: 87.6837
+ix: 20 jx: 14
+ent: 2
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 86.8895xbar_vect[jx]: 87.6837
+ix: 20 jx: 14
+ent: 3
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 88.279xbar_vect[jx]: 87.6837
+ix: 20 jx: 15
+ent: 1
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 93.6569xbar_vect[jx]: 93.4231
+ix: 20 jx: 15
+ent: 2
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 92.6893xbar_vect[jx]: 93.4231
+ix: 20 jx: 15
+ent: 3
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 93.9232xbar_vect[jx]: 93.4231
+ix: 20 jx: 16
+ent: 1
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 95.0199xbar_vect[jx]: 94.4255
+ix: 20 jx: 16
+ent: 2
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 93.4832xbar_vect[jx]: 94.4255
+ix: 20 jx: 16
+ent: 3
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 94.7733xbar_vect[jx]: 94.4255
+ix: 20 jx: 17
+ent: 1
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 98.0729xbar_vect[jx]: 98.1071
+ix: 20 jx: 17
+ent: 2
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 97.3129xbar_vect[jx]: 98.1071
+ix: 20 jx: 17
+ent: 3
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 98.9356xbar_vect[jx]: 98.1071
+ix: 20 jx: 18
+ent: 1
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 103.979xbar_vect[jx]: 104.794
+ix: 20 jx: 18
+ent: 2
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 102.589xbar_vect[jx]: 104.794
+ix: 20 jx: 18
+ent: 3
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 107.813xbar_vect[jx]: 104.794
+ix: 20 jx: 19
+ent: 1
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 0xbar_vect[jx]: 30.9745
+ix: 20 jx: 19
+ent: 2
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 92.9235xbar_vect[jx]: 30.9745
+ix: 20 jx: 19
+ent: 3
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 0xbar_vect[jx]: 30.9745
+ix: 20 jx: 20
+ent: 1
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 20 jx: 20
+ent: 2
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 0xbar_vect[jx]: 0
+ix: 20 jx: 20
+ent: 3
+uni[ix]: 0xbar_vect[ix]: 0
+uni[jx]: 0xbar_vect[jx]: 0
+CVM: 
+
+20x20 matrix is as follows
+
+     |       0    |       1    |       2    |       3    |       4    |
+----------------------------------------------------------------------
+   0 |          0           0           0           0           0 
+   1 |          0           0           0           0           0 
+   2 |          0           0           0           0           0 
+   3 |          0           0           0           0           0 
+   4 |          0           0           0           0           0 
+   5 |          0           0           0           0           0 
+   6 |          0           0           0           0           0 
+   7 |          0           0           0           0           0 
+   8 |          0           0           0           0           0 
+   9 |          0           0           0           0           0 
+  10 |          0           0           0           0           0 
+  11 |          0           0           0           0           0 
+  12 |          0           0           0           0           0 
+  13 |          0           0           0           0           0 
+  14 |          0           0           0           0           0 
+  15 |          0           0           0           0           0 
+  16 |          0           0           0           0           0 
+  17 |          0           0           0           0           0 
+  18 |          0           0           0           0           0 
+  19 |          0           0           0           0           0 
+
+
+     |       5    |       6    |       7    |       8    |       9    |
+----------------------------------------------------------------------
+   0 |          0           0           0           0           0 
+   1 |          0           0           0           0           0 
+   2 |          0           0           0           0           0 
+   3 |          0           0           0           0           0 
+   4 |          0           0           0           0           0 
+   5 |  3.597e+07   2.587e+04        6655        4081        2736 
+   6 |  2.587e+04        1343       245.6       120.2       79.04 
+   7 |       6655       245.6       45.01       22.07       14.52 
+   8 |       4081       120.2       22.07       10.84       7.133 
+   9 |       2736       79.04       14.52       7.133       4.694 
+  10 |       2300       55.86       10.28       5.059        3.33 
+  11 |       2023       44.53       8.206       4.043       2.661 
+  12 |        842       30.01       5.502       2.699       1.775 
+  13 |      654.5       21.36        3.92       1.924       1.266 
+  14 |      823.5       19.23        3.54       1.743       1.147 
+  15 |       2343       21.67       4.066       2.035       1.341 
+  16 |     -363.9       23.76         4.3       2.085        1.37 
+  17 |      -4156       73.36       13.11       6.287       4.127 
+  18 | -1.186e+05       -1508      -280.5      -139.4       -91.8 
+  19 |          0           0           0           0           0 
+
+
+     |      10    |      11    |      12    |      13    |      14    |
+----------------------------------------------------------------------
+   0 |          0           0           0           0           0 
+   1 |          0           0           0           0           0 
+   2 |          0           0           0           0           0 
+   3 |          0           0           0           0           0 
+   4 |          0           0           0           0           0 
+   5 |       2300        2023         842       654.5       823.5 
+   6 |      55.86       44.53       30.01       21.36       19.23 
+   7 |      10.28       8.206       5.502        3.92        3.54 
+   8 |      5.059       4.043       2.699       1.924       1.743 
+   9 |       3.33       2.661       1.775       1.266       1.147 
+  10 |      2.366       1.893       1.257       0.897      0.8154 
+  11 |      1.893       1.515       1.004      0.7164      0.6525 
+  12 |      1.257       1.004      0.6727      0.4793      0.4331 
+  13 |      0.897      0.7164      0.4793      0.3415       0.309 
+  14 |     0.8154      0.6525      0.4331       0.309      0.2811 
+  15 |     0.9677      0.7817      0.4985      0.3579      0.3348 
+  16 |       0.96      0.7609      0.5249      0.3724      0.3297 
+  17 |      2.859        2.25       1.598       1.129      0.9792 
+  18 |      -65.8      -52.94      -34.36       -24.6      -22.73 
+  19 |          0           0           0           0           0 
+
+
+     |      15    |      16    |      17    |      18    |      19    |
+----------------------------------------------------------------------
+   0 |          0           0           0           0           0 
+   1 |          0           0           0           0           0 
+   2 |          0           0           0           0           0 
+   3 |          0           0           0           0           0 
+   4 |          0           0           0           0           0 
+   5 |       2343      -363.9       -4156  -1.186e+05           0 
+   6 |      21.67       23.76       73.36       -1508           0 
+   7 |      4.066         4.3       13.11      -280.5           0 
+   8 |      2.035       2.085       6.287      -139.4           0 
+   9 |      1.341        1.37       4.127       -91.8           0 
+  10 |     0.9677        0.96       2.859       -65.8           0 
+  11 |     0.7817      0.7609        2.25      -52.94           0 
+  12 |     0.4985      0.5249       1.598      -34.36           0 
+  13 |     0.3579      0.3724       1.129       -24.6           0 
+  14 |     0.3348      0.3297      0.9792      -22.73           0 
+  15 |     0.4541      0.3387      0.8812      -29.19           0 
+  16 |     0.3387      0.4395       1.427       -24.6           0 
+  17 |     0.8812       1.427       4.881      -68.29           0 
+  18 |     -29.19       -24.6      -68.29        1919           0 
+  19 |          0           0           0           0           0 
+
+19 ix: 10jx: 10CVM: 4.69373
+19 ix: 10jx: 11CVM: 3.32964
+19 ix: 10jx: 12CVM: 2.66089
+19 ix: 10jx: 13CVM: 1.77546
+19 ix: 10jx: 14CVM: 1.26576
+19 ix: 10jx: 15CVM: 1.14718
+19 ix: 10jx: 16CVM: 1.34106
+19 ix: 10jx: 17CVM: 1.37046
+19 ix: 10jx: 18CVM: 4.12731
+19 ix: 10jx: 19CVM: -91.8008
+19 ix: 11jx: 10CVM: 3.32964
+19 ix: 11jx: 11CVM: 2.36574
+19 ix: 11jx: 12CVM: 1.89252
+19 ix: 11jx: 13CVM: 1.25746
+19 ix: 11jx: 14CVM: 0.897034
+19 ix: 11jx: 15CVM: 0.815409
+19 ix: 11jx: 16CVM: 0.967651
+19 ix: 11jx: 17CVM: 0.960019
+19 ix: 11jx: 18CVM: 2.85922
+19 ix: 11jx: 19CVM: -65.8027
+19 ix: 12jx: 10CVM: 2.66089
+19 ix: 12jx: 11CVM: 1.89252
+19 ix: 12jx: 12CVM: 1.51496
+19 ix: 12jx: 13CVM: 1.00386
+19 ix: 12jx: 14CVM: 0.716418
+19 ix: 12jx: 15CVM: 0.65247
+19 ix: 12jx: 16CVM: 0.781715
+19 ix: 12jx: 17CVM: 0.760936
+19 ix: 12jx: 18CVM: 2.2496
+19 ix: 12jx: 19CVM: -52.9372
+19 ix: 13jx: 10CVM: 1.77546
+19 ix: 13jx: 11CVM: 1.25746
+19 ix: 13jx: 12CVM: 1.00386
+19 ix: 13jx: 13CVM: 0.672668
+19 ix: 13jx: 14CVM: 0.479254
+19 ix: 13jx: 15CVM: 0.433067
+19 ix: 13jx: 16CVM: 0.498514
+19 ix: 13jx: 17CVM: 0.52491
+19 ix: 13jx: 18CVM: 1.59799
+19 ix: 13jx: 19CVM: -34.3595
+19 ix: 14jx: 10CVM: 1.26576
+19 ix: 14jx: 11CVM: 0.897034
+19 ix: 14jx: 12CVM: 0.716418
+19 ix: 14jx: 13CVM: 0.479254
+19 ix: 14jx: 14CVM: 0.341538
+19 ix: 14jx: 15CVM: 0.308986
+19 ix: 14jx: 16CVM: 0.357864
+19 ix: 14jx: 17CVM: 0.372385
+19 ix: 14jx: 18CVM: 1.12889
+19 ix: 14jx: 19CVM: -24.5983
+19 ix: 15jx: 10CVM: 1.14718
+19 ix: 15jx: 11CVM: 0.815409
+19 ix: 15jx: 12CVM: 0.65247
+19 ix: 15jx: 13CVM: 0.433067
+19 ix: 15jx: 14CVM: 0.308986
+19 ix: 15jx: 15CVM: 0.281079
+19 ix: 15jx: 16CVM: 0.334802
+19 ix: 15jx: 17CVM: 0.329713
+19 ix: 15jx: 18CVM: 0.979187
+19 ix: 15jx: 19CVM: -22.7303
+19 ix: 16jx: 10CVM: 1.34106
+19 ix: 16jx: 11CVM: 0.967651
+19 ix: 16jx: 12CVM: 0.781715
+19 ix: 16jx: 13CVM: 0.498514
+19 ix: 16jx: 14CVM: 0.357864
+19 ix: 16jx: 15CVM: 0.334802
+19 ix: 16jx: 16CVM: 0.454103
+19 ix: 16jx: 17CVM: 0.338744
+19 ix: 16jx: 18CVM: 0.881171
+19 ix: 16jx: 19CVM: -29.1873
+19 ix: 17jx: 10CVM: 1.37046
+19 ix: 17jx: 11CVM: 0.960019
+19 ix: 17jx: 12CVM: 0.760936
+19 ix: 17jx: 13CVM: 0.52491
+19 ix: 17jx: 14CVM: 0.372385
+19 ix: 17jx: 15CVM: 0.329713
+19 ix: 17jx: 16CVM: 0.338744
+19 ix: 17jx: 17CVM: 0.439458
+19 ix: 17jx: 18CVM: 1.42696
+19 ix: 17jx: 19CVM: -24.6012
+19 ix: 18jx: 10CVM: 4.12731
+19 ix: 18jx: 11CVM: 2.85922
+19 ix: 18jx: 12CVM: 2.2496
+19 ix: 18jx: 13CVM: 1.59799
+19 ix: 18jx: 14CVM: 1.12889
+19 ix: 18jx: 15CVM: 0.979187
+19 ix: 18jx: 16CVM: 0.881171
+19 ix: 18jx: 17CVM: 1.42696
+19 ix: 18jx: 18CVM: 4.88145
+19 ix: 18jx: 19CVM: -68.2929
+19 ix: 19jx: 10CVM: -91.8008
+19 ix: 19jx: 11CVM: -65.8027
+19 ix: 19jx: 12CVM: -52.9372
+19 ix: 19jx: 13CVM: -34.3595
+19 ix: 19jx: 14CVM: -24.5983
+19 ix: 19jx: 15CVM: -22.7303
+19 ix: 19jx: 16CVM: -29.1873
+19 ix: 19jx: 17CVM: -24.6012
+19 ix: 19jx: 18CVM: -68.2929
+19 ix: 19jx: 19CVM: 1918.84

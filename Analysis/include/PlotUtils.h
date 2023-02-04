@@ -11,7 +11,8 @@
 #include "TCut.h"
 #include "TCanvas.h"
 #include "TChain.h"
-#include "TDatabasePDG.h"
+// Comment out due to Oxford server doesn't support it
+//#include "TDatabasePDG.h"
 #include "TDecompLU.h"
 #include "TDecompSVD.h"
 #include "TDirectory.h"
@@ -20,8 +21,9 @@
 #include "TF2.h"
 #include "TFile.h"
 #include "TGaxis.h"
-#include "TGeoManager.h"
-#include "TGeoGlobalMagField.h"
+// Comment out due to Oxford server doesn't support it
+//#include "TGeoManager.h"
+//#include "TGeoGlobalMagField.h"
 #include "TRandom3.h"
 #include "TGraph.h"
 #include "TGraphAsymmErrors.h"
@@ -71,9 +73,14 @@ class PlotUtils
 {
   public:
   double PrintStat(const TString tag, TH1 *hh, const double val0, const double val1, const double oldsel);
-  void FillHist(TH1 * hh,  double xx, const double yy);
+  void FillHist(TH1 * hh,  double xx, const double yy, const double & weight = 1.);
+  void FillHist(TH2 * hh,  double xx, const double yy, const double & weight = 1.);
+
   void ProcessHist(TList *lout, const bool kMC);
-  void DrawHist(TList *lout, const double plotscale, TList * overlayList, const TString outdir);
+  //void DrawHist(TList *lout, const double plotscale, TList * overlayList, const TString outdir);
+  void DrawHist(TList *lout, const double plotscale, TList * overlayList, const TString outdir, TGraph *g_inel, TGraph *g_cex, TGraph *g_675, TGraph *g_775, TGraph *g_875, TGraph *g_675theta, TGraph *g_775theta, TGraph *g_875theta,  TGraph *g_675costheta, TGraph *g_775costheta, TGraph *g_875costheta);
+  //void DrawHist(TList *lout, const double plotscale, TList * overlayList, const TString outdir, TGraph *g_inel, TGraph *g_cex, TH1D *g_cex_600MeV);
+
   THStack * ConvertToStack(const TH2D * hh, const bool kMC, std::map<TString,vector<double>> &typeMaps);
   TH1D * GetStackedSum(THStack *stk);
   void ScaleStack(THStack *stk, const double scale);
@@ -96,9 +103,18 @@ class PlotUtils
   void SetTitleFormat(TH1 * hh);
   void SetTitleFormat(TH2 * h2d);
   void SetTitleFormat(THStack * stk, bool offSet = true);
-  void DrawDataMCRatio(TH1D * hratio);
+  void DrawDataMCRatio(TH1D * hratio, bool xsec = false);
   vector<TString> FillLegendType(TString tag, TString name);
   vector<TString> FillLegendStyle(int opt, TString tag);
+
+  void PrintShowerPurityandEff(const TString tag, TH1D * h_ldGamma, TH1D * h_slGamma, TH2D * h_showers);
+  void PrintPi0PurityandEff(const TString tag, TH1D * h_ldGamma, TH2D * h2d);
+  void PrintExcPurityandEff(const TString tag, TH1D * h_1, TH1D * h_2, TH1D * h_3, TH1D * h_4, TH2D * h2d);
+
+  void TotalCEXXSCal(TH1 * hh, TH1D * InteractingHist, TH1D * xsec, const bool & Eslice = true, const bool & widerBin = false, const bool & newMethod = false);
+  void DiffCEXXSCal(TH1D * DiffCEXInteractingHist, TH1D * DiffCEXxsec, const double diffInt, const double diffInterror);
+  TH1D * GetIncidentHist(TH1D * InitialHist, TH1D * InteractingHist);
+
 
   static Double_t CauchyDens(Double_t *x, Double_t *par)
   {
@@ -124,6 +140,9 @@ class PlotUtils
   static std::map<TString,vector<double>> typeMaps;
 
   private:
+
+  const double slice_width = 1.0;
+  
 };
 
 std::map<TString,vector<double>> PlotUtils::typeMaps;

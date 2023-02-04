@@ -32,7 +32,7 @@ double PlotUtils::PrintStat(const TString tag, TH1 *hh, const double val0, const
 }
 
 
-void PlotUtils::FillHist(TH1 * hh,  double xx, const double yy)
+void PlotUtils::FillHist(TH1 * hh,  double xx, const double yy, const double & weight)
 {
   // Get histogram name
   const TString tag = hh->GetName();
@@ -54,7 +54,44 @@ void PlotUtils::FillHist(TH1 * hh,  double xx, const double yy)
     hh->Fill(xx, yy);
   }
   else{
-    hh->Fill(xx);
+    hh->Fill(xx, weight);
+  }
+
+  double tmpoverflow = -999;
+  if(h2){
+    tmpoverflow = h2->Integral(nbx+1, nbx+1, 0, 10000);
+  }
+  else{
+    tmpoverflow = hh->GetBinContent(nbx+1);
+  }
+  if(tmpoverflow>1E-12){
+    printf("PlotUtils::FillInRange still overflow! %s %f %d %f %f\n", tag.Data(), tmpoverflow, nbx, xx, yy); exit(1);
+  }
+}
+
+void PlotUtils::FillHist(TH2 * hh,  double xx, const double yy, const double & weight)
+{
+  // Get histogram name
+  const TString tag = hh->GetName();
+  // Get X bin size
+  const int nbx = hh->GetNbinsX();
+  // Get min and max value
+  const double xmin = hh->GetXaxis()->GetBinLowEdge(1);
+  const double xmax = hh->GetXaxis()->GetBinUpEdge(nbx);  
+  
+  if(xx<xmin){
+    xx = hh->GetXaxis()->GetBinCenter(1);
+  }
+  if(xx>=xmax){
+    xx = hh->GetXaxis()->GetBinCenter(nbx);
+  }
+
+  TH2 * h2 = dynamic_cast<TH2*>(hh);
+  if(h2){
+    hh->Fill(xx, yy, weight);
+  }
+  else{
+    hh->Fill(xx, weight);
   }
 
   double tmpoverflow = -999;
@@ -78,6 +115,7 @@ void PlotUtils::ProcessHist(TList *lout, const bool kMC)
     TH2D * htmp = dynamic_cast<TH2D *>( lout->At(ii) );
     if(htmp){
       const TString tag = htmp->GetName();
+
       // Check if the histogram name contians stack tags
       if(tag.Contains("STK") || tag.Contains("OVERLAY") || tag.Contains("COMPOSE")){
         // Convert this tmp 2D histogram to a stack histogram
@@ -137,10 +175,11 @@ void PlotUtils::ProcessHist(TList *lout, const bool kMC)
       else if(tag.Contains("sigma")){   
         xSlicedSigma(htmp,tag);
       }
+
       // Do nothing (You can add more else if to process more tags)
       else {}
     } // End of if(htmp)
-
+    
     // Stack histogram
     THStack * hstk = dynamic_cast<THStack *>(lout->At(ii));
     if(hstk){
@@ -187,9 +226,32 @@ void PlotUtils::ProcessHist(TList *lout, const bool kMC)
     TH1 * hh = dynamic_cast<TH1*> (lout->At(ii));
     if(hh){
       const TString tag = hh->GetName();
+      // Proton rec. efficiency
+      if(tag.Contains("hMatchedTruthProtonMomentum") && kMC && !tag.Contains("_ratio")){
+        const TString truth_tmp = "e006hTruthProtonP";
+        TH1D *htrue = (TH1D*)lout->FindObject(truth_tmp);
+        TH1D *hEff = GetRecEfficiency(hh,htrue,tag);
+        lout->Add(hEff);
+      }
+
+      // Leading Proton rec. efficiency
+      if(tag.Contains("hMatchedTruthLeadingProtonMomentum") && kMC && !tag.Contains("_ratio")){
+        const TString truth_tmp = "e006hTruthLeadingProtonP";
+        TH1D *htrue = (TH1D*)lout->FindObject(truth_tmp);
+        TH1D *hEff = GetRecEfficiency(hh,htrue,tag);
+        lout->Add(hEff);
+      }
+
       // Pi0 rec. efficiency
       if(tag.Contains("hMatchedTruthPi0Momentum") && kMC && !tag.Contains("_ratio")){
         const TString truth_tmp = "e008hTruthLeadingPiZeroE";
+        TH1D *htrue = (TH1D*)lout->FindObject(truth_tmp);
+        TH1D *hEff = GetRecEfficiency(hh,htrue,tag);
+        lout->Add(hEff);
+      }
+      // Leading photon rec. efficiency
+      if(tag.Contains("hMatchedTruthLeadingShowerEnergy") && kMC && !tag.Contains("_ratio")){
+        const TString truth_tmp = "e012hTruthLeadingPi0GammaPBin1";
         TH1D *htrue = (TH1D*)lout->FindObject(truth_tmp);
         TH1D *hEff = GetRecEfficiency(hh,htrue,tag);
         lout->Add(hEff);
@@ -230,11 +292,407 @@ void PlotUtils::ProcessHist(TList *lout, const bool kMC)
         TH1D *hEff = GetRecEfficiency(hh,htrue,tag);
         lout->Add(hEff);
       }
+      // Total CEX XS calculation
+      if(tag.Contains("i026hUnFoldedIncidentHist") && !tag.Contains("Data")){
+        // hh is the incident histogram
+        // Now find the interacting histogram from the list
+        TString name = "i025hUnFoldedInteractingHist";
+        TH1D *InteractingHist = (TH1D*)lout->FindObject(name);
+        // Clone the interating histogram (since modify the hist will change the original one)
+        TH1D *xsec = (TH1D*)InteractingHist->Clone();
+        // Calculate the XS
+        TotalCEXXSCal(hh, InteractingHist, xsec, false);
+        xsec->SetName(tag+"_xsec");
+        lout->Add(xsec);
+      }
+      
+      if(tag.Contains("i027hUnFoldedBeamIncidentHist") && !tag.Contains("Data")){
+        // hh is the incident histogram
+        // Now find the interacting histogram from the list
+        TString name = "i025hUnFoldedInteractingHist";
+        TH1D *InteractingHist = (TH1D*)lout->FindObject(name);
+        InteractingHist->Scale(0.5); //== FIXME whole sample
+
+        // Clone the interating histogram (since modify the hist will change the original one)
+        TH1D *xsec = (TH1D*)InteractingHist->Clone();
+
+        TH1D *hinc = (TH1D*)hh->Clone();
+        hinc->Rebin(50);
+        // Calculate the XS
+        TotalCEXXSCal(hinc, InteractingHist, xsec);
+        xsec->SetName(tag+"_xsec");
+        lout->Add(xsec);
+      }
+
+      if(tag.Contains("i029hUnFoldedBeamIncidentHistData")){
+        // hh is the incident histogram
+        // Now find the interacting histogram from the list
+        TString name = "i025hUnFoldedInteractingHistData";
+        TH1D *InteractingHist = (TH1D*)lout->FindObject(name);
+        // Clone the interating histogram (since modify the hist will change the original one)
+        TH1D *xsec = (TH1D*)InteractingHist->Clone();
+
+        TH1D *hinc = (TH1D*)hh->Clone();
+        hinc->Rebin(50);
+        // Calculate the XS
+        TotalCEXXSCal(hinc, InteractingHist, xsec);
+        xsec->SetName(tag+"_xsec");
+        lout->Add(xsec);
+      }
+
+/* // Data unfold histogram
+      if(tag.Contains("i026hUnFoldedIncidentHist") && tag.Contains("Data")){
+
+        double avogadro_constant = 6.02214076e23;  // 1 / mol
+        double argon_molar_mass = 39.95;           // g / mol
+        double liquid_argon_density = 1.39;        // g / cm^3
+        double fiducial_thickness = 0.479;         // cm wire spacing
+        //double fiducial_thickness = 20;         // cm wire spacing
+
+        double sigma_factor = argon_molar_mass / (avogadro_constant * liquid_argon_density * fiducial_thickness);
+
+
+        TString name = "i025hUnFoldedInteractingHistData";
+        TH1D *InteractingHist = (TH1D*)lout->FindObject(name);
+        //TH1D *IncidentHist = (TH1D*)hh->Clone(Form("IncidentHist_%d",ii));
+        TH1D *xsec = (TH1D*)InteractingHist->Clone();
+        //xsec->Divide(hh);
+        xsec->Scale(0);
+        const Int_t x0 = hh->GetXaxis()->GetFirst();
+        const Int_t x1 = hh->GetXaxis()->GetLast();
+
+        cout << "reco slice * Ninc: " << fiducial_thickness*hh->Integral("width") << endl;
+        cout << "reco Nint: " << InteractingHist->Integral("width") << endl;
+
+        for(Int_t ix=x0; ix<=x1; ix++){
+          double max = hh->GetXaxis()->GetBinUpEdge(ix);
+          double min = hh->GetXaxis()->GetBinLowEdge(ix);
+
+          double incE = hh->GetBinContent(ix);
+          double intE = InteractingHist->GetBinContent(ix);
+
+          double ratio = log(incE/(incE-intE));
+          //double ratio = intE/incE;
+          if(incE != 0) xsec->SetBinContent(ix,ratio);
+          //double error = sqrt(intE+pow(intE,2)/incE)/incE;
+          double einc = hh->GetBinError(ix);
+          double eint = InteractingHist->GetBinError(ix);
+          double error = sqrt(ratio*ratio*(pow(einc/incE,2)+pow(eint/intE,2)));
+          if(ratio != 0 ) xsec->SetBinError(ix,error);
+          //cout << "ix: " << ix << "intE: " << intE << endl;
+          //cout << "ix: " << ix << "incE: " << incE << endl;
+          //cout << "ix: " << ix << "intE/incE: " << intE/incE << endl;
+          
+          const Int_t x0_x = AnaIO::hTruthTotalXSecHist->GetXaxis()->GetFirst();
+          const Int_t x1_x = AnaIO::hTruthTotalXSecHist->GetXaxis()->GetLast();
+
+          for(Int_t ix=x0_x; ix<=x1_x; ix++){
+            //double bin_center = AnaIO::hTruthTotalXSecHist->GetBinCenter(ix);
+            double max_x = AnaIO::hTruthTotalXSecHist->GetXaxis()->GetBinUpEdge(ix);
+            double min_x = AnaIO::hTruthTotalXSecHist->GetXaxis()->GetBinLowEdge(ix);
+            if(max < max_x && min_x <= min) AnaIO::hTruthTotalXSecHist->SetBinContent(ix,ratio*sigma_factor*1e27);
+          }
+        }
+
+        
+        xsec->Scale(sigma_factor*1e27);
+        xsec->SetMaximum(300);
+        xsec->SetMinimum(0);
+        xsec->SetName(tag+"_xsec");
+        lout->Add(xsec);
+
+      }
+// End of data unfold hist */
+      if(tag.Contains("i000hTruthBeamIncidentHist") || tag.Contains("i001hTruthBeamCalcIncidentHist") || tag.Contains("i000hTruthBeamIncidentHistOldM")){
+        //const Int_t x1_c = hh->GetXaxis()->GetLast();
+        //cout << "Before rebin: " << x1_c << endl;
+
+        // Rebin the incident histogram
+        hh->Rebin(50);
+        //cout << "Rebin: " << tag << endl;
+        //const Int_t x1_cc = hh->GetXaxis()->GetLast();
+
+        //cout << "Dir After rebin: " << x1_cc << endl;
+      }
+
+      if(tag.Contains("i001hTruthIncidentHist")){
+        //TString ininame = "i000hTruthInitialHist";
+        //TH1D *InitialHist = (TH1D*)lout->FindObject(ininame);
+
+        // Total inelastic xsec (but now it's also CEX --Todo fix it)
+        TString intname = "i002hTruthInteractingHist";
+        TH1D *InteractingHist = (TH1D*)lout->FindObject(intname);
+        //TH1D *IncidentHist = (TH1D*)hh->Clone(Form("IncidentHist_%d",ii));
+        TH1D *xsec = (TH1D*)InteractingHist->Clone();
+        TH1D *Calxsec = (TH1D*)InteractingHist->Clone();
+
+
+        // Test get Inicident Hist i001hTruthBeamCalcIncidentHist
+        /*TString beamintname = "i002hTruthBeamInteractingHist";
+        TH1D *BeamInteractingHist = (TH1D*)lout->FindObject(beamintname);
+
+        TH1D * IncidentHist = GetIncidentHist(InitialHist,BeamInteractingHist);
+        cout << "IncidentHist integral: " << IncidentHist->Integral(0,100000) << endl;
+        cout << "BeamInteractingHist integral: " << BeamInteractingHist->Integral(0,100000) << endl;
+        */
+        TString beamincname = "i001hTruthBeamCalcIncidentHist";
+        TH1D *IncidentHist_tmp = (TH1D*)lout->FindObject(beamincname);
+        TH1D *IncidentHist = (TH1D*)IncidentHist_tmp->Clone();
+
+        TString Newbeamincname = "i001hNewTruthBeamCalcIncidentHist";
+        TH1D *NewIncidentHist_tmp = (TH1D*)lout->FindObject(Newbeamincname);
+        TH1D *NewIncidentHist = (TH1D*)NewIncidentHist_tmp->Clone();
+
+        cout << "IncidentHist integral: " << IncidentHist->Integral(0,100000) << endl;
+        IncidentHist->Rebin(50);
+        const Int_t x1_c = IncidentHist->GetXaxis()->GetLast();
+        cout << "After rebin: " << x1_c << endl;
+
+        // Wider Binning
+        TString beamincname_50MeVbin = "i001hTruthBeamCalcIncidentHist_50MeVbin";
+        TH1D *IncidentHist_tmp_50MeVbin = (TH1D*)lout->FindObject(beamincname_50MeVbin);
+        TH1D *IncidentHist_50MeVbin = (TH1D*)IncidentHist_tmp_50MeVbin->Clone();
+
+        cout << "IncidentHist integral: " << IncidentHist_50MeVbin->Integral(0,100000) << endl;
+        //IncidentHist->Rebin(50);
+        const Int_t x1_c_50MeVbin = IncidentHist_50MeVbin->GetXaxis()->GetLast();
+        cout << "After rebin_50MeVbin: " << x1_c_50MeVbin << endl;
+
+
+        // Calculate the xsec 
+        TotalCEXXSCal(hh, InteractingHist, xsec, false);
+        xsec->SetName(tag+"_xsec");
+        lout->Add(xsec);
+
+        // Calculate the xsec 
+        TotalCEXXSCal(IncidentHist, InteractingHist, Calxsec);
+        Calxsec->SetName(tag+"_Calxsec");
+        lout->Add(Calxsec);
+
+        
+        // Charge Exchange xsec
+        TString CEXname = "i004hTruthCEXInteractingHist";
+        TH1D *CEXInteractingHist = (TH1D*)lout->FindObject(CEXname);
+        TString NewCEXname = "i004hNewTruthCEXInteractingHist";
+        TH1D *NewCEXInteractingHist = (TH1D*)lout->FindObject(NewCEXname);
+
+        //TH1D *IncidentHist = (TH1D*)hh->Clone(Form("IncidentHist_%d",ii));
+        TH1D *CEXxsec = (TH1D*)CEXInteractingHist->Clone();
+        TH1D *CalCEXxsec = (TH1D*)CEXInteractingHist->Clone();
+        TH1D *NewCalCEXxsec = (TH1D*)NewCEXInteractingHist->Clone();
+        TH1D *CalCEXxsec_50MeVbin = (TH1D*)CEXInteractingHist->Clone();
+
+
+        // Calculate the CEX xsec
+        TotalCEXXSCal(hh, CEXInteractingHist, CEXxsec, false);
+        CEXxsec->SetName(tag+"_CEXxsec");
+        lout->Add(CEXxsec);
+
+        // Calculate the CEX xsec
+        TotalCEXXSCal(IncidentHist, CEXInteractingHist, CalCEXxsec);
+        CalCEXxsec->SetName(tag+"_CalCEXxsec");
+        lout->Add(CalCEXxsec);
+
+        // Calculate the New CEX xsec
+        TotalCEXXSCal(NewIncidentHist, NewCEXInteractingHist, NewCalCEXxsec, true, false, true);
+        NewCalCEXxsec->SetName(tag+"_CalNewCEXxsec");
+        lout->Add(NewCalCEXxsec);
+
+        // Calculate the xsec 
+        TotalCEXXSCal(IncidentHist_50MeVbin, CEXInteractingHist, CalCEXxsec_50MeVbin, true, true);
+        CalCEXxsec_50MeVbin->SetName(tag+"_CalCEXxsec_50MeVbin");
+        lout->Add(CalCEXxsec_50MeVbin);
+        
+        //------ Differential xsec ------// 
+        // 700 MeV slice
+        double diffInt_700MeV  = CEXInteractingHist->GetBinContent(14);
+        double diffInterror_700MeV = CEXInteractingHist->GetBinError(14);
+        TString DiffCEXname_700MeV = "i005hTruthDiffCEXInteractingHist_700MeV";
+        TH1D *DiffCEXInteractingHist_700MeV = (TH1D*)lout->FindObject(DiffCEXname_700MeV);
+        TH1D *DiffCEXxsec_700MeV = (TH1D*)DiffCEXInteractingHist_700MeV->Clone();
+        // Calculate the diff. cross section
+        DiffCEXXSCal(DiffCEXInteractingHist_700MeV, DiffCEXxsec_700MeV, diffInt_700MeV, diffInterror_700MeV);
+        DiffCEXxsec_700MeV->SetName(tag+"_DiffCEXxsec700");
+        lout->Add(DiffCEXxsec_700MeV);
+        // Theta case
+        TString DiffCEXnameTheta_700MeV = "i055hTruthDiffCEXInteractingHistTheta_700MeV";
+        TH1D *DiffCEXInteractingHistTheta_700MeV = (TH1D*)lout->FindObject(DiffCEXnameTheta_700MeV);
+        TH1D *DiffCEXxsecTheta_700MeV = (TH1D*)DiffCEXInteractingHistTheta_700MeV->Clone();
+        // Calculate the diff. cross section
+        DiffCEXXSCal(DiffCEXInteractingHistTheta_700MeV, DiffCEXxsecTheta_700MeV, diffInt_700MeV, diffInterror_700MeV);
+        DiffCEXxsecTheta_700MeV->SetName(tag+"_DiffCEXxsecTheta700");
+        lout->Add(DiffCEXxsecTheta_700MeV);
+        // Cos Theta case
+        TString DiffCEXnameCosTheta_700MeV = "i555hTruthDiffCEXInteractingHistCosTheta_700MeV";
+        TH1D *DiffCEXInteractingHistCosTheta_700MeV = (TH1D*)lout->FindObject(DiffCEXnameCosTheta_700MeV);
+        TH1D *DiffCEXxsecCosTheta_700MeV = (TH1D*)DiffCEXInteractingHistCosTheta_700MeV->Clone();
+        // Calculate the diff. cross section
+        DiffCEXXSCal(DiffCEXInteractingHistCosTheta_700MeV, DiffCEXxsecCosTheta_700MeV, diffInt_700MeV, diffInterror_700MeV);
+        DiffCEXxsecCosTheta_700MeV->SetName(tag+"_DiffCEXxsecCosTheta700");
+        lout->Add(DiffCEXxsecCosTheta_700MeV);
+
+        // 800 MeV slice
+        double diffInt_800MeV  = CEXInteractingHist->GetBinContent(16);
+        double diffInterror_800MeV  = CEXInteractingHist->GetBinError(16);
+        TString DiffCEXname_800MeV = "i006hTruthDiffCEXInteractingHist_800MeV";
+        TH1D *DiffCEXInteractingHist_800MeV = (TH1D*)lout->FindObject(DiffCEXname_800MeV);
+        TH1D *DiffCEXxsec_800MeV = (TH1D*)DiffCEXInteractingHist_800MeV->Clone();
+        // Calculate the diff. cross section
+        DiffCEXXSCal(DiffCEXInteractingHist_800MeV, DiffCEXxsec_800MeV, diffInt_800MeV, diffInterror_800MeV);
+        DiffCEXxsec_800MeV->SetName(tag+"_DiffCEXxsec800");
+        lout->Add(DiffCEXxsec_800MeV);
+
+        // Theta case
+        TString DiffCEXnameTheta_800MeV = "i066hTruthDiffCEXInteractingHistTheta_800MeV";
+        TH1D *DiffCEXInteractingHistTheta_800MeV = (TH1D*)lout->FindObject(DiffCEXnameTheta_800MeV);
+        TH1D *DiffCEXxsecTheta_800MeV = (TH1D*)DiffCEXInteractingHistTheta_800MeV->Clone();
+        // Calculate the diff. cross section
+        DiffCEXXSCal(DiffCEXInteractingHistTheta_800MeV, DiffCEXxsecTheta_800MeV, diffInt_800MeV, diffInterror_800MeV);
+        DiffCEXxsecTheta_800MeV->SetName(tag+"_DiffCEXxsecTheta800");
+        lout->Add(DiffCEXxsecTheta_800MeV);
+
+        // Cos Theta case
+        TString DiffCEXnameCosTheta_800MeV = "i666hTruthDiffCEXInteractingHistCosTheta_800MeV";
+        TH1D *DiffCEXInteractingHistCosTheta_800MeV = (TH1D*)lout->FindObject(DiffCEXnameCosTheta_800MeV);
+        TH1D *DiffCEXxsecCosTheta_800MeV = (TH1D*)DiffCEXInteractingHistCosTheta_800MeV->Clone();
+        // Calculate the diff. cross section
+        DiffCEXXSCal(DiffCEXInteractingHistCosTheta_800MeV, DiffCEXxsecCosTheta_800MeV, diffInt_800MeV, diffInterror_800MeV);
+        DiffCEXxsecCosTheta_800MeV->SetName(tag+"_DiffCEXxsecCosTheta800");
+        lout->Add(DiffCEXxsecCosTheta_800MeV);
+
+        // 900MeV slice
+        double diffInt_900MeV  = CEXInteractingHist->GetBinContent(18);
+        double diffInterror_900MeV  = CEXInteractingHist->GetBinError(18);
+        TString DiffCEXname_900MeV = "i007hTruthDiffCEXInteractingHist_900MeV";
+        TH1D *DiffCEXInteractingHist_900MeV = (TH1D*)lout->FindObject(DiffCEXname_900MeV);
+        TH1D *DiffCEXxsec_900MeV = (TH1D*)DiffCEXInteractingHist_900MeV->Clone();
+        // Calculate the diff. cross section
+        DiffCEXXSCal(DiffCEXInteractingHist_900MeV, DiffCEXxsec_900MeV, diffInt_900MeV, diffInterror_900MeV);
+        DiffCEXxsec_900MeV->SetName(tag+"_DiffCEXxsec900");
+        lout->Add(DiffCEXxsec_900MeV);
+
+        // Theta case
+        TString DiffCEXnameTheta_900MeV = "i077hTruthDiffCEXInteractingHistTheta_900MeV";
+        TH1D *DiffCEXInteractingHistTheta_900MeV = (TH1D*)lout->FindObject(DiffCEXnameTheta_900MeV);
+        TH1D *DiffCEXxsecTheta_900MeV = (TH1D*)DiffCEXInteractingHistTheta_900MeV->Clone();
+        // Calculate the diff. cross section
+        DiffCEXXSCal(DiffCEXInteractingHistTheta_900MeV, DiffCEXxsecTheta_900MeV, diffInt_900MeV, diffInterror_900MeV);
+        DiffCEXxsecTheta_900MeV->SetName(tag+"_DiffCEXxsecTheta900");
+        lout->Add(DiffCEXxsecTheta_900MeV);
+
+        // Cos Theta case
+        TString DiffCEXnameCosTheta_900MeV = "i777hTruthDiffCEXInteractingHistCosTheta_900MeV";
+        TH1D *DiffCEXInteractingHistCosTheta_900MeV = (TH1D*)lout->FindObject(DiffCEXnameCosTheta_900MeV);
+        TH1D *DiffCEXxsecCosTheta_900MeV = (TH1D*)DiffCEXInteractingHistCosTheta_900MeV->Clone();
+        // Calculate the diff. cross section
+        DiffCEXXSCal(DiffCEXInteractingHistCosTheta_900MeV, DiffCEXxsecCosTheta_900MeV, diffInt_900MeV, diffInterror_900MeV);
+        DiffCEXxsecCosTheta_900MeV->SetName(tag+"_DiffCEXxsecCosTheta900");
+        lout->Add(DiffCEXxsecCosTheta_900MeV);
+      }
+
+ 
+      if(tag.Contains("i031hUnFoldedPi0KEHist") && !tag.Contains("Data")){
+        // Scale half fake data
+        hh->Scale(0.5);
+        // Charge Exchange xsec
+        TString CEXname = "i025hUnFoldedInteractingHist";
+        TH1D *CEXInteractingHist = (TH1D*)lout->FindObject(CEXname);
+        // 800 MeV
+        double diffInt_800MeV  = CEXInteractingHist->GetBinContent(16);
+        double diffInterror_800MeV  = CEXInteractingHist->GetBinError(16);
+        TH1D *DiffCEXInteractingHist_800MeV = (TH1D*)hh->Clone();
+        TH1D *DiffCEXxsec_800MeV = (TH1D*)hh->Clone();
+        // Calculate the diff. cross section
+        DiffCEXXSCal(DiffCEXInteractingHist_800MeV, DiffCEXxsec_800MeV, diffInt_800MeV, diffInterror_800MeV);
+        DiffCEXxsec_800MeV->SetName(tag+"_DiffCEXRecoxsec800");
+        lout->Add(DiffCEXxsec_800MeV);
+
+      }
+
+      if(tag.Contains("i033hUnFoldedPi0CosThetaHist") && !tag.Contains("Data")){
+        // Scale half fake data
+        hh->Scale(0.5);
+        // Charge Exchange xsec
+        TString CEXname = "i025hUnFoldedInteractingHist";
+        TH1D *CEXInteractingHist = (TH1D*)lout->FindObject(CEXname);
+        // 800 MeV
+        double diffInt_800MeV  = CEXInteractingHist->GetBinContent(16);
+        double diffInterror_800MeV  = CEXInteractingHist->GetBinError(16);
+        TH1D *DiffCEXInteractingHist_800MeV = (TH1D*)hh->Clone();
+        TH1D *DiffCEXxsec_800MeV = (TH1D*)hh->Clone();
+        // Calculate the diff. cross section
+        DiffCEXXSCal(DiffCEXInteractingHist_800MeV, DiffCEXxsec_800MeV, diffInt_800MeV, diffInterror_800MeV);
+        DiffCEXxsec_800MeV->SetName(tag+"_DiffCEXRecoxsec800");
+        lout->Add(DiffCEXxsec_800MeV);
+      }
+
+      if(tag.Contains("i035hUnFoldedPi0ThetaHist") && !tag.Contains("Data")){
+        // Scale half fake data
+        hh->Scale(0.5);
+        // Charge Exchange xsec
+        TString CEXname = "i025hUnFoldedInteractingHist";
+        TH1D *CEXInteractingHist = (TH1D*)lout->FindObject(CEXname);
+        // 800 MeV
+        double diffInt_800MeV  = CEXInteractingHist->GetBinContent(16);
+        double diffInterror_800MeV  = CEXInteractingHist->GetBinError(16);
+        TH1D *DiffCEXInteractingHist_800MeV = (TH1D*)hh->Clone();
+        TH1D *DiffCEXxsec_800MeV = (TH1D*)hh->Clone();
+        // Calculate the diff. cross section
+        DiffCEXXSCal(DiffCEXInteractingHist_800MeV, DiffCEXxsec_800MeV, diffInt_800MeV, diffInterror_800MeV);
+        DiffCEXxsec_800MeV->SetName(tag+"_DiffCEXRecoxsec800");
+        lout->Add(DiffCEXxsec_800MeV);
+      }
+/* // Data unfold histogram
+      if(tag.Contains("i031hUnFoldedPi0KEHist") && tag.Contains("Data")){
+
+        // Charge Exchange xsec
+        TString CEXname = "i025hUnFoldedInteractingHistData";
+        TH1D *CEXInteractingHist = (TH1D*)lout->FindObject(CEXname);
+
+        // 800 MeV
+        double diffInt_800MeV  = CEXInteractingHist->GetBinContent(16);
+        TH1D *DiffCEXxsec_800MeV = (TH1D*)hh->Clone();
+        //xsec->Divide(hh);
+        DiffCEXxsec_800MeV->Scale(0);
+
+        const Int_t x0_diff_800MeV = hh->GetXaxis()->GetFirst();
+        const Int_t x1_diff_800MeV = hh->GetXaxis()->GetLast();
+        double sum_800MeV = 0;
+        for(Int_t ix=x0_diff_800MeV; ix<=x1_diff_800MeV; ix++){
+          double incE = diffInt_800MeV;
+          double intE = hh->GetBinContent(ix);
+          if(intE != 0 ){
+            //double ratio = log(incE/(incE-intE));
+            double ratio = intE/incE;
+            DiffCEXxsec_800MeV->SetBinContent(ix,ratio);
+            //double error = sqrt(intE+pow(intE,2)/incE)/incE;
+            double einc = CEXInteractingHist->GetBinError(16);
+            double eint = hh->GetBinError(ix);
+            double error = sqrt(ratio*ratio*(pow(einc/incE,2)+pow(eint/intE,2)));
+            DiffCEXxsec_800MeV->SetBinError(ix,error);
+            //cout << "error_800MeV: " << error << endl;
+            //cout << "intE: " << intE << endl;
+            //cout << "incE: " << incE << endl;
+
+            //cout << "ratio_800MeV: " << ratio << endl;
+            sum_800MeV += intE;
+
+            //cout << "diffInt_800MeV: " << diffInt << endl;
+          }
+          //cout << "DiffCEXInteractingHist->GetBinContent(ix): " << intE << endl;
+        }
+
+        DiffCEXxsec_800MeV->SetName(tag+"_DiffCEXRecoxsec800Data");
+        lout->Add(DiffCEXxsec_800MeV);
+
+      }*/
+
+      
     }
   } // End of for loop
 }
 
-void PlotUtils::DrawHist(TList *lout, const double plotscale, TList * overlayList, const TString outdir)
+void PlotUtils::DrawHist(TList *lout, const double plotscale, TList * overlayList, const TString outdir, TGraph *g_inel, TGraph *g_cex, TGraph *g_675, TGraph *g_775, TGraph *g_875, TGraph *g_675theta, TGraph *g_775theta, TGraph *g_875theta,  TGraph *g_675costheta, TGraph *g_775costheta, TGraph *g_875costheta)
 {
   TLatex tt;
   tt.SetNDC();
@@ -259,7 +717,6 @@ void PlotUtils::DrawHist(TList *lout, const double plotscale, TList * overlayLis
     TH2 * h2d = 0x0;
     // Data overlay histogram
     TH1D *holay = (TH1D*)overlayList->FindObject(tag);
-
     //=========================== 1D and 2D histograms ===========================//
     if(hh){
       // Cast to 2D histogram
@@ -280,7 +737,7 @@ void PlotUtils::DrawHist(TList *lout, const double plotscale, TList * overlayLis
             line->Draw();
             h2d->Draw("colz");
           }
-          if((tag.Contains("REG") || tag.Contains("RES")) && tag.Contains("_nor")){
+          else if((tag.Contains("REG") || tag.Contains("RES")) && tag.Contains("_nor")){
             //TPad *h2_pad = new TPad("h2_pad", "h2_pad",0.0,0.0,1.0,1.0);
             //h2_pad->Draw();
 
@@ -306,8 +763,9 @@ void PlotUtils::DrawHist(TList *lout, const double plotscale, TList * overlayLis
             TRegexp re("_nor");
             TString name = tag;
             name(re) = "_projX";
-            cout << "name: " << name << endl;
-            TH1D *hcdf = (TH1D*)lout->FindObject(name);
+            //cout << "name: " << name << endl;
+            TH1D *htmp = (TH1D*)lout->FindObject(name);
+            TH1D *hcdf = (TH1D*)htmp->Clone(Form("hcdf_%d",ii));
 
             TPad *pad2 = new TPad(Form("pad2_%d",ii), Form("pad2_%d",ii), 0, 0, 1, 0.3);
              
@@ -355,6 +813,33 @@ void PlotUtils::DrawHist(TList *lout, const double plotscale, TList * overlayLis
             hcdf->Draw("hist");
             c1->cd();
           }
+          else if(tag.Contains("InstXY") && !tag.Contains("nor") && !tag.Contains("mis")){
+
+            TPad *pad1 = new TPad(Form("pad1_%d",ii), Form("pad1_%d",ii), 0.01, 0, 0.5, 0.98);
+            pad1->Draw();
+            pad1->cd();
+            h2d->GetYaxis()->SetTitleOffset(1.01);
+            h2d->Draw("colz");
+            auto lgMC = new TLegend(0.7,0.7,0.85,0.88);
+            lgMC->SetHeader("MC","C");
+            lgMC->Draw("same");
+            c1->Update();
+            c1->cd();
+
+            TPad *pad2 = new TPad(Form("pad1_%d",ii), Form("pad1_%d",ii), 0.51, 0, 1, 0.98);
+            pad2->Draw();
+            pad2->cd();
+            SetTitleFormat(holay);
+            holay->GetYaxis()->SetTitleOffset(1.01);
+            holay->Draw("colz");
+            auto lgDATA = new TLegend(0.6,0.7,0.85,0.88);
+            lgDATA->SetHeader("DATA","C");
+            lgDATA->Draw("same");
+            c1->cd();
+          }
+          else{
+            h2d->Draw("colz");
+          }
         }
         if(!tag.Contains("proj") && tag.Contains("Bin")){
           h2d->SetMarkerSize(2);
@@ -367,6 +852,46 @@ void PlotUtils::DrawHist(TList *lout, const double plotscale, TList * overlayLis
           //gStyle->SetPaintTextFormat("4.3f");
           h2d->Draw("colz text");
         }
+
+        if(tag.Contains("MAP")){
+          //h2d->Divide(holay);
+          //h2d->SetMarkerSize(2);
+          TH2D *hh=(TH2D*)h2d->Clone(Form("%s_clone",h2d->GetName()));
+          h2d->Scale(0);
+          hh->Scale(plotscale);
+          
+          const Int_t x0 = h2d->GetXaxis()->GetFirst();
+          const Int_t x1 = h2d->GetXaxis()->GetLast();
+          const Int_t y0 = h2d->GetYaxis()->GetFirst();
+          const Int_t y1 = h2d->GetYaxis()->GetLast();
+
+
+          for(Int_t ix=x0; ix<=x1; ix++){
+            for(Int_t iy=y0; iy<=y1; iy++){
+              double MCbin = hh->GetBinContent(ix,iy);
+              double DATAbin = holay->GetBinContent(ix,iy);
+              //cout << "ix: " << ix << " iy: " << iy << " MC: " << MCbin << " DATA: " << DATAbin << " ratio: " << DATAbin/(MCbin+1e-10) << endl;
+              h2d->SetBinContent(ix,iy,DATAbin/(MCbin+1e-10));
+            }
+          }
+          
+          h2d->GetZaxis()->SetRangeUser(0.5, 1.5);
+          h2d->Draw("colz");
+        }
+
+        else{
+          h2d->Draw("colz");
+          if(tag.Contains("response")){
+            cout << "tag res: " << tag << endl;
+            double max = h2d->GetXaxis()->GetBinUpEdge(h2d->GetXaxis()->GetLast());
+            double min = h2d->GetXaxis()->GetBinLowEdge(h2d->GetXaxis()->GetFirst());
+            TLine *line = new TLine(min,min,max,max);
+            line->SetLineColor(kBlack);
+            line->SetLineWidth(2);
+            line->Draw();
+          }
+        }
+
       }
       // There is no h2d, we only have 1D histogram
       else {
@@ -375,10 +900,10 @@ void PlotUtils::DrawHist(TList *lout, const double plotscale, TList * overlayLis
         if(holay){
           // Fracitonal plots
           if(tag.Contains("FCN")){
-            auto lg = new TLegend(0.7,0.7,0.85,0.88);
+            auto lg = new TLegend(0.19,0.7,0.34,0.88);
             TF1 *fitfuncMC = 0x0;
             TF1 *fitfuncData = 0x0;
-            if(tag.Contains("Start")){
+            if(tag.Contains("Start") || tag.Contains("Inst") ){
               fitfuncMC = new TF1("fMC","gaus",-100,100);
               fitfuncMC->SetLineColor(kRed);
               fitfuncData = new TF1("fData","gaus",-100,100);
@@ -418,7 +943,7 @@ void PlotUtils::DrawHist(TList *lout, const double plotscale, TList * overlayLis
 
             hh->Fit("fMC");
             hh->Draw("E");
-/*            
+            
             gPad->Update();
             TPaveStats *st = (TPaveStats*)hh->GetListOfFunctions()->FindObject("stats");
             //st->SetOptFit(1);
@@ -429,14 +954,14 @@ void PlotUtils::DrawHist(TList *lout, const double plotscale, TList * overlayLis
             st->SetX1NDC(0.7); 
             st->SetX2NDC(0.93);
             st->SetTextColor(kRed);
-*/
+
             holay->Scale(1/holay->Integral(0,1000));
             
             DrawOverlay(holay);
             holay->Fit("fData");
             
             //holay->Draw("sames E");
-/*
+
             gPad->Update();
             TPaveStats *st1 = (TPaveStats*)holay->GetListOfFunctions()->FindObject("stats");
             //st1->SetOptFit(1);
@@ -447,7 +972,7 @@ void PlotUtils::DrawHist(TList *lout, const double plotscale, TList * overlayLis
             st1->SetX1NDC(0.7); 
             st1->SetX2NDC(0.93);
             st1->SetTextColor(kBlack);
-*/
+
             TLegendEntry *le = lg->AddEntry(hh,"MC","lp");
             le->SetTextColor(kRed);
             lg->AddEntry(holay,"DATA","lp");
@@ -524,9 +1049,9 @@ void PlotUtils::DrawHist(TList *lout, const double plotscale, TList * overlayLis
                 holayFit->SetLineWidth(2);
                 holayFit->Draw("SAMES hist");
                 c1->Update();
-                cout << "E1E2 mean: " << hh->GetMean() << " RMS: " << hh->GetRMS() << endl;
-                cout << "E1OA mean: " << holayRaw->GetMean() << " RMS: " << holayRaw->GetRMS() << endl;
-                cout << "Asym mean: " << holayFit->GetMean() << " RMS: " << holayFit->GetRMS() << endl;
+                //cout << "E1E2 mean: " << hh->GetMean() << " RMS: " << hh->GetRMS() << endl;
+                //cout << "E1OA mean: " << holayRaw->GetMean() << " RMS: " << holayRaw->GetRMS() << endl;
+                //cout << "Asym mean: " << holayFit->GetMean() << " RMS: " << holayFit->GetRMS() << endl;
               }
               auto lg = new TLegend(0.6,0.5,0.85,0.88);
 
@@ -548,7 +1073,7 @@ void PlotUtils::DrawHist(TList *lout, const double plotscale, TList * overlayLis
             else hh->Draw("hist");
           }
           
-          else if(tag.Contains("FitRes") && tag.Contains("projY")){
+          else if((tag.Contains("FitRes") || tag.Contains("FitRawRes")) && tag.Contains("projY")){
             TF1 *fCauchy = new TF1("fCauchy",CauchyDens,-1000,1000,3);
             Double_t par[3];
             par[0] = hh->GetMean(); 
@@ -581,6 +1106,7 @@ void PlotUtils::DrawHist(TList *lout, const double plotscale, TList * overlayLis
             hh->SetFillStyle(4050);
             hh->SetFillColor(24);
             hh->SetLineColor(24);
+            //hh->SetFillColorAlpha(24, 0.35);
             hh->Draw("hist");
             //hh->SetName("Pre Fit");
             gPad->Update();
@@ -591,9 +1117,10 @@ void PlotUtils::DrawHist(TList *lout, const double plotscale, TList * overlayLis
             st->SetX1NDC(0.7); 
             st->SetX2NDC(0.93);
 */    
-            holay->SetFillStyle(3001);
+            holay->SetFillStyle(4050);
             holay->SetFillColor(46);
             holay->SetLineColor(46);
+            holay->SetFillColorAlpha(46, 0.35);
             //holay->SetStats(0);
             holay->Draw("SAMES hist");
             //holay->SetName("Post Fit");
@@ -707,6 +1234,28 @@ void PlotUtils::DrawHist(TList *lout, const double plotscale, TList * overlayLis
               fCorMean->Draw("same");
             }
 
+            else if(tag.Contains("BeamTheta")){
+              fCorMean = new TF1("fCorMean","pol3",-280,280);
+              hh->Fit("fCorMean");
+              hh->Draw("hist");
+              fCorMean->Draw("same");
+            }
+            else if(tag.Contains("BeamPhi")){
+              fCorMean = new TF1("fCorMean","pol3",-280,280);
+              hh->Fit("fCorMean");
+              hh->Draw("hist");
+              fCorMean->Draw("same");
+            }
+
+            if(tag.Contains("BeamMomentum")){
+              fCorMean = new TF1("fCorMean",CorrectionFCN,0,2,4);
+              fCorMean->SetParameters(-178558,8.639592,0.08331107,-0.00658262);
+              hh->Fit("fCorMean");
+              hh->Draw("hist");
+              fCorMean->Draw("same");
+            }
+
+
             else {
               cout << "not found!!" << endl;
             }
@@ -717,7 +1266,10 @@ void PlotUtils::DrawHist(TList *lout, const double plotscale, TList * overlayLis
 
             hh->GetXaxis()->SetTitle("Energy (GeV)");
             hh->GetYaxis()->SetTitle("Efficiency");
- 
+            if(tag.Contains("Proton")){
+              hh->GetXaxis()->SetTitle("Momentum (GeV/c)");
+              hh->GetYaxis()->SetTitle("Efficiency");
+            }
             hh->SetMarkerStyle(8);
             hh->SetMarkerSize(1);
             hh->SetMarkerColor(kBlack);
@@ -730,6 +1282,23 @@ void PlotUtils::DrawHist(TList *lout, const double plotscale, TList * overlayLis
             hh->SetFillColor(kBlack);
             hh->SetFillStyle(3001);
             hh->SetFillColorAlpha(kBlack, 0.35);
+
+            // Proton case
+            if(tag.Contains("Proton")){
+              hh->SetMarkerColor(kGreen+3);
+              hh->SetLineColor(kGreen+3);
+              hh->SetFillColor(kGreen+3);
+              hh->SetFillStyle(3001);
+              hh->SetFillColorAlpha(kGreen+3, 0.35);
+            }
+            // Leading shower case
+            if(tag.Contains("LeadingShower")){
+              hh->SetMarkerColor(kRed);
+              hh->SetLineColor(kRed);
+              hh->SetFillColor(kRed);
+              hh->SetFillStyle(3001);
+              hh->SetFillColorAlpha(kRed, 0.35);
+            }
             hh->Draw("e2same");
 
             if(tag.Contains("m010hMatchedTruthPi0Momentum")){
@@ -835,6 +1404,1822 @@ void PlotUtils::DrawHist(TList *lout, const double plotscale, TList * overlayLis
             lg->AddEntry(holay,"Subleading #gamma","l");
             lg->Draw("same");
           }
+
+          else if(tag.Contains("UpStreamELoss")){
+            TF1 *f1 = new TF1(Form("f1%s",tag.Data()),"gaus",-100,100);    
+            if (hh->GetEntries() != 0) {
+              f1->SetParameters(hh->GetMaximum(), hh->GetMean(), hh->GetRMS() );
+              hh->Fit(Form("f1%s",tag.Data()));
+            }
+            double sigma = f1->GetParameter("Sigma");
+            double mean = f1->GetParameter("Mean");
+            // 3 sigma value
+            double scraperValue = mean+sigma*3.0;
+            cout << "tag: " << tag << " scraperValue: " << scraperValue << endl;
+            cout << "sigma: " << sigma << " mean: " << mean << endl;
+
+            // Draw the line
+            TLine *line = new TLine(scraperValue,0,scraperValue,f1->GetMaximum());
+            line->SetLineColor(kBlue);
+            line->SetLineStyle(kDashed);
+            line->SetLineWidth(2);
+            line->Draw();
+            //hpj->SetStats(0);
+            hh->Draw("sames");
+          }
+
+          //------- xsec plots ------//
+          /*else if (tag.Contains("TotalXSec")){
+            
+            hh->SetMaximum(1200);
+            hh->SetMinimum(0);
+
+            hh->SetMarkerStyle(8);
+            hh->SetMarkerSize(1);
+            hh->SetMarkerColor(kBlack);
+            hh->SetLineColor(kBlack);
+            hh->SetLineWidth(1);
+            hh->Draw("sames E");
+            //hh->Draw("hist e");
+            g_inel->SetLineColor(kRed);
+            g_inel->Draw("sames C");
+            
+          }*/
+
+          // Total CEX xsec plots
+          // i026hUnFoldedIncidentHist_xsec && i001hTruthIncidentHist_CEXxsec && i001hTruthIncidentHist_xsec (useless)
+          else if (tag.Contains("xsec") && !tag.Contains("Total")  && !tag.Contains("Diff")){
+            TPad *pad1 = new TPad(Form("pad1_%d",ii), Form("pad1_%d",ii), 0, 0.2, 1, 0.98);
+            // Set 0.01 will hide axis label
+            pad1->SetBottomMargin(0.01);
+            //  pad1->SetGridx();
+            //  pad1->SetGridy();
+            pad1->Draw();
+            pad1->cd();
+
+            hh->SetMarkerStyle(8);
+            hh->SetMarkerSize(1);
+            hh->SetMarkerColor(kBlack);
+            hh->SetLineColor(kBlack);
+            hh->SetLineWidth(1);
+            hh->Draw("sames E1");
+
+            //auto* legend = new TLegend(0.6, 0.6, 0.85, 0.88);
+            TLegend * legend = new TLegend(0.15, 0.58, 0.48, 0.88);
+
+            //hh->Draw("hist e");
+            if(tag.Contains("CEX") || tag.Contains("UnFold")){
+              g_cex->SetLineColor(kRed);
+              g_cex->Draw("sames C");
+
+              if(tag.Contains("i001hTruthIncidentHist_CEXxsec")){
+                TString truth_Eslice = "i001hTruthIncidentHist_CalCEXxsec";
+                TH1D *holay_truth_Eslice = (TH1D*)lout->FindObject(truth_Eslice);
+
+                holay_truth_Eslice->SetMarkerStyle(25);
+                holay_truth_Eslice->SetMarkerSize(1);
+                holay_truth_Eslice->SetMarkerColor(kBlue);
+                holay_truth_Eslice->SetLineColor(kBlue);
+                holay_truth_Eslice->SetLineWidth(1);
+                holay_truth_Eslice->Draw("sames E1");
+
+                TString truth_Eslice_50MeVbin = "i001hTruthIncidentHist_CalCEXxsec_50MeVbin";
+                TH1D *holay_truth_Eslice_50MeVbin = (TH1D*)lout->FindObject(truth_Eslice_50MeVbin);
+
+                holay_truth_Eslice_50MeVbin->SetMarkerStyle(23);
+                holay_truth_Eslice_50MeVbin->SetMarkerSize(1);
+                holay_truth_Eslice_50MeVbin->SetMarkerColor(kOrange+3);
+                holay_truth_Eslice_50MeVbin->SetLineColor(kOrange+3);
+                holay_truth_Eslice_50MeVbin->SetLineWidth(1);
+                holay_truth_Eslice_50MeVbin->Draw("sames E1");
+
+                TString truth_Eslice_New = "i001hTruthIncidentHist_CalNewCEXxsec";
+                TH1D *holay_truth_Eslice_New = (TH1D*)lout->FindObject(truth_Eslice_New);
+
+                holay_truth_Eslice_New->SetMarkerStyle(22);
+                holay_truth_Eslice_New->SetMarkerSize(1);
+                holay_truth_Eslice_New->SetMarkerColor(kGreen+3);
+                holay_truth_Eslice_New->SetLineColor(kGreen+3);
+                holay_truth_Eslice_New->SetLineWidth(1);
+                holay_truth_Eslice_New->Draw("sames E1");
+
+                legend->AddEntry(g_cex, "Geant4 Prediction", "l");
+                legend->AddEntry(hh, "MC Truth (Thin-Slice)", "lep");
+                legend->AddEntry(holay_truth_Eslice, "MC Truth (E-Slice)", "lep");
+                legend->AddEntry(holay_truth_Eslice_50MeVbin, "MC Truth (E-Slice 50MeV Bin)", "lep");
+                legend->AddEntry(holay_truth_Eslice_New, "MC Truth (New Method)", "lep");
+
+                legend->Draw("same");
+
+              }
+              else if(tag.Contains("i029")){
+                legend->AddEntry(g_cex, "Geant4 Prediction", "l");
+                legend->AddEntry(hh, "Data", "lep");
+                legend->Draw("same");
+              }
+              else{
+                legend->AddEntry(g_cex, "Geant4 Prediction", "l");
+                legend->AddEntry(hh, "MC Reco", "lep");
+                legend->Draw("same");
+              }
+            }
+            else{
+              g_inel->SetLineColor(kRed);
+              g_inel->Draw("sames C");
+
+              //g_inel->SetLineColor(kRed);
+              //g_inel->Draw("sames C");
+
+              legend->AddEntry(g_inel, "Geant4 Prediction", "l");
+              legend->AddEntry(hh, "MC Reco", "lep");
+              legend->Draw("same");
+            }
+
+            if(tag.Contains("i026")){
+              TString truth = "i001hTruthIncidentHist_CEXxsec";
+              TH1D *holay_truth = (TH1D*)lout->FindObject(truth);
+              holay_truth->SetMarkerStyle(8);
+              holay_truth->SetMarkerSize(1);
+              holay_truth->SetMarkerColor(kBlue);
+              holay_truth->SetMarkerStyle(kFullSquare);
+              holay_truth->SetLineColor(kBlue);
+              holay_truth->SetLineWidth(1);
+              holay_truth->Draw("sames E1");
+              legend->AddEntry(holay_truth, "MC Truth", "lep");
+              TString lheader("Fake Data (1/2 MC sample)");
+              legend->SetHeader(lheader);
+              legend->Draw("same");
+            }
+
+            if(tag.Contains("i027")){
+              TString truth = "i001hTruthIncidentHist_CalCEXxsec";
+              TH1D *holay_truth = (TH1D*)lout->FindObject(truth);
+              holay_truth->SetMarkerStyle(8);
+              holay_truth->SetMarkerSize(1);
+              holay_truth->SetMarkerColor(kBlue);
+              holay_truth->SetMarkerStyle(kFullSquare);
+              holay_truth->SetLineColor(kBlue);
+              holay_truth->SetLineWidth(1);
+              holay_truth->Draw("sames E1");
+              legend->AddEntry(holay_truth, "MC Truth", "lep");
+              TString lheader("Fake Data (1/2 MC sample)");
+              legend->SetHeader(lheader);
+              legend->Draw("same");
+            }
+
+            if(tag.Contains("i029")){
+              TString truth = "i001hTruthIncidentHist_CalCEXxsec";
+              TH1D *holay_truth = (TH1D*)lout->FindObject(truth);
+              holay_truth->SetMarkerStyle(8);
+              holay_truth->SetMarkerSize(1);
+              holay_truth->SetMarkerColor(kBlue);
+              holay_truth->SetMarkerStyle(kFullSquare);
+              holay_truth->SetLineColor(kBlue);
+              holay_truth->SetLineWidth(1);
+              holay_truth->Draw("sames E1");
+              legend->AddEntry(holay_truth, "MC Truth", "lep");
+
+              TString reco = "i027hUnFoldedBeamIncidentHist_xsec";
+              TH1D *holay_reco = (TH1D*)lout->FindObject(reco);
+              holay_reco->SetMarkerStyle(8);
+              holay_reco->SetMarkerSize(1);
+              holay_reco->SetMarkerColor(kGreen+3);
+              holay_reco->SetMarkerStyle(23);
+              holay_reco->SetLineColor(kGreen+3);
+              holay_reco->SetLineWidth(1);
+              holay_reco->Draw("sames E1");
+              legend->AddEntry(holay_reco, "MC Reco", "lep");
+
+              TString lheader("Real Data (Full sample)");
+              legend->SetHeader(lheader);
+              legend->Draw("same");
+            }
+
+            c1->Update();
+            c1->cd();
+            TPad *pad2 = new TPad(Form("pad2_%d",ii), Form("pad2_%d",ii), 0, 0, 1, 0.2);
+            
+            pad2->SetTopMargin(0.03);
+            pad2->SetBottomMargin(0.42);
+            pad2->SetGridx();
+            pad2->SetGridy();
+            pad2->Draw();
+            pad2->cd();
+
+            TH1D *hratio = (TH1D*)hh->Clone(Form("hratio_%d",ii));
+
+            const Int_t x0_x = hh->GetXaxis()->GetFirst();
+            const Int_t x1_x = hh->GetXaxis()->GetLast();
+
+            hratio->Scale(0);
+
+            for(Int_t ix=x0_x; ix<=x1_x; ix++){
+              double bin_center = hh->GetBinCenter(ix);
+              double MC = 0;
+              if(tag.Contains("CEX") || tag.Contains("UnFold")) MC = g_cex->Eval(bin_center);
+              else  MC = g_inel->Eval(bin_center);
+
+              double data = hh->GetBinContent(ix);
+              double edata = hh->GetBinError(ix);
+              if(MC != 0){
+                double ratio = data/MC;
+                hratio->SetBinContent(ix,ratio);
+                double error = sqrt(ratio*ratio*(pow(edata/data,2)));
+                hratio->SetBinError(ix,error);
+              }
+              //cout << "bin: " << hratio->GetBinContent(ix) << endl;
+            }
+            hratio->SetTitle(" ");
+            //hratio->Divide(hsum);
+            DrawDataMCRatio(hratio,true);
+            c1->cd();
+
+          }
+
+          // Three KE truth diff. xsec plots
+          else if (tag.Contains("DiffCEXxsec") && !tag.Contains("Theta") && !tag.Contains("Cos")){
+            
+            TPad *pad1 = new TPad(Form("pad1_%d",ii), Form("pad1_%d",ii), 0, 0.2, 1, 0.98);
+            // Set 0.01 will hide axis label
+            pad1->SetBottomMargin(0.01);
+            //  pad1->SetGridx();
+            //  pad1->SetGridy();
+            pad1->Draw();
+            pad1->cd();
+            // Thin-Slice
+            //TString CEXname = "i001hTruthIncidentHist_CEXxsec";
+            // E-Slice
+            TString CEXname = "i001hTruthIncidentHist_CalCEXxsec";
+            TH1D *CEXInteractingHist = (TH1D*)lout->FindObject(CEXname);
+
+            //cout << " no norm: " << hh->Integral("width") << endl;
+            hh->Scale(1/50.0);
+            SetTitleFormat(hh);
+            //cout << " mid norm: " << hh->Integral("width") << endl;
+            //hh->Scale(g_cex->Eval(600));
+            //cout << "evl: " << g_cex->Eval(600) << endl;
+            if(tag.Contains("700")) hh->Scale(CEXInteractingHist->GetBinContent(14));
+            else if(tag.Contains("800")) hh->Scale(CEXInteractingHist->GetBinContent(16));
+            else if(tag.Contains("900")) hh->Scale(CEXInteractingHist->GetBinContent(18));
+
+            //cout << "true scale(16): " << CEXInteractingHist->GetBinContent(16) << endl;
+
+            //cout << "evl: " << g_cex->Eval(600) << endl;
+            //cout << "evl hand: " << CEXInteractingHist->GetBinContent(12) << endl;
+            //cout << "norm: " << hh->Integral("width") << endl;
+            hh->SetMarkerStyle(8);
+            hh->SetMarkerSize(1);
+            hh->SetMarkerColor(kBlack);
+            hh->SetLineColor(kBlack);
+            hh->SetLineWidth(1);
+            hh->SetMaximum(0.4);
+            hh->SetMinimum(0);
+
+            hh->Draw("E");
+
+            auto* legend = new TLegend(0.6, 0.6, 0.85, 0.88);
+
+            if(tag.Contains("700")){
+              g_675->SetLineColor(kRed);
+              g_675->Draw("sames C");
+              legend->AddEntry(hh, "Pion KE 675 MeV", "lep");
+              legend->AddEntry(g_675, "Geant4 Prediction", "l");
+            }
+            else if(tag.Contains("800")){
+              g_775->SetLineColor(kRed);
+              g_775->Draw("sames C");
+              legend->AddEntry(hh, "Pion KE 775 MeV", "lep");
+              legend->AddEntry(g_775, "Geant4 Prediction", "l");
+            }
+            else if(tag.Contains("900")){
+              g_875->SetLineColor(kRed);
+              g_875->Draw("sames C");
+              legend->AddEntry(hh, "Pion KE 875 MeV", "lep");
+              legend->AddEntry(g_875, "Geant4 Prediction", "l");
+            }
+          
+            legend->Draw("same");
+
+            c1->Update();
+            c1->cd();
+            TPad *pad2 = new TPad(Form("pad2_%d",ii), Form("pad2_%d",ii), 0, 0, 1, 0.2);
+            
+            pad2->SetTopMargin(0.03);
+            pad2->SetBottomMargin(0.42);
+            pad2->SetGridx();
+            pad2->SetGridy();
+            pad2->Draw();
+            pad2->cd();
+
+            TH1D *hratio = (TH1D*)hh->Clone(Form("hratio_%d",ii));
+
+            const Int_t x0_x = hh->GetXaxis()->GetFirst();
+            const Int_t x1_x = hh->GetXaxis()->GetLast();
+
+            hratio->Scale(0);
+
+            for(Int_t ix=x0_x; ix<=x1_x; ix++){
+              double bin_center = hh->GetBinCenter(ix);
+              double MC = 0;
+              if(tag.Contains("700")) MC = g_675->Eval(bin_center);
+              else if(tag.Contains("800")) MC = g_775->Eval(bin_center);
+              else if(tag.Contains("900")) MC = g_875->Eval(bin_center);
+              double data = hh->GetBinContent(ix);
+              double edata = hh->GetBinError(ix);
+              if(MC != 0){
+                double ratio = data/MC;
+                hratio->SetBinContent(ix,ratio);
+                double error = sqrt(ratio*ratio*(pow(edata/data,2)));
+                hratio->SetBinError(ix,error);
+
+              }
+              //cout << "bin: " << hratio->GetBinContent(ix) << endl;
+            }
+            hratio->SetTitle(" ");
+            //hratio->Divide(hsum);
+            DrawDataMCRatio(hratio,true);
+
+            c1->cd();
+          }
+
+          // Three Theta truth diff. xsec plots
+          else if (tag.Contains("DiffCEXxsec") && tag.Contains("Theta") && !tag.Contains("Cos")){
+            
+            TPad *pad1 = new TPad(Form("pad1_%d",ii), Form("pad1_%d",ii), 0, 0.2, 1, 0.98);
+            // Set 0.01 will hide axis label
+            pad1->SetBottomMargin(0.01);
+            //  pad1->SetGridx();
+            //  pad1->SetGridy();
+            pad1->Draw();
+            pad1->cd();
+
+            // Thin-Slice
+            //TString CEXname = "i001hTruthIncidentHist_CEXxsec";
+            // E-Slice
+            TString CEXname = "i001hTruthIncidentHist_CalCEXxsec";
+            TH1D *CEXInteractingHist = (TH1D*)lout->FindObject(CEXname);
+
+            //cout << " no norm: " << hh->Integral("width") << endl;
+            hh->Scale(1/20.0);
+            //cout << " after norm: " << hh->Integral("width") << endl;
+
+            SetTitleFormat(hh);
+            
+            if(tag.Contains("700")) hh->Scale(CEXInteractingHist->GetBinContent(14));
+            else if(tag.Contains("800")) hh->Scale(CEXInteractingHist->GetBinContent(16));
+            else if(tag.Contains("900")) hh->Scale(CEXInteractingHist->GetBinContent(18));
+
+            
+            hh->SetMarkerStyle(8);
+            hh->SetMarkerSize(1);
+            hh->SetMarkerColor(kBlack);
+            hh->SetLineColor(kBlack);
+            hh->SetLineWidth(1);
+            //hh->SetMaximum(0.4);
+            hh->SetMinimum(0);
+
+            hh->Draw("E");
+
+            auto* legend = new TLegend(0.6, 0.6, 0.85, 0.88);
+
+            if(tag.Contains("700")){
+              g_675theta->SetLineColor(kRed);
+              g_675theta->Draw("sames C");
+              legend->AddEntry(hh, "Pion KE 675 MeV", "lep");
+              legend->AddEntry(g_675theta, "Geant4 Prediction", "l");
+            }
+            else if(tag.Contains("800")){
+              g_775theta->SetLineColor(kRed);
+              g_775theta->Draw("sames C");
+              legend->AddEntry(hh, "Pion KE 775 MeV", "lep");
+              legend->AddEntry(g_775theta, "Geant4 Prediction", "l");
+            }
+            else if(tag.Contains("900")){
+              g_875theta->SetLineColor(kRed);
+              g_875theta->Draw("sames C");
+              legend->AddEntry(hh, "Pion KE 875 MeV", "lep");
+              legend->AddEntry(g_875theta, "Geant4 Prediction", "l");
+            }
+          
+            legend->Draw("same");
+
+            c1->Update();
+            c1->cd();
+            TPad *pad2 = new TPad(Form("pad2_%d",ii), Form("pad2_%d",ii), 0, 0, 1, 0.2);
+            
+            pad2->SetTopMargin(0.03);
+            pad2->SetBottomMargin(0.42);
+            pad2->SetGridx();
+            pad2->SetGridy();
+            pad2->Draw();
+            pad2->cd();
+
+            TH1D *hratio = (TH1D*)hh->Clone(Form("hratio_%d",ii));
+
+            const Int_t x0_x = hh->GetXaxis()->GetFirst();
+            const Int_t x1_x = hh->GetXaxis()->GetLast();
+
+            hratio->Scale(0);
+
+            for(Int_t ix=x0_x; ix<=x1_x; ix++){
+              double bin_center = hh->GetBinCenter(ix);
+              double MC = 0;
+              if(tag.Contains("700")) MC = g_675theta->Eval(bin_center);
+              else if(tag.Contains("800")) MC = g_775theta->Eval(bin_center);
+              else if(tag.Contains("900")) MC = g_875theta->Eval(bin_center);
+              double data = hh->GetBinContent(ix);
+              double edata = hh->GetBinError(ix);
+              if(MC != 0){
+                double ratio = data/MC;
+                hratio->SetBinContent(ix,ratio);
+                double error = sqrt(ratio*ratio*(pow(edata/data,2)));
+                hratio->SetBinError(ix,error);
+
+              }
+              //cout << "bin: " << hratio->GetBinContent(ix) << endl;
+            }
+            hratio->SetTitle(" ");
+            //hratio->Divide(hsum);
+            DrawDataMCRatio(hratio,true);
+
+            c1->cd();
+          }
+
+
+          // Three Cos Theta truth diff. xsec plots
+          else if (tag.Contains("DiffCEXxsec") && tag.Contains("Theta") && tag.Contains("Cos")){
+            
+            TPad *pad1 = new TPad(Form("pad1_%d",ii), Form("pad1_%d",ii), 0, 0.2, 1, 0.98);
+            // Set 0.01 will hide axis label
+            pad1->SetBottomMargin(0.01);
+            //  pad1->SetGridx();
+            //  pad1->SetGridy();
+            pad1->Draw();
+            pad1->cd();
+
+            // Thin-Slice
+            //TString CEXname = "i001hTruthIncidentHist_CEXxsec";
+            // E-Slice
+            TString CEXname = "i001hTruthIncidentHist_CalCEXxsec";
+            TH1D *CEXInteractingHist = (TH1D*)lout->FindObject(CEXname);
+
+            //cout << " no norm: " << hh->Integral("width") << endl;
+            hh->Scale(1/0.2);
+            //cout << " after norm: " << hh->Integral("width") << endl;
+
+            SetTitleFormat(hh);
+            
+            if(tag.Contains("700")) hh->Scale(CEXInteractingHist->GetBinContent(14));
+            else if(tag.Contains("800")) hh->Scale(CEXInteractingHist->GetBinContent(16));
+            else if(tag.Contains("900")) hh->Scale(CEXInteractingHist->GetBinContent(18));
+
+            
+            hh->SetMarkerStyle(8);
+            hh->SetMarkerSize(1);
+            hh->SetMarkerColor(kBlack);
+            hh->SetLineColor(kBlack);
+            hh->SetLineWidth(1);
+            hh->SetMaximum(240);
+            hh->SetMinimum(0);
+
+            hh->Draw("E");
+
+            auto* legend = new TLegend(0.15, 0.6, 0.4, 0.88);
+
+            if(tag.Contains("700")){
+              g_675costheta->SetLineColor(kRed);
+              g_675costheta->Draw("sames C");
+              legend->AddEntry(hh, "Pion KE 675 MeV", "lep");
+              legend->AddEntry(g_675costheta, "Geant4 Prediction", "l");
+            }
+            else if(tag.Contains("800")){
+              g_775costheta->SetLineColor(kRed);
+              g_775costheta->Draw("sames C");
+              legend->AddEntry(hh, "Pion KE 775 MeV", "lep");
+              legend->AddEntry(g_775costheta, "Geant4 Prediction", "l");
+            }
+            else if(tag.Contains("900")){
+              g_875costheta->SetLineColor(kRed);
+              g_875costheta->Draw("sames C");
+              legend->AddEntry(hh, "Pion KE 875 MeV", "lep");
+              legend->AddEntry(g_875costheta, "Geant4 Prediction", "l");
+            }
+          
+            legend->Draw("same");
+
+            c1->Update();
+            c1->cd();
+            TPad *pad2 = new TPad(Form("pad2_%d",ii), Form("pad2_%d",ii), 0, 0, 1, 0.2);
+            
+            pad2->SetTopMargin(0.03);
+            pad2->SetBottomMargin(0.42);
+            pad2->SetGridx();
+            pad2->SetGridy();
+            pad2->Draw();
+            pad2->cd();
+
+            TH1D *hratio = (TH1D*)hh->Clone(Form("hratio_%d",ii));
+
+            const Int_t x0_x = hh->GetXaxis()->GetFirst();
+            const Int_t x1_x = hh->GetXaxis()->GetLast();
+
+            hratio->Scale(0);
+
+            for(Int_t ix=x0_x; ix<=x1_x; ix++){
+              double bin_center = hh->GetBinCenter(ix);
+              double MC = 0;
+              if(tag.Contains("700")) MC = g_675costheta->Eval(bin_center);
+              else if(tag.Contains("800")) MC = g_775costheta->Eval(bin_center);
+              else if(tag.Contains("900")) MC = g_875costheta->Eval(bin_center);
+              double data = hh->GetBinContent(ix);
+              double edata = hh->GetBinError(ix);
+              if(MC != 0){
+                double ratio = data/MC;
+                hratio->SetBinContent(ix,ratio);
+                double error = sqrt(ratio*ratio*(pow(edata/data,2)));
+                hratio->SetBinError(ix,error);
+
+              }
+              //cout << "bin: " << hratio->GetBinContent(ix) << endl;
+            }
+            hratio->SetTitle(" ");
+            //hratio->Divide(hsum);
+            DrawDataMCRatio(hratio,true);
+
+            c1->cd();
+          }
+
+          // i031hUnFoldedPi0KEHist_DiffCEXRecoxsec800
+          // Rec. plus Truth. final diff xsec plot
+          else if (tag.Contains("_DiffCEXRecoxsec800") && !tag.Contains("Data")){
+
+            TPad *pad1 = new TPad(Form("pad1_%d",ii), Form("pad1_%d",ii), 0, 0.2, 1, 0.98);
+            // Set 0.01 will hide axis label
+            pad1->SetBottomMargin(0.01);
+            //  pad1->SetGridx();
+            //  pad1->SetGridy();
+            pad1->Draw();
+            pad1->cd();
+
+            //hh->Scale(1/50.0);
+            SetTitleFormat(hh);
+            // Thin-slice
+            //TString CEXname = "i026hUnFoldedIncidentHist_xsec";
+            // E-slice
+            TString CEXname = "i027hUnFoldedBeamIncidentHist_xsec";
+            TH1D *CEXInteractingHist = (TH1D*)lout->FindObject(CEXname);
+            hh->Scale(CEXInteractingHist->GetBinContent(16));
+            //cout << "scale(16): " << CEXInteractingHist->GetBinContent(16) << endl;
+
+            hh->SetMarkerStyle(8);
+            hh->SetMarkerSize(1);
+            hh->SetMarkerColor(kBlack);
+            hh->SetLineColor(kBlack);
+            hh->SetLineWidth(1);
+            //hh->SetMaximum(0.4);
+            hh->SetMinimum(0.);
+
+            //hh->Draw("E");
+
+            if(!tag.Contains("Theta")){
+              hh->Scale(1/50.0);
+              hh->SetMaximum(0.4);
+              hh->SetMinimum(0.);
+              hh->Draw("E");
+              TString TruthCEXname = "i001hTruthIncidentHist_DiffCEXxsec800";
+              TH1D *holay_truth = (TH1D*)lout->FindObject(TruthCEXname);
+
+
+              holay_truth->SetMarkerStyle(8);
+              holay_truth->SetMarkerSize(1);
+              holay_truth->SetMarkerColor(kBlue);
+              holay_truth->SetMarkerStyle(kFullSquare);
+              holay_truth->SetLineColor(kBlue);
+              holay_truth->SetLineWidth(1);
+              holay_truth->Draw("sames E1");
+
+              auto* legend = new TLegend(0.6, 0.5, 0.85, 0.88);
+              g_775->SetLineColor(kRed);
+              g_775->Draw("sames C");
+              legend->AddEntry(holay_truth, "MC Truth T_{beam #pi^{+}} = 775 MeV", "lep");
+              legend->AddEntry(hh, "MC Reco T_{beam #pi^{+}} = 775 MeV", "lep");
+              legend->AddEntry(g_775, "Geant4 Prediction", "l");
+              
+              TString lheader("Fake Data (Full MC sample)");
+              legend->SetHeader(lheader);
+              //legend->SetHeader("#splitline{Fake Data (Full MC sample)}{T_{beam #pi^{+}} = 775 MeV}");
+              legend->Draw("same");
+            }
+
+
+            if(tag.Contains("CosTheta")){
+              hh->Scale(1/0.2);
+              //hh->SetMaximum(0.4);
+              hh->SetMinimum(0.);
+              hh->Draw("E");
+              TString TruthCEXname = "i001hTruthIncidentHist_DiffCEXxsecCosTheta800";
+              TH1D *holay_truth = (TH1D*)lout->FindObject(TruthCEXname);
+
+              holay_truth->SetMarkerStyle(8);
+              holay_truth->SetMarkerSize(1);
+              holay_truth->SetMarkerColor(kBlue);
+              holay_truth->SetMarkerStyle(kFullSquare);
+              holay_truth->SetLineColor(kBlue);
+              holay_truth->SetLineWidth(1);
+              holay_truth->Draw("sames E1");
+
+              auto* legend = new TLegend(0.15, 0.5, 0.45, 0.88);
+              g_775costheta->SetLineColor(kRed);
+              g_775costheta->Draw("sames C");
+              legend->AddEntry(holay_truth, "MC Truth T_{beam #pi^{+}} = 775 MeV", "lep");
+              legend->AddEntry(hh, "MC Reco T_{beam #pi^{+}} = 775 MeV", "lep");
+              legend->AddEntry(g_775costheta, "Geant4 Prediction", "l");
+              
+              TString lheader("Fake Data (Full MC sample)");
+              legend->SetHeader(lheader);
+              //legend->SetHeader("#splitline{Fake Data (Full MC sample)}{T_{beam #pi^{+}} = 775 MeV}");
+              legend->Draw("same");
+            }
+
+            if(tag.Contains("Theta") && !tag.Contains("Cos")){
+              hh->Scale(1/20.0);
+
+              //hh->SetMaximum(0.4);
+              hh->SetMinimum(0.);
+              hh->Draw("E");
+              TString TruthCEXname = "i001hTruthIncidentHist_DiffCEXxsecTheta800";
+              TH1D *holay_truth = (TH1D*)lout->FindObject(TruthCEXname);
+
+              holay_truth->SetMarkerStyle(8);
+              holay_truth->SetMarkerSize(1);
+              holay_truth->SetMarkerColor(kBlue);
+              holay_truth->SetMarkerStyle(kFullSquare);
+              holay_truth->SetLineColor(kBlue);
+              holay_truth->SetLineWidth(1);
+              holay_truth->Draw("sames E1");
+
+              auto* legend = new TLegend(0.6, 0.5, 0.85, 0.88);
+              g_775theta->SetLineColor(kRed);
+              g_775theta->Draw("sames C");
+              legend->AddEntry(holay_truth, "MC Truth T_{beam #pi^{+}} = 775 MeV", "lep");
+              legend->AddEntry(hh, "MC Reco T_{beam #pi^{+}} = 775 MeV", "lep");
+              legend->AddEntry(g_775theta, "Geant4 Prediction", "l");
+              
+              TString lheader("Fake Data (Full MC sample)");
+              legend->SetHeader(lheader);
+              //legend->SetHeader("#splitline{Fake Data (Full MC sample)}{T_{beam #pi^{+}} = 775 MeV}");
+              legend->Draw("same");
+            }
+
+            c1->Update();
+            c1->cd();
+            TPad *pad2 = new TPad(Form("pad2_%d",ii), Form("pad2_%d",ii), 0, 0, 1, 0.2);
+            
+            pad2->SetTopMargin(0.03);
+            pad2->SetBottomMargin(0.42);
+            pad2->SetGridx();
+            pad2->SetGridy();
+            pad2->Draw();
+            pad2->cd();
+
+            TH1D *hratio = (TH1D*)hh->Clone(Form("hratio_%d",ii));
+
+            const Int_t x0_x = hh->GetXaxis()->GetFirst();
+            const Int_t x1_x = hh->GetXaxis()->GetLast();
+
+            hratio->Scale(0);
+
+            for(Int_t ix=x0_x; ix<=x1_x; ix++){
+              double bin_center = hh->GetBinCenter(ix);
+              double MC = 0;
+              //if(tag.Contains("700")) MC = g_675->Eval(bin_center);
+              //else if(tag.Contains("800")) MC = g_775->Eval(bin_center);
+              //else if(tag.Contains("900")) MC = g_875->Eval(bin_center);
+              if(!tag.Contains("Theta")) MC = g_775->Eval(bin_center);
+              if(tag.Contains("CosTheta")) MC = g_775costheta->Eval(bin_center);
+              if(tag.Contains("Theta") && !tag.Contains("Cos")) MC = g_775theta->Eval(bin_center);
+
+
+              double data = hh->GetBinContent(ix);
+              double edata = hh->GetBinError(ix);
+              if(MC != 0){
+                double ratio = data/MC;
+                hratio->SetBinContent(ix,ratio);
+                double error = sqrt(ratio*ratio*(pow(edata/data,2)));
+                hratio->SetBinError(ix,error);
+
+              }
+              //cout << "bin: " << hratio->GetBinContent(ix) << endl;
+            }
+            hratio->SetTitle(" ");
+            //hratio->Divide(hsum);
+            DrawDataMCRatio(hratio);
+
+            c1->cd();
+
+          }
+/* // Data unfold histogram
+          else if (tag.Contains("_DiffCEXRecoxsec800") && tag.Contains("Data")){
+
+            TPad *pad1 = new TPad(Form("pad1_%d",ii), Form("pad1_%d",ii), 0, 0.2, 1, 0.98);
+            // Set 0.01 will hide axis label
+            pad1->SetBottomMargin(0.01);
+            //  pad1->SetGridx();
+            //  pad1->SetGridy();
+            pad1->Draw();
+            pad1->cd();
+
+            hh->Scale(1/50.0);
+            SetTitleFormat(hh);
+            TString CEXname = "i026hUnFoldedIncidentHistData_xsec";
+            TH1D *CEXInteractingHist = (TH1D*)lout->FindObject(CEXname);
+            hh->Scale(CEXInteractingHist->GetBinContent(16));
+            cout << "scale(16): " << CEXInteractingHist->GetBinContent(16) << endl;
+
+            hh->SetMarkerStyle(8);
+            hh->SetMarkerSize(1);
+            hh->SetMarkerColor(kBlack);
+            hh->SetLineColor(kBlack);
+            hh->SetLineWidth(1);
+            hh->SetMaximum(0.4);
+            hh->SetMinimum(0);
+
+            hh->Draw("E");
+
+            
+
+            auto* legend = new TLegend(0.6, 0.6, 0.85, 0.88);
+            g_775->SetLineColor(kRed);
+            g_775->Draw("sames C");
+            //legend->AddEntry(holay_truth, "MC Truth 775 MeV", "lep");
+            legend->AddEntry(hh, "MC Reco 775 MeV", "lep");
+            legend->AddEntry(g_775, "Geant4 Prediction", "l");
+            
+            TString lheader("Fake Data (Full MC sample)");
+            legend->SetHeader(lheader);
+            legend->Draw("same");
+
+
+            c1->Update();
+            c1->cd();
+            TPad *pad2 = new TPad(Form("pad2_%d",ii), Form("pad2_%d",ii), 0, 0, 1, 0.2);
+            
+            pad2->SetTopMargin(0.03);
+            pad2->SetBottomMargin(0.42);
+            pad2->SetGridx();
+            pad2->SetGridy();
+            pad2->Draw();
+            pad2->cd();
+
+            TH1D *hratio = (TH1D*)hh->Clone(Form("hratio_%d",ii));
+
+            const Int_t x0_x = hh->GetXaxis()->GetFirst();
+            const Int_t x1_x = hh->GetXaxis()->GetLast();
+
+            hratio->Scale(0);
+
+            for(Int_t ix=x0_x; ix<=x1_x; ix++){
+              double bin_center = hh->GetBinCenter(ix);
+              double MC = 0;
+              //if(tag.Contains("700")) MC = g_675->Eval(bin_center);
+              //else if(tag.Contains("800")) MC = g_775->Eval(bin_center);
+              //else if(tag.Contains("900")) MC = g_875->Eval(bin_center);
+              MC = g_775->Eval(bin_center);
+              double data = hh->GetBinContent(ix);
+              double edata = hh->GetBinError(ix);
+              if(MC != 0){
+                double ratio = data/MC;
+                hratio->SetBinContent(ix,ratio);
+                double error = sqrt(ratio*ratio*(pow(edata/data,2)));
+                hratio->SetBinError(ix,error);
+
+              }
+              //cout << "bin: " << hratio->GetBinContent(ix) << endl;
+            }
+            hratio->SetTitle(" ");
+            //hratio->Divide(hsum);
+            DrawDataMCRatio(hratio);
+
+            c1->cd();
+
+          }*/
+
+/*
+          else if (tag.Contains("DiffCEXxsec800")){
+
+              TString CEXname = "i001hTruthIncidentHist_CEXxsec";
+              TH1D *CEXInteractingHist = (TH1D*)lout->FindObject(CEXname);
+
+              cout << " no norm: " << hh->Integral("width") << endl;
+              hh->Scale(1/50.0);
+              cout << " mid norm: " << hh->Integral("width") << endl;
+              //hh->Scale(g_cex->Eval(800));
+              //cout << "evl: " << g_cex->Eval(800) << endl;
+              hh->Scale(CEXInteractingHist->GetBinContent(16));
+              cout << "evl 800: " << g_cex->Eval(800) << endl;
+              cout << "evl hand 800: " << CEXInteractingHist->GetBinContent(16) << endl;
+              cout << "norm: " << hh->Integral("width") << endl;
+              hh->SetMarkerStyle(8);
+              hh->SetMarkerSize(1);
+              hh->SetMarkerColor(kBlack);
+              hh->SetLineColor(kBlack);
+              hh->SetLineWidth(1);
+              hh->SetMaximum(0.4);
+              hh->SetMinimum(0);
+
+              hh->Draw("E");
+
+              g_775->SetLineColor(kRed);
+              g_775->Draw("sames C");
+
+              auto* legend = new TLegend(0.6, 0.6, 0.85, 0.88);
+              legend->AddEntry(hh, "Pion KE 800 MeV", "lep");
+              legend->AddEntry(g_775, "Geant4 Prediction", "l");
+              legend->Draw("same");
+          }
+
+          else if (tag.Contains("DiffCEXxsec900")){
+
+              TString CEXname = "i001hTruthIncidentHist_CEXxsec";
+              TH1D *CEXInteractingHist = (TH1D*)lout->FindObject(CEXname);
+
+              cout << " no norm: " << hh->Integral("width") << endl;
+              hh->Scale(1/50.0);
+              cout << " mid norm: " << hh->Integral("width") << endl;
+              //hh->Scale(g_cex->Eval(900));
+              //cout << "evl: " << g_cex->Eval(900) << endl;
+              hh->Scale(CEXInteractingHist->GetBinContent(18));
+              cout << "evl 900: " << g_cex->Eval(900) << endl;
+              cout << "evl hand 900: " << CEXInteractingHist->GetBinContent(16) << endl;
+              cout << "norm: " << hh->Integral("width") << endl;
+              hh->SetMarkerStyle(8);
+              hh->SetMarkerSize(1);
+              hh->SetMarkerColor(kBlack);
+              hh->SetLineColor(kBlack);
+              hh->SetLineWidth(1);
+              hh->SetMaximum(0.4);
+              hh->SetMinimum(0);
+
+              hh->Draw("E");
+
+              g_875->SetLineColor(kRed);
+              g_875->Draw("sames C");
+
+
+              auto* legend = new TLegend(0.6, 0.6, 0.85, 0.88);
+              legend->AddEntry(hh, "Pion KE 900 MeV", "lep");
+              legend->AddEntry(g_875, "Geant4 Prediction", "l");
+              legend->Draw("same");
+          }
+*/
+          else if(tag.Contains("i011hTruthDiffCEXInteractingHist_100MeV")){
+        
+            TString Name200MeV = "i010hTruthDiffCEXInteractingHist_200MeV";
+            TString Name300MeV = "i009hTruthDiffCEXInteractingHist_300MeV";
+            TString Name500MeV = "i008hTruthDiffCEXInteractingHist_500MeV";
+            TString Name600MeV = "i005hTruthDiffCEXInteractingHist_700MeV";
+            TString Name800MeV = "i006hTruthDiffCEXInteractingHist_800MeV";
+            TString Name900MeV = "i007hTruthDiffCEXInteractingHist_900MeV";
+            TString NameSum = "i012hTruthDiffCEXInteractingHist";
+
+            TH1D *DiffCEXInteractingHist_900MeV = (TH1D*)lout->FindObject(Name900MeV);
+            TH1D *DiffCEXInteractingHist_800MeV = (TH1D*)lout->FindObject(Name800MeV);
+            TH1D *DiffCEXInteractingHist_600MeV = (TH1D*)lout->FindObject(Name600MeV);
+            TH1D *DiffCEXInteractingHist_500MeV = (TH1D*)lout->FindObject(Name500MeV);
+            TH1D *DiffCEXInteractingHist_300MeV = (TH1D*)lout->FindObject(Name300MeV);
+            TH1D *DiffCEXInteractingHist_200MeV = (TH1D*)lout->FindObject(Name200MeV);
+
+            TH1D *DiffCEXInteractingHist_Sum = (TH1D*)lout->FindObject(NameSum);
+
+
+            const int * cols = GetColorArray();
+
+            hh->SetMaximum(500);
+
+            DiffCEXInteractingHist_900MeV->SetLineColor(GetColor(cols[0]));
+            hh->Draw("sames C");
+
+            DiffCEXInteractingHist_900MeV->SetLineColor(GetColor(cols[1]));
+            DiffCEXInteractingHist_900MeV->Draw("sames C");
+
+            DiffCEXInteractingHist_800MeV->SetLineColor(GetColor(cols[2]));
+            DiffCEXInteractingHist_800MeV->Draw("sames C");
+
+            DiffCEXInteractingHist_600MeV->SetLineColor(GetColor(cols[3]));
+            DiffCEXInteractingHist_600MeV->Draw("sames C");
+
+            DiffCEXInteractingHist_500MeV->SetLineColor(GetColor(cols[4]));
+            DiffCEXInteractingHist_500MeV->Draw("sames C");
+
+            DiffCEXInteractingHist_300MeV->SetLineColor(GetColor(cols[5]));
+            DiffCEXInteractingHist_300MeV->Draw("sames C");
+
+            DiffCEXInteractingHist_200MeV->SetLineColor(GetColor(cols[6]));
+            DiffCEXInteractingHist_200MeV->Draw("sames C");
+
+            DiffCEXInteractingHist_Sum->SetLineColor(kBlack);
+            DiffCEXInteractingHist_Sum->Draw("sames C");
+
+
+            auto* legend = new TLegend(0.72, 0.55, 0.85, 0.88);
+              
+            legend->AddEntry(hh, "100MeV", "f");
+            legend->AddEntry(DiffCEXInteractingHist_200MeV, "200MeV", "f");
+            legend->AddEntry(DiffCEXInteractingHist_300MeV, "300MeV", "f");
+            legend->AddEntry(DiffCEXInteractingHist_500MeV, "500MeV", "f");
+            legend->AddEntry(DiffCEXInteractingHist_600MeV, "700MeV", "f");
+            legend->AddEntry(DiffCEXInteractingHist_800MeV, "800MeV", "f");
+            legend->AddEntry(DiffCEXInteractingHist_900MeV, "900MeV", "f");
+
+            legend->AddEntry(DiffCEXInteractingHist_Sum, "Total", "f");
+            legend->Draw("same");
+          
+          }
+
+          else if(tag.Contains("i017hRecoIncidentHist")){
+
+            TString truthMatchedInc = "i019hTruthMatchedIncidentHist";
+            TH1D *holay = (TH1D*)lout->FindObject(truthMatchedInc);
+
+            TString recoBckSubInc = "i021hRecoBckSubIncidentHist";
+            TH1D *htmp = (TH1D*)lout->FindObject(recoBckSubInc);
+            TH1D *holaybckSub = (TH1D*)htmp->Clone("hint");
+            //TH1D *holaybckSub = (TH1D*)lout->FindObject(recoBckSubInc);
+
+            TString BckInc = "i023hNonPionBeamIncidentHist";
+            TH1D *holaybck = (TH1D*)lout->FindObject(BckInc);
+            
+            hh->SetMarkerStyle(8);
+            hh->SetMarkerSize(1);
+            hh->SetMarkerColor(kBlack);
+            hh->SetLineColor(kBlack);
+            hh->SetLineWidth(1);
+            hh->Draw("e1");
+
+            holaybckSub->SetMarkerStyle(8);
+            holaybckSub->SetMarkerSize(1);
+            holaybckSub->SetMarkerColor(kBlue);
+            holaybckSub->SetLineColor(kBlue);
+            holaybckSub->SetLineWidth(1);
+            holaybckSub->Add(holaybck,-1);
+            holaybckSub->Draw("e1 sames");
+
+            holay->SetLineColor(kRed);
+            holay->Draw("hist sames");
+            
+          }
+
+          else if(tag.Contains("i018hRecoInteractingHist")){
+
+            TString truthMatchedInt = "i020hTruthMatchedInteractingHist";
+            TH1D *holay = (TH1D*)lout->FindObject(truthMatchedInt);
+
+            TString recoBckSubInt = "i022hRecoBckSubInteractingHist";
+            TH1D *htmp = (TH1D*)lout->FindObject(recoBckSubInt);
+            TH1D *holaybckSub = (TH1D*)htmp->Clone("hint");
+            //TH1D *holaybckSub = (TH1D*)lout->FindObject(recoBckSubInt);
+
+            TString BckInc = "i024hNonPionBeamInteractingHist";
+            TH1D *holaybck = (TH1D*)lout->FindObject(BckInc);
+            
+            hh->SetMarkerStyle(8);
+            hh->SetMarkerSize(1);
+            hh->SetMarkerColor(kBlack);
+            hh->SetLineColor(kBlack);
+            hh->SetLineWidth(1);
+            hh->Draw("e1");
+
+            holaybckSub->SetMarkerStyle(8);
+            holaybckSub->SetMarkerSize(1);
+            holaybckSub->SetMarkerColor(kBlue);
+            holaybckSub->SetLineColor(kBlue);
+            holaybckSub->SetLineWidth(1);
+            holaybckSub->Add(holaybck,-1);
+            holaybckSub->Draw("e1 sames");
+
+            holay->SetLineColor(kRed);
+            holay->Draw("hist sames");
+            
+          }
+/*
+          else if(tag.Contains("i000hTruthInitialHist")){
+
+            // hh is initial
+            // hint is interacting
+            // hinc is incident
+            TH1D *hini = (TH1D*)hh->Clone("hini");
+
+            TString intHist = "i002hTruthInteractingHist";
+            TH1D *hint = (TH1D*)lout->FindObject(intHist);
+
+            TString incHist = "i001hTruthIncidentHist";
+            TH1D *hinc = (TH1D*)lout->FindObject(incHist);
+
+            const Int_t x0 = hh->GetXaxis()->GetFirst();
+            const Int_t x1 = hh->GetXaxis()->GetLast();
+            cout << "x0: " << x0 << endl;
+            cout << "x1: " << x1 << endl;
+
+            hini->Scale(0);
+
+            for(Int_t ix=x1; ix>=x0; ix--){
+              double iniN = 0;
+              double intN = 0;
+              for(Int_t jx=x1; jx>=ix; jx--){
+                iniN += hh->GetBinContent(jx);
+              }
+              for(Int_t jx=x1; jx>=ix-1; jx--){
+                intN += hint->GetBinContent(jx);
+              }
+              cout << "iniN: " << iniN << endl;
+              cout << "intN: " << intN << endl;
+              cout << "iniN - intN: " << iniN - intN << endl;
+              hini->SetBinContent(ix,iniN-intN);
+              //hh->SetBinError(ix,error);
+            }
+
+            hini->Draw("hist");
+            hinc->Draw("sames e1");
+            //hh->Draw("hist");
+            
+          }
+*/
+          else if(tag.Contains("i000hTruthBeamIncidentHist")){
+
+            TString CalcInc = "i001hTruthBeamCalcIncidentHist";
+            TH1D *hcalint = (TH1D*)lout->FindObject(CalcInc);
+
+            TString CalcIncOld = "i000hTruthBeamIncidentHistOldM";
+            TH1D *hcalintOld = (TH1D*)lout->FindObject(CalcIncOld);
+
+            
+
+            hh->SetLineColor(kRed);
+            //hh->Rebin(50);
+            hh->Draw("hist");
+
+            hcalint->SetLineColor(kBlue);
+            //hcalint->Rebin(50);
+            hcalint->Draw("e1 sames");
+
+            hcalintOld->SetLineColor(kGreen);
+            //hcalintOld->Rebin(50);
+            hcalintOld->Draw("hist sames");
+
+            TLegend * lg = new TLegend(0.15, 0.58, 0.48, 0.88);
+            TString lheader("Fake Data (1/2 MC sample)");
+            lg->SetHeader(lheader);
+            lg->AddEntry(hh, "(IniE - IntE)/Eslice", "l");
+            lg->AddEntry(hcalint, "Ini-Int Hist Substraction", "l");
+            lg->AddEntry(hcalintOld, "Jake's Method", "l");
+
+
+            lg->Draw("sames");
+
+          } 
+
+          // This is the initial histogram plot (bck sub && unfolding && truth)
+          else if(tag.Contains("i000hTruthBeamInitialHist") && !tag.Contains("50MeVbin")){
+
+            TString recoBckSubInc = "i016hRecoInitialHist";
+            TH1D *htmp = (TH1D*)lout->FindObject(recoBckSubInc);
+            TH1D *holaybckSub = (TH1D*)htmp->Clone("hint");
+            holaybckSub->Rebin(50);
+            //TH1D *holaybckSub = (TH1D*)lout->FindObject(recoBckSubInc);
+            TString UnfoldInc = "i024hUnFoldedInitialHist";
+            TH1D *holayunfold = (TH1D*)lout->FindObject(UnfoldInc);
+            holayunfold->Rebin(50);
+
+            hh->Rebin(50);
+            hh->SetMaximum(hh->GetMaximum()*1.5);
+
+            hh->SetLineColor(kRed);
+            hh->Draw("hist");
+
+            holaybckSub->SetMarkerStyle(8);
+            holaybckSub->SetMarkerSize(1);
+            holaybckSub->SetMarkerColor(kGreen+3);
+            holaybckSub->SetLineColor(kGreen+3);
+            holaybckSub->SetLineWidth(1);
+            //holaybckSub->Add(holaybck,-1);
+            holaybckSub->Draw("e1 sames");
+
+            holayunfold->SetMarkerStyle(8);
+            holayunfold->SetMarkerSize(1);
+            holayunfold->SetMarkerColor(kBlack);
+            holayunfold->SetLineColor(kBlack);
+            holayunfold->SetLineWidth(1);
+            //holayunfold->Add(holaybck,-1);
+            holayunfold->Draw("e1 sames");
+
+            TLegend * lg = new TLegend(0.15, 0.58, 0.48, 0.88);
+            TString lheader("Fake Data (1/2 MC sample)");
+            lg->SetHeader(lheader);
+            lg->AddEntry(hh, "MC Truth", "l");
+            lg->AddEntry(holaybckSub, "Bck Sub", "lp");
+            lg->AddEntry(holayunfold, "Unfolded", "lp");
+
+            lg->Draw("sames");
+
+          }
+
+          // This is the beam interacting histogram plot (bck sub && unfolding && truth)
+          else if(tag.Contains("i002hTruthBeamInteractingHist") && !tag.Contains("50MeVbin")){
+
+            TString recoBckSubInc = "i016hRecoBeamInteractingHist";
+            TH1D *htmp = (TH1D*)lout->FindObject(recoBckSubInc);
+            TH1D *holaybckSub = (TH1D*)htmp->Clone("hint");
+            holaybckSub->Rebin(50);
+            //TH1D *holaybckSub = (TH1D*)lout->FindObject(recoBckSubInc);
+            TString UnfoldInc = "i024hUnFoldedBeamInteractingHist";
+            TH1D *holayunfold = (TH1D*)lout->FindObject(UnfoldInc);
+            holayunfold->Rebin(50);
+
+            hh->Rebin(50);
+            hh->SetMaximum(hh->GetMaximum()*1.5);
+
+            hh->SetLineColor(kRed);
+            hh->Draw("hist");
+
+            holaybckSub->SetMarkerStyle(8);
+            holaybckSub->SetMarkerSize(1);
+            holaybckSub->SetMarkerColor(kGreen+3);
+            holaybckSub->SetLineColor(kGreen+3);
+            holaybckSub->SetLineWidth(1);
+            //holaybckSub->Add(holaybck,-1);
+            holaybckSub->Draw("e1 sames");
+
+            holayunfold->SetMarkerStyle(8);
+            holayunfold->SetMarkerSize(1);
+            holayunfold->SetMarkerColor(kBlack);
+            holayunfold->SetLineColor(kBlack);
+            holayunfold->SetLineWidth(1);
+            //holayunfold->Add(holaybck,-1);
+            holayunfold->Draw("e1 sames");
+
+            TLegend * lg = new TLegend(0.15, 0.58, 0.48, 0.88);
+            TString lheader("Fake Data (1/2 MC sample)");
+            lg->SetHeader(lheader);
+            lg->AddEntry(hh, "MC Truth", "l");
+            lg->AddEntry(holaybckSub, "Bck Sub", "lp");
+            lg->AddEntry(holayunfold, "Unfolded", "lp");
+
+            lg->Draw("sames");
+
+          }
+
+          // This is the beam incident histogram plot (bck sub && unfolding && truth)
+          else if(tag.Contains("i001hTruthBeamCalcIncidentHist")){
+
+            /*TString recoBckSubInc = "i016hRecoBeamInteractingHist";
+            TH1D *htmp = (TH1D*)lout->FindObject(recoBckSubInc);
+            TH1D *holaybckSub = (TH1D*)htmp->Clone("hint");
+            holaybckSub->Rebin(50);*/
+            //TH1D *holaybckSub = (TH1D*)lout->FindObject(recoBckSubInc);
+            TString UnfoldInc = "i027hUnFoldedBeamIncidentHist";
+            TH1D *holayunfold = (TH1D*)lout->FindObject(UnfoldInc);
+            //cout << "i027hUnfoldedBeamIncidentHist total: " << holayunfold->Integral(0,10000) << endl;
+            
+            holayunfold->Rebin(50);
+
+            //hh->Rebin(50);
+            hh->SetMaximum(hh->GetMaximum()*1.5);
+
+            hh->SetLineColor(kRed);
+            hh->Draw("hist");
+
+            /*holaybckSub->SetMarkerStyle(8);
+            holaybckSub->SetMarkerSize(1);
+            holaybckSub->SetMarkerColor(kGreen+3);
+            holaybckSub->SetLineColor(kGreen+3);
+            holaybckSub->SetLineWidth(1);
+            //holaybckSub->Add(holaybck,-1);
+            holaybckSub->Draw("e1 sames");*/
+
+            holayunfold->SetMarkerStyle(8);
+            holayunfold->SetMarkerSize(1);
+            holayunfold->SetMarkerColor(kBlack);
+            holayunfold->SetLineColor(kBlack);
+            holayunfold->SetLineWidth(1);
+            //holayunfold->Add(holaybck,-1);
+            holayunfold->Draw("e1 sames");
+
+            TLegend * lg = new TLegend(0.15, 0.58, 0.48, 0.88);
+            TString lheader("Fake Data (1/2 MC sample)");
+            lg->SetHeader(lheader);
+            lg->AddEntry(hh, "MC Truth", "l");
+            //lg->AddEntry(holaybckSub, "Bck Sub", "lp");
+            lg->AddEntry(holayunfold, "Unfolded", "lp");
+
+            lg->Draw("sames");
+
+          }
+
+          // Data
+          else if(tag.Contains("i029hUnFoldedBeamIncidentHistData")){
+
+            TString truth = "i001hTruthBeamCalcIncidentHist";
+            TH1D *htmp = (TH1D*)lout->FindObject(truth);
+            TH1D *htruth = (TH1D*)htmp->Clone("hint");
+            //htruth->Rebin(50);
+            //TH1D *htruth = (TH1D*)lout->FindObject(recoBckSubInc);
+            TString UnfoldInc = "i027hUnFoldedBeamIncidentHist";
+            TH1D *htmp1 = (TH1D*)lout->FindObject(UnfoldInc);
+            TH1D *holayunfold = (TH1D*)htmp1->Clone("hint1");
+
+            //cout << "i027hUnfoldedBeamIncidentHist total: " << holayunfold->Integral(0,10000) << endl;
+            double scale = hh->Integral(0,10000)/holayunfold->Integral(0,10000);
+
+            hh->Rebin(50);
+            holayunfold->Scale(scale);
+            holayunfold->Rebin(50);
+            holayunfold->SetMaximum(hh->GetMaximum()*1.5);
+            holayunfold->SetMinimum(0.0);
+
+            holayunfold->SetMarkerStyle(8);
+            holayunfold->SetMarkerSize(1);
+            holayunfold->SetMarkerColor(kGreen+3);
+            holayunfold->SetLineColor(kGreen+3);
+            holayunfold->SetLineWidth(1);
+            holayunfold->Draw("e1");
+
+            htruth->SetLineColor(kRed);
+            htruth->Scale(scale);
+            htruth->Draw("hist sames");
+
+            /*htruth->SetMarkerStyle(8);
+            htruth->SetMarkerSize(1);
+            htruth->SetMarkerColor(kGreen+3);
+            htruth->SetLineColor(kGreen+3);
+            htruth->SetLineWidth(1);
+            //htruth->Add(holaybck,-1);
+            htruth->Draw("e1 sames");*/
+
+            hh->SetMarkerStyle(8);
+            hh->SetMarkerSize(1);
+            hh->SetMarkerColor(kBlack);
+            hh->SetLineColor(kBlack);
+            hh->SetLineWidth(1);
+            //hh->Add(holaybck,-1);
+            hh->Draw("e1 sames");
+
+            TLegend * lg = new TLegend(0.15, 0.58, 0.48, 0.88);
+            TString lheader("Real Data (Full sample)");
+            lg->SetHeader(lheader);
+            lg->AddEntry(holayunfold, "MC Reco", "l");
+            lg->AddEntry(htruth, "MC Truth", "l");
+            lg->AddEntry(hh, "Data", "lp");
+
+            lg->Draw("sames");
+
+          }
+
+          // Data
+          else if(tag.Contains("i027hUnFoldedBeamInitialHistData")){
+
+            TString truth = "i000hTruthBeamInitialHist";
+            TH1D *htmp = (TH1D*)lout->FindObject(truth);
+            TH1D *htruth = (TH1D*)htmp->Clone("hint");
+            //htruth->Rebin(50);
+            //TH1D *htruth = (TH1D*)lout->FindObject(recoBckSubInc);
+            TString UnfoldInc = "i024hUnFoldedInitialHist";
+            TH1D *htmp1 = (TH1D*)lout->FindObject(UnfoldInc);
+            TH1D *holayunfold = (TH1D*)htmp1->Clone("hint1");
+            //cout << "i027hUnfoldedBeamIncidentHist total: " << holayunfold->Integral(0,10000) << endl;
+            double scale = hh->Integral(0,10000)/holayunfold->Integral(0,10000);
+
+            hh->Rebin(50);
+            holayunfold->Scale(scale);
+            holayunfold->Rebin(50);
+            holayunfold->SetMaximum(hh->GetMaximum()*1.5);
+            holayunfold->SetMinimum(0.0);
+
+            holayunfold->SetMarkerStyle(8);
+            holayunfold->SetMarkerSize(1);
+            holayunfold->SetMarkerColor(kGreen+3);
+            holayunfold->SetLineColor(kGreen+3);
+            holayunfold->SetLineWidth(1);
+            holayunfold->Draw("e1");
+
+            htruth->SetLineColor(kRed);
+            htruth->Scale(scale);
+            htruth->Draw("hist sames");
+
+            hh->SetMarkerStyle(8);
+            hh->SetMarkerSize(1);
+            hh->SetMarkerColor(kBlack);
+            hh->SetLineColor(kBlack);
+            hh->SetLineWidth(1);
+            //hh->Add(holaybck,-1);
+            hh->Draw("e1 sames");
+
+            TLegend * lg = new TLegend(0.15, 0.58, 0.48, 0.88);
+            TString lheader("Real Data (Full sample)");
+            lg->SetHeader(lheader);
+            lg->AddEntry(holayunfold, "MC Reco", "lp");
+            lg->AddEntry(htruth, "MC Truth", "l");
+            lg->AddEntry(hh, "Data", "lp");
+
+            lg->Draw("sames");
+
+          }
+
+          // Data
+          else if(tag.Contains("i028hUnFoldedBeamInteractingHistData")){
+
+            TString truth = "i002hTruthBeamInteractingHist";
+            TH1D *htmp = (TH1D*)lout->FindObject(truth);
+            TH1D *htruth = (TH1D*)htmp->Clone("hint");
+            //htruth->Rebin(50);
+            //TH1D *htruth = (TH1D*)lout->FindObject(recoBckSubInc);
+            TString UnfoldInc = "i024hUnFoldedBeamInteractingHist";
+            TH1D *htmp1 = (TH1D*)lout->FindObject(UnfoldInc);
+            TH1D *holayunfold = (TH1D*)htmp1->Clone("hint1");
+            //cout << "i027hUnfoldedBeamIncidentHist total: " << holayunfold->Integral(0,10000) << endl;
+            double scale = hh->Integral(0,10000)/holayunfold->Integral(0,10000);
+
+            hh->Rebin(50);
+            holayunfold->Scale(scale);
+            holayunfold->Rebin(50);
+            holayunfold->SetMaximum(hh->GetMaximum()*1.5);
+            holayunfold->SetMinimum(0.0);
+
+            //holayunfold->SetLineColor(kGreen+3);
+            holayunfold->SetMarkerStyle(8);
+            holayunfold->SetMarkerSize(1);
+            holayunfold->SetMarkerColor(kGreen+3);
+            holayunfold->SetLineColor(kGreen+3);
+            holayunfold->SetLineWidth(1);
+            holayunfold->Draw("e1");
+
+            htruth->SetLineColor(kRed);
+            htruth->Scale(scale);
+            htruth->Draw("hist sames");
+
+            hh->SetMarkerStyle(8);
+            hh->SetMarkerSize(1);
+            hh->SetMarkerColor(kBlack);
+            hh->SetLineColor(kBlack);
+            hh->SetLineWidth(1);
+            //hh->Add(holaybck,-1);
+            hh->Draw("e1 sames");
+
+            TLegend * lg = new TLegend(0.15, 0.58, 0.48, 0.88);
+            TString lheader("Real Data (Full sample)");
+            lg->SetHeader(lheader);
+            lg->AddEntry(holayunfold, "MC Reco", "lp");
+            lg->AddEntry(htruth, "MC Truth", "l");
+            lg->AddEntry(hh, "Data", "lp");
+
+            lg->Draw("sames");
+
+          }
+
+          // Data
+          else if(tag.Contains("i025hUnFoldedInteractingHistData")){
+
+            TString truth = "i004hTruthCEXInteractingHist";
+            TH1D *htmp = (TH1D*)lout->FindObject(truth);
+            TH1D *htruth = (TH1D*)htmp->Clone("hint");
+            //htruth->Rebin(50);
+            //TH1D *htruth = (TH1D*)lout->FindObject(recoBckSubInc);
+            TString UnfoldInc = "i025hUnFoldedInteractingHist";
+            TH1D *htmp1 = (TH1D*)lout->FindObject(UnfoldInc);
+            TH1D *holayunfold = (TH1D*)htmp1->Clone("hint1");
+            //cout << "i027hUnfoldedBeamIncidentHist total: " << holayunfold->Integral(0,10000) << endl;
+            double scale = hh->Integral(0,10000)/holayunfold->Integral(0,10000);
+            
+            holayunfold->SetLineColor(kGreen+3);
+            holayunfold->Scale(scale);
+            holayunfold->SetMaximum(holayunfold->GetMaximum()*1.5);
+            holayunfold->SetMinimum(0.0);
+
+            holayunfold->SetMarkerStyle(8);
+            holayunfold->SetMarkerSize(1);
+            holayunfold->SetMarkerColor(kGreen+3);
+            holayunfold->SetLineColor(kGreen+3);
+            holayunfold->SetLineWidth(1);
+            holayunfold->Draw("e1");
+
+            htruth->SetLineColor(kRed);
+            htruth->Scale(scale);
+            htruth->Draw("hist sames");
+
+
+            /*htruth->SetMarkerStyle(8);
+            htruth->SetMarkerSize(1);
+            htruth->SetMarkerColor(kRed+3);
+            htruth->SetLineColor(kGreen+3);
+            htruth->SetLineWidth(1);
+            //htruth->Add(holaybck,-1);
+            htruth->Draw("e1 sames");*/
+
+            hh->SetMarkerStyle(8);
+            hh->SetMarkerSize(1);
+            hh->SetMarkerColor(kBlack);
+            hh->SetLineColor(kBlack);
+            hh->SetLineWidth(1);
+            //hh->Add(holaybck,-1);
+            hh->Draw("e1 sames");
+
+            TLegend * lg = new TLegend(0.15, 0.58, 0.48, 0.88);
+            TString lheader("Real Data (Full sample)");
+            lg->SetHeader(lheader);
+            lg->AddEntry(holayunfold, "MC Reco", "lp");
+            lg->AddEntry(htruth, "MC Truth", "l");
+            lg->AddEntry(hh, "Data", "lp");
+
+            lg->Draw("sames");
+
+          }
+
+
+          // This is the incident histogram plot (bck sub && unfolding && truth)
+          else if(tag.Contains("i001hTruthIncidentHist")){
+
+            TString CalcInc = "i001hTruthCalcIncidentHist";
+            TH1D *hcalint = (TH1D*)lout->FindObject(CalcInc);
+
+            TString recoBckSubInc = "i021hRecoBckSubIncidentHist";
+            TH1D *htmp = (TH1D*)lout->FindObject(recoBckSubInc);
+            TH1D *holaybckSub = (TH1D*)htmp->Clone("hint");
+            //TH1D *holaybckSub = (TH1D*)lout->FindObject(recoBckSubInc);
+
+            TString BckInc = "i023hNonPionBeamIncidentHist";
+            TH1D *holaybck = (TH1D*)lout->FindObject(BckInc);
+
+            TString UnfoldInc = "i026hUnFoldedIncidentHist";
+            TH1D *holayunfold = (TH1D*)lout->FindObject(UnfoldInc);
+
+            hh->SetLineColor(kRed);
+            hh->Draw("hist");
+
+            holaybckSub->SetMarkerStyle(8);
+            holaybckSub->SetMarkerSize(1);
+            holaybckSub->SetMarkerColor(kGreen+3);
+            holaybckSub->SetLineColor(kGreen+3);
+            holaybckSub->SetLineWidth(1);
+            holaybckSub->Add(holaybck,-1);
+            holaybckSub->Draw("e1 sames");
+
+            holayunfold->SetMarkerStyle(8);
+            holayunfold->SetMarkerSize(1);
+            holayunfold->SetMarkerColor(kBlack);
+            holayunfold->SetLineColor(kBlack);
+            holayunfold->SetLineWidth(1);
+            //holayunfold->Add(holaybck,-1);
+            holayunfold->Draw("e1 sames");
+
+            
+            hcalint->SetMarkerStyle(8);
+            hcalint->SetMarkerSize(1);
+            hcalint->SetMarkerColor(kBlue);
+            hcalint->SetLineColor(kBlue);
+            hcalint->SetLineWidth(1);
+            //hcalint->Add(holaybck,-1);
+            hcalint->Draw("e1 sames");
+
+            TLegend * lg = new TLegend(0.15, 0.58, 0.48, 0.88);
+            TString lheader("Fake Data (1/2 MC sample)");
+            lg->SetHeader(lheader);
+            lg->AddEntry(hh, "MC Truth", "l");
+            lg->AddEntry(holaybckSub, "Bck Sub", "lp");
+            lg->AddEntry(holayunfold, "Unfolded", "lp");
+            lg->AddEntry(hcalint, "Calc", "lp");
+
+            lg->Draw("sames");
+
+          }
+          // This is the interacting histogram plot (bck sub && unfolding && truth)
+          else if(tag.Contains("i002hTruthInteractingHist")){
+
+            TString recoBckSubInt = "i022hRecoBckSubInteractingHist";
+            TH1D *htmp = (TH1D*)lout->FindObject(recoBckSubInt);
+            TH1D *holaybckSub = (TH1D*)htmp->Clone("hint");
+            //TH1D *holaybckSub = (TH1D*)lout->FindObject(recoBckSubInt);
+
+            TString BckInc = "i024hNonPionBeamInteractingHist";
+            TH1D *holaybck = (TH1D*)lout->FindObject(BckInc);
+
+            TString UnfoldInc = "i025hUnFoldedInteractingHist";
+            TH1D *holayunfold = (TH1D*)lout->FindObject(UnfoldInc);
+
+            hh->SetLineColor(kRed);
+            hh->SetMaximum(hh->GetMaximum()*1.5);
+            hh->Draw("hist");
+
+            holaybckSub->SetMarkerStyle(8);
+            holaybckSub->SetMarkerSize(1);
+            holaybckSub->SetMarkerColor(kGreen+3);
+            holaybckSub->SetLineColor(kGreen+3);
+            holaybckSub->SetLineWidth(1);
+            holaybckSub->Add(holaybck,-1);
+            holaybckSub->Draw("e1 sames");
+
+            holayunfold->SetMarkerStyle(8);
+            holayunfold->SetMarkerSize(1);
+            holayunfold->SetMarkerColor(kBlack);
+            holayunfold->SetLineColor(kBlack);
+            holayunfold->SetLineWidth(1);
+            //holayunfold->Add(holaybck,-1);
+            holayunfold->Draw("e1 sames");
+
+            TLegend * lg = new TLegend(0.15, 0.58, 0.48, 0.88);
+            TString lheader("Fake Data (1/2 MC sample)");
+            lg->SetHeader(lheader);
+            lg->AddEntry(hh, "MC Truth", "l");
+            lg->AddEntry(holaybckSub, "Bck Sub", "lp");
+            lg->AddEntry(holayunfold, "Unfolded", "lp");
+            lg->Draw("sames");
+          }
+          // This is the pi0 KE histogram plot (bck sub && unfolding && truth)
+          else if(tag.Contains("i006hTruthDiffCEXInteractingHist_800MeV")){
+
+            TString recoBckSubInt = "i030hRecoPi0KEHist";
+            TH1D *htmp = (TH1D*)lout->FindObject(recoBckSubInt);
+            
+            TH1D *holaybckSub = (TH1D*)htmp->Clone("hint");
+            //TH1D *holaybckSub = (TH1D*)lout->FindObject(recoBckSubInt);
+
+            //TString BckInc = "i030hRecoPi0KEHist";
+            //TH1D *holaybck = (TH1D*)lout->FindObject(BckInc);
+
+            TString UnfoldInc = "i031hUnFoldedPi0KEHist";
+            TH1D *holayunfold = (TH1D*)lout->FindObject(UnfoldInc);
+
+            TString UnfoldIncData = "i031hUnFoldedPi0KEHistData";
+            TH1D *holayunfoldData = (TH1D*)lout->FindObject(UnfoldIncData);
+
+            hh->SetLineColor(kRed);
+            hh->SetMaximum(hh->GetMaximum()*1.5);
+            hh->Draw("hist");
+
+            holaybckSub->SetMarkerStyle(8);
+            holaybckSub->SetMarkerSize(1);
+            holaybckSub->SetMarkerColor(kGreen+3);
+            holaybckSub->SetLineColor(kGreen+3);
+            holaybckSub->SetLineWidth(1);
+            //holaybckSub->Add(holaybck,-1);
+            holaybckSub->Draw("e1 sames");
+
+            holayunfold->SetMarkerStyle(8);
+            holayunfold->SetMarkerSize(1);
+            holayunfold->SetMarkerColor(kBlue);
+            holayunfold->SetLineColor(kBlue);
+            holayunfold->SetLineWidth(1);
+            //holayunfold->Scale(0.5);
+            //holayunfold->Add(holaybck,-1);
+            holayunfold->Draw("e1 sames");
+
+            holayunfoldData->SetMarkerStyle(8);
+            holayunfoldData->SetMarkerSize(1);
+            holayunfoldData->SetMarkerColor(kBlack);
+            holayunfoldData->SetLineColor(kBlack);
+            holayunfoldData->SetLineWidth(1);
+            //holayunfoldData->Scale(0.5);
+            //holayunfoldData->Add(holaybck,-1);
+            holayunfoldData->Draw("e1 sames");
+
+            TLegend * lg = new TLegend(0.55, 0.55, 0.85, 0.88);
+            TString lheader("Fake Data (Full MC sample)");
+            lg->SetHeader(lheader);
+            lg->AddEntry(hh, "MC Truth T_{beam #pi^{+}} = 775 MeV", "l");
+            lg->AddEntry(holaybckSub, "Bck Sub T_{beam #pi^{+}} = 775 MeV", "lp");
+            lg->AddEntry(holayunfold, "Unfolded T_{beam #pi^{+}} = 775 MeV", "lp");
+            lg->AddEntry(holayunfoldData, "Data", "lp");
+
+            lg->Draw("sames");
+          }
+
+          // This is the pi0 Costheta histogram plot (bck sub && unfolding && truth)
+          else if(tag.Contains("i666hTruthDiffCEXInteractingHistCosTheta_800MeV")){
+
+            TString recoBckSubInt = "i032hRecoPi0CosThetaHist";
+            TH1D *htmp = (TH1D*)lout->FindObject(recoBckSubInt);
+            TH1D *holaybckSub = (TH1D*)htmp->Clone("hint");
+            //TH1D *holaybckSub = (TH1D*)lout->FindObject(recoBckSubInt);
+
+            //TString BckInc = "i030hRecoPi0KEHist";
+            //TH1D *holaybck = (TH1D*)lout->FindObject(BckInc);
+
+            TString UnfoldInc = "i033hUnFoldedPi0CosThetaHist";
+            TH1D *holayunfold = (TH1D*)lout->FindObject(UnfoldInc);
+
+            hh->SetLineColor(kRed);
+            hh->SetMaximum(hh->GetMaximum()*1.1);
+            hh->Draw("hist");
+
+            holaybckSub->SetMarkerStyle(8);
+            holaybckSub->SetMarkerSize(1);
+            holaybckSub->SetMarkerColor(kGreen+3);
+            holaybckSub->SetLineColor(kGreen+3);
+            holaybckSub->SetLineWidth(1);
+            //holaybckSub->Add(holaybck,-1);
+            holaybckSub->Draw("e1 sames");
+
+            holayunfold->SetMarkerStyle(8);
+            holayunfold->SetMarkerSize(1);
+            holayunfold->SetMarkerColor(kBlack);
+            holayunfold->SetLineColor(kBlack);
+            holayunfold->SetLineWidth(1);
+            //holayunfold->Scale(0.5);
+            //holayunfold->Add(holaybck,-1);
+            holayunfold->Draw("e1 sames");
+
+            TLegend * lg = new TLegend(0.15, 0.55, 0.45, 0.88);
+            TString lheader("Fake Data (Full MC sample)");
+            lg->SetHeader(lheader);
+            lg->AddEntry(hh, "MC Truth T_{beam #pi^{+}} = 775 MeV", "l");
+            lg->AddEntry(holaybckSub, "Bck Sub T_{beam #pi^{+}} = 775 MeV", "lp");
+            lg->AddEntry(holayunfold, "Unfolded T_{beam #pi^{+}} = 775 MeV", "lp");
+            lg->Draw("sames");
+          }
+
+
+          // This is the pi0 theta histogram plot (bck sub && unfolding && truth)
+          else if(tag.Contains("i066hTruthDiffCEXInteractingHistTheta_800MeV")){
+
+            TString recoBckSubInt = "i034hRecoPi0ThetaHist";
+            TH1D *htmp = (TH1D*)lout->FindObject(recoBckSubInt);
+            TH1D *holaybckSub = (TH1D*)htmp->Clone("hint");
+            //TH1D *holaybckSub = (TH1D*)lout->FindObject(recoBckSubInt);
+
+            //TString BckInc = "i030hRecoPi0KEHist";
+            //TH1D *holaybck = (TH1D*)lout->FindObject(BckInc);
+
+            TString UnfoldInc = "i035hUnFoldedPi0ThetaHist";
+            TH1D *holayunfold = (TH1D*)lout->FindObject(UnfoldInc);
+
+            hh->SetLineColor(kRed);
+            hh->SetMaximum(hh->GetMaximum()*1.1);
+            hh->Draw("hist");
+
+            holaybckSub->SetMarkerStyle(8);
+            holaybckSub->SetMarkerSize(1);
+            holaybckSub->SetMarkerColor(kGreen+3);
+            holaybckSub->SetLineColor(kGreen+3);
+            holaybckSub->SetLineWidth(1);
+            //holaybckSub->Add(holaybck,-1);
+            holaybckSub->Draw("e1 sames");
+
+            holayunfold->SetMarkerStyle(8);
+            holayunfold->SetMarkerSize(1);
+            holayunfold->SetMarkerColor(kBlack);
+            holayunfold->SetLineColor(kBlack);
+            holayunfold->SetLineWidth(1);
+            //holayunfold->Scale(0.5);
+            //holayunfold->Add(holaybck,-1);
+            holayunfold->Draw("e1 sames");
+
+            TLegend * lg = new TLegend(0.55, 0.55, 0.85, 0.88);
+            TString lheader("Fake Data (Full MC sample)");
+            lg->SetHeader(lheader);
+            lg->AddEntry(hh, "MC Truth T_{beam #pi^{+}} = 775 MeV", "l");
+            lg->AddEntry(holaybckSub, "Bck Sub T_{beam #pi^{+}} = 775 MeV", "lp");
+            lg->AddEntry(holayunfold, "Unfolded T_{beam #pi^{+}} = 775 MeV", "lp");
+            lg->Draw("sames");
+          }
+
+          // Same as i002 total Interacting Histogram 
+          else if(tag.Contains("i004hTruthCEXInteractingHist")){
+
+            TString recoBckSubInt = "i022hRecoBckSubInteractingHist";
+            TH1D *htmp = (TH1D*)lout->FindObject(recoBckSubInt);
+            TH1D *holaybckSub = (TH1D*)htmp->Clone("hint");
+            //TH1D *holaybckSub = (TH1D*)lout->FindObject(recoBckSubInt);
+            //holaybckSub->Rebin(50);
+            //holaybckSub->Scale(0.5);
+
+
+            //TString BckInc = "i024hNonPionBeamInteractingHist";
+            //TH1D *holaybck = (TH1D*)lout->FindObject(BckInc);
+
+
+            TString UnfoldInc = "i025hUnFoldedInteractingHist";
+            TH1D *holayunfold = (TH1D*)lout->FindObject(UnfoldInc);
+            //holayunfold->Rebin(50);
+            //holayunfold->Scale(0.5); //== FIXME whole sample
+
+
+
+            //hh->Rebin(50);
+            hh->SetLineColor(kRed);
+            hh->SetMaximum(hh->GetMaximum()*1.5);
+            hh->Draw("hist");
+
+            holaybckSub->SetMarkerStyle(8);
+            holaybckSub->SetMarkerSize(1);
+            holaybckSub->SetMarkerColor(kGreen+3);
+            holaybckSub->SetLineColor(kGreen+3);
+            holaybckSub->SetLineWidth(1);
+            //holaybckSub->Add(holaybck,-1);
+            holaybckSub->Draw("e1 sames");
+
+            holayunfold->SetMarkerStyle(8);
+            holayunfold->SetMarkerSize(1);
+            holayunfold->SetMarkerColor(kBlack);
+            holayunfold->SetLineColor(kBlack);
+            holayunfold->SetLineWidth(1);
+            //holayunfold->Add(holaybck,-1);
+            holayunfold->Draw("e1 sames");
+
+            TLegend * lg = new TLegend(0.15, 0.58, 0.48, 0.88);
+            TString lheader("Fake Data (1/2 MC sample)");
+            lg->SetHeader(lheader);
+            lg->AddEntry(hh, "MC Truth", "l");
+            lg->AddEntry(holaybckSub, "Bck Sub", "lp");
+            lg->AddEntry(holayunfold, "Unfolded", "lp");
+            lg->Draw("sames");
+
+          }
+          // Cos theta angle plots
+          else if(tag.Contains("OVERLAY") && tag.Contains("CosTheta") && tag.Contains("Low")){
+
+            TString Mid = "i105hTruthPi0DaughtersCosTheta_Middle_OVERLAY";
+            TString High = "i104hTruthPi0DaughtersCosTheta_High_OVERLAY";
+
+            TH1D *holaymid = (TH1D*)lout->FindObject(Mid);
+            TH1D *holayhigh = (TH1D*)lout->FindObject(High);
+
+
+            SetTitleFormat(hh);
+            hh->SetMaximum(holayhigh->GetMaximum()*1.5);
+
+            hh->SetLineWidth(3);
+            holaymid->SetLineWidth(3);
+            holayhigh->SetLineWidth(3);
+
+            //hh->SetFillColor(1505);
+            hh->SetLineColor(1505);
+            hh->Draw("hists");
+
+            //holaymid->SetFillColor(1509);
+            holaymid->SetLineColor(1509);
+            holaymid->Draw("sames hists");
+
+            //holayhigh->SetFillColor(1502);
+            holayhigh->SetLineColor(1502);
+            holayhigh->Draw("sames hists");
+
+
+            //auto* legend = new TLegend(0.55, 0.55, 0.85, 0.88);
+            TLegend * legend = new TLegend(0.15, 0.58, 0.48, 0.88);
+            
+
+            TString lheader("T_{beam #pi^{+}} = 875 MeV");
+            //if(tag.Contains("Middle"))  lheader = ("T_{beam #pi^{+}} = 875 MeV, 200 < T_{#pi^{0}} < 400 MeV");
+            //if(tag.Contains("Low")) lheader = ("T_{beam #pi^{+}} = 875 MeV, T_{#pi^{0}} < 150 MeV");
+
+            legend->SetHeader(lheader);
+            legend->AddEntry(hh, "T_{#pi^{0}} < 150 MeV", "l");
+            legend->AddEntry(holaymid, "200 < T_{#pi^{0}} < 400 MeV", "l");
+            legend->AddEntry(holayhigh, "T_{#pi^{0}} > 800 MeV", "l");
+            legend->Draw("same");
+            
+          }
+
+          else if (tag.Contains("hTruthTestFFEnergyM1")){
+            TString M2 = "i000hTruthTestFFEnergyM2";
+            TH1D *hm2 = (TH1D*)lout->FindObject(M2);
+            hh->SetMaximum(hm2->GetMaximum()*1.3);
+
+            hh->SetLineColor(kRed);
+            hh->Draw("hist");
+
+            hm2->SetLineColor(kBlue);
+            hm2->Draw("hist sames");
+
+            TLegend * legend = new TLegend(0.15, 0.58, 0.48, 0.88);
+            TString lheader("True Front-Face Energy Compare");
+            
+            legend->SetHeader(lheader);
+            legend->AddEntry(hh, "Method1 - EnergySlice", "l");
+            legend->AddEntry(hm2, "Method2 - SpaceSlice", "l");
+            legend->Draw("same");
+
+          }
+
+          else if (tag.Contains("hTruthTestIntEnergyM1")){
+            TString M2 = "i100hTruthTestIntEnergyM2";
+            TH1D *hm2 = (TH1D*)lout->FindObject(M2);
+            hh->SetMaximum(hm2->GetMaximum()*1.3);
+
+            hh->SetLineColor(kRed);
+            hh->Draw("hist");
+
+            hm2->SetLineColor(kBlue);
+            hm2->Draw("hist sames");
+
+            TLegend * legend = new TLegend(0.15, 0.58, 0.48, 0.88);
+            TString lheader("True Interaction Energy Compare");
+            
+            legend->SetHeader(lheader);
+            legend->AddEntry(hh, "Method1 - EnergySlice", "l");
+            legend->AddEntry(hm2, "Method2 - SpaceSlice", "l");
+            legend->Draw("same");
+
+          }
+
           else {
             hh->Draw("hist");
           }
@@ -908,9 +3293,12 @@ void PlotUtils::DrawHist(TList *lout, const double plotscale, TList * overlayLis
           SetTitleFormat(hstk);
 
           TH1D * hsum = dynamic_cast<TH1D*> (hstk->GetStack()->Last());
-          hstk->SetMaximum(hsum->GetMaximum()*1.2);
+          if(hsum->GetMaximum() > holay->GetMaximum()) hstk->SetMaximum(hsum->GetMaximum()*1.2);
+          else hstk->SetMaximum(holay->GetMaximum()*1.2);
           if(tag.Contains("Pi0Energy_COMPOSE")) hstk->SetMaximum(hsum->GetMaximum()*1.7);
           hstk->Draw("nostack HIST");
+          //hstk->Draw("HIST");
+
           DrawOverlay(holay);
           if(tag.Contains("Mass")){
             double ymax = hsum->GetMaximum()*1.2;
@@ -940,11 +3328,86 @@ void PlotUtils::DrawHist(TList *lout, const double plotscale, TList * overlayLis
           for(auto ie : typeMaps[name]){
             tot += ie;
           }
-          legend->AddEntry(h1, Form("Two Gammas same Pi0 (%.1f%s)",(typeMaps[name][0])/tot*100,"%"), "f");
-          legend->AddEntry(h2, Form("Two Gammas diff Pi0 (%.1f%s)",(typeMaps[name][1])/tot*100,"%"), "f");
-          legend->AddEntry(h3, Form("One Gamma (%.2f%s)",(typeMaps[name][2])/tot*100,"%"), "f");
-          legend->AddEntry(hsum, "MC", "f");
-          legend->Draw("same");
+          if(!tag.Contains("_EVT") && !tag.Contains("i07") && !tag.Contains("i08") && !tag.Contains("i09") && !tag.Contains("i100")){
+            legend->AddEntry(h1, Form("Two Gammas same Pi0 (%.1f%s)",(typeMaps[name][0])/tot*100,"%"), "f");
+            legend->AddEntry(h2, Form("Two Gammas diff Pi0 (%.1f%s)",(typeMaps[name][1])/tot*100,"%"), "f");
+            legend->AddEntry(h3, Form("One Gamma (%.2f%s)",(typeMaps[name][2])/tot*100,"%"), "f");
+            //legend->AddEntry(holay, "Fake Data (1/2 MC sample)", "pl");
+            legend->AddEntry(holay, "Data", "pl");
+            legend->AddEntry(hsum, "MC", "f");
+            legend->Draw("same");
+          }
+          else if(tag.Contains("_EVTXS")) {
+            legend = new TLegend(0.15, 0.55, 0.49, 0.88);
+
+            const TList * ll = hstk->GetHists();
+            TH1D * h1 = (TH1D*)ll->At(0);
+            TH1D * h2 = (TH1D*)ll->At(1);
+            TH1D * h3 = (TH1D*)ll->At(2);
+            TH1D * h4 = (TH1D*)ll->At(3);
+            TH1D * h5 = (TH1D*)ll->At(4);
+            TH1D * h6 = (TH1D*)ll->At(5);
+            TH1D * h7 = (TH1D*)ll->At(6);
+            TH1D * h8 = (TH1D*)ll->At(7);
+
+ 
+            /*legend->AddEntry(h1, Form("Signal (Charge Exchange) (%.1f%s)",(typeMaps[name][0])/tot*100,"%"), "f");
+            legend->AddEntry(h2, Form("Absorption Backgrounds (%.1f%s)",(typeMaps[name][1])/tot*100,"%"), "f");
+            legend->AddEntry(h3, Form("Inelastic Backgrounds (%.2f%s)",(typeMaps[name][2])/tot*100,"%"), "f");
+            legend->AddEntry(h4, Form("Sigle #pi^{0} Backgrounds (#pi^{#pm} > 0) (%.2f%s)",(typeMaps[name][3])/tot*100,"%"), "f");
+            legend->AddEntry(h5, Form("Multi #pi^{0} Backgrounds (%.2f%s)",(typeMaps[name][4])/tot*100,"%"), "f");
+            */
+            legend->AddEntry(h1, Form("Beam #pi^{+} (%.1f%s)",(typeMaps[name][0])/tot*100,"%"), "f");
+            legend->AddEntry(h2, Form("Beam #mu^{+} (%.1f%s)",(typeMaps[name][1])/tot*100,"%"), "f");
+            legend->AddEntry(h3, Form("misID: p (%.1f%s)",(typeMaps[name][2])/tot*100,"%"), "f");
+            legend->AddEntry(h4, Form("misID: #pi^{#pm} (%.1f%s)",(typeMaps[name][3])/tot*100,"%"), "f");
+            legend->AddEntry(h5, Form("misID: #mu^{+} (%.1f%s)",(typeMaps[name][4])/tot*100,"%"), "f");
+            legend->AddEntry(h6, Form("misID: e/#gamma (%.1f%s)",(typeMaps[name][5])/tot*100,"%"), "f");
+            legend->AddEntry(h7, Form("Comics (%.1f%s)",(typeMaps[name][6])/tot*100,"%"), "f");
+            legend->AddEntry(h8, Form("others (%.1f%s)",(typeMaps[name][7])/tot*100,"%"), "f");
+    
+            legend->AddEntry(hsum, "MC", "f");
+            legend->Draw("same");
+          }
+          else{
+
+            if(tag.Contains("i07")) legend = new TLegend(0.15, 0.55, 0.49, 0.88);
+            if(tag.Contains("i08")) legend = new TLegend(0.55, 0.55, 0.89, 0.88);
+            if(tag.Contains("i09")) legend = new TLegend(0.15, 0.55, 0.49, 0.88);
+            if(tag.Contains("i100")) legend = new TLegend(0.15, 0.55, 0.49, 0.88);
+
+            const TList * ll = hstk->GetHists();
+            TH1D * h1 = (TH1D*)ll->At(0);
+            TH1D * h2 = (TH1D*)ll->At(1);
+            TH1D * h3 = (TH1D*)ll->At(2);
+            TH1D * h4 = (TH1D*)ll->At(3);
+            TH1D * h5 = (TH1D*)ll->At(4);
+            TH1D * h6 = (TH1D*)ll->At(5);
+            //TH1D * h7 = (TH1D*)ll->At(6);
+ 
+            /*legend->AddEntry(h1, Form("Signal (Charge Exchange) (%.1f%s)",(typeMaps[name][0])/tot*100,"%"), "f");
+            legend->AddEntry(h2, Form("Absorption Backgrounds (%.1f%s)",(typeMaps[name][1])/tot*100,"%"), "f");
+            legend->AddEntry(h3, Form("Inelastic Backgrounds (%.2f%s)",(typeMaps[name][2])/tot*100,"%"), "f");
+            legend->AddEntry(h4, Form("Sigle #pi^{0} Backgrounds (#pi^{#pm} > 0) (%.2f%s)",(typeMaps[name][3])/tot*100,"%"), "f");
+            legend->AddEntry(h5, Form("Multi #pi^{0} Backgrounds (%.2f%s)",(typeMaps[name][4])/tot*100,"%"), "f");
+            */
+            legend->AddEntry(h1, Form("Signal (Charge Exchange) (%.1f%s)",(typeMaps[name][0])/tot*100,"%"), "f");
+            legend->AddEntry(h2, Form("Absorption Background (%.1f%s)",(typeMaps[name][1])/tot*100,"%"), "f");
+            legend->AddEntry(h3, Form("Pion Production Background (#pi^{0} = 0) (%.2f%s)",(typeMaps[name][2])/tot*100,"%"), "f");
+            legend->AddEntry(h4, Form("Pion Production Background (#pi^{0} = 1) (%.2f%s)",(typeMaps[name][3])/tot*100,"%"), "f");
+            legend->AddEntry(h5, Form("Pion Production Background (#pi^{0} > 1) (%.2f%s)",(typeMaps[name][4])/tot*100,"%"), "f");
+            //legend->AddEntry(h6, Form("Other Background (%.2f%s)",(typeMaps[name][5])/tot*100,"%"), "f");
+            legend->AddEntry(h6, Form("Beam Background (%.2f%s)",(typeMaps[name][5])/tot*100,"%"), "f");
+            
+            //legend->AddEntry(holay, "Fake Data (1/2 MC Sample)", "pl");
+            legend->AddEntry(holay, "Data", "pl");
+            //legend->AddEntry(h6, Form("Other Backgrounds (%.2f%s)",(typeMaps[name][5])/tot*100,"%"), "f");
+            //legend->AddEntry(h7, Form("Beam Backgrounds (%.2f%s)",(typeMaps[name][6])/tot*100,"%"), "f");
+
+            legend->AddEntry(hsum, "MC", "f");
+            legend->Draw("same");
+          }
+          
 
           c1->Update();
           c1->cd();
@@ -1023,20 +3486,40 @@ void PlotUtils::DrawHist(TList *lout, const double plotscale, TList * overlayLis
 
         else{
           TPad *pad1 = new TPad(Form("pad1_%d",ii), Form("pad1_%d",ii), 0, 0.2, 1, 1.);
+          if(tag.Contains("BeamQualityTheta") || tag.Contains("BeamQualityZ")) pad1->SetLogy();
           pad1->SetBottomMargin(0.02);
           //  pad1->SetGridx();
           //  pad1->SetGridy();
           pad1->Draw();
           pad1->cd();
 
+          // Get the correct sacle factor (turn on when needed)
+          /*TH1D * hMC = dynamic_cast<TH1D*> (hstk->GetStack()->Last());
+          if(tag.Contains("EndZ_Cut")){
+            cout << "MC entry: " << hMC->Integral() << endl;
+            cout << "Data entry: " << holay->Integral() << endl;
+            cout << "name: " << tag << "scale factor: " << holay->Integral()/hMC->Integral() << endl;
+          }*/
+
+          // Scale the beam cuts related hists data to MC
+          if(tag.Contains("EndZ_CutPDG")) ScaleStack(hstk, 0.702223); // CutPDG
+          else if(tag.Contains("EndZ_CutPandora")) ScaleStack(hstk, 0.709511); // CutPandora
+          else if(tag.Contains("EndZ_CutCaloSize")) ScaleStack(hstk, 0.703488); // CutCaloSize
+          else if(tag.Contains("EndZ_CutBeamQuality")) ScaleStack(hstk, 0.698653); // CutBeamQuality
+          else if(tag.Contains("EndZ_CutAPA3")) ScaleStack(hstk, 0.658395); // CutAPA3
+          else if(tag.Contains("EndZ_CutMichelScore")) ScaleStack(hstk, 0.65585);  // CutMichelScore
+          else if(tag.Contains("EndZ_CutChi2DOF")) ScaleStack(hstk, 0.649126); // CutChi2DOF
+          else if(tag.Contains("EndZ_CutBeamScraper")) ScaleStack(hstk, 0.57804); // CutBeamScraper(final beam scale)
+          
           // Scale data to MC
-          ScaleStack(hstk, plotscale);
+          else ScaleStack(hstk, plotscale);
           
           hstk->GetYaxis()->SetTitle(holay->GetYaxis()->GetTitle());
           SetTitleFormat(hstk);
 
           TH1D * hsum = dynamic_cast<TH1D*> (hstk->GetStack()->Last());
           hstk->SetMaximum(holay->GetMaximum()*1.2);
+          if(tag.Contains("Recdalphat_STK")) hstk->SetMaximum(holay->GetMaximum()*2);
           hstk->Draw("hist");
           DrawOverlay(holay);
           //c1->Update();
@@ -1044,7 +3527,7 @@ void PlotUtils::DrawHist(TList *lout, const double plotscale, TList * overlayLis
           const int overlayColor = kBlack;
 
           // Event type legend
-          if(hstk->GetNhists() <= 3){
+          if(hstk->GetNhists() <= 3 && !tag.Contains("Channel")){
             vector<TString> evtType = FillLegendType("evtType",hstk->GetName());
             vector<TString> htype = FillLegendStyle(2,"evtType");
 
@@ -1055,13 +3538,44 @@ void PlotUtils::DrawHist(TList *lout, const double plotscale, TList * overlayLis
             lg = DrawLegend(evtType, htype, tag, cols, mrks);
             lg->Draw("same");
           }
+          
           // Beam particle type
-          else if(hstk->GetNhists() == 6){
+          else if((hstk->GetNhists() == 8 && !tag.Contains("Channel")) || tag.Contains("i05") || tag.Contains("i06")){
+
             vector<TString> beamType = FillLegendType("beamType",hstk->GetName());
             vector<TString> htype = FillLegendStyle(2,"beamType");
 
             int *cols=GetColorArray(beamType.size());
-            const int mrks[]={1,1,1,1,1,1,6};
+            const int mrks[]={1,1,1,1,1,1,1,1,6};
+            cols[beamType.size()-1]=overlayColor;
+
+            TLegend * lg = 0x0;
+            lg = DrawLegend(beamType, htype, tag, cols, mrks, 2);
+            lg->Draw("same");
+          }
+
+          // Channel type
+          else if(tag.Contains("Channel")){
+            vector<TString> beamType = FillLegendType("channelType",hstk->GetName());
+            vector<TString> htype = FillLegendStyle(2,"channelType");
+
+            int *cols=GetColorArray(beamType.size());
+            const int mrks[]={1,1,1,1,1,1,1,6};
+            cols[beamType.size()-1]=overlayColor;
+
+            TLegend * lg = 0x0;
+            lg = DrawLegend(beamType, htype, tag, cols, mrks, 2);
+            lg->Draw("same");
+          }
+
+          
+          // TKI particle type
+          else if(hstk->GetNhists() == 4){
+            vector<TString> beamType = FillLegendType("TKIType",hstk->GetName());
+            vector<TString> htype = FillLegendStyle(2,"TKIType");
+
+            int *cols=GetColorArray(beamType.size());
+            const int mrks[]={1,1,1,1,1,6};
             cols[beamType.size()-1]=overlayColor;
 
             TLegend * lg = 0x0;
@@ -1103,7 +3617,8 @@ void PlotUtils::DrawHist(TList *lout, const double plotscale, TList * overlayLis
       }
 
       // Spectial case
-      else if(tag.Contains("OVERLAY")){
+      else if(tag.Contains("OVERLAY") && !tag.Contains("CEX")){
+        
         TH1D * hsum = dynamic_cast<TH1D*> (hstk->GetStack()->Last());
         hstk->SetMaximum(hsum->GetMaximum()*1.2);
 
@@ -1136,12 +3651,53 @@ void PlotUtils::DrawHist(TList *lout, const double plotscale, TList * overlayLis
         legend->AddEntry(holay_Pi0, "#pi^{0} Spectrum", "f");
         legend->Draw("same");
         
-      }  
+      } 
+
+      else if(tag.Contains("OVERLAY") && tag.Contains("CEX")){
+
+        TH1D * hsum = dynamic_cast<TH1D*> (hstk->GetStack()->Last());
+        hstk->SetMaximum(hsum->GetMaximum()*1.2);
+        
+        hstk->GetXaxis()->SetTitle("Number of Particles");
+        hstk->GetYaxis()->SetTitle("Candidates");
+        SetTitleFormat(hstk,false);
+
+        hstk->Draw("nostack L");
+        //hstk->Draw("nostack HIST");
+
+        auto* legend = new TLegend(0.5, 0.55, 0.85, 0.88);
+        // Cheat Legend
+        TH1D * h1 = 0x0;
+        TH1D * h2 = 0x0;
+        TH1D * h3 = 0x0;
+        h1 = new TH1D(Form("h1%s", tag.Data()),  "", 20, -0.5, 19.5); 
+        h2 = new TH1D(Form("h2%s", tag.Data()),  "", 20, -0.5, 19.5); 
+        h3 = new TH1D(Form("h3%s", tag.Data()),  "", 20, -0.5, 19.5); 
+        //h1->SetFillStyle(3004);h2->SetFillStyle(3004);h3->SetFillStyle(3004);
+        h1->SetFillColor(1505);h2->SetFillColor(1509);h1->SetLineColor(1505);h2->SetLineColor(1509);
+        h3->SetFillColor(1502);h3->SetLineColor(1502);
+        h1->SetLineWidth(3);
+        h2->SetLineWidth(3);
+        h3->SetLineWidth(3);
+
+        TString lheader("T_{#pi^{0}} > 800 MeV");
+        //legend->SetHeader("#splitline{Fake Data (Full MC sample)}{T_{beam #pi^{+}} = 775 MeV}");
+        if(tag.Contains("Middle"))  lheader = ("200 < T_{#pi^{0}} < 400 MeV");
+        if(tag.Contains("Low")) lheader = ("T_{#pi^{0}} < 150 MeV");
+
+        legend->SetHeader(lheader);
+        legend->AddEntry(h1, "Protons", "l");
+        legend->AddEntry(h2, "Neutrons", "l");
+        legend->AddEntry(h3, "Nucleus", "l");
+        legend->Draw("same");
+
+      }
     }
     else cout << "PlotUtils::DrawHist not found correct histogram!" << " name: " << tag << endl;
 
     tt.SetTextSize(0.035);
-    tt.DrawLatex(0.125,0.925,"DUNE:ProtoDUNE-SP");
+    if(tag.Contains("i001") && !tag.Contains("_")) tt.DrawLatex(0.165,0.925,"DUNE:ProtoDUNE-SP");
+    else tt.DrawLatex(0.125,0.925,"DUNE:ProtoDUNE-SP");
     c1->Print(outdir+"/"+tag+".png");
     
   } // End of for loop
@@ -1150,7 +3706,7 @@ void PlotUtils::DrawHist(TList *lout, const double plotscale, TList * overlayLis
 THStack * PlotUtils::ConvertToStack(const TH2D * hh, const bool kMC, std::map<TString, vector<double>> &typeMaps)
 {
   TString tag = hh->GetName();
-  cout << "tag: " << tag << endl;
+  //cout << "tag: " << tag << endl;
   const TString tit = hh->GetTitle();
   const char* Xtitle = hh->GetXaxis()->GetTitle();
   const char* Ytitle = hh->GetYaxis()->GetTitle();
@@ -1198,9 +3754,16 @@ THStack * PlotUtils::ConvertToStack(const TH2D * hh, const bool kMC, std::map<TS
     htmp->SetLineColor(kBlack);
     htmp->SetLineWidth(1);
     htmp->SetMarkerSize(2);
-    if(tag.Contains("OVERLAY")){
+    if(tag.Contains("OVERLAY") && !tag.Contains("CEX")){
       htmp->SetLineColor(icol);
       htmp->SetFillStyle(3004);
+    }
+    if(tag.Contains("OVERLAY") && tag.Contains("CEX")){
+      htmp->SetLineColor(icol);
+      htmp->SetFillStyle(0);
+      htmp->SetLineWidth(2);
+      //htmp->SetFillColorAlpha(icol,0.3);
+
     }
     if(tag.Contains("COMPOSE")){
       htmp->SetLineColor(icol);
@@ -1210,14 +3773,17 @@ THStack * PlotUtils::ConvertToStack(const TH2D * hh, const bool kMC, std::map<TS
         htmp->SetLineWidth(2);
       }
     }
-    printf("PlotUtils::ConvertToStack %s adding y %f with color %d\n", tag.Data(), hh->GetYaxis()->GetBinCenter(iy), icol);
+    //printf("PlotUtils::ConvertToStack %s adding y %f with color %d\n", tag.Data(), hh->GetYaxis()->GetBinCenter(iy), icol);
     stk->Add(htmp);
   }
   //cout << "newintegral: " << newintegral << endl;
-  for(double in : TruthTypeVect){
-    cout << "Type percent: " << in/newintegral*100 << "%" << endl;
-  }
-  if(oldintegral!=newintegral){
+  //for(double in : TruthTypeVect){
+    //cout << "Type percent: " << in/newintegral*100 << "%" << endl;
+  //}
+  int oldintegralintPart = (int) oldintegral;
+  int newintegralintPart = (int) newintegral;
+
+  if(oldintegralintPart!=newintegralintPart){
     printf("PlotUtils::ConvertToStack integral not matched! %s old %f new %f\n", tag.Data(), oldintegral, newintegral); exit(1);
   }
   if(kMC) typeMaps[tag] = TruthTypeVect;
@@ -1347,6 +3913,96 @@ THStack * PlotUtils::NormalizeStack(THStack * hstk)
       htmp->Sumw2();
       htmp->Divide(hsum);
       hout->Add(htmp);
+
+      if(tag.Contains("i054hRecPiPlusInitialEnergy_STK") && ii == 0){
+        cout << "i054hRecPiPlusInitialEnergy_STK" << endl;
+        const Int_t x0 = htmp->GetXaxis()->GetFirst();
+        const Int_t x1 = htmp->GetXaxis()->GetLast();
+        for(Int_t ix=x0; ix<=x1; ix++){
+          cout << "ix: " << ix << "ratio: " << htmp->GetBinContent(ix) << endl;
+        }
+      }
+
+      if(tag.Contains("i054hRecPiPlusInitialEnergyPosZCut_STK") && ii == 0){
+        cout << "i054hRecPiPlusInitialEnergyPosZCut_STK" << endl;
+        const Int_t x0 = htmp->GetXaxis()->GetFirst();
+        const Int_t x1 = htmp->GetXaxis()->GetLast();
+        for(Int_t ix=x0; ix<=x1; ix++){
+          cout << "ix: " << ix << "ratio: " << htmp->GetBinContent(ix) << endl;
+        }
+      }
+      
+      if(tag.Contains("i050hRecPiPlusInteractingEnergy_STK") && ii == 0){
+        cout << "i050hRecPiPlusInteractingEnergy_STK" << endl;
+        const Int_t x0 = htmp->GetXaxis()->GetFirst();
+        const Int_t x1 = htmp->GetXaxis()->GetLast();
+        for(Int_t ix=x0; ix<=x1; ix++){
+          cout << "ix: " << ix << "ratio: " << htmp->GetBinContent(ix) << endl;
+        }
+      }
+
+      if(tag.Contains("i076PiPlusInteractingEnergyEvt_COMPOSE") && ii == 0){
+        cout << "i076PiPlusInteractingEnergyEvt_COMPOSE" << endl;
+        const Int_t x0 = htmp->GetXaxis()->GetFirst();
+        const Int_t x1 = htmp->GetXaxis()->GetLast();
+        for(Int_t ix=x0; ix<=x1; ix++){
+          cout << "ix: " << ix << "ratio: " << htmp->GetBinContent(ix) << endl;
+        }
+      }
+
+      if(tag.Contains("i088hRecPiZeroSliceKineticEnergyEvt_COMPOSE") && ii == 0){
+        cout << "i088hRecPiZeroSliceKineticEnergyEvt_COMPOSE" << endl;
+        const Int_t x0 = htmp->GetXaxis()->GetFirst();
+        const Int_t x1 = htmp->GetXaxis()->GetLast();
+        for(Int_t ix=x0; ix<=x1; ix++){
+          cout << "ix: " << ix << "ratio: " << htmp->GetBinContent(ix) << endl;
+        }
+      }
+      
+      if(tag.Contains("i082hRecPiZeroRangeKineticEnergyEvtAnotherWeight_COMPOSE") && ii == 0){
+        cout << "i082hRecPiZeroRangeKineticEnergyEvtAnotherWeight_COMPOSE" << endl;
+        const Int_t x0 = htmp->GetXaxis()->GetFirst();
+        const Int_t x1 = htmp->GetXaxis()->GetLast();
+        for(Int_t ix=x0; ix<=x1; ix++){
+          cout << "ix: " << ix << "ratio: " << htmp->GetBinContent(ix) << endl;
+        }
+      }
+
+      if(tag.Contains("i086hRecPiZeroRangeCosThetaEvtAnotherWeight_COMPOSE") && ii == 0){
+        cout << "i086hRecPiZeroRangeCosThetaEvtAnotherWeight_COMPOSE" << endl;
+        const Int_t x0 = htmp->GetXaxis()->GetFirst();
+        const Int_t x1 = htmp->GetXaxis()->GetLast();
+        for(Int_t ix=x0; ix<=x1; ix++){
+          cout << "ix: " << ix << "ratio: " << htmp->GetBinContent(ix) << endl;
+        }
+      }
+
+      if(tag.Contains("i087hRecPiZeroRangeThetaEvtAnotherWeight_COMPOSE") && ii == 0){
+        cout << "i087hRecPiZeroRangeThetaEvtAnotherWeight_COMPOSE" << endl;
+        const Int_t x0 = htmp->GetXaxis()->GetFirst();
+        const Int_t x1 = htmp->GetXaxis()->GetLast();
+        for(Int_t ix=x0; ix<=x1; ix++){
+          cout << "ix: " << ix << "ratio: " << htmp->GetBinContent(ix) << endl;
+        }
+      }
+
+      if(tag.Contains("i086hRecPiZeroRangeCosThetaEvt_COMPOSE") && ii == 0){
+        cout << "i086hRecPiZeroRangeCosThetaEvt_COMPOSE" << endl;
+        const Int_t x0 = htmp->GetXaxis()->GetFirst();
+        const Int_t x1 = htmp->GetXaxis()->GetLast();
+        for(Int_t ix=x0; ix<=x1; ix++){
+          cout << "ix: " << ix << "ratio: " << htmp->GetBinContent(ix) << endl;
+        }
+      }
+
+      if(tag.Contains("i087hRecPiZeroRangeThetaEvt_COMPOSE") && ii == 0){
+        cout << "i087hRecPiZeroRangeThetaEvt_COMPOSE" << endl;
+        const Int_t x0 = htmp->GetXaxis()->GetFirst();
+        const Int_t x1 = htmp->GetXaxis()->GetLast();
+        for(Int_t ix=x0; ix<=x1; ix++){
+          cout << "ix: " << ix << "ratio: " << htmp->GetBinContent(ix) << endl;
+        }
+      }
     }
 
     delete hsum;
@@ -1696,6 +4352,34 @@ void PlotUtils::xSlicedEnergyCorrection(TH2D * h2d)
         AnaIO::hMeanSLShowerE->SetBinError(ii,fitfunc->GetParError(0));
         cout << "shower SL E: " << fitfunc->GetParameter(0) << endl;
       }
+
+      // Beam 
+      if(name.Contains("BeamTheta")){
+        AnaIO::hMeanBeamTheta->SetMinimum(-60);
+        AnaIO::hMeanBeamTheta->SetMaximum(60);
+        AnaIO::hMeanBeamTheta->SetBinContent(ii,fitfunc->GetParameter(0));
+        AnaIO::hMeanBeamTheta->SetBinError(ii,fitfunc->GetParError(0));
+        
+        cout << "Beam Theta bin : " << AnaIO::hMeanBeamTheta->GetXaxis()->GetBinCenter(ii) << endl;
+        cout << "Beam Theta: " << fitfunc->GetParameter(0) << endl;
+      }
+      if(name.Contains("BeamPhi")){
+        AnaIO::hMeanBeamPhi->SetMinimum(-60);
+        AnaIO::hMeanBeamPhi->SetMaximum(60);
+        AnaIO::hMeanBeamPhi->SetBinContent(ii,fitfunc->GetParameter(0));
+        AnaIO::hMeanBeamPhi->SetBinError(ii,fitfunc->GetParError(0));
+        cout << "Beam Phi bin : "  << AnaIO::hMeanBeamPhi->GetXaxis()->GetBinCenter(ii) << endl;
+        cout << "Beam Phi: " << fitfunc->GetParameter(0) << endl;
+      }
+
+      if(name.Contains("BeamPAll")){
+        AnaIO::hMeanBeamPMom->SetMinimum(-0.2);
+        AnaIO::hMeanBeamPMom->SetMaximum(0.2);
+        AnaIO::hMeanBeamPMom->SetBinContent(ii,fitfunc->GetParameter(0));
+        AnaIO::hMeanBeamPMom->SetBinError(ii,fitfunc->GetParError(0));
+        cout << "Beam p all bin : " << AnaIO::hMeanPMom->GetXaxis()->GetBinCenter(ii) << endl;
+        cout << "Beam p all: " << fitfunc->GetParameter(0) << endl;
+      }
       
 
     }
@@ -1733,13 +4417,22 @@ TLegend *PlotUtils::DrawLegend(const vector<TString> &entries, const vector<TStr
   //SetGlobalStyle();
   TLegend * lg = 0x0;
   // Larger legend box
-  //lg = new TLegend(0.55, 0.58, 0.88, 0.88);
+  //lg = new TLegend(0.6, 0.6, 0.88, 0.88);
+  //lg = new TLegend(0.4, 0.4, 0.88, 0.88);
   lg = new TLegend(0.65, 0.68, 0.88, 0.88);
   if(tag.Contains("COMPOSE")){
     lg = new TLegend(0.4, 0.55, 0.88, 0.88);
-    if(tag.Contains("LOG")) lg = new TLegend(0.4, 0.6, 0.88, 0.9);
+    if(tag.Contains("LOG")) lg = new TLegend(0.4, 0.61, 0.88, 0.88);
   }
-
+  if(tag.Contains("Channel") || tag.Contains("BeamEndZ")){
+    lg = new TLegend(0.5, 0.6, 0.88, 0.88);
+  }
+  if(tag.Contains("BeamQualityTheta")){
+    lg = new TLegend(0.2, 0.6, 0.58, 0.88);
+  }
+  if(tag.Contains("i05")){
+    lg = new TLegend(0.13, 0.6, 0.4, 0.88);
+  }
   for(int ii=0; ii<nent; ii++){
     TH1D * hh=new TH1D(Form("h%d%s",ii,tag.Data()),"",1,0,1);
     const int col = GetColor(cols[ii]);
@@ -1828,7 +4521,7 @@ void PlotUtils::SetTitleFormat(THStack * stk, bool offSet){
   }
 }
 
-void PlotUtils::DrawDataMCRatio(TH1D * hratio){
+void PlotUtils::DrawDataMCRatio(TH1D * hratio, bool xsec){
   
   hratio->GetYaxis()->SetTitle("Data/MC");
   hratio->GetXaxis()->SetLabelSize(0.15);
@@ -1838,7 +4531,8 @@ void PlotUtils::DrawDataMCRatio(TH1D * hratio){
   hratio->GetYaxis()->SetTitleSize(0.15);
   hratio->GetYaxis()->SetTitleOffset(.3);
   hratio->GetYaxis()->SetNdivisions(505);
-  hratio->GetYaxis()->SetRangeUser(0,2);
+  hratio->GetYaxis()->SetRangeUser(0,2.1);
+  if(xsec) hratio->GetYaxis()->SetRangeUser(0.5,1.6);
   hratio->GetXaxis()->CenterTitle();
   hratio->GetYaxis()->CenterTitle();
 
@@ -1882,14 +4576,37 @@ vector<TString> PlotUtils::FillLegendType(TString tag, TString name){
   }
 
   if(tag.Contains("beamType")){
-    tmpType.push_back(Form("p beam (%.1f%s)",(typeMaps[name][0])/tot*100,"%"));
-    tmpType.push_back(Form("#pi^{+} (%.1f%s)",(typeMaps[name][1])/tot*100,"%"));
-    tmpType.push_back(Form("#mu^{#pm} (%.1f%s)",(typeMaps[name][2])/tot*100,"%"));
-    tmpType.push_back(Form("e/#gamma (%.1f%s)",(typeMaps[name][3])/tot*100,"%"));
-    tmpType.push_back(Form("#pi^{-} (%.1f%s)",(typeMaps[name][4])/tot*100,"%"));
-    tmpType.push_back(Form("others (%.1f%s)",(typeMaps[name][5])/tot*100,"%"));
+    tmpType.push_back(Form("Beam #pi^{+} (%.1f%s)",(typeMaps[name][0])/tot*100,"%"));
+    tmpType.push_back(Form("Beam #mu^{+} (%.1f%s)",(typeMaps[name][1])/tot*100,"%"));
+    tmpType.push_back(Form("misID: p (%.1f%s)",(typeMaps[name][2])/tot*100,"%"));
+    tmpType.push_back(Form("misID: #pi^{#pm} (%.1f%s)",(typeMaps[name][3])/tot*100,"%"));
+    tmpType.push_back(Form("misID: #mu^{+} (%.1f%s)",(typeMaps[name][4])/tot*100,"%"));
+    tmpType.push_back(Form("misID: e/#gamma (%.1f%s)",(typeMaps[name][5])/tot*100,"%"));
+    tmpType.push_back(Form("Comisc (%.1f%s)",(typeMaps[name][6])/tot*100,"%"));
+    tmpType.push_back(Form("others (%.1f%s)",(typeMaps[name][7])/tot*100,"%"));
     tmpType.push_back("data");
   }
+
+  if(tag.Contains("TKIType")){
+    tmpType.push_back(Form("1p0n (%.1f%s)",(typeMaps[name][0])/tot*100,"%"));
+    tmpType.push_back(Form("1pMn (%.1f%s)",(typeMaps[name][1])/tot*100,"%"));
+    //tmpType.push_back(Form("Np0n (%.1f%s)",(typeMaps[name][2])/tot*100,"%"));
+    tmpType.push_back(Form("NpMn (%.1f%s)",(typeMaps[name][2])/tot*100,"%"));
+    tmpType.push_back(Form("background (%.1f%s)",(typeMaps[name][3])/tot*100,"%"));
+    tmpType.push_back(Form("non-#pi^{+} beam (%.1f%s)",(typeMaps[name][4])/tot*100,"%"));
+    tmpType.push_back("data");
+  }
+  if(tag.Contains("channelType")){
+    tmpType.push_back(Form("Charge Exchange (%.1f%s)",(typeMaps[name][0])/tot*100,"%"));
+    tmpType.push_back(Form("Inelastic (%.1f%s)",(typeMaps[name][1])/tot*100,"%"));
+    tmpType.push_back(Form("Absorption (%.1f%s)",(typeMaps[name][2])/tot*100,"%"));
+    tmpType.push_back(Form("PionDecays (%.1f%s)",(typeMaps[name][3])/tot*100,"%"));
+    tmpType.push_back(Form("OtherChannels (%.1f%s)",(typeMaps[name][4])/tot*100,"%"));
+    tmpType.push_back(Form("BeamMuons (%.1f%s)",(typeMaps[name][5])/tot*100,"%"));
+    tmpType.push_back(Form("Background (%.1f%s)",(typeMaps[name][6])/tot*100,"%"));
+    tmpType.push_back("data");
+  }
+  
 
   return tmpType;
 }
@@ -1937,7 +4654,28 @@ vector<TString> PlotUtils::FillLegendStyle(int opt, TString tag){
     tmpType.push_back("ple");
   }
 
+  if(tag.Contains("TKIType") && opt == 2){
+    tmpType.push_back("f");
+    tmpType.push_back("f");
+    tmpType.push_back("f");
+    tmpType.push_back("f");
+    tmpType.push_back("f");
+    tmpType.push_back("ple");
+  }
+
   if(tag.Contains("beamType") && opt == 2){
+    tmpType.push_back("f");
+    tmpType.push_back("f");
+    tmpType.push_back("f");
+    tmpType.push_back("f");
+    tmpType.push_back("f");
+    tmpType.push_back("f");
+    tmpType.push_back("f");
+    tmpType.push_back("f");
+    tmpType.push_back("ple");
+  }
+  if(tag.Contains("channelType") && opt == 2){
+    tmpType.push_back("f");
     tmpType.push_back("f");
     tmpType.push_back("f");
     tmpType.push_back("f");
@@ -1950,4 +4688,222 @@ vector<TString> PlotUtils::FillLegendStyle(int opt, TString tag){
   return tmpType;
 }
 
+void PlotUtils::PrintShowerPurityandEff(const TString tag, TH1D * h_ldGamma, TH1D * h_slGamma, TH2D * h2d)
+{
+  TString name = h2d->GetName();
+  //cout << "h2d name: " << name << endl;
+  std::map<TString,vector<double>> typeMaps;
+  ConvertToStack(h2d,true,typeMaps);
+  double tot = 0;
+  for(auto ie : typeMaps[name]){
+    tot += ie;
+  }
+  double deno = h_ldGamma->Integral(0,10000) + h_slGamma->Integral(0,10000);
+  if(name.Contains("Pi0")) deno = h_ldGamma->Integral(0,10000);
+  
+  //cout << "stk name: " << stk->GetName() << endl;
+  //cout << "tot: " << tot << "deno: " << deno << endl;
+  //cout << "num: " << (typeMaps[name][3]) << endl;
+  //cout << "purity: " << (typeMaps[name][3])/tot << " eff: " << (typeMaps[name][3])/deno << endl;
 
+  const double purity = (typeMaps[name][3])/tot;
+  const double eff = (typeMaps[name][3])/deno;
+
+  printf("%-50s: purity %5.2f efficiency %5.2f pur*eff %.3f%% \n", tag.Data(), purity, eff, purity*eff);
+  
+}
+
+void PlotUtils::PrintPi0PurityandEff(const TString tag, TH1D * h_ldGamma, TH2D * h2d)
+{
+  TString name = h2d->GetName();
+  //cout << "h2d name: " << name << endl;
+  std::map<TString,vector<double>> typeMaps;
+  ConvertToStack(h2d,true,typeMaps);
+  double tot = 0;
+  for(auto ie : typeMaps[name]){
+    tot += ie;
+  }
+  double deno = h_ldGamma->Integral(0,10000);
+  
+  //cout << "stk name: " << stk->GetName() << endl;
+  //cout << "tot: " << tot << "deno: " << deno << endl;
+  //cout << "num: " << (typeMaps[name][0]) << endl;
+  //cout << "purity: " << (typeMaps[name][0])/tot << " eff: " << (typeMaps[name][0])/deno << endl;
+
+  const double purity = (typeMaps[name][0])/tot;
+  const double eff = (typeMaps[name][0])/deno;
+
+  printf("%-50s: purity %5.3f efficiency %5.3f pur*eff %.3f%% \n", tag.Data(), purity, eff, purity*eff);
+
+}
+
+
+void PlotUtils::PrintExcPurityandEff(const TString tag, TH1D * h_1, TH1D * h_2, TH1D * h_3, TH1D * h_4, TH2D * h2d)
+{
+  TString name = h2d->GetName();
+  //cout << "h2d name: " << name << endl;
+  std::map<TString,vector<double>> typeMaps;
+  ConvertToStack(h2d,true,typeMaps);
+  double tot = 0;
+  for(auto ie : typeMaps[name]){
+    tot += ie;
+  }
+  double deno = h_1->Integral(0,10000) + h_2->Integral(0,10000) + h_3->Integral(0,10000) + h_4->Integral(0,10000);
+  
+  //cout << "stk name: " << stk->GetName() << endl;
+  //cout << "tot: " << tot << "deno: " << deno << endl;
+  //cout << "num: " << (typeMaps[name][0]) << endl;
+  //cout << "purity: " << (typeMaps[name][0])/tot << " eff: " << (typeMaps[name][0])/deno << endl;
+
+  const double purity = (typeMaps[name][0]+typeMaps[name][1]+typeMaps[name][2])/tot;
+  const double eff = (typeMaps[name][0]+typeMaps[name][1]+typeMaps[name][2])/deno;
+
+  printf("%-50s: purity %5.2f efficiency %5.2f pur*eff %.3f%% \n", tag.Data(), purity, eff, purity*eff);
+
+}
+
+void PlotUtils::TotalCEXXSCal(TH1 * hh, TH1D * InteractingHist, TH1D * xsec, const bool & Eslice, const bool & widerBin, const bool & newMethod)
+{
+  
+  // Scale down it to zero for later calculation
+  xsec->Scale(0);
+  double avogadro_constant = 6.02214076e23;  // 1 / mol
+  double argon_molar_mass = 39.95;           // g / mol
+  double liquid_argon_density = 1.39;        // g / cm^3
+  double fiducial_thickness = 0.479;//slice_width;//0.479;         // cm wire spacing
+  if(Eslice) fiducial_thickness = slice_width;
+  if(Eslice && newMethod) fiducial_thickness = slice_width*50.0;
+  if(Eslice && widerBin) fiducial_thickness = slice_width*50.0;
+  //double fiducial_thickness = 20;         // cm wire spacing
+  double sigma_factor = argon_molar_mass / (avogadro_constant * liquid_argon_density * fiducial_thickness); // pre-factor
+  double meandEdx[] = {5.06921, 2.78604, 2.35879, 2.20657, 2.14137, 2.11321, 2.10322, 2.10293, 2.10805, 2.11628, 2.12627, 2.13724, 2.14869, 2.16033, 2.17195,
+                       2.18344, 2.19472, 2.20573, 2.21646, 2.2269};
+  // Define start and end bins
+  const Int_t x0 = hh->GetXaxis()->GetFirst();
+  const Int_t x1 = hh->GetXaxis()->GetLast();
+
+  // Testing slice thickness effect
+  //cout << "reco slice * Ninc: " << fiducial_thickness*hh->Integral("width") << endl;
+  //cout << "reco Nint: " << InteractingHist->Integral("width") << endl;
+
+  // Loop over each bin and combine the incident and interacting histograms to get xsec
+  for(Int_t ix=x0; ix<=x1; ix++){
+
+    // Read off the entry for each bin of the two histograms
+    double incE = hh->GetBinContent(ix);
+    double intE = InteractingHist->GetBinContent(ix);
+    // Calculate the ratio in the full log form
+    double ratio = 0;
+    if(incE > intE) ratio = log(incE/(incE-intE));//*meandEdx[ix-1]*sigma_factor*1e27;
+    if(Eslice) ratio = ratio * meandEdx[ix-1]*sigma_factor*1e27;
+
+    if(incE != 0) cout << "ix: "<< ix << "incE: " << incE << "intE: " << intE << " ratio: " << ratio << "meandEdx[ix]: " << meandEdx[ix-1] << endl;
+
+    // Simple ratio form 
+    //double ratio = intE/incE;
+
+    // If the incE entry is not zero set the bin content
+    if(incE != 0) xsec->SetBinContent(ix,ratio);
+
+    // Error propagation method 1
+    //double error = sqrt(intE+pow(intE,2)/incE)/incE;
+    // Error propagation method 2
+    double einc = hh->GetBinError(ix);
+    double eint = InteractingHist->GetBinError(ix);
+    double error = sqrt(ratio*ratio*(pow(einc/incE,2)+pow(eint/intE,2)));
+    // If the ratio is not zero set the error
+    if(ratio != 0 ) xsec->SetBinError(ix,error);
+    
+  }
+  // The xsec histogram entry is now set
+  if(!Eslice) xsec->Scale(sigma_factor*1e27);
+  xsec->SetMaximum(300);
+  TString tag = InteractingHist->GetName();
+  if(!tag.Contains("CEX") && !tag.Contains("UnFold")) xsec->SetMaximum(1600);
+  xsec->SetMinimum(0);
+   /*for(Int_t ix=x0; ix<=x1; ix++){
+    cout << "ix: "<< ix << "bin content: " << xsec->GetBinContent(ix) << endl;
+   }*/
+}
+
+
+void PlotUtils::DiffCEXXSCal(TH1D * DiffCEXInteractingHist, TH1D * DiffCEXxsec, const double diffInt,  const double diffInterror)
+{
+
+  DiffCEXxsec->Scale(0);
+
+  const Int_t x0_diff = DiffCEXInteractingHist->GetXaxis()->GetFirst();
+  const Int_t x1_diff = DiffCEXInteractingHist->GetXaxis()->GetLast();
+
+  for(Int_t ix=x0_diff; ix<=x1_diff; ix++){
+    double incE = diffInt;
+    double intE = DiffCEXInteractingHist->GetBinContent(ix);
+    if(intE != 0 ){
+      //double ratio = log(incE/(incE-intE));
+      double ratio = intE/incE;
+      DiffCEXxsec->SetBinContent(ix,ratio);
+      //double error = sqrt(intE+pow(intE,2)/incE)/incE;
+      double einc = diffInterror;
+      double eint = DiffCEXInteractingHist->GetBinError(ix);
+      double error = sqrt(ratio*ratio*(pow(einc/incE,2)+pow(eint/intE,2)));
+      DiffCEXxsec->SetBinError(ix,error);
+      //cout << "error: " << error << endl;
+      //cout << "ratio: " << ratio << endl;
+    }
+  }
+} 
+
+TH1D * PlotUtils::GetIncidentHist(TH1D * InitialHist, TH1D * InteractingHist)
+{
+  TH1D *IncidentHist = (TH1D*)InitialHist->Clone();
+  IncidentHist->Scale(0);
+
+  //double IniSum = 0, IntSum = 0;
+  const Int_t x0 = InteractingHist->GetXaxis()->GetFirst();
+  const Int_t x1 = InteractingHist->GetXaxis()->GetLast();
+/*  for(Int_t ix=x1; ix>=x0; ix--){
+    IniSum += InitialHist->GetBinContent(ix+1);
+    //double error = InitialHist->GetBinError(ix);
+    IntSum += InteractingHist->GetBinContent(ix+1);
+    IncidentHist->SetBinContent(ix, IniSum-IntSum);
+  }
+*/
+  cout << "Name: " << InitialHist->GetName() << endl;
+  cout << "InitialHist: " << InitialHist->Integral(0,10000) << endl;
+  cout << "InteractingHist: " << InteractingHist->Integral(0,10000) << endl;
+
+  for(Int_t ix=x1; ix>=x0; ix--){
+    double iniN = 0;
+    double intN = 0;
+    for(Int_t jx=x1; jx>=ix; jx--){
+      iniN += InitialHist->GetBinContent(jx);
+    }
+    for(Int_t jx=x1; jx>=ix+1; jx--){
+      intN += InteractingHist->GetBinContent(jx);
+    }
+    /*for(Int_t jx=ix; jx>=x0; jx--){
+      intN += InteractingHist->GetBinContent(jx);
+    }
+    for(Int_t jx=ix-1; jx>=x0; jx--){
+      iniN += InitialHist->GetBinContent(jx);
+    }*/
+    //cout << "iniN: " << iniN << endl;
+    //cout << "intN: " << intN << endl;
+    //cout << "iniN - intN: " << iniN - intN << endl;
+
+    //cout << "intN: " << intN << endl;
+    //cout << "iniN: " << iniN << endl;
+    //cout << "intN - iniN: " << intN - iniN << endl;
+
+    //double entry = intN - iniN;
+    double entry = iniN - intN;
+    //cout << "ix: " << ix << "entry: " << entry << endl; 
+    if (entry < 0) entry = 0;
+    IncidentHist->SetBinContent(ix,entry);
+    IncidentHist->SetBinError(ix,InitialHist->GetBinError(ix));
+
+    //hh->SetBinError(ix,error);
+  }
+
+  return IncidentHist;
+}

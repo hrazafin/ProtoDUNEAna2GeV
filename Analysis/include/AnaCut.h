@@ -9,9 +9,7 @@ class AnaCut
     AnaCut() {};
     ~AnaCut() {};
     // All beam cut for both MC and data including 1.beam ID cut; 2.primary beam type cut; 3.beam position cut; 4.APA3 cut
-    bool CutBeamAllInOne(const bool kMC);
-    // Fill beam quality cuts histograms (use fitted value for beam quality cut latter)
-    void FillBeamQualityHist();
+    bool CutBeamAllInOne(const bool kMC, bool kFill = false);
     // Cut on beam PDG code
     bool CutBeamPDG(const bool kMC);
     // Cut on Pandora slice
@@ -19,18 +17,20 @@ class AnaCut
     // Cut on Calo size
     bool CutCaloSize();
     // Cut on beam quality
-    bool CutBeamQuality(const bool kMC, bool DoAngleCut = true);
+    bool CutBeamQuality(const bool kMC, bool DoAngleCut = true, bool kFill = false);
+    bool CutBeamInstQuality(bool kMC);
     // Cut on end Z APA3
-    bool CutAPA3EndZ(const bool kMC);
+    bool CutAPA3EndZ(const bool kMC, bool kFill = false);
     // Cut on Michel Score (remove muons)
-    bool CutMichelScore(const bool kMC);
+    bool CutMichelScore(const bool kMC, bool kFill = false);
     // Cut on median dE/dx (remove protons)
     bool CutMediandEdx(const bool kMC);
     // Cut on median dE/dx (remove protons)
-    bool CutProtonChi2DOF(const bool kMC);
+    bool CutProtonChi2DOF(const bool kMC, bool kFill = false);
+    // Cut on beam scrapers
+    bool CutBeamScraper(const bool kMC);
 
-    
-    // --------------------------------- Legacy Cuts (not used anymore) ----------------------- //
+    // --------------------------------- Legacy Cuts (not used anymore replaced by beam quality cuts) ----------------------- //
     // Cut on beam position for MC
     bool CutMCBeamPos(); 
     // Cut on beam position for data
@@ -49,17 +49,16 @@ class AnaCut
                              const double beam_inst_dirY,  const double beam_inst_dirZ,
                              const int beam_inst_nMomenta, const int beam_inst_nTracks);
 
-    // --------------------------------- Legacy Cuts (not used anymore) ----------------------- //
+    // --------------------------------- Legacy Cuts (not used anymore replaced by beam quality cuts) ----------------------- //
 
-    // Get truth particle PDG from it's ID
-    int GetTruthPDGFromID(const int inID, const vector<int> * idarray, const vector<int> * pdgarray);
-    // Get truth-matched particle info using reco particle index
-    int GetTruthParticleInfoFromRec(const int recidx);
-    bool CutTopology(const bool kMC);
+    // Event and final state particle selections
+    bool CutTopology(const bool kMC, double & pi0KineticE, double & pi0costheta, bool kFill = false);
     void CountPFP(const bool kMC, const bool kFill);
     bool IsProton(const int ii, const bool kMC);
     bool IsTrack(const int ii, const bool kMC);  
+    bool IsPionTrack(const int ii, const bool kMC);  
     bool PassProtonSubPID(const int ii);
+    bool PassPionSubPID(const int ii);
     bool IsPiplus(const int ii, const bool kMC);
     bool IsShower(const int ii, const bool kMC);
     bool IsMichel(const int ii, const bool kMC);
@@ -83,26 +82,36 @@ class AnaCut
     // Cut values
     const double cut_EndZ_APA3 = 220.0; // in cm
     const double cut_MichelScore = 0.55;
-
+    // Beam quality cuts
     const double MCmeanStartX = -30.85; // in cm
     const double MCmeanStartY = 422.4;  
-    const double MCmeanStartZ = 0.1145; 
+    const double MCmeanStartZ = 0.1146; 
     const double MCmeanThetaX = 101.6 * TMath::DegToRad(); // in rad.
     const double MCmeanThetaY = 101.2 * TMath::DegToRad();
     const double MCmeanThetaZ = 16.61 * TMath::DegToRad();
-    const double MCsigmaStartX = 5.047;
-    const double MCsigmaStartY = 4.528;
-    const double MCsigmaStartZ = 0.2164;
+    const double MCsigmaStartX = 5.043;
+    const double MCsigmaStartY = 4.535;
+    const double MCsigmaStartZ = 0.2166;
 
-    const double DATAmeanStartX = -28.44; // in cm
+    const double DATAmeanStartX = -28.35; // in cm
     const double DATAmeanStartY = 424.6;
-    const double DATAmeanStartZ = 2.959;
+    const double DATAmeanStartZ = 3.175;
     const double DATAmeanThetaX = 100.6 * TMath::DegToRad(); // in rad.
-    const double DATAmeanThetaY = 103.4 * TMath::DegToRad();
-    const double DATAmeanThetaZ = 17.65 * TMath::DegToRad();
-    const double DATAsigmaStartX = 4.802;
-    const double DATAsigmaStartY = 5.355;
-    const double DATAsigmaStartZ = 1.332;
+    const double DATAmeanThetaY = 103.6 * TMath::DegToRad();
+    const double DATAmeanThetaZ = 17.79 * TMath::DegToRad();
+    const double DATAsigmaStartX = 4.636;
+    const double DATAsigmaStartY = 5.217;
+    const double DATAsigmaStartZ = 1.326;
+
+    const double MCmeanInstX = -29.28;
+    const double MCsigmaInstX = 4.127;
+    const double DATAmeanInstX = -30.66;
+    const double DATAsigmaInstX = 4.163;
+    const double MCmeanInstY = 421.7;
+    const double MCsigmaInstY = 3.983;
+    const double DATAmeanInstY = 422.3;
+    const double DATAsigmaInstY = 3.867;
+
 
     
 };
