@@ -78,18 +78,17 @@ void DrawOutput(TH2D* h2d_beam, TH2D* h2d_scraper, const double & x_mean, const 
 TF1 * FitGausFunc(TH1D * hh, const double &min, const double &max);
 void Draw1D(TH1D* hh, TF1* f1);
 void DoPlots(TH2D* h2d_beam, TH2D* h2d_scraper,TH1D* h1d_beamx, TH1D* h1d_beamy);
-void DrawEffResponsePlots(TH2D * h2d, TH1D * h1d, TString tag, bool rebin, double overall);
-double GetOverallEff(TH1D * h1d); // This function is incorrect
+
 
 
 int main(int argc, char * argv[])
 {
     
-    //const TString finName = "input/outana.root"; // Scaper plots
-    //const TString finName = "input/out_smearing_new.root";
+    const TString finName_beamScraper = "input/outana.root"; // Scaper plots
+    //const TString finName_beamScraper = "input/out_smearing_new.root";
     
-    //const TString finName = "input/out_InstEstudy.root";
-    //const TString finName = "input/out_UpstreamFit.root"; // Eloss
+    //const TString finName_beamScraper = "input/out_InstEstudy.root";
+    //const TString finName_beamScraper = "input/out_UpstreamFit.root"; // Eloss
 
     //const TString finName = "input/out_new1115.root"; // Eff and response
     //const TString finName = "input/out_new1116.root"; // Eff and response
@@ -98,9 +97,15 @@ int main(int argc, char * argv[])
     const TString finName = "input/outana_wholeRange_0123.root"; // Eff and response
 
     TFile *file = TFile::Open(finName);
+    TFile *file_beamScraper = TFile::Open(finName_beamScraper);
 
     if(!file->IsOpen()){
       cout << "file file not open" << endl;
+      exit(1);
+    }
+
+    if(!file_beamScraper->IsOpen()){
+      cout << "file_beamScraper file not open" << endl;
       exit(1);
     }
 /* == change to newer file
@@ -124,38 +129,38 @@ int main(int argc, char * argv[])
     Draw1D(h2d_InstP_mc_projX,f1);
     Draw1D(h1d_InstP_data,f2);
 */
-/*
+
     // ========== Beam Scraper Cut ========== //
 
-    TH2D * h2d_beam700MeV = (TH2D*) file->Get("mc/j004hBeamInstXVSBeamInstYBeam700MeV_RES;1");
-    TH2D * h2d_scraper700MeV = (TH2D*) file->Get("mc/j005hBeamInstXVSBeamInstYScraper700MeV_RES;1");
+    TH2D * h2d_beam700MeV = (TH2D*) file_beamScraper->Get("mc/j004hBeamInstXVSBeamInstYBeam700MeV_RES;1");
+    TH2D * h2d_scraper700MeV = (TH2D*) file_beamScraper->Get("mc/j005hBeamInstXVSBeamInstYScraper700MeV_RES;1");
 
-    TH1D * h1d_beamx700MeV = (TH1D*) file->Get("mc/j004hBeamInstXVSBeamInstYBeam700MeV_RES_projX;1");
-    TH1D * h1d_beamy700MeV = (TH1D*) file->Get("mc/j004hBeamInstXVSBeamInstYBeam700MeV_RES_projY;1");
+    TH1D * h1d_beamx700MeV = (TH1D*) file_beamScraper->Get("mc/j004hBeamInstXVSBeamInstYBeam700MeV_RES_projX;1");
+    TH1D * h1d_beamy700MeV = (TH1D*) file_beamScraper->Get("mc/j004hBeamInstXVSBeamInstYBeam700MeV_RES_projY;1");
 
     DoPlots(h2d_beam700MeV,h2d_scraper700MeV,h1d_beamx700MeV,h1d_beamy700MeV);
 
-    TH2D * h2d_beam800MeV = (TH2D*) file->Get("mc/j004hBeamInstXVSBeamInstYBeam800MeV_RES;1");
-    TH2D * h2d_scraper800MeV = (TH2D*) file->Get("mc/j005hBeamInstXVSBeamInstYScraper800MeV_RES;1");
+    TH2D * h2d_beam800MeV = (TH2D*) file_beamScraper->Get("mc/j004hBeamInstXVSBeamInstYBeam800MeV_RES;1");
+    TH2D * h2d_scraper800MeV = (TH2D*) file_beamScraper->Get("mc/j005hBeamInstXVSBeamInstYScraper800MeV_RES;1");
 
-    TH1D * h1d_beamx800MeV = (TH1D*) file->Get("mc/j004hBeamInstXVSBeamInstYBeam800MeV_RES_projX;1");
-    TH1D * h1d_beamy800MeV = (TH1D*) file->Get("mc/j004hBeamInstXVSBeamInstYBeam800MeV_RES_projY;1");
+    TH1D * h1d_beamx800MeV = (TH1D*) file_beamScraper->Get("mc/j004hBeamInstXVSBeamInstYBeam800MeV_RES_projX;1");
+    TH1D * h1d_beamy800MeV = (TH1D*) file_beamScraper->Get("mc/j004hBeamInstXVSBeamInstYBeam800MeV_RES_projY;1");
 
     DoPlots(h2d_beam800MeV,h2d_scraper800MeV,h1d_beamx800MeV,h1d_beamy800MeV);
 
-    TH2D * h2d_beam900MeV = (TH2D*) file->Get("mc/j004hBeamInstXVSBeamInstYBeam900MeV_RES;1");
-    TH2D * h2d_scraper900MeV = (TH2D*) file->Get("mc/j005hBeamInstXVSBeamInstYScraper900MeV_RES;1");
+    TH2D * h2d_beam900MeV = (TH2D*) file_beamScraper->Get("mc/j004hBeamInstXVSBeamInstYBeam900MeV_RES;1");
+    TH2D * h2d_scraper900MeV = (TH2D*) file_beamScraper->Get("mc/j005hBeamInstXVSBeamInstYScraper900MeV_RES;1");
 
-    TH1D * h1d_beamx900MeV = (TH1D*) file->Get("mc/j004hBeamInstXVSBeamInstYBeam900MeV_RES_projX;1");
-    TH1D * h1d_beamy900MeV = (TH1D*) file->Get("mc/j004hBeamInstXVSBeamInstYBeam900MeV_RES_projY;1");
+    TH1D * h1d_beamx900MeV = (TH1D*) file_beamScraper->Get("mc/j004hBeamInstXVSBeamInstYBeam900MeV_RES_projX;1");
+    TH1D * h1d_beamy900MeV = (TH1D*) file_beamScraper->Get("mc/j004hBeamInstXVSBeamInstYBeam900MeV_RES_projY;1");
 
     DoPlots(h2d_beam900MeV,h2d_scraper900MeV,h1d_beamx900MeV,h1d_beamy900MeV);
 
-    TH2D * h2d_beam1000MeV = (TH2D*) file->Get("mc/j004hBeamInstXVSBeamInstYBeam1000MeV_RES;1");
-    TH2D * h2d_scraper1000MeV = (TH2D*) file->Get("mc/j005hBeamInstXVSBeamInstYScraper1000MeV_RES;1");
+    TH2D * h2d_beam1000MeV = (TH2D*) file_beamScraper->Get("mc/j004hBeamInstXVSBeamInstYBeam1000MeV_RES;1");
+    TH2D * h2d_scraper1000MeV = (TH2D*) file_beamScraper->Get("mc/j005hBeamInstXVSBeamInstYScraper1000MeV_RES;1");
 
-    TH1D * h1d_beamx1000MeV = (TH1D*) file->Get("mc/j004hBeamInstXVSBeamInstYBeam1000MeV_RES_projX;1");
-    TH1D * h1d_beamy1000MeV = (TH1D*) file->Get("mc/j004hBeamInstXVSBeamInstYBeam1000MeV_RES_projY;1");
+    TH1D * h1d_beamx1000MeV = (TH1D*) file_beamScraper->Get("mc/j004hBeamInstXVSBeamInstYBeam1000MeV_RES_projX;1");
+    TH1D * h1d_beamy1000MeV = (TH1D*) file_beamScraper->Get("mc/j004hBeamInstXVSBeamInstYBeam1000MeV_RES_projY;1");
 
     DoPlots(h2d_beam1000MeV,h2d_scraper1000MeV,h1d_beamx1000MeV,h1d_beamy1000MeV);
 
@@ -184,9 +189,9 @@ int main(int argc, char * argv[])
     TCanvas * ctmp = new TCanvas("ctmp", "", 1200, 800);
     hFitEloss->Fit("pol2");
     hFitEloss->Draw("e1");
-    ctmp->Print("output/Eloss.pdf");
+    ctmp->Print("output/Eloss.png");
 
-*/
+
     TH2D * h2d_InstE = (TH2D*) file->Get("mc/j008hUpStreamELossAfterSmearingAndWeight;1");
 
     const int ny = h2d_InstE->GetNbinsY();
@@ -207,9 +212,9 @@ int main(int argc, char * argv[])
       TF1 *f1 = FitGausFunc(htmp,-300,300);
       hFitElossSW->SetBinContent(iy+6,f1->GetParameter("Mean"));
       // Sigma band
-      //hFitElossSW->SetBinError(iy+6,f1->GetParameter("Sigma"));
+      hFitElossSW->SetBinError(iy+6,f1->GetParameter("Sigma"));
       // Stats Error
-      hFitElossSW->SetBinError(iy+6,1/sqrt(htmp->Integral()));
+      //hFitElossSW->SetBinError(iy+6,1/sqrt(htmp->Integral()));
 
     }
 
@@ -259,7 +264,7 @@ int main(int argc, char * argv[])
     tt.SetTextSize(0.035);
     tt.DrawLatex(0.125,0.925,"DUNE:ProtoDUNE-SP");
 
-    ctmp1->Print("output/ElossSW.pdf");
+    ctmp1->Print("output/ElossSW.png");
 
 
     TH1D * hLoss = h2d_InstE->ProjectionX();
@@ -272,108 +277,10 @@ int main(int argc, char * argv[])
     f11->Draw("sames");
     cout << "f11 mean: " << f11->GetParameter("Mean") << endl;
 
-    ctmp2->Print("output/hLoss.pdf");
-
-    // ========== Efficiency and Response Matrix ========== //
-
-    TH2D * h2d_beamint = (TH2D*) file->Get("mc/i902response_BeamInt;1");
-    TH1D * h1d_beamint = (TH1D*) file->Get("mc/i913eff_BeamInt;1");
-    TString name_beamint = h2d_beamint->GetName();
-    DrawEffResponsePlots(h2d_beamint, h1d_beamint, name_beamint, true, 0.499024);
-
-    TH2D * h2d_int = (TH2D*) file->Get("mc/i901response_Int;1");
-    TH1D * h1d_int = (TH1D*) file->Get("mc/i910eff_Int;1");
-    TString name_int = h2d_int->GetName();
-    DrawEffResponsePlots(h2d_int, h1d_int, name_int, false, 0.0482581);
-
-    TH2D * h2d_ini = (TH2D*) file->Get("mc/i904response_Ini;1");
-    TH1D * h1d_ini = (TH1D*) file->Get("mc/i912eff_Ini;1");
-    TString name_ini = h2d_ini->GetName();
-    DrawEffResponsePlots(h2d_ini, h1d_ini, name_ini, false, 0.499024);
-
-    // Pi0 related
-    TH2D * h2d_Pi0KE = (TH2D*) file->Get("mc/i905response_pi0KE;1");
-    TH1D * h1d_Pi0KE = (TH1D*) file->Get("mc/i914eff_Pi0KE;1");
-    TString name_Pi0KE = h2d_Pi0KE->GetName();
-    DrawEffResponsePlots(h2d_Pi0KE, h1d_Pi0KE, name_Pi0KE, false, 0.059414);
-
-    TH2D * h2d_Pi0CosTheta = (TH2D*) file->Get("mc/i906response_pi0CosTheta;1");
-    TH1D * h1d_Pi0CosTheta = (TH1D*) file->Get("mc/i915eff_Pi0CosTheta;1");
-    TString name_Pi0CosTheta = h2d_Pi0CosTheta->GetName();
-    DrawEffResponsePlots(h2d_Pi0CosTheta, h1d_Pi0CosTheta, name_Pi0CosTheta, false, 0.059414);
-
-    TH2D * h2d_Pi0Theta = (TH2D*) file->Get("mc/i907response_pi0Theta;1");
-    TH1D * h1d_Pi0Theta = (TH1D*) file->Get("mc/i916eff_Pi0Theta;1");
-    TString name_Pi0Theta = h2d_Pi0Theta->GetName();
-    DrawEffResponsePlots(h2d_Pi0Theta, h1d_Pi0Theta, name_Pi0Theta, false, 0.059414);
-
+    ctmp2->Print("output/hLoss.png");
 
     file->Close();
-}
-double GetOverallEff(TH1D * h1d){
-  
-  const int nx = h1d->GetNbinsX();
-  double eff = 0;
-  double nn = 0;
-  for(int ix=0; ix<=nx+1; ix++){
-    eff += h1d->GetBinContent(ix);
-    if(h1d->GetBinContent(ix)!=0) nn++;
-  }
-  return eff/nn;
-}
-
-void DrawEffResponsePlots(TH2D * h2d, TH1D * h1d, TString tag, bool rebin, double overall){
-    gStyle->SetOptStat(0);
-
-    TLatex tt;
-    tt.SetNDC();
-
-    TCanvas * c11 = new TCanvas(Form("c11%s",tag.Data()), "", 1200, 800);
-    if(rebin) h2d->Rebin2D(50,50);
-    h2d->SetTitle(" ");
-    h2d->Draw("box");
-    tt.SetTextSize(0.035);
-    tt.DrawLatex(0.125,0.925,"DUNE:ProtoDUNE-SP");
-
-    c11->Print("output/"+tag+"_response.pdf");
-
-    TCanvas * c12 = new TCanvas(Form("c12%s",tag.Data()), "", 1200, 800);
-    h1d->SetTitle("");
-    h1d->GetXaxis()->SetTitle("True Pion Energy (MeV)");
-    if(tag.Contains("pi0Theta")) h1d->GetXaxis()->SetTitle("True Pion Theta (deg.)");
-    if(tag.Contains("pi0CosTheta")) h1d->GetXaxis()->SetTitle("True Pion Cos Theta");
-    h1d->GetYaxis()->SetTitle("Efficiency");
-
-    h1d->SetMarkerColor(kBlack);
-    h1d->SetLineColor(kBlack);
-    h1d->SetMarkerStyle(kFullSquare);
-    // This is incorrect -- see main Analysis
-    //cout << "GetOverallEff: "  << h1d->GetName() << " "<< GetOverallEff(h1d) << endl;
-    h1d->Draw("e1");
-
-    TLine *line = new TLine(0,overall,1000,overall);
-    if(tag.Contains("pi0Theta")) line = new TLine(0,overall,180,overall);
-    if(tag.Contains("pi0CosTheta")) line = new TLine(-1,overall,1,overall);
-
-    line->SetLineColor(kBlue);
-    line->SetLineStyle(kDashed);
-    line->SetLineWidth(2);
-    line->Draw("sames");
-
-    auto lg = new TLegend(0.15,0.58,0.4,0.68);
-    if(tag.Contains("pi0Theta")) lg = new TLegend(0.6,0.58,0.85,0.68);
-    //if(tag.Contains("Pi0CosTheta")) new TLegend(0.15,0.58,0.4,0.68);
-
-    lg->AddEntry(line,"Overall Efficiency","l");
-    lg->SetBorderSize(0);
-    lg->Draw("sames");
-
-
-
-    tt.SetTextSize(0.035);
-    tt.DrawLatex(0.125,0.925,"DUNE:ProtoDUNE-SP");
-    c12->Print("output/"+tag+"_eff.pdf");
-
+    file_beamScraper->Close();
 
 }
 
@@ -424,7 +331,7 @@ void Draw1D(TH1D* hh, TF1* f1){
   hh->Draw("hists");
   f1->Draw("sames C");
   
-  c1->Print("output/"+tag+".pdf");
+  c1->Print("output/"+tag+".png");
 
 }
 void DrawOutput(TH2D* h2d_beam, TH2D* h2d_scraper, const double & x_mean, const double & y_mean, const double & radius, const double & multi){
@@ -497,7 +404,8 @@ void DrawOutput(TH2D* h2d_beam, TH2D* h2d_scraper, const double & x_mean, const 
     lg->SetHeader(tit);
     lg->AddEntry(h2d_beam,"Non-Scraper","l");
     lg->AddEntry(h2d_scraper,"Scraper","l");
-    lg->AddEntry(el1,"Sungbin's cut","l");
+    //lg->AddEntry(el1,"Sungbin's cut","l");
+    lg->AddEntry(el1,"Beam Scraper cut","l");
     lg->SetBorderSize(0);
     lg->SetTextFont(22);
     lg->Draw("sames");
@@ -505,5 +413,5 @@ void DrawOutput(TH2D* h2d_beam, TH2D* h2d_scraper, const double & x_mean, const 
     tt.SetTextSize(0.035);
     tt.DrawLatex(0.125,0.925,"DUNE:ProtoDUNE-SP");
 
-    c1->Print("output/"+tagbeam+".pdf");
+    c1->Print("output/"+tagbeam+".png");
 }   
