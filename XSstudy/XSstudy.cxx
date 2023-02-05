@@ -374,7 +374,7 @@ int main(int argc, char * argv[])
   g_650to800->SetLineColor(kRed);
   g_650to800->Draw("sames C");
 
-  ctmp->Print("output/truth_Diff600to800CEXXS.pdf");
+  ctmp->Print("output/truth_Diff600to800CEXXS.png");
 
 
   
@@ -449,8 +449,8 @@ void DrawHistOutput(TH1D *h_truth, TH1D *h_reco, TH1D *h_unfold, TH1D *h_unfold_
   if(tag.Contains("i006")||tag.Contains("i066")) tt.DrawLatex(0.22,0.825,"#bf{#it{Preliminary}}");
   else tt.DrawLatex(0.725,0.825,"#bf{#it{Preliminary}}");
 
-  //c1->Print("output/hint_uf.pdf");
-  c1->Print("output/"+tag+".pdf");
+  //c1->Print("output/hint_uf.png");
+  c1->Print("output/"+tag+".png");
 
 }
 
@@ -575,7 +575,7 @@ void DrawTotalXSPlots(TH1D *hinc_truth, TH1D *hint_truth, TH1D *hinc_reco, TH1D 
   //tt.DrawLatex(0.705,0.775,"#bf{#it{(Stats. Error Only)}}");
   tt.DrawLatex(0.705,0.775,"#bf{#it{(Stats. + Syst. Error)}}");
 
-  c1->Print("output/truth_TotalCEXXS.pdf");
+  c1->Print("output/truth_TotalCEXXS.png");
 
   
 }
@@ -710,7 +710,7 @@ void DrawDiffXSPlots(TH1D *hpi0KE_truth, TH1D *hpi0KE_reco, TH1D *hpi0KE_data, T
   if(!name.Contains("CosTheta")) tt.DrawLatex(0.22,0.775,"#bf{#it{(Stats. Error Only)}}");
   if(name.Contains("CosTheta")) tt.DrawLatex(0.605,0.775,"#bf{#it{(Stats. Error Only)}}");
 
-  c2->Print("output/plot_Diff"+name+"CEXXS.pdf");
+  c2->Print("output/plot_Diff"+name+"CEXXS.png");
 
 }
 
