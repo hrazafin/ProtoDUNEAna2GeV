@@ -1,0 +1,148 @@
+/data/dune/users/yangk/workdir/pduneAnalysis/bin/mkexe.sh
+================== Compiling Analysis with Analysis -lRooUnfold -I/data/dune/users/yangk/workdir/pduneAnalysis/RooUnfold/build -L/data/dune/users/yangk/workdir/pduneAnalysis/RooUnfold/build =================
+
+g++ Analysis.cxx -g -O3 -Wall -Werror -std=c++17 -I/cvmfs/larsoft.opensciencegrid.org/products/root/v6_22_06a/Linux64bit+3.10-2.17-e20-p383b-prof/include -Wl,--no-as-needed -L./ -L/cvmfs/larsoft.opensciencegrid.org/products/root/v6_22_06a/Linux64bit+3.10-2.17-e20-p383b-prof/lib -lCore -lImt -lRIO -lNet -lHist -lGraf -lGraf3d -lGpad -lROOTVecOps -lTree -lTreePlayer -lRint -lPostscript -lMatrix -lPhysics -lMathCore -lThread -lMultiProc -lROOTDataFrame -pthread -lm -ldl -rdynamic -lTree -lMinuit -lASImage -o Analysis -lRooUnfold -I/data/dune/users/yangk/workdir/pduneAnalysis/RooUnfold/build -L/data/dune/users/yangk/workdir/pduneAnalysis/RooUnfold/build
+
+
+checked: /data/dune/users/yangk/workdir/pduneAnalysis/bin/mkexe.sh Analysis done!
+
+
+[1mRooFit v3.60 -- Developed by Wouter Verkerke and David Kirkby[0m 
+                Copyright (C) 2000-2013 NIKHEF, University of California & Stanford University
+                All rights reserved, please read http://roofit.sourceforge.net/license.txt
+
+Name: h_cexThetapi0
+Done creating splines for particle with pdgcode 211
+Input file:
+/data/dune/users/yangk/protoDUNE_mc_reco_flattree_prod4a_ntuple.root
+
+fin is open!
+Successuflly get mc tree with name: pduneana/beamana
+Name: i000hTruthBeamInitialHist
+InitialHist: 70552.6
+InteractingHist: 70552.6
+ana IncidentHist integral: 1.10048e+07
+Name: i000hNewTruthBeamInitialHist
+InitialHist: 56433.6
+InteractingHist: 56433.6
+ana NewIncidentHist integral: 188581
+Name: i000hTruthBeamInitialHist_50MeVbin
+InitialHist: 70552.6
+InteractingHist: 70552.6
+ana IncidentHist integral: 288213
+int overall eff: 0.0482581
+beam int overall eff: 0.499024
+ini overall eff: 0.499024
+Pi0KE overall eff: 0.059414
+Pi0CosTheta overall eff: 0.059414
+Pi0Theta overall eff: 0.059414
+xloop: 62094
+trueloop: 0
+xloopin: 27212xloopout: 26761xloopoutbadtrack: 7359
+xlooptotal: 61332
+xcexloop: 8743
+truecexloop: 0
+truecex800loop: 0
+cex800loopin: 367
+cex800loopout: 6819
+cex800looptotal: 7186
+cex800looptotalhalf: 3593
+cex800loopfill: 367
+cex800loopfillnonzero: 367
+beam back: -nan
+cex back: -nan
+pi0cex back: -nan
+good: -nan
+All entries: 298194
+BeamCount: 69654
+CEXEventCount: 1143
+Now unfolding...
+Iteration : 0
+Chi^2 of change 1792.82
+Iteration : 1
+Chi^2 of change 47.5874
+Iteration : 2
+Chi^2 of change 33.3554
+Iteration : 3
+Chi^2 of change 26.6196
+Calculating covariances due to number of measured events
+hini_uf: 68821.1
+Now unfolding...
+Iteration : 0
+Chi^2 of change 1183.39
+Iteration : 1
+Chi^2 of change 142.697
+Iteration : 2
+Chi^2 of change 84.7303
+Iteration : 3
+Chi^2 of change 58.7806
+Calculating covariances due to number of measured events
+hbeamint_uf: 70603.2
+Now unfolding...
+Iteration : 0
+Chi^2 of change 14726.3
+Iteration : 1
+Chi^2 of change 261.861
+Iteration : 2
+Chi^2 of change 34.7384
+Iteration : 3
+Chi^2 of change 12.4114
+Calculating covariances due to number of measured events
+hinc_uf: 9.30313e+06
+Now unfolding...
+Iteration : 0
+Chi^2 of change 237.276
+Iteration : 1
+Chi^2 of change 0.116971
+Iteration : 2
+Chi^2 of change 0.046484
+Iteration : 3
+Chi^2 of change 0.0313239
+Calculating covariances due to number of measured events
+hint_uf: 19423.8
+Now unfolding...
+Iteration : 0
+Chi^2 of change 1.32461e-28
+Iteration : 1
+Chi^2 of change 7.02045e-28
+Iteration : 2
+Chi^2 of change 1.46613e-29
+Iteration : 3
+Chi^2 of change 6.71501e-29
+Calculating covariances due to number of measured events
+hpi0KE_uf: 7856.02
+Now unfolding...
+Iteration : 0
+Chi^2 of change 3.85423e-29
+Iteration : 1
+Chi^2 of change 3.43419e-29
+Iteration : 2
+Chi^2 of change 3.61938e-29
+Iteration : 3
+Chi^2 of change 2.02143e-28
+Calculating covariances due to number of measured events
+hpi0CosTheta_uf: 7856.02
+Now unfolding...
+Iteration : 0
+Chi^2 of change 1.83014e-28
+Iteration : 1
+Chi^2 of change 1.55806e-28
+Iteration : 2
+Chi^2 of change 6.5889e-29
+Iteration : 3
+Chi^2 of change 8.17259e-29
+Calculating covariances due to number of measured events
+hpi0Theta_uf: 7856.02
+Name: i024hUnFoldedInitialHist
+InitialHist: 68821.1
+InteractingHist: 70603.2
+ana RecoIncidentHist integral: 1.056e+07
+mc 0. Beam PDG                                    : all 298194.0 selected 170238.0 fraction 57.1% histogram a001hCutBeamPDGPass 
+mc 1. Pandora slice                               : all 170238.0 selected 145004.0 fraction 85.2% histogram a002hCutPandoraSlicePass 
+mc 2. Calo size                                   : all 145004.0 selected 142362.0 fraction 98.2% histogram a003hCutCaloSizePass 
+mc 3. Beam Quality                                : all 142362.0 selected 100824.0 fraction 70.8% histogram a004hCutBeamQualityPass 
+mc 4. APA3 endZ                                   : all 100824.0 selected 82212.0 fraction 81.5% histogram a005hCutAPA3EndZPass 
+mc 5. Michel score                                : all 82212.0 selected 80616.0 fraction 98.1% histogram a006hCutMichelScorePass 
+mc 6. Chi2/DOF                                    : all 80616.0 selected 76583.0 fraction 95.0% histogram a007hCutProtonChi2Pass 
+mc 7. Beam Scraper                                : all 76583.0 selected 60174.0 fraction 78.6% histogram a008hCutBeamScraperPass 
+style::PrintStat newall != oldsel 68300.000000 60174.000000

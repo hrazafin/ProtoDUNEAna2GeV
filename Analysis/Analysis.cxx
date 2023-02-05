@@ -74,7 +74,7 @@ int anaRec(const TString finName, TList *lout, const TString tag, const int nEnt
   double badevt = 0;
   double goodevt = 0;
 
-  bool doit = false;
+  bool doit = true;
 
   // Loop over TTree
   while(tree->GetEntry(ientry)){
@@ -663,8 +663,8 @@ int anaRec(const TString finName, TList *lout, const TString tag, const int nEnt
     double bckweight = anaUtils.CalBckWeight(kMC);
 
     // Count beam after beam cut before other cuts
-    BeamCount++;
-    //BeamCount += 1.0*weight*bckweight;
+    //BeamCount++;
+    BeamCount += 1.0*weight*bckweight;
 
     anaUtils.GetFSParticlesTruth();
     if(anaUtils.GetNParticles()[2] > 0) anaUtils.GetFSPiZeroDecayDaughterTruth();
