@@ -111,6 +111,7 @@ class PlotUtils
   void PrintPi0PurityandEff(const TString tag, TH1D * h_ldGamma, TH2D * h2d);
   void PrintExcPurityandEff(const TString tag, TH1D * h_1, TH1D * h_2, TH1D * h_3, TH1D * h_4, TH2D * h2d);
 
+  void PrintXSUnfoldingInfo(const double& i_true, const double& i_reco, const double& i_reco_sel, const double& i_reco_nosel, const double& i_reco_bad);
   void TotalCEXXSCal(TH1 * hh, TH1D * InteractingHist, TH1D * xsec, const bool & Eslice = true, const bool & widerBin = false, const bool & newMethod = false);
   void DiffCEXXSCal(TH1D * DiffCEXInteractingHist, TH1D * DiffCEXxsec, const double diffInt, const double diffInterror);
   TH1D * GetIncidentHist(TH1D * InitialHist, TH1D * InteractingHist);

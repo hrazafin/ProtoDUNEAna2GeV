@@ -4762,6 +4762,17 @@ void PlotUtils::PrintExcPurityandEff(const TString tag, TH1D * h_1, TH1D * h_2, 
 
 }
 
+void PlotUtils::PrintXSUnfoldingInfo(const double& i_true, const double& i_reco, const double& i_reco_sel, const double& i_reco_nosel, const double& i_reco_bad){
+
+  cout << "truth entry: " << i_true << endl; 
+  cout << "reco entry: " << i_reco << endl; 
+  cout << "------------------------" << endl;
+  cout << "reco selected: " << i_reco_sel << " reco not-selected: " << i_reco_nosel << " reco bad: " << i_reco_bad << endl;
+  cout << "reco sum entry: " << i_reco_sel + i_reco_nosel + i_reco_bad << endl;
+  cout << endl;
+
+}
+
 void PlotUtils::TotalCEXXSCal(TH1 * hh, TH1D * InteractingHist, TH1D * xsec, const bool & Eslice, const bool & widerBin, const bool & newMethod)
 {
   

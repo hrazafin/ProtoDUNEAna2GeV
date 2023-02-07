@@ -2528,7 +2528,7 @@ void AnaUtils::KF(const TLorentzVector &ldShower, const TLorentzVector &slShower
 
 }
 
-void AnaUtils::FillXSTrueHistograms(){
+void AnaUtils::FillXSTrueHistograms(int &trueloop, int &truecexloop, int &truecex800loop){
   // Option to control fake data sample
   bool isFakeData = IsFakeData();
   // Get the MC weight for each event
@@ -2536,7 +2536,6 @@ void AnaUtils::FillXSTrueHistograms(){
 
   // Select true pion beam
   if(AnaIO::true_beam_PDG == 211 && isFakeData){
-    //trueloop++;
     // Clear the incident beam energy vector
     AnaIO::true_beam_incidentEnergies->clear();
     // Fill the beam traj Z position with/without SCE correction
@@ -2553,6 +2552,8 @@ void AnaUtils::FillXSTrueHistograms(){
     double interactingE = MakeTrueIncidentEnergies(AnaIO::true_beam_traj_Z, AnaIO::true_beam_traj_KE, AnaIO::true_beam_incidentEnergies);
 
     if(AnaIO::true_beam_incidentEnergies->size() != 0){
+      trueloop++;
+
       // First element is the initial energy
       // One method
       double initialE = (*AnaIO::true_beam_incidentEnergies)[0];
@@ -2609,7 +2610,7 @@ void AnaUtils::FillXSTrueHistograms(){
       // Select all true charge exchange (CEX) events i.e. 1-pi0 and 0-pi+/-
       if((*AnaIO::true_beam_endProcess) == "pi+Inelastic" &&  AnaIO::true_daughter_nPi0 == 1 && AnaIO::true_daughter_nPiPlus == 0 &&  AnaIO::true_daughter_nPiMinus == 0) {
         
-        //truecexloop++;
+        truecexloop++;
         // Fill the interacting histogram for CEX events
         if(interactingE != -999) AnaIO::hTruthCEXInteractingHist->Fill(interactingE, weight);
         FillEsliceHistograms(AnaIO::hNewTruthBeamInitialHist, AnaIO::hNewTruthBeamInteractingHist, AnaIO::hNewTruthBeamIncidentHist, AnaIO::hNewTruthCEXInteractingHist, initialE, interactingE, interactingE, weight, binning_100MeV, N_binning_100MeV, true);
@@ -2632,6 +2633,7 @@ void AnaUtils::FillXSTrueHistograms(){
 
         // Select different pion beam interacting slice for Diff. xsec calculation
         if(interactingE > 650 && interactingE < 800){
+          truecex800loop++;
           AnaIO::hTruthDiffCEXInteractingHist_650to800MeV->Fill(LeadingPiZeroKE*1000, weight);
           AnaIO::hTruthDiffCEXInteractingHistTheta_650to800MeV->Fill(theta, weight);
           AnaIO::hTruthDiffCEXInteractingHistCosTheta_650to800MeV->Fill(costheta, weight);

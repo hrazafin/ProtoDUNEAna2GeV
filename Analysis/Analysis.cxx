@@ -2,7 +2,6 @@
 #include "src/PlotUtils.cxx"
 #include "src/AnaUtils.cxx"
 #include "src/AnaCut.cxx"
-//#include "src/BetheBloch.cxx"
 #include "src/Unfold.cxx"
 
 TRandom3 *grdm = new TRandom3(1); // fixed seed
@@ -45,22 +44,27 @@ int anaRec(const TString finName, TList *lout, const TString tag, const int nEnt
   double mc_i = 0;
   double data_i = 0;
 
-  
+  // Total truth
+  int trueloop = 0;
+  // Total reco
   int xloop = 0;
   int xloopin = 0;
   int xloopout = 0;
   int xloopoutbadtrack = 0;
-  int xcexloop = 0;
-
-  int trueloop = 0;
+  // Cex truth
   int truecexloop = 0;
-
+  // Cex reco
+  int xcexloop = 0;
+  int xcexloopin = 0;
+  int xcexloopout = 0;
+  int xcexloopoutbadtrack = 0;
+  // Diff cex truth
   int truecex800loop = 0;
+  // Diff cex reco
+  int cex800loop = 0;
   int cex800loopin = 0;
   int cex800loopout = 0;
-
-  int cex800loopfill = 0;
-  int cex800loopfillnonzero = 0;
+  int cex800loopoutbadtrack = 0;
 
   double beampiplus = 0;
   double totalbeam = 0;
@@ -123,7 +127,7 @@ int anaRec(const TString finName, TList *lout, const TString tag, const int nEnt
       }
       
       // Fill XS hisotgrams
-      anaUtils.FillXSTrueHistograms();
+      anaUtils.FillXSTrueHistograms(trueloop, truecexloop, truecex800loop);
 
       // Set signal using truth info
       anaUtils.SetFullSignal();
@@ -149,9 +153,7 @@ int anaRec(const TString finName, TList *lout, const TString tag, const int nEnt
     //====================== End truth information (MC only)======================//
 
     //====================== MC reco information (MC cex and train response matrix)======================//
-    // == Binnings for cross sections
-    int N_binning_100MeV = 20;
-    vector<double> binning_100MeV = {0., 50., 100., 150., 200., 250., 300., 350., 400., 450., 500., 550., 600., 650., 700., 750., 800., 850., 900., 950., 1000.};
+
     // Thin-slice method, incident and interaction histograms calcualtion and filling
     if(kMC && doit){
       // Divide the MC sample into half according to the event number
@@ -164,6 +166,11 @@ int anaRec(const TString finName, TList *lout, const TString tag, const int nEnt
       if(AnaIO::reco_beam_true_byHits_PDG == 211){
         AnaIO::hTruthPDGCode_PionMatched->Fill(AnaIO::true_beam_PDG);
       }
+
+      // == Binnings for cross sections (SungBin's method)
+      int N_binning_100MeV = 20;
+      vector<double> binning_100MeV = {0., 50., 100., 150., 200., 250., 300., 350., 400., 450., 500., 550., 600., 650., 700., 750., 800., 850., 900., 950., 1000.};
+    
       // Select true pion beam for the unfolding process
       if(AnaIO::true_beam_PDG == 211){     
         // True beam incident energy (vector) and interaction energy calculation (use true_beam_traj_Z and true_beam_traj_KE)
@@ -383,6 +390,7 @@ int anaRec(const TString finName, TList *lout, const TString tag, const int nEnt
                   plotUtils.FillHist(AnaIO::hRecPiPlusInteractingEnergyBckSub, interactingE_reco, evtXStype, weight);
                   // Fake data used to fill interacting histogram
                   if(isFakeData){
+                    xcexloopin++;
                     //>!
                     AnaIO::hRecoInteractingHist->Fill(interactingE_reco, weight);
                     // Sungbin's new method
@@ -416,7 +424,7 @@ int anaRec(const TString finName, TList *lout, const TString tag, const int nEnt
                     // ?? Indenpent of fake data use full MC to fill diff. XS unfolding matrix
                     //if(/*!isFakeData && */interactingE > 750 && interactingE < 800) {
                     if(/*!isFakeData && */interactingE > 650 && interactingE < 800) {
-                      cex800loopin++;
+                      if(isFakeData) {cex800loop++; cex800loopin++;}
                       uf.response_SliceID_Pi0KE.Fill(pi0KineticE*1000, LeadingPiZeroKE*1000, weight);
                       uf.response_SliceID_Pi0CosTheta.Fill(pi0costheta, LeadingPiZeroCosTheta, weight);
                       double pi0theta = TMath::RadToDeg() * TMath::ACos(pi0costheta);
@@ -429,16 +437,13 @@ int anaRec(const TString finName, TList *lout, const TString tag, const int nEnt
                     //}
                     // ?? Fill diff. XS pi0 KE histogram
                       //if(interactingE_reco > 750 && interactingE_reco < 800) {
-                        cex800loopfill++;
+                        
                         plotUtils.FillHist(AnaIO::hRecPi0Energy_OVERLAY_After_EVT_High, pi0KineticE*1000, evtXStype, weight);
                         AnaIO::hRecoPi0KEHist->Fill(pi0KineticE*1000, weight);
                         AnaIO::hRecoPi0CosThetaHist->Fill(pi0costheta, weight);
                         //double pi0theta = TMath::RadToDeg() * TMath::ACos(pi0costheta);
                         AnaIO::hRecoPi0ThetaHist->Fill(pi0theta, weight);
-                        if(pi0KineticE != -999) {
-                          //cout << "pi0KineticE*1000: " << pi0KineticE*1000 << endl;
-                          cex800loopfillnonzero++;
-                        }
+
                       //}
 
                       /*else{
@@ -463,6 +468,7 @@ int anaRec(const TString finName, TList *lout, const TString tag, const int nEnt
                   
                 }
                 else{ // Not pass beam cuts or not pass event topology or both
+                  if(isFakeData) xcexloopout++;
                   // Fill missing response matrix
                   //if(!isFakeData) {
                     //if(interactingE != -999) 
@@ -483,14 +489,14 @@ int anaRec(const TString finName, TList *lout, const TString tag, const int nEnt
                     //cout << "Not pass beam cuts nPi-: " << AnaIO::true_daughter_nPiMinus << endl;  
 
 
-                    cex800loopout++;
+                    if(isFakeData) {cex800loop++;cex800loopout++;}
                   }
                 }
               }
             }
             else{ // reco KE beam size = 0
               //cout << "reco KE beam size = 0" << endl;
-              if(isFakeData) {xloop++; xloopoutbadtrack++;}
+              if(isFakeData) {xloopoutbadtrack++;}
             
               if(!isFakeData){
                 uf.response_SliceID_Ini.Miss((*AnaIO::true_beam_incidentEnergies)[1], weight);
@@ -502,13 +508,14 @@ int anaRec(const TString finName, TList *lout, const TString tag, const int nEnt
                 }
               }  
               if((*AnaIO::true_beam_endProcess) == "pi+Inelastic" &&  AnaIO::true_daughter_nPi0 == 1 && AnaIO::true_daughter_nPiPlus == 0 &&  AnaIO::true_daughter_nPiMinus == 0){
+
                 //if(!isFakeData) {
                   //if(interactingE != -999) 
                   uf.response_SliceID_Int.Miss(interactingE, weight);
                   //cout << "Not 0 beam size interactingE: " << interactingE << endl;               
                 //}
                 
-                if(isFakeData) xcexloop++;
+                if(isFakeData) {xcexloop++; xcexloopoutbadtrack++;}
                 //if(/*!isFakeData && */interactingE > 750 && interactingE < 800) {
                 if(/*!isFakeData && */interactingE > 650 && interactingE < 800) {
                   uf.response_SliceID_Pi0KE.Miss(LeadingPiZeroKE*1000, weight);
@@ -522,7 +529,7 @@ int anaRec(const TString finName, TList *lout, const TString tag, const int nEnt
                   //cout << "Not 0 beam size nPi+: " << AnaIO::true_daughter_nPiPlus << endl;               
                   //cout << "Not 0 beam size nPi-: " << AnaIO::true_daughter_nPiMinus << endl;               
                   
-                  cex800loopout++;
+                  if(isFakeData) {cex800loop++; cex800loopoutbadtrack++;}
                 }
               }
             }
@@ -549,7 +556,7 @@ int anaRec(const TString finName, TList *lout, const TString tag, const int nEnt
 
               //}
               
-              if(isFakeData) xcexloop++;
+              if(isFakeData) {xcexloop++; xcexloopoutbadtrack++;}
               //if(/*!isFakeData && */interactingE > 750 && interactingE < 800) {
               if(/*!isFakeData && */interactingE > 650 && interactingE < 800) {
                 uf.response_SliceID_Pi0KE.Miss(LeadingPiZeroKE*1000, weight);
@@ -563,7 +570,7 @@ int anaRec(const TString finName, TList *lout, const TString tag, const int nEnt
                 //cout << "Unphysical reco track length nPi+: " << AnaIO::true_daughter_nPiPlus << endl;               
                 //cout << "Unphysical reco track length nPi-: " << AnaIO::true_daughter_nPiMinus << endl;     
 
-                cex800loopout++;
+                if(isFakeData) {cex800loop++; cex800loopoutbadtrack++;}
               }
             }
           } // End of Unphysical reco track length ...
@@ -922,25 +929,13 @@ int anaRec(const TString finName, TList *lout, const TString tag, const int nEnt
 
   }
 
-
-
-  cout << "xloop: " << xloop << endl; 
-  cout << "trueloop: " << trueloop << endl; 
-  cout << "xloopin: " << xloopin << "xloopout: " << xloopout << "xloopoutbadtrack: " << xloopoutbadtrack << endl;
-  cout << "xlooptotal: " << xloopin + xloopout + xloopoutbadtrack << endl;
-
-  cout << "xcexloop: " << xcexloop << endl; 
-  cout << "truecexloop: " << truecexloop << endl;
-
-  cout << "truecex800loop: " << truecex800loop << endl;
-  cout << "cex800loopin: " << cex800loopin << endl; 
-  cout << "cex800loopout: " << cex800loopout << endl; 
-  cout << "cex800looptotal: " << cex800loopin + cex800loopout << endl; 
-  cout << "cex800looptotalhalf: " << (cex800loopin + cex800loopout)/2.0 << endl; 
-
-  cout << "cex800loopfill: " << cex800loopfill << endl;
-  cout << "cex800loopfillnonzero: " << cex800loopfillnonzero << endl;
-
+  cout << "--------------- Unfold beam initial ----------------" << endl;
+  plotUtils.PrintXSUnfoldingInfo(trueloop,xloop,xloopin,xloopout,xloopoutbadtrack);
+  cout << "--------------- Unfold beam int ----------------" << endl;
+  plotUtils.PrintXSUnfoldingInfo(truecexloop,xcexloop,xcexloopin,xcexloopout,xcexloopoutbadtrack);
+  cout << "--------------- Unfold daughter pi0 ----------------" << endl;
+  plotUtils.PrintXSUnfoldingInfo(truecex800loop,cex800loop,cex800loopin,cex800loopout,cex800loopoutbadtrack);
+  
   cout << "beam back: " << beampiplus/(totalbeam+beampiplus) << endl;
   cout << "cex back: " << cex/(totalcex+cex) << endl;
 

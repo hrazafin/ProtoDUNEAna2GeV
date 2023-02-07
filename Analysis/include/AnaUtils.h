@@ -146,7 +146,7 @@ class AnaUtils
     }
 
 
-    void FillXSTrueHistograms();
+    void FillXSTrueHistograms(int &trueloop, int &truecexloop, int &truecex800loop);
     void FillXSRecoHistograms();
 
     //void FillEsliceHistograms(double KE_init, double KE_end, double KE_int, double weight, const vector<double> binning, int N_bin, bool fill_int);
