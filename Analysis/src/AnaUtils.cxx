@@ -3075,37 +3075,37 @@ void AnaUtils::FillUpStreamEnergyLossHistBeforeCut(double beam_inst_KE, double t
   if(beam_inst_KE > 1.0 && beam_inst_KE < 1.1) AnaIO::hUpStreamELoss1000MeV->Fill(UpStreamELoss);
 
   double beam_inst_X = -999.0, beam_inst_Y = -999.0;
-  /*int start_idx = -1;
+  int start_idx = -1;
   // Get reco front face KE (need to find the index when Z > 0)
-  for (unsigned int i=0; i<AnaIO::reco_beam_calo_Z->size(); i++){
-    if ((*AnaIO::reco_beam_calo_Z)[i] >= 0){
+  for (unsigned int i=0; i<AnaIO::true_beam_traj_Z->size(); i++){
+    if ((*AnaIO::true_beam_traj_Z)[i] >= 0){
       start_idx = i-1; // the trajectory point before entering the TPC
       if (start_idx < 0) start_idx = -1;
       break;
     }
-  }*/
+  }
   // Front face X and Y
-  //if(start_idx != -1){
-  beam_inst_X = AnaIO::beam_inst_X;
-  beam_inst_Y = AnaIO::beam_inst_Y;
+  if(start_idx != -1){
+    beam_inst_X = AnaIO::beam_inst_X;
+    beam_inst_Y = AnaIO::beam_inst_Y;
 
-  if(beam_inst_KE > 0.7 && beam_inst_KE < 0.8){
-    if(UpStreamELoss < 54.7121) plotUtils.FillHist(AnaIO::hBeamInstXVSBeamInstYBeam700MeV,beam_inst_X,beam_inst_Y);
-    else plotUtils.FillHist(AnaIO::hBeamInstXVSBeamInstYScraper700MeV,beam_inst_X,beam_inst_Y);
+    if(beam_inst_KE > 0.7 && beam_inst_KE < 0.8){
+      if(UpStreamELoss < 56.1) plotUtils.FillHist(AnaIO::hBeamInstXVSBeamInstYBeam700MeV,beam_inst_X,beam_inst_Y);
+      else plotUtils.FillHist(AnaIO::hBeamInstXVSBeamInstYScraper700MeV,beam_inst_X,beam_inst_Y);
+    }
+    if(beam_inst_KE > 0.8 && beam_inst_KE < 0.9){
+      if(UpStreamELoss < 72.5) plotUtils.FillHist(AnaIO::hBeamInstXVSBeamInstYBeam800MeV,beam_inst_X,beam_inst_Y);
+      else plotUtils.FillHist(AnaIO::hBeamInstXVSBeamInstYScraper800MeV,beam_inst_X,beam_inst_Y);
+    }
+    if(beam_inst_KE > 0.9 && beam_inst_KE < 1.0){
+      if(UpStreamELoss < 88.0) plotUtils.FillHist(AnaIO::hBeamInstXVSBeamInstYBeam900MeV,beam_inst_X,beam_inst_Y);
+      else plotUtils.FillHist(AnaIO::hBeamInstXVSBeamInstYScraper900MeV,beam_inst_X,beam_inst_Y);
+    }
+    if(beam_inst_KE > 1.0 && beam_inst_KE < 1.1){
+      if(UpStreamELoss < 112.6) plotUtils.FillHist(AnaIO::hBeamInstXVSBeamInstYBeam1000MeV,beam_inst_X,beam_inst_Y);
+      else plotUtils.FillHist(AnaIO::hBeamInstXVSBeamInstYScraper1000MeV,beam_inst_X,beam_inst_Y);
+    }
   }
-  if(beam_inst_KE > 0.8 && beam_inst_KE < 0.9){
-    if(UpStreamELoss < 71.2335) plotUtils.FillHist(AnaIO::hBeamInstXVSBeamInstYBeam800MeV,beam_inst_X,beam_inst_Y);
-    else plotUtils.FillHist(AnaIO::hBeamInstXVSBeamInstYScraper800MeV,beam_inst_X,beam_inst_Y);
-  }
-  if(beam_inst_KE > 0.9 && beam_inst_KE < 1.0){
-    if(UpStreamELoss < 86.6192) plotUtils.FillHist(AnaIO::hBeamInstXVSBeamInstYBeam900MeV,beam_inst_X,beam_inst_Y);
-    else plotUtils.FillHist(AnaIO::hBeamInstXVSBeamInstYScraper900MeV,beam_inst_X,beam_inst_Y);
-  }
-  if(beam_inst_KE > 1.0 && beam_inst_KE < 1.1){
-    if(UpStreamELoss < 109.097) plotUtils.FillHist(AnaIO::hBeamInstXVSBeamInstYBeam1000MeV,beam_inst_X,beam_inst_Y);
-    else plotUtils.FillHist(AnaIO::hBeamInstXVSBeamInstYScraper1000MeV,beam_inst_X,beam_inst_Y);
-  }
-  //}
 }
 
 void AnaUtils::FillUpStreamEnergyLossHistAfterCut(double beam_inst_KE, double true_ffKE)

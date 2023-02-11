@@ -23,6 +23,7 @@ bool AnaCut::CutBeamAllInOne(const bool kMC, bool kFill)
 
   // Fill beam quality cut histograms (use fitted value for beam quality cut latter)
   if(kFill) anaUtils.FillBeamQualityHist();
+
   
   // 2. Pandora slice cut (track like/shower like)
   const bool passPandoraSlice = CutPandoraSlice();

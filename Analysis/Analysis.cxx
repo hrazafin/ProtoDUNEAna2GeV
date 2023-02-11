@@ -70,7 +70,6 @@ int anaRec(const TString finName, TList *lout, const TString tag, const int nEnt
 
     // Gaus smearing 
     double radGaus = 0.0;
-
     if(kMC && doXS){
       // Select true pion beam for the unfolding process
       if(anaCut.CutBeamAllInOne(kMC)){
@@ -679,6 +678,7 @@ int anaRec(const TString finName, TList *lout, const TString tag, const int nEnt
         if(beam_inst_KE > 0.95 && beam_inst_KE < 1.0) plotUtils.FillHist(AnaIO::hUpStreamELossAfterSmearingAndWeight,UpStreamELoss,5,weight);
         if(beam_inst_KE > 1.0 && beam_inst_KE < 1.05) plotUtils.FillHist(AnaIO::hUpStreamELossAfterSmearingAndWeight,UpStreamELoss,6,weight);
         if(beam_inst_KE > 1.05 && beam_inst_KE < 1.1) plotUtils.FillHist(AnaIO::hUpStreamELossAfterSmearingAndWeight,UpStreamELoss,7,weight);
+        
       }
       // Get the energy dependent energy loss (not used for now)
       //double Eloss = anaUtils.GetUpStreamEnergyLoss(kMC, beam_inst_KE);
@@ -764,7 +764,7 @@ int anaRec(const TString finName, TList *lout, const TString tag, const int nEnt
     
     // Do TKI calculation 
     //anaUtils.TruthMatchingTKI(anaUtils.RecPi0LTVet,anaUtils.RecProtonLTVet,anaUtils.TruthPi0LTVet,anaUtils.TruthProtonLTVet,kMC,anaUtils.GoodTruthMatch);
-  
+ 
     // Fill output tree
     tout->Fill();
   } // End of while loop
