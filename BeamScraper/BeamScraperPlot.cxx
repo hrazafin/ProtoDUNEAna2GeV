@@ -78,214 +78,98 @@ void DrawOutput(TH2D* h2d_beam, TH2D* h2d_scraper, const double & x_mean, const 
 TF1 * FitGausFunc(TH1D * hh, const double &min, const double &max);
 void Draw1D(TH1D* hh, TF1* f1);
 void DoPlots(TH2D* h2d_beam, TH2D* h2d_scraper,TH1D* h1d_beamx, TH1D* h1d_beamy);
-
-
+void DrawBeamScraperDef(TH1D* hh, bool kCut = false);
+void DrawUpStreamELossAfterCuts(TH2D * h2d_InstE);
+void SetProtoDUNELabel();
+void SetBeamInstELabel(const TString name);
+void SetTitleFormat(TH1 * hh);
 
 int main(int argc, char * argv[])
 {
     
-    const TString finName_beamScraper = "input/outana.root"; // Scaper plots
-    //const TString finName_beamScraper = "input/out_smearing_new.root";
+    //const TString finName = "input/benchmark_WithoutSmearing.root"; // Scaper plots (No SM only affect ElossSW)
+    const TString finName = "input/benchmark_WithSmearing.root"; // Scaper plots (With SM only affect ElossSW)
     
-    //const TString finName_beamScraper = "input/out_InstEstudy.root";
-    //const TString finName_beamScraper = "input/out_UpstreamFit.root"; // Eloss
-
-    //const TString finName = "input/out_new1115.root"; // Eff and response
-    //const TString finName = "input/out_new1116.root"; // Eff and response
-    //const TString finName = "input/out_new1117.root"; // Eff and response
-    //const TString finName = "input/out_new1118.root"; // Eff and response
-    const TString finName = "input/outana_wholeRange_0123.root"; // Eff and response
-
     TFile *file = TFile::Open(finName);
-    TFile *file_beamScraper = TFile::Open(finName_beamScraper);
 
     if(!file->IsOpen()){
       cout << "file file not open" << endl;
       exit(1);
     }
 
-    if(!file_beamScraper->IsOpen()){
-      cout << "file_beamScraper file not open" << endl;
-      exit(1);
-    }
-/* == change to newer file
-    // ========== Beam Inst P Smearing ========== //
+    // ========== Define Beam Scraper Events ========== //
+    TH1D * h1d_upEloss700MeV = (TH1D*) file->Get("mc/j003hUpStreamELoss700MeV;1");
+    TH1D * h1d_upEloss800MeV = (TH1D*) file->Get("mc/j003hUpStreamELoss800MeV;1");
+    TH1D * h1d_upEloss900MeV = (TH1D*) file->Get("mc/j003hUpStreamELoss900MeV;1");
+    TH1D * h1d_upEloss1000MeV = (TH1D*) file->Get("mc/j003hUpStreamELoss1000MeV;1");
 
-    TH2D * h2d_InstP_mc = (TH2D*) file->Get("mc/i051hRecPiPlusInstMomentum_STK;1");
-    TH1D * h1d_InstP_data = (TH1D*) file->Get("data/i051hRecPiPlusInstMomentum_STK_sum;1");
+    DrawBeamScraperDef(h1d_upEloss700MeV);
+    DrawBeamScraperDef(h1d_upEloss800MeV);
+    DrawBeamScraperDef(h1d_upEloss900MeV);
+    DrawBeamScraperDef(h1d_upEloss1000MeV);
 
-    TH1D * h2d_InstP_mc_projX = h2d_InstP_mc->ProjectionX();
-
-    TF1 *f1 = FitGausFunc(h2d_InstP_mc_projX,850.0,1150.0);
-    double mc_sigma = f1->GetParameter("Sigma");
-    double mc_mean = f1->GetParameter("Mean");
-
-    TF1 *f2 = FitGausFunc(h1d_InstP_data,850.0,1150.0);
-    double data_sigma = f2->GetParameter("Sigma");
-    double data_mean = f2->GetParameter("Mean");
-
-    cout << "mu: " << (data_mean - mc_mean)/1000.0 << " sigma: " << sqrt(pow(data_sigma/1000.0,2)-pow(mc_sigma/1000.0,2)) << endl;
-
-    Draw1D(h2d_InstP_mc_projX,f1);
-    Draw1D(h1d_InstP_data,f2);
-*/
 
     // ========== Beam Scraper Cut ========== //
 
-    TH2D * h2d_beam700MeV = (TH2D*) file_beamScraper->Get("mc/j004hBeamInstXVSBeamInstYBeam700MeV_RES;1");
-    TH2D * h2d_scraper700MeV = (TH2D*) file_beamScraper->Get("mc/j005hBeamInstXVSBeamInstYScraper700MeV_RES;1");
+    TH2D * h2d_beam700MeV = (TH2D*) file->Get("mc/j004hBeamInstXVSBeamInstYBeam700MeV_RES;1");
+    TH2D * h2d_scraper700MeV = (TH2D*) file->Get("mc/j005hBeamInstXVSBeamInstYScraper700MeV_RES;1");
 
-    TH1D * h1d_beamx700MeV = (TH1D*) file_beamScraper->Get("mc/j004hBeamInstXVSBeamInstYBeam700MeV_RES_projX;1");
-    TH1D * h1d_beamy700MeV = (TH1D*) file_beamScraper->Get("mc/j004hBeamInstXVSBeamInstYBeam700MeV_RES_projY;1");
+    TH1D * h1d_beamx700MeV = (TH1D*) file->Get("mc/j004hBeamInstXVSBeamInstYBeam700MeV_RES_projX;1");
+    TH1D * h1d_beamy700MeV = (TH1D*) file->Get("mc/j004hBeamInstXVSBeamInstYBeam700MeV_RES_projY;1");
 
     DoPlots(h2d_beam700MeV,h2d_scraper700MeV,h1d_beamx700MeV,h1d_beamy700MeV);
 
-    TH2D * h2d_beam800MeV = (TH2D*) file_beamScraper->Get("mc/j004hBeamInstXVSBeamInstYBeam800MeV_RES;1");
-    TH2D * h2d_scraper800MeV = (TH2D*) file_beamScraper->Get("mc/j005hBeamInstXVSBeamInstYScraper800MeV_RES;1");
+    TH2D * h2d_beam800MeV = (TH2D*) file->Get("mc/j004hBeamInstXVSBeamInstYBeam800MeV_RES;1");
+    TH2D * h2d_scraper800MeV = (TH2D*) file->Get("mc/j005hBeamInstXVSBeamInstYScraper800MeV_RES;1");
 
-    TH1D * h1d_beamx800MeV = (TH1D*) file_beamScraper->Get("mc/j004hBeamInstXVSBeamInstYBeam800MeV_RES_projX;1");
-    TH1D * h1d_beamy800MeV = (TH1D*) file_beamScraper->Get("mc/j004hBeamInstXVSBeamInstYBeam800MeV_RES_projY;1");
+    TH1D * h1d_beamx800MeV = (TH1D*) file->Get("mc/j004hBeamInstXVSBeamInstYBeam800MeV_RES_projX;1");
+    TH1D * h1d_beamy800MeV = (TH1D*) file->Get("mc/j004hBeamInstXVSBeamInstYBeam800MeV_RES_projY;1");
 
     DoPlots(h2d_beam800MeV,h2d_scraper800MeV,h1d_beamx800MeV,h1d_beamy800MeV);
 
-    TH2D * h2d_beam900MeV = (TH2D*) file_beamScraper->Get("mc/j004hBeamInstXVSBeamInstYBeam900MeV_RES;1");
-    TH2D * h2d_scraper900MeV = (TH2D*) file_beamScraper->Get("mc/j005hBeamInstXVSBeamInstYScraper900MeV_RES;1");
+    TH2D * h2d_beam900MeV = (TH2D*) file->Get("mc/j004hBeamInstXVSBeamInstYBeam900MeV_RES;1");
+    TH2D * h2d_scraper900MeV = (TH2D*) file->Get("mc/j005hBeamInstXVSBeamInstYScraper900MeV_RES;1");
 
-    TH1D * h1d_beamx900MeV = (TH1D*) file_beamScraper->Get("mc/j004hBeamInstXVSBeamInstYBeam900MeV_RES_projX;1");
-    TH1D * h1d_beamy900MeV = (TH1D*) file_beamScraper->Get("mc/j004hBeamInstXVSBeamInstYBeam900MeV_RES_projY;1");
+    TH1D * h1d_beamx900MeV = (TH1D*) file->Get("mc/j004hBeamInstXVSBeamInstYBeam900MeV_RES_projX;1");
+    TH1D * h1d_beamy900MeV = (TH1D*) file->Get("mc/j004hBeamInstXVSBeamInstYBeam900MeV_RES_projY;1");
 
     DoPlots(h2d_beam900MeV,h2d_scraper900MeV,h1d_beamx900MeV,h1d_beamy900MeV);
 
-    TH2D * h2d_beam1000MeV = (TH2D*) file_beamScraper->Get("mc/j004hBeamInstXVSBeamInstYBeam1000MeV_RES;1");
-    TH2D * h2d_scraper1000MeV = (TH2D*) file_beamScraper->Get("mc/j005hBeamInstXVSBeamInstYScraper1000MeV_RES;1");
+    TH2D * h2d_beam1000MeV = (TH2D*) file->Get("mc/j004hBeamInstXVSBeamInstYBeam1000MeV_RES;1");
+    TH2D * h2d_scraper1000MeV = (TH2D*) file->Get("mc/j005hBeamInstXVSBeamInstYScraper1000MeV_RES;1");
 
-    TH1D * h1d_beamx1000MeV = (TH1D*) file_beamScraper->Get("mc/j004hBeamInstXVSBeamInstYBeam1000MeV_RES_projX;1");
-    TH1D * h1d_beamy1000MeV = (TH1D*) file_beamScraper->Get("mc/j004hBeamInstXVSBeamInstYBeam1000MeV_RES_projY;1");
+    TH1D * h1d_beamx1000MeV = (TH1D*) file->Get("mc/j004hBeamInstXVSBeamInstYBeam1000MeV_RES_projX;1");
+    TH1D * h1d_beamy1000MeV = (TH1D*) file->Get("mc/j004hBeamInstXVSBeamInstYBeam1000MeV_RES_projY;1");
 
     DoPlots(h2d_beam1000MeV,h2d_scraper1000MeV,h1d_beamx1000MeV,h1d_beamy1000MeV);
 
 
-    // ========== Upstream Energy Loss ========== //
 
-    TH1D * h1d_InstP_700 = (TH1D*) file->Get("mc/j007hUpStreamELoss700MeVAfterScraperCuts;1");
-    TH1D * h1d_InstP_800 = (TH1D*) file->Get("mc/j007hUpStreamELoss800MeVAfterScraperCuts;1");
-    TH1D * h1d_InstP_900 = (TH1D*) file->Get("mc/j007hUpStreamELoss900MeVAfterScraperCuts;1");
-    TH1D * h1d_InstP_1000 = (TH1D*) file->Get("mc/j007hUpStreamELoss1000MeVAfterScraperCuts;1");
+    // ========== After Beam Scraper Cut (Check Performance) ========== //
+    TH1D * h1d_upEloss700MeV_afterCuts = (TH1D*) file->Get("mc/j007hUpStreamELoss700MeVAfterScraperCuts;1");
+    TH1D * h1d_upEloss800MeV_afterCuts = (TH1D*) file->Get("mc/j007hUpStreamELoss800MeVAfterScraperCuts;1");
+    TH1D * h1d_upEloss900MeV_afterCuts = (TH1D*) file->Get("mc/j007hUpStreamELoss900MeVAfterScraperCuts;1");
+    TH1D * h1d_upEloss1000MeV_afterCuts = (TH1D*) file->Get("mc/j007hUpStreamELoss1000MeVAfterScraperCuts;1");
+    
+    DrawBeamScraperDef(h1d_upEloss700MeV_afterCuts,true);
+    DrawBeamScraperDef(h1d_upEloss800MeV_afterCuts,true);
+    DrawBeamScraperDef(h1d_upEloss900MeV_afterCuts,true);
+    DrawBeamScraperDef(h1d_upEloss1000MeV_afterCuts,true);
 
-    TH1D * hFitEloss = new TH1D("hFitEloss","", 8, 400, 1200); 
-    hFitEloss->SetBinContent(3,h1d_InstP_700->GetMean());
-    hFitEloss->SetBinError(3,h1d_InstP_700->GetRMS());
-
-    hFitEloss->SetBinContent(4,h1d_InstP_800->GetMean());
-    hFitEloss->SetBinError(4,h1d_InstP_800->GetRMS());
-
-    hFitEloss->SetBinContent(5,h1d_InstP_900->GetMean());
-    hFitEloss->SetBinError(5,h1d_InstP_900->GetRMS());
-
-    hFitEloss->SetBinContent(6,h1d_InstP_1000->GetMean());
-    hFitEloss->SetBinError(6,h1d_InstP_1000->GetRMS());
-
-
-    TCanvas * ctmp = new TCanvas("ctmp", "", 1200, 800);
-    hFitEloss->Fit("pol2");
-    hFitEloss->Draw("e1");
-    ctmp->Print("output/Eloss.png");
-
+    // ========== Upstream Energy Loss (after smearing and beam reweight) ========== //
 
     TH2D * h2d_InstE = (TH2D*) file->Get("mc/j008hUpStreamELossAfterSmearingAndWeight;1");
-
-    const int ny = h2d_InstE->GetNbinsY();
-    const int nx = h2d_InstE->GetNbinsX();
-    const double xmin = h2d_InstE->GetXaxis()->GetBinLowEdge(1);
-    const double xmax = h2d_InstE->GetXaxis()->GetBinUpEdge(nx);
-
-    TH1D * hFitElossSW = new TH1D("hFitElossSW",";KE_{Beam  Inst.}^{reco.} (MeV);#mu(KE_{Beam  Inst.}^{reco.} - KE_{ff}^{true}) (MeV)", 16, 400, 1200); 
-
-
-    for(int iy = 1; iy <= ny-1; iy++){
-
-      TH1D * htmp = new TH1D(Form("tmp%d",iy), "", nx, xmin, xmax);
-      for(int ix=0; ix<=nx+1; ix++){
-        const double ientry = h2d_InstE->GetBinContent(ix, iy);
-        htmp->SetBinContent(ix, ientry);
-      }
-      TF1 *f1 = FitGausFunc(htmp,-300,300);
-      hFitElossSW->SetBinContent(iy+6,f1->GetParameter("Mean"));
-      // Sigma band
-      hFitElossSW->SetBinError(iy+6,f1->GetParameter("Sigma"));
-      // Stats Error
-      //hFitElossSW->SetBinError(iy+6,1/sqrt(htmp->Integral()));
-
-    }
-
-    TLatex tt;
-    tt.SetNDC();
-    gStyle->SetOptStat(0);
-
-    TCanvas * ctmp1 = new TCanvas("ctmp1", "", 1200, 800);
-    TF1 *f_pol2 = new TF1("f_pol2", "pol2", 650, 1100);
-    hFitElossSW->Fit("f_pol2","0");
-    hFitElossSW->SetMarkerColor(kBlack);
-    hFitElossSW->SetMarkerStyle(kFullCircle);
-    hFitElossSW->Draw("e1");
-    f_pol2->Draw("sames C");
-
-    TLine *line = new TLine(400,0,1200,0);
-    line->SetLineColor(kBlack);
-    line->SetLineWidth(1);
-    line->Draw("sames");
-
-
-    //TLine *line1 = new TLine(400,12.74,1200,12.74);
-    TLine *line1 = new TLine(400,11.966,1200,11.966);
-
-    line1->SetLineColor(kBlue);
-    line1->SetLineStyle(kDashed);
-    line1->SetLineWidth(2);
-    line1->Draw("sames");
-
-    TLine *line2 = new TLine(400,2.652,1200,2.652);
-
-    line2->SetLineColor(kGreen+3);
-    line2->SetLineStyle(kDashed);
-    line2->SetLineWidth(2);
-    line2->Draw("sames");
-
-    auto lg = new TLegend(0.15,0.55,0.62,0.88);
-    lg->AddEntry(hFitElossSW,"#Delta KE_{upstream}","lp");
-    lg->AddEntry(f_pol2,"Fitted Poly2","l");
-    lg->AddEntry(line1,"Constant Eloss (11.966 MeV) - Before Smearing","l");
-    lg->AddEntry(line2,"Constant Eloss (2.652 MeV) - After Smearing","l");
-
-    lg->SetBorderSize(0);
-    lg->Draw("sames");
-
-
-    tt.SetTextSize(0.035);
-    tt.DrawLatex(0.125,0.925,"DUNE:ProtoDUNE-SP");
-
-    ctmp1->Print("output/ElossSW.png");
-
-
-    TH1D * hLoss = h2d_InstE->ProjectionX();
-    TCanvas * ctmp2 = new TCanvas("ctmp2", "", 1200, 800);
-    TF1 *f11 = new TF1("f11","gaus",-100,100);    
-
-    cout << "hLoss mean: " << hLoss->GetMean() << endl;
-    hLoss->Fit("f11","0");
-    hLoss->Draw("hist");
-    f11->Draw("sames");
-    cout << "f11 mean: " << f11->GetParameter("Mean") << endl;
-
-    ctmp2->Print("output/hLoss.png");
-
+    
+    DrawUpStreamELossAfterCuts(h2d_InstE);
+    
     file->Close();
-    file_beamScraper->Close();
 
 }
 
 void DoPlots(TH2D* h2d_beam, TH2D* h2d_scraper,TH1D* h1d_beamx, TH1D* h1d_beamy){
 
+/*
+    // Get my own circle but now used Sungbin's cut below
     TF1 *f1 = FitGausFunc(h1d_beamx,-50.0,0.0);
     double x_sigma = f1->GetParameter("Sigma");
     double x_mean = f1->GetParameter("Mean");
@@ -299,11 +183,14 @@ void DoPlots(TH2D* h2d_beam, TH2D* h2d_scraper,TH1D* h1d_beamx, TH1D* h1d_beamy)
     cout << "x_mean: " << x_mean << endl;
     cout << "y_mean: " << y_mean << endl;
     cout << "radius: " << radius << endl;
+*/
+    // Draw projection plots
+    //Draw1D(h1d_beamx,f1);
+    //Draw1D(h1d_beamy,f2);
 
-    Draw1D(h1d_beamx,f1);
-    Draw1D(h1d_beamy,f2);
-
+    // Get my own circle but now used Sungbin's cut below
     //DrawOutput(h2d_beam, h2d_scraper, x_mean, y_mean, radius, 1.4);
+    // Sungbin's circle for MC
     DrawOutput(h2d_beam, h2d_scraper, -29.6, 422, 4.8, 1.4);
 }
 
@@ -312,7 +199,7 @@ TF1 * FitGausFunc(TH1D * hh, const double &min, const double &max){
   TF1 *f1 = new TF1(Form("f1%s",tag.Data()),"gaus",min,max);    
   if (hh->GetEntries() != 0) {
     f1->SetParameters(hh->GetMaximum(), hh->GetMean(), hh->GetRMS() );
-    hh->Fit(Form("f1%s",tag.Data()));
+    hh->Fit(Form("f1%s",tag.Data()),"q");
   }
   return f1;
 }
@@ -351,7 +238,7 @@ void DrawOutput(TH2D* h2d_beam, TH2D* h2d_scraper, const double & x_mean, const 
     c1->SetFillColor(0);
 
     gStyle->SetOptStat(0);
-
+    
     //h2d_beam -> SetMarkerColor(kGreen);
     //h2d_scraper -> SetMarkerColor(kRed);
     //h2d_beam -> SetLineColor(kGreen);
@@ -380,8 +267,6 @@ void DrawOutput(TH2D* h2d_beam, TH2D* h2d_scraper, const double & x_mean, const 
     else if(tagbeam.Contains("900")) tit = "KE_{Beam  Inst.}^{reco.} (900-1000 MeV)";
     else if(tagbeam.Contains("1000")) tit = "KE_{Beam  Inst.}^{reco.} (1000-1100 MeV)";
 
-    
-    
 /*
     h2d_beam -> SetMarkerColor(kGreen);
     h2d_scraper -> SetMarkerColor(kRed);
@@ -410,8 +295,197 @@ void DrawOutput(TH2D* h2d_beam, TH2D* h2d_scraper, const double & x_mean, const 
     lg->SetTextFont(22);
     lg->Draw("sames");
 
+
     tt.SetTextSize(0.035);
     tt.DrawLatex(0.125,0.925,"DUNE:ProtoDUNE-SP");
 
     c1->Print("output/"+tagbeam+".png");
 }   
+
+void DrawBeamScraperDef(TH1D* hh, bool kCut){
+  
+    TString tag = hh->GetName();
+    TCanvas * c1 = new TCanvas(Form("c1_%s",tag.Data()), "", 1200, 800);
+    // Show the fitted pars
+    gStyle->SetOptStat(0);
+    gStyle->SetOptFit(1);
+    // Remove the borderSize size
+    gStyle->SetStatBorderSize(-1);
+    SetTitleFormat(hh);
+    hh->Draw();
+    
+    TF1 *f1 = FitGausFunc(hh,-300,300);
+
+    gPad->Update();
+    TPaveStats *st = (TPaveStats*) gPad->GetPrimitive("stats");
+    gPad->Modified(); gPad->Update(); // make sure it’s (re)drawn
+
+    st->SetY1NDC(0.65); 
+    st->SetY2NDC(0.85);
+    st->SetX1NDC(0.65); 
+    st->SetX2NDC(0.88);
+    st->SetTextColor(kRed);
+
+    f1->Draw("sames C");
+
+    double sigma = f1->GetParameter("Sigma");
+    double mean = f1->GetParameter("Mean");
+    // 3 sigma value
+    double scraperValue = mean+sigma*3.0;
+    //cout << "scraperValue: " << scraperValue << endl;
+    //cout << "sigma: " << sigma << " mean: " << mean << endl;
+
+    // Draw the line
+    TLine *line = new TLine(scraperValue,0,scraperValue,f1->GetMaximum());
+    line->SetLineColor(kBlue);
+    line->SetLineStyle(kDashed);
+    line->SetLineWidth(3);
+    line->Draw("sames");
+
+    auto lg = new TLegend(0.15,0.6,0.4,0.88);
+    lg->AddEntry(f1,"Gaus Fit","l");
+    lg->AddEntry(line,"Scraper Definition","l");
+    lg->SetBorderSize(0);
+    //lg->SetTextFont(22);
+    lg->Draw("sames");
+
+    TLatex latex(.18,.52,Form("#bf{#mu + 3#sigma = %1.1f [MeV]}",scraperValue)); 
+    latex.SetTextSize(0.04);
+    latex.SetNDC(kTRUE);
+    if(!kCut)latex.Draw();
+
+    SetProtoDUNELabel();
+    SetBeamInstELabel(tag);
+    
+    c1->Print("output/"+tag+".png");
+}
+
+void DrawUpStreamELossAfterCuts(TH2D * h2d_InstE){
+
+  const int ny = h2d_InstE->GetNbinsY();
+  const int nx = h2d_InstE->GetNbinsX();
+  const double xmin = h2d_InstE->GetXaxis()->GetBinLowEdge(1);
+  const double xmax = h2d_InstE->GetXaxis()->GetBinUpEdge(nx);
+
+  TH1D * hFitElossSW = new TH1D("hFitElossSW",";KE_{Beam  Inst.}^{reco.} (MeV);#mu(KE_{Beam  Inst.}^{reco.} - KE_{ff}^{true}) (MeV)", 16, 400, 1200); 
+  SetTitleFormat(hFitElossSW);
+
+  for(int iy = 1; iy <= ny-1; iy++){
+
+    TH1D * htmp = new TH1D(Form("tmp%d",iy), "", nx, xmin, xmax);
+    for(int ix=0; ix<=nx+1; ix++){
+      const double ientry = h2d_InstE->GetBinContent(ix, iy);
+      htmp->SetBinContent(ix, ientry);
+    }
+    TF1 *f1 = FitGausFunc(htmp,-300,300);
+    hFitElossSW->SetBinContent(iy+6,f1->GetParameter("Mean"));
+    // Sigma band
+    hFitElossSW->SetBinError(iy+6,f1->GetParameter("Sigma"));
+    // Stats Error
+    //hFitElossSW->SetBinError(iy+6,1/sqrt(htmp->Integral()));
+  }
+
+ 
+  TCanvas * ctmp1 = new TCanvas("ctmp1", "", 1200, 800);
+  TF1 *f_pol2 = new TF1("f_pol2", "pol2", 650, 1100);
+
+  gStyle->SetOptStat(0);
+  gStyle->SetOptFit(1);
+
+  hFitElossSW->SetMarkerColor(kBlack);
+  hFitElossSW->SetMarkerStyle(kFullCircle);
+  hFitElossSW->SetMaximum(120);
+
+  hFitElossSW->Draw("e1");
+
+  hFitElossSW->Fit("f_pol2","0");
+
+  gPad->Update();
+  TPaveStats *st = (TPaveStats*) gPad->GetPrimitive("stats");
+  gPad->Modified(); gPad->Update(); // make sure it’s (re)drawn
+
+  st->SetY1NDC(0.65); 
+  st->SetY2NDC(0.85);
+  st->SetX1NDC(0.65); 
+  st->SetX2NDC(0.88);
+  st->SetTextColor(kRed);
+
+  f_pol2->Draw("sames C");
+
+  TLine *line = new TLine(400,0,1200,0);
+  line->SetLineColor(kBlack);
+  line->SetLineWidth(1);
+  line->Draw("sames");
+
+
+  //TLine *line1 = new TLine(400,12.74,1200,12.74);
+  TLine *line1 = new TLine(400,11.966,1200,11.966);
+
+  line1->SetLineColor(kBlue);
+  line1->SetLineStyle(kDashed);
+  line1->SetLineWidth(2);
+  line1->Draw("sames");
+
+  TLine *line2 = new TLine(400,2.652,1200,2.652);
+
+  line2->SetLineColor(kGreen+3);
+  line2->SetLineStyle(kDashed);
+  line2->SetLineWidth(2);
+  line2->Draw("sames");
+
+  auto lg = new TLegend(0.15,0.55,0.62,0.88);
+  lg->AddEntry(hFitElossSW,"#Delta KE_{upstream}","lp");
+  lg->AddEntry(f_pol2,"Fitted Poly2","l");
+  lg->AddEntry(line1,"Constant Eloss (11.966 MeV) - Before Smearing","l");
+  lg->AddEntry(line2,"Constant Eloss (2.652 MeV) - After Smearing","l");
+
+  lg->SetBorderSize(0);
+  lg->Draw("sames");
+
+  SetProtoDUNELabel();
+
+  ctmp1->Print("output/ElossSW.png");
+
+
+  // Print const E loss before and after smearing
+  TH1D * hLoss = h2d_InstE->ProjectionX();
+ 
+  TF1 *f11 = new TF1("f11","gaus",-100,100);    
+  cout << "Const. Energy loss from histogram (no fit): " << hLoss->GetMean() << endl;
+  hLoss->Fit("f11","0");
+  cout << "Const. Energy loss (after fit and smearing): " << f11->GetParameter("Mean") << endl;
+
+
+}
+
+void SetProtoDUNELabel(){
+  TLatex tt;
+  tt.SetNDC();
+  tt.SetTextSize(0.035);
+  tt.DrawLatex(0.125,0.925,"DUNE:ProtoDUNE-SP");
+}
+
+void SetBeamInstELabel(const TString name){
+  TLatex tt;
+  tt.SetNDC();
+  tt.SetTextSize(0.035);
+  if(name.Contains("700")) tt.DrawLatex(0.600,0.925,"700 MeV < E_{inst}^{reco.} < 800 MeV");
+  if(name.Contains("800")) tt.DrawLatex(0.600,0.925,"800 MeV < E_{inst}^{reco.} < 900 MeV");
+  if(name.Contains("900")) tt.DrawLatex(0.600,0.925,"900 MeV < E_{inst}^{reco.} < 1000 MeV");
+  if(name.Contains("1000")) tt.DrawLatex(0.600,0.925,"1000 MeV < E_{inst}^{reco.} < 1100 MeV");
+}
+
+void SetTitleFormat(TH1 * hh){
+  hh->SetTitle(" ");
+  hh->GetYaxis()->CenterTitle();
+  // Bold text
+  //hh->GetYaxis()->SetTitleFont(22);
+  hh->GetYaxis()->SetTitleSize(0.04);
+  hh->GetYaxis()->SetTitleOffset(0.99);
+  hh->GetXaxis()->CenterTitle();
+  //hh->GetXaxis()->SetTitleFont(22);
+  hh->GetXaxis()->SetTitleSize(0.04);
+  hh->GetXaxis()->SetTitleOffset(0.99);
+  //hh->GetXaxis()->SetLabelOffset(999);
+  //hh->GetXaxis()->SetLabelSize(0);
+}
