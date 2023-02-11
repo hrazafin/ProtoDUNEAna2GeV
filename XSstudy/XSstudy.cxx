@@ -104,7 +104,7 @@ int main(int argc, char * argv[])
   //const TString finName = "input/outana_dataNobckSub.root";
   TString finName = "input/outana_dataNobckSub.root";
   //if(IsRange) finName = "input/outana_wholeRange.root";
-  if(IsRange) finName = "input/outana_wholeRange_0123.root";
+  if(IsRange) finName = "input/outana_benchmark.root";//"input/outana_wholeRange_0123.root";
 
   TFile *file = TFile::Open(finName);
 
