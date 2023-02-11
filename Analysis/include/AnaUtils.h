@@ -20,9 +20,9 @@ class AnaUtils
     // Set if event is a signal based on phase space cuts on protons 
     void SetFullSignal();
     // Get a vector of true Final-State(FS) particles 4 vector with Pi0 + leading + subleading proton 
-    vector<TLorentzVector> GetFSParticlesTruth(bool kFill = true); 
+    vector<TLorentzVector> GetFSParticlesTruth(bool kFill = false); 
     // Get a vector of true pi0 showers 4 vector 
-    vector<TLorentzVector> GetFSPiZeroDecayDaughterTruth(bool kFill = true); 
+    vector<TLorentzVector> GetFSPiZeroDecayDaughterTruth(bool kFill = false); 
     // Get truth interacting histogram for xsec calculation
     double MakeTrueIncidentEnergies(vector<double> *true_beam_traj_Z, vector<double> *true_beam_traj_KE, vector<double> *true_beam_new_incidentEnergies);
     double MakeRecoIncidentEnergies(vector<double> *reco_beam_traj_Z, vector<double> *reco_beam_traj_KE, vector<double> *reco_beam_new_incidentEnergies);

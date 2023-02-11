@@ -245,7 +245,7 @@ void AnaUtils::SetFullSignal()
   // We only want need beam pion daughters
   if(AnaIO::true_beam_PDG == 211){
     // Get final state particles vector in this event
-    vector<TLorentzVector> vecFSParticle = GetFSParticlesTruth(false);
+    vector<TLorentzVector> vecFSParticle = GetFSParticlesTruth();
     
     // Get the FS particles momentum
     double LeadingPiZeroP = vecFSParticle[0].P();
@@ -262,7 +262,7 @@ void AnaUtils::SetFullSignal()
     */
     // Check the pi0 daughters 
     if(nPiZero > 0){
-      vector<TLorentzVector> vecPi0FSParticle = GetFSPiZeroDecayDaughterTruth(false);
+      vector<TLorentzVector> vecPi0FSParticle = GetFSPiZeroDecayDaughterTruth();
       //double LeadingShowerE = vecPi0FSParticle[0].E();
       //double SubLeadingShowerE = vecPi0FSParticle[1].E();
       //cout << "Sig Showers: " << nPiZeroGamma  << endl;
@@ -850,7 +850,7 @@ double AnaUtils::MakeRecoIncidentEnergies(vector<double> *reco_beam_traj_Z, vect
   // If the trajectory does not reach the end of the fiducial slices it must have interacted.
   // The interacting energy will be the last incident energy.
   if( next_slice_num < fSliceCut && reco_beam_new_incidentEnergies->size() > 0 ) {
-    reco_beam_new_interactingEnergy = reco_beam_new_incidentEnergies->back();// + 25.0; //FIXME upper Syst
+    reco_beam_new_interactingEnergy = reco_beam_new_incidentEnergies->back();//FIXME upper Syst
     //cout << "reco_beam_new_interactingEnergy: " << reco_beam_new_interactingEnergy << endl;
   }
 
@@ -1432,7 +1432,7 @@ TLorentzVector AnaUtils::GetRecPiZeroFromShowers(double &OA, bool kMC, bool kFil
   const int truthEventType = GetFillEventType();
   // Get the size of shower array
   const int showerSize = showerArray.size();
-  plotUtils.FillHist(AnaIO::hRecPi0Nshower, showerSize, truthEventType); 
+  if(kFill) plotUtils.FillHist(AnaIO::hRecPi0Nshower, showerSize, truthEventType); 
   // Declare PiZero vector
   TLorentzVector PiZeroVec, PiZeroVec_MassCal;
   // Raw PiZero vector without energy correction
@@ -1468,14 +1468,14 @@ TLorentzVector AnaUtils::GetRecPiZeroFromShowers(double &OA, bool kMC, bool kFil
 
     cout << "rec shower ld raw: " << RecPi0Showers[2].E() << "rec shower sl raw: " << RecPi0Showers[3].E() << endl;
 */
+    const double openingAngle = RecPi0Showers[0].Angle(RecPi0Showers[1].Vect())*TMath::RadToDeg();
+    const double openingAngleRaw = RecPi0Showers[2].Angle(RecPi0Showers[3].Vect())*TMath::RadToDeg();
+    OA = openingAngle;
     // Fill pi0 info
     if(kFill){
 
       //plotUtils.FillHist(AnaIO::hPi0Energy_NoCut,PiZeroVec.E(),truthPi0Type);
 
-      const double openingAngle = RecPi0Showers[0].Angle(RecPi0Showers[1].Vect())*TMath::RadToDeg();
-      const double openingAngleRaw = RecPi0Showers[2].Angle(RecPi0Showers[3].Vect())*TMath::RadToDeg();
-      OA = openingAngle;
       // Fill pi0 mass and momentum
       plotUtils.FillHist(AnaIO::hRecPi0Mass, PiZeroVec_MassCal.M(), truthPi0Type);
       plotUtils.FillHist(AnaIO::hRecPi0MassRaw, PiZeroVecRaw.M(), truthPi0Type);
@@ -1602,8 +1602,8 @@ vector<TLorentzVector> AnaUtils::GetTwoPi0Showers(double &separation, bool kMC, 
     separation = distVect.Mag();
   }
 
-  if(false){ //FIXME -- speed up 
-  //if(kDoKF){
+  //if(false){ //FIXME -- speed up 
+  if(kDoKF){
     vector<double> FittedVars;
     KF(ldShower, slShower, FittedVars);
     // Set the shower energy after KF
@@ -1895,7 +1895,7 @@ void AnaUtils::DoTruthTKICalculation(){
   const int targetA = 40;
   const int targetZ = 18;
 
-  vector<TLorentzVector> vecPiP = GetFSParticlesTruth(false);
+  vector<TLorentzVector> vecPiP = GetFSParticlesTruth();
   AnaIO::finPimomentum = vecPiP[0].P();
   AnaIO::finProtonmomentum = vecPiP[1].P();
   AnaIO::fin2Pmom = vecPiP[2].P();
@@ -2615,7 +2615,7 @@ void AnaUtils::FillXSTrueHistograms(int &true_avaPionBeam, int &true_avaPionCEXe
         FillEsliceHistograms(AnaIO::hNewTruthBeamInitialHist, AnaIO::hNewTruthBeamInteractingHist, AnaIO::hNewTruthBeamIncidentHist, AnaIO::hNewTruthCEXInteractingHist, initialE, interactingE, interactingE, weight, binning_100MeV, N_binning_100MeV, true);
 
         // Get the true pi0 4-vectors (0 element of this vector is pion)
-        vector<TLorentzVector> vecFSParticle = GetFSParticlesTruth(false);
+        vector<TLorentzVector> vecFSParticle = GetFSParticlesTruth();
         // Get the FS pi0 momentum
         double LeadingPiZeroP = vecFSParticle[0].P();
         double LeadingPiZeroPz = vecFSParticle[0].Pz();
@@ -3050,8 +3050,6 @@ void AnaUtils::FillBeamQualityHist()
 void AnaUtils::SetBeamInstKEandFrontFaceKE(double &beam_inst_KE, double &true_ffKE, bool kFill)
 {  
   int start_idx = -1;
-  // Get true beam track length
-  //GetTrueTrackLength();
   // Get reco beam inst KE
   beam_inst_KE = sqrt(pow(AnaIO::beam_inst_P,2)+pow(AnaFunctions::PionMass(),2)) - AnaFunctions::PionMass();
   // Get true front face KE (need to find the index when Z > 0)

@@ -415,6 +415,7 @@ bool AnaCut::CutTopology(const bool kMC, double & pi0KineticE, double & pi0costh
   pi0costheta = -999;
   // Count reco final state particles and determine types 
   CountPFP(kMC,kFill);
+ 
   /*cout << "Rec nproton: " << nproton << " Rec npi0shower: " << npi0shower << " Rec npiplus: " << npiplus << " Rec nmichel: " << nmichel << 
   " Rec npi0: " << npi0 << endl;
   cout << "anaUtils.RecProtonLTVet: " << anaUtils.RecProtonLTVet.P() << " anaUtils.TruthProtonLTVet: " << anaUtils.TruthProtonLTVet.P() << endl;
@@ -992,7 +993,7 @@ bool AnaCut::IsPizero(const bool kMC, const bool kFill)
   double OA = -999;
   int type = -999;
   TLorentzVector PiZeroVec;
-  if(kFill) PiZeroVec = anaUtils.GetRecPiZeroFromShowers(OA,kMC,true,true,type);
+  PiZeroVec = anaUtils.GetRecPiZeroFromShowers(OA,kMC,kFill,true,type);
   //if(kFill) PiZeroVec = anaUtils.GetRecPiZeroFromShowers(OA,kMC,true,false,type);
 
   // Output tree for kinematic fitting
@@ -1020,7 +1021,7 @@ bool AnaCut::IsPizero(const bool kMC, const bool kFill)
 
   // Opening angle cut
   if(OA < 10 || OA > 80){
-     AnaIO::hCutDaughterPi0OAPass->Fill(false);
+    AnaIO::hCutDaughterPi0OAPass->Fill(false);
     return false;
   }
   else AnaIO::hCutDaughterPi0OAPass->Fill(true);

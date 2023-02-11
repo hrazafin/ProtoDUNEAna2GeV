@@ -77,8 +77,8 @@ class PlotUtils
   void FillHist(TH2 * hh,  double xx, const double yy, const double & weight = 1.);
 
   void ProcessHist(TList *lout, const bool kMC);
-  //void DrawHist(TList *lout, const double plotscale, TList * overlayList, const TString outdir);
-  void DrawHist(TList *lout, const double plotscale, TList * overlayList, const TString outdir, TGraph *g_inel, TGraph *g_cex, TGraph *g_675, TGraph *g_775, TGraph *g_875, TGraph *g_675theta, TGraph *g_775theta, TGraph *g_875theta,  TGraph *g_675costheta, TGraph *g_775costheta, TGraph *g_875costheta);
+  void DrawHist(TList *lout, const double plotscale, TList * overlayList, const TString outdir);
+  //void DrawHist(TList *lout, const double plotscale, TList * overlayList, const TString outdir, TGraph *g_inel, TGraph *g_cex, TGraph *g_675, TGraph *g_775, TGraph *g_875, TGraph *g_675theta, TGraph *g_775theta, TGraph *g_875theta,  TGraph *g_675costheta, TGraph *g_775costheta, TGraph *g_875costheta);
   //void DrawHist(TList *lout, const double plotscale, TList * overlayList, const TString outdir, TGraph *g_inel, TGraph *g_cex, TH1D *g_cex_600MeV);
 
   THStack * ConvertToStack(const TH2D * hh, const bool kMC, std::map<TString,vector<double>> &typeMaps);

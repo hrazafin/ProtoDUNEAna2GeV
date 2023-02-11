@@ -292,6 +292,7 @@ void PlotUtils::ProcessHist(TList *lout, const bool kMC)
         TH1D *hEff = GetRecEfficiency(hh,htrue,tag);
         lout->Add(hEff);
       }
+/*      
       // Total CEX XS calculation
       if(tag.Contains("i026hUnFoldedIncidentHist") && !tag.Contains("Data")){
         // hh is the incident histogram
@@ -340,69 +341,7 @@ void PlotUtils::ProcessHist(TList *lout, const bool kMC)
         lout->Add(xsec);
       }
 
-/* // Data unfold histogram
-      if(tag.Contains("i026hUnFoldedIncidentHist") && tag.Contains("Data")){
 
-        double avogadro_constant = 6.02214076e23;  // 1 / mol
-        double argon_molar_mass = 39.95;           // g / mol
-        double liquid_argon_density = 1.39;        // g / cm^3
-        double fiducial_thickness = 0.479;         // cm wire spacing
-        //double fiducial_thickness = 20;         // cm wire spacing
-
-        double sigma_factor = argon_molar_mass / (avogadro_constant * liquid_argon_density * fiducial_thickness);
-
-
-        TString name = "i025hUnFoldedInteractingHistData";
-        TH1D *InteractingHist = (TH1D*)lout->FindObject(name);
-        //TH1D *IncidentHist = (TH1D*)hh->Clone(Form("IncidentHist_%d",ii));
-        TH1D *xsec = (TH1D*)InteractingHist->Clone();
-        //xsec->Divide(hh);
-        xsec->Scale(0);
-        const Int_t x0 = hh->GetXaxis()->GetFirst();
-        const Int_t x1 = hh->GetXaxis()->GetLast();
-
-        cout << "reco slice * Ninc: " << fiducial_thickness*hh->Integral("width") << endl;
-        cout << "reco Nint: " << InteractingHist->Integral("width") << endl;
-
-        for(Int_t ix=x0; ix<=x1; ix++){
-          double max = hh->GetXaxis()->GetBinUpEdge(ix);
-          double min = hh->GetXaxis()->GetBinLowEdge(ix);
-
-          double incE = hh->GetBinContent(ix);
-          double intE = InteractingHist->GetBinContent(ix);
-
-          double ratio = log(incE/(incE-intE));
-          //double ratio = intE/incE;
-          if(incE != 0) xsec->SetBinContent(ix,ratio);
-          //double error = sqrt(intE+pow(intE,2)/incE)/incE;
-          double einc = hh->GetBinError(ix);
-          double eint = InteractingHist->GetBinError(ix);
-          double error = sqrt(ratio*ratio*(pow(einc/incE,2)+pow(eint/intE,2)));
-          if(ratio != 0 ) xsec->SetBinError(ix,error);
-          //cout << "ix: " << ix << "intE: " << intE << endl;
-          //cout << "ix: " << ix << "incE: " << incE << endl;
-          //cout << "ix: " << ix << "intE/incE: " << intE/incE << endl;
-          
-          const Int_t x0_x = AnaIO::hTruthTotalXSecHist->GetXaxis()->GetFirst();
-          const Int_t x1_x = AnaIO::hTruthTotalXSecHist->GetXaxis()->GetLast();
-
-          for(Int_t ix=x0_x; ix<=x1_x; ix++){
-            //double bin_center = AnaIO::hTruthTotalXSecHist->GetBinCenter(ix);
-            double max_x = AnaIO::hTruthTotalXSecHist->GetXaxis()->GetBinUpEdge(ix);
-            double min_x = AnaIO::hTruthTotalXSecHist->GetXaxis()->GetBinLowEdge(ix);
-            if(max < max_x && min_x <= min) AnaIO::hTruthTotalXSecHist->SetBinContent(ix,ratio*sigma_factor*1e27);
-          }
-        }
-
-        
-        xsec->Scale(sigma_factor*1e27);
-        xsec->SetMaximum(300);
-        xsec->SetMinimum(0);
-        xsec->SetName(tag+"_xsec");
-        lout->Add(xsec);
-
-      }
-// End of data unfold hist */
       if(tag.Contains("i000hTruthBeamIncidentHist") || tag.Contains("i001hTruthBeamCalcIncidentHist") || tag.Contains("i000hTruthBeamIncidentHistOldM")){
         //const Int_t x1_c = hh->GetXaxis()->GetLast();
         //cout << "Before rebin: " << x1_c << endl;
@@ -428,13 +367,7 @@ void PlotUtils::ProcessHist(TList *lout, const bool kMC)
 
 
         // Test get Inicident Hist i001hTruthBeamCalcIncidentHist
-        /*TString beamintname = "i002hTruthBeamInteractingHist";
-        TH1D *BeamInteractingHist = (TH1D*)lout->FindObject(beamintname);
 
-        TH1D * IncidentHist = GetIncidentHist(InitialHist,BeamInteractingHist);
-        cout << "IncidentHist integral: " << IncidentHist->Integral(0,100000) << endl;
-        cout << "BeamInteractingHist integral: " << BeamInteractingHist->Integral(0,100000) << endl;
-        */
         TString beamincname = "i001hTruthBeamCalcIncidentHist";
         TH1D *IncidentHist_tmp = (TH1D*)lout->FindObject(beamincname);
         TH1D *IncidentHist = (TH1D*)IncidentHist_tmp->Clone();
@@ -642,57 +575,15 @@ void PlotUtils::ProcessHist(TList *lout, const bool kMC)
         DiffCEXxsec_800MeV->SetName(tag+"_DiffCEXRecoxsec800");
         lout->Add(DiffCEXxsec_800MeV);
       }
-/* // Data unfold histogram
-      if(tag.Contains("i031hUnFoldedPi0KEHist") && tag.Contains("Data")){
+*/
 
-        // Charge Exchange xsec
-        TString CEXname = "i025hUnFoldedInteractingHistData";
-        TH1D *CEXInteractingHist = (TH1D*)lout->FindObject(CEXname);
-
-        // 800 MeV
-        double diffInt_800MeV  = CEXInteractingHist->GetBinContent(16);
-        TH1D *DiffCEXxsec_800MeV = (TH1D*)hh->Clone();
-        //xsec->Divide(hh);
-        DiffCEXxsec_800MeV->Scale(0);
-
-        const Int_t x0_diff_800MeV = hh->GetXaxis()->GetFirst();
-        const Int_t x1_diff_800MeV = hh->GetXaxis()->GetLast();
-        double sum_800MeV = 0;
-        for(Int_t ix=x0_diff_800MeV; ix<=x1_diff_800MeV; ix++){
-          double incE = diffInt_800MeV;
-          double intE = hh->GetBinContent(ix);
-          if(intE != 0 ){
-            //double ratio = log(incE/(incE-intE));
-            double ratio = intE/incE;
-            DiffCEXxsec_800MeV->SetBinContent(ix,ratio);
-            //double error = sqrt(intE+pow(intE,2)/incE)/incE;
-            double einc = CEXInteractingHist->GetBinError(16);
-            double eint = hh->GetBinError(ix);
-            double error = sqrt(ratio*ratio*(pow(einc/incE,2)+pow(eint/intE,2)));
-            DiffCEXxsec_800MeV->SetBinError(ix,error);
-            //cout << "error_800MeV: " << error << endl;
-            //cout << "intE: " << intE << endl;
-            //cout << "incE: " << incE << endl;
-
-            //cout << "ratio_800MeV: " << ratio << endl;
-            sum_800MeV += intE;
-
-            //cout << "diffInt_800MeV: " << diffInt << endl;
-          }
-          //cout << "DiffCEXInteractingHist->GetBinContent(ix): " << intE << endl;
-        }
-
-        DiffCEXxsec_800MeV->SetName(tag+"_DiffCEXRecoxsec800Data");
-        lout->Add(DiffCEXxsec_800MeV);
-
-      }*/
 
       
     }
   } // End of for loop
 }
 
-void PlotUtils::DrawHist(TList *lout, const double plotscale, TList * overlayList, const TString outdir, TGraph *g_inel, TGraph *g_cex, TGraph *g_675, TGraph *g_775, TGraph *g_875, TGraph *g_675theta, TGraph *g_775theta, TGraph *g_875theta,  TGraph *g_675costheta, TGraph *g_775costheta, TGraph *g_875costheta)
+void PlotUtils::DrawHist(TList *lout, const double plotscale, TList * overlayList, const TString outdir)
 {
   TLatex tt;
   tt.SetNDC();
@@ -1427,25 +1318,7 @@ void PlotUtils::DrawHist(TList *lout, const double plotscale, TList * overlayLis
             //hpj->SetStats(0);
             hh->Draw("sames");
           }
-
-          //------- xsec plots ------//
-          /*else if (tag.Contains("TotalXSec")){
-            
-            hh->SetMaximum(1200);
-            hh->SetMinimum(0);
-
-            hh->SetMarkerStyle(8);
-            hh->SetMarkerSize(1);
-            hh->SetMarkerColor(kBlack);
-            hh->SetLineColor(kBlack);
-            hh->SetLineWidth(1);
-            hh->Draw("sames E");
-            //hh->Draw("hist e");
-            g_inel->SetLineColor(kRed);
-            g_inel->Draw("sames C");
-            
-          }*/
-
+/*
           // Total CEX xsec plots
           // i026hUnFoldedIncidentHist_xsec && i001hTruthIncidentHist_CEXxsec && i001hTruthIncidentHist_xsec (useless)
           else if (tag.Contains("xsec") && !tag.Contains("Total")  && !tag.Contains("Diff")){
@@ -2118,160 +1991,7 @@ void PlotUtils::DrawHist(TList *lout, const double plotscale, TList * overlayLis
             c1->cd();
 
           }
-/* // Data unfold histogram
-          else if (tag.Contains("_DiffCEXRecoxsec800") && tag.Contains("Data")){
 
-            TPad *pad1 = new TPad(Form("pad1_%d",ii), Form("pad1_%d",ii), 0, 0.2, 1, 0.98);
-            // Set 0.01 will hide axis label
-            pad1->SetBottomMargin(0.01);
-            //  pad1->SetGridx();
-            //  pad1->SetGridy();
-            pad1->Draw();
-            pad1->cd();
-
-            hh->Scale(1/50.0);
-            SetTitleFormat(hh);
-            TString CEXname = "i026hUnFoldedIncidentHistData_xsec";
-            TH1D *CEXInteractingHist = (TH1D*)lout->FindObject(CEXname);
-            hh->Scale(CEXInteractingHist->GetBinContent(16));
-            cout << "scale(16): " << CEXInteractingHist->GetBinContent(16) << endl;
-
-            hh->SetMarkerStyle(8);
-            hh->SetMarkerSize(1);
-            hh->SetMarkerColor(kBlack);
-            hh->SetLineColor(kBlack);
-            hh->SetLineWidth(1);
-            hh->SetMaximum(0.4);
-            hh->SetMinimum(0);
-
-            hh->Draw("E");
-
-            
-
-            auto* legend = new TLegend(0.6, 0.6, 0.85, 0.88);
-            g_775->SetLineColor(kRed);
-            g_775->Draw("sames C");
-            //legend->AddEntry(holay_truth, "MC Truth 775 MeV", "lep");
-            legend->AddEntry(hh, "MC Reco 775 MeV", "lep");
-            legend->AddEntry(g_775, "Geant4 Prediction", "l");
-            
-            TString lheader("Fake Data (Full MC sample)");
-            legend->SetHeader(lheader);
-            legend->Draw("same");
-
-
-            c1->Update();
-            c1->cd();
-            TPad *pad2 = new TPad(Form("pad2_%d",ii), Form("pad2_%d",ii), 0, 0, 1, 0.2);
-            
-            pad2->SetTopMargin(0.03);
-            pad2->SetBottomMargin(0.42);
-            pad2->SetGridx();
-            pad2->SetGridy();
-            pad2->Draw();
-            pad2->cd();
-
-            TH1D *hratio = (TH1D*)hh->Clone(Form("hratio_%d",ii));
-
-            const Int_t x0_x = hh->GetXaxis()->GetFirst();
-            const Int_t x1_x = hh->GetXaxis()->GetLast();
-
-            hratio->Scale(0);
-
-            for(Int_t ix=x0_x; ix<=x1_x; ix++){
-              double bin_center = hh->GetBinCenter(ix);
-              double MC = 0;
-              //if(tag.Contains("700")) MC = g_675->Eval(bin_center);
-              //else if(tag.Contains("800")) MC = g_775->Eval(bin_center);
-              //else if(tag.Contains("900")) MC = g_875->Eval(bin_center);
-              MC = g_775->Eval(bin_center);
-              double data = hh->GetBinContent(ix);
-              double edata = hh->GetBinError(ix);
-              if(MC != 0){
-                double ratio = data/MC;
-                hratio->SetBinContent(ix,ratio);
-                double error = sqrt(ratio*ratio*(pow(edata/data,2)));
-                hratio->SetBinError(ix,error);
-
-              }
-              //cout << "bin: " << hratio->GetBinContent(ix) << endl;
-            }
-            hratio->SetTitle(" ");
-            //hratio->Divide(hsum);
-            DrawDataMCRatio(hratio);
-
-            c1->cd();
-
-          }*/
-
-/*
-          else if (tag.Contains("DiffCEXxsec800")){
-
-              TString CEXname = "i001hTruthIncidentHist_CEXxsec";
-              TH1D *CEXInteractingHist = (TH1D*)lout->FindObject(CEXname);
-
-              cout << " no norm: " << hh->Integral("width") << endl;
-              hh->Scale(1/50.0);
-              cout << " mid norm: " << hh->Integral("width") << endl;
-              //hh->Scale(g_cex->Eval(800));
-              //cout << "evl: " << g_cex->Eval(800) << endl;
-              hh->Scale(CEXInteractingHist->GetBinContent(16));
-              cout << "evl 800: " << g_cex->Eval(800) << endl;
-              cout << "evl hand 800: " << CEXInteractingHist->GetBinContent(16) << endl;
-              cout << "norm: " << hh->Integral("width") << endl;
-              hh->SetMarkerStyle(8);
-              hh->SetMarkerSize(1);
-              hh->SetMarkerColor(kBlack);
-              hh->SetLineColor(kBlack);
-              hh->SetLineWidth(1);
-              hh->SetMaximum(0.4);
-              hh->SetMinimum(0);
-
-              hh->Draw("E");
-
-              g_775->SetLineColor(kRed);
-              g_775->Draw("sames C");
-
-              auto* legend = new TLegend(0.6, 0.6, 0.85, 0.88);
-              legend->AddEntry(hh, "Pion KE 800 MeV", "lep");
-              legend->AddEntry(g_775, "Geant4 Prediction", "l");
-              legend->Draw("same");
-          }
-
-          else if (tag.Contains("DiffCEXxsec900")){
-
-              TString CEXname = "i001hTruthIncidentHist_CEXxsec";
-              TH1D *CEXInteractingHist = (TH1D*)lout->FindObject(CEXname);
-
-              cout << " no norm: " << hh->Integral("width") << endl;
-              hh->Scale(1/50.0);
-              cout << " mid norm: " << hh->Integral("width") << endl;
-              //hh->Scale(g_cex->Eval(900));
-              //cout << "evl: " << g_cex->Eval(900) << endl;
-              hh->Scale(CEXInteractingHist->GetBinContent(18));
-              cout << "evl 900: " << g_cex->Eval(900) << endl;
-              cout << "evl hand 900: " << CEXInteractingHist->GetBinContent(16) << endl;
-              cout << "norm: " << hh->Integral("width") << endl;
-              hh->SetMarkerStyle(8);
-              hh->SetMarkerSize(1);
-              hh->SetMarkerColor(kBlack);
-              hh->SetLineColor(kBlack);
-              hh->SetLineWidth(1);
-              hh->SetMaximum(0.4);
-              hh->SetMinimum(0);
-
-              hh->Draw("E");
-
-              g_875->SetLineColor(kRed);
-              g_875->Draw("sames C");
-
-
-              auto* legend = new TLegend(0.6, 0.6, 0.85, 0.88);
-              legend->AddEntry(hh, "Pion KE 900 MeV", "lep");
-              legend->AddEntry(g_875, "Geant4 Prediction", "l");
-              legend->Draw("same");
-          }
-*/
           else if(tag.Contains("i011hTruthDiffCEXInteractingHist_100MeV")){
         
             TString Name200MeV = "i010hTruthDiffCEXInteractingHist_200MeV";
@@ -2401,49 +2121,7 @@ void PlotUtils::DrawHist(TList *lout, const double plotscale, TList * overlayLis
             holay->Draw("hist sames");
             
           }
-/*
-          else if(tag.Contains("i000hTruthInitialHist")){
 
-            // hh is initial
-            // hint is interacting
-            // hinc is incident
-            TH1D *hini = (TH1D*)hh->Clone("hini");
-
-            TString intHist = "i002hTruthInteractingHist";
-            TH1D *hint = (TH1D*)lout->FindObject(intHist);
-
-            TString incHist = "i001hTruthIncidentHist";
-            TH1D *hinc = (TH1D*)lout->FindObject(incHist);
-
-            const Int_t x0 = hh->GetXaxis()->GetFirst();
-            const Int_t x1 = hh->GetXaxis()->GetLast();
-            cout << "x0: " << x0 << endl;
-            cout << "x1: " << x1 << endl;
-
-            hini->Scale(0);
-
-            for(Int_t ix=x1; ix>=x0; ix--){
-              double iniN = 0;
-              double intN = 0;
-              for(Int_t jx=x1; jx>=ix; jx--){
-                iniN += hh->GetBinContent(jx);
-              }
-              for(Int_t jx=x1; jx>=ix-1; jx--){
-                intN += hint->GetBinContent(jx);
-              }
-              cout << "iniN: " << iniN << endl;
-              cout << "intN: " << intN << endl;
-              cout << "iniN - intN: " << iniN - intN << endl;
-              hini->SetBinContent(ix,iniN-intN);
-              //hh->SetBinError(ix,error);
-            }
-
-            hini->Draw("hist");
-            hinc->Draw("sames e1");
-            //hh->Draw("hist");
-            
-          }
-*/
           else if(tag.Contains("i000hTruthBeamIncidentHist")){
 
             TString CalcInc = "i001hTruthBeamCalcIncidentHist";
@@ -2571,10 +2249,7 @@ void PlotUtils::DrawHist(TList *lout, const double plotscale, TList * overlayLis
           // This is the beam incident histogram plot (bck sub && unfolding && truth)
           else if(tag.Contains("i001hTruthBeamCalcIncidentHist")){
 
-            /*TString recoBckSubInc = "i016hRecoBeamInteractingHist";
-            TH1D *htmp = (TH1D*)lout->FindObject(recoBckSubInc);
-            TH1D *holaybckSub = (TH1D*)htmp->Clone("hint");
-            holaybckSub->Rebin(50);*/
+
             //TH1D *holaybckSub = (TH1D*)lout->FindObject(recoBckSubInc);
             TString UnfoldInc = "i027hUnFoldedBeamIncidentHist";
             TH1D *holayunfold = (TH1D*)lout->FindObject(UnfoldInc);
@@ -2588,13 +2263,6 @@ void PlotUtils::DrawHist(TList *lout, const double plotscale, TList * overlayLis
             hh->SetLineColor(kRed);
             hh->Draw("hist");
 
-            /*holaybckSub->SetMarkerStyle(8);
-            holaybckSub->SetMarkerSize(1);
-            holaybckSub->SetMarkerColor(kGreen+3);
-            holaybckSub->SetLineColor(kGreen+3);
-            holaybckSub->SetLineWidth(1);
-            //holaybckSub->Add(holaybck,-1);
-            holaybckSub->Draw("e1 sames");*/
 
             holayunfold->SetMarkerStyle(8);
             holayunfold->SetMarkerSize(1);
@@ -2647,13 +2315,7 @@ void PlotUtils::DrawHist(TList *lout, const double plotscale, TList * overlayLis
             htruth->Scale(scale);
             htruth->Draw("hist sames");
 
-            /*htruth->SetMarkerStyle(8);
-            htruth->SetMarkerSize(1);
-            htruth->SetMarkerColor(kGreen+3);
-            htruth->SetLineColor(kGreen+3);
-            htruth->SetLineWidth(1);
-            //htruth->Add(holaybck,-1);
-            htruth->Draw("e1 sames");*/
+
 
             hh->SetMarkerStyle(8);
             hh->SetMarkerSize(1);
@@ -2806,13 +2468,7 @@ void PlotUtils::DrawHist(TList *lout, const double plotscale, TList * overlayLis
             htruth->Draw("hist sames");
 
 
-            /*htruth->SetMarkerStyle(8);
-            htruth->SetMarkerSize(1);
-            htruth->SetMarkerColor(kRed+3);
-            htruth->SetLineColor(kGreen+3);
-            htruth->SetLineWidth(1);
-            //htruth->Add(holaybck,-1);
-            htruth->Draw("e1 sames");*/
+ 
 
             hh->SetMarkerStyle(8);
             hh->SetMarkerSize(1);
@@ -3219,7 +2875,7 @@ void PlotUtils::DrawHist(TList *lout, const double plotscale, TList * overlayLis
             legend->Draw("same");
 
           }
-
+*/
           else {
             hh->Draw("hist");
           }
