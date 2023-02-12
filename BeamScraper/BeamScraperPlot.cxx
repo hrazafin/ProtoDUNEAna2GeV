@@ -88,7 +88,8 @@ int main(int argc, char * argv[])
 {
     
     //const TString finName = "input/benchmark_WithoutSmearing.root"; // Scaper plots (No SM only affect ElossSW)
-    const TString finName = "input/benchmark_WithSmearing.root"; // Scaper plots (With SM only affect ElossSW)
+    //const TString finName = "input/benchmark_WithSmearing.root"; // Scaper plots (With SM only affect ElossSW)
+    const TString finName = "input/benchmark_WithSmearing_InstPSM.root"; // Scaper plots (plus InstP SM)
     
     TFile *file = TFile::Open(finName);
 
@@ -96,6 +97,34 @@ int main(int argc, char * argv[])
       cout << "file file not open" << endl;
       exit(1);
     }
+
+    // ========== Beam Inst P Before Smearing ========== //
+    TH2D * h2d_InstP_mc_raw = (TH2D*) file->Get("mc/i057hRecPiPlusInstMomentumNoSmearing_STK;1");
+    TH1D * h1d_InstP_data_raw = (TH1D*) file->Get("data/i057hRecPiPlusInstMomentumNoSmearing_STK_sum;1");
+    TH1D * h2d_InstP_mc_projX_raw = h2d_InstP_mc_raw->ProjectionX();
+    TF1 *f1_raw = FitGausFunc(h2d_InstP_mc_projX_raw,850.0,1150.0);
+    double mc_sigma_raw = f1_raw->GetParameter("Sigma");
+    double mc_mean_raw = f1_raw->GetParameter("Mean");
+    TF1 *f2_raw = FitGausFunc(h1d_InstP_data_raw,850.0,1150.0);
+    double data_sigma_raw = f2_raw->GetParameter("Sigma");
+    double data_mean_raw = f2_raw->GetParameter("Mean");
+    cout << "mu_raw: " << (data_mean_raw - mc_mean_raw)/1000.0 << " sigma_raw: " << sqrt(pow(data_sigma_raw/1000.0,2)-pow(mc_sigma_raw/1000.0,2)) << endl;
+    Draw1D(h2d_InstP_mc_projX_raw,f1_raw);
+    Draw1D(h1d_InstP_data_raw,f2_raw);
+
+    // ========== Beam Inst P After Smearing ========== //
+    TH2D * h2d_InstP_mc = (TH2D*) file->Get("mc/i051hRecPiPlusInstMomentum_STK;1");
+    TH1D * h1d_InstP_data = (TH1D*) file->Get("data/i051hRecPiPlusInstMomentum_STK_sum;1");
+    TH1D * h2d_InstP_mc_projX = h2d_InstP_mc->ProjectionX();
+    TF1 *f1 = FitGausFunc(h2d_InstP_mc_projX,850.0,1150.0);
+    double mc_sigma = f1->GetParameter("Sigma");
+    double mc_mean = f1->GetParameter("Mean");
+    TF1 *f2 = FitGausFunc(h1d_InstP_data,850.0,1150.0);
+    double data_sigma = f2->GetParameter("Sigma");
+    double data_mean = f2->GetParameter("Mean");
+    cout << "mu: " << (data_mean - mc_mean)/1000.0 << " sigma: " << sqrt(pow(data_sigma/1000.0,2)-pow(mc_sigma/1000.0,2)) << endl;
+    Draw1D(h2d_InstP_mc_projX,f1);
+    Draw1D(h1d_InstP_data,f2);
 
     // ========== Define Beam Scraper Events ========== //
     TH1D * h1d_upEloss700MeV = (TH1D*) file->Get("mc/j003hUpStreamELoss700MeV;1");
