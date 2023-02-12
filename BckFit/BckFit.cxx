@@ -75,7 +75,6 @@
 
 
 using namespace std;
-//double plotScale = 0.561778;
 double plotScale = 0.499375;
 
 double GetChi2(TH1D * hdata, TH1D * hmc);
@@ -204,10 +203,9 @@ void Get1pi0BckScale(vector<double> &Par, vector<double> &Parerr)
     TH1D * h2_low = new TH1D("h2_low1pi0",";Interacting Energy (MeV); Candidates", 20, 0, 1000); 
     TH1D * h2_high = new TH1D("h2_high1pi0",";Interacting Energy (MeV); Candidates", 20, 0, 1000); 
 
-    //const TString finName = "input/outana_1pi0.root";
-    //const TString finName = "input/outana_bck1pi0New.root";
-    //const TString finName = "input/outana_bck1pi0New.root";
-    const TString finName = "input/outana_1pi0New1117.root";
+    //const TString finName = "input/outana_1pi0New1117.root";
+    const TString finName = "input/outana_Bck1pi0_benchmark.root";
+    //const TString finName = "input/outana_Bck1pi0_benchmark_12MeV.root";
     
     TFile *file = TFile::Open(finName);
 
@@ -305,9 +303,9 @@ void Get0pi0BckScale(vector<double> &Par, vector<double> &Parerr, const double &
     TH1D * h2_low = new TH1D("h2_low0pi0",";Interacting Energy (MeV); Candidates", 20, 0, 1000); 
     TH1D * h2_high = new TH1D("h2_high0pi0",";Interacting Energy (MeV); Candidates", 20, 0, 1000); 
 
-    //const TString finName = "input/outana_0pi0_noMichel.root";
-    //const TString finName = "input/outana_bck0pi0New.root";
-    const TString finName = "input/outana_0pi0New1117.root";
+    //const TString finName = "input/outana_0pi0New1117.root";
+    const TString finName = "input/outana_Bck0pi0_benchmark.root";
+    //const TString finName = "input/outana_Bck0pi0_benchmark_12MeV.root";
     
     TFile *file = TFile::Open(finName);
 
@@ -409,9 +407,9 @@ void GetSignalResults(const double &low1pi0Scale, const double &high1pi0Scale, c
     TH1D * h1pi0_s1 = new TH1D(Form("h1pi0_s1_%s",tag.Data()),";Interacting Energy (MeV); Candidates", 20, 0, 1000);
     TH1D * h1pi0_s2 = new TH1D(Form("h1pi0_s2_%s",tag.Data()),";Interacting Energy (MeV); Candidates", 20, 0, 1000);
     
-    //const TString finName = "input/outana_sig.root";
-    //const TString finName = "input/outana_sigNew.root";
-    const TString finName = "input/outana_sigNew1117.root";
+    //const TString finName = "input/outana_sigNew1117.root";
+    const TString finName = "input/outana_Sig_benchmark.root";
+    //const TString finName = "input/outana_Sig_benchmark_12MeV.root";
     
     TFile *file = TFile::Open(finName);
 
@@ -664,10 +662,10 @@ void GetSimulFitScale(vector<double> &Par, vector<double> &Parerr, int &bs1, int
     TH1D * h0_sample2 = new TH1D("h0_s2",";Interacting Energy (MeV); Candidates", 20, 0, 1000); 
     TH1D * h1_sample2 = new TH1D("h1_s2",";Interacting Energy (MeV); Candidates", 20, 0, 1000); 
     TH1D * h2_sample2 = new TH1D("h2_s2",";Interacting Energy (MeV); Candidates", 20, 0, 1000);
-
-    //const TString finName_1pi0 = "input/outana_1pi0.root";  
-    //const TString finName_1pi0 = "input/outana_bck1pi0New.root";  
-    const TString finName_1pi0 = "input/outana_1pi0New1117.root";  
+  
+    //const TString finName_1pi0 = "input/outana_1pi0New1117.root";  // Same with benchmark
+    const TString finName_1pi0 = "input/outana_Bck1pi0_benchmark.root";  
+    //const TString finName_1pi0 = "input/outana_Bck1pi0_benchmark_12MeV.root"; // Hadron Ana Meeting Plots
 
     TFile *file_1pi0 = TFile::Open(finName_1pi0);   
 
@@ -720,10 +718,9 @@ void GetSimulFitScale(vector<double> &Par, vector<double> &Parerr, int &bs1, int
     
     file_1pi0->Close();
 
-
-    //const TString finName_0pi0 = "input/outana_0pi0_noMichel.root";
-    //const TString finName_0pi0 = "input/outana_bck0pi0New.root";
-    const TString finName_0pi0 = "input/outana_0pi0New1117.root";
+    //const TString finName_0pi0 = "input/outana_0pi0New1117.root";
+    const TString finName_0pi0 = "input/outana_Bck0pi0_benchmark.root";
+    //const TString finName_0pi0 = "input/outana_Bck0pi0_benchmark_12MeV.root";
     
     TFile *file_0pi0 = TFile::Open(finName_0pi0);
 
@@ -801,6 +798,7 @@ void GetSimulFitScale(vector<double> &Par, vector<double> &Parerr, int &bs1, int
     //bs1 = 13; bs2 = 16; // chisq = 12.11;
 
     bs1 = 14; bs2 = 13; // chisq = 11.98;
+    
     
 
     fitter.SetSimulHistograms(h0_sample1, h1_sample1, h2_sample1, h0_sample2, h1_sample2, h2_sample2, bs1, bs2);
