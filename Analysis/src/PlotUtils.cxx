@@ -2876,6 +2876,71 @@ void PlotUtils::DrawHist(TList *lout, const double plotscale, TList * overlayLis
 
           }
 */
+          else if(tag.Contains("_PreFit")){
+            TH1D *hh = (TH1D*)lout->FindObject(tag);
+            SetTitleFormat(hh);
+            TRegexp re("_PreFit");
+            TString name = tag;
+            name(re) = "_PostFit";
+            //cout << "name: " << name << endl;
+            TH1D *hpostFit = (TH1D*)lout->FindObject(name);
+            if(hpostFit){
+              //if(hh->GetMaximum() > hpostFit->GetMaximum()) hh->SetMaximum(hh->GetMaximum()*1.15);
+              //else hh->SetMaximum(hpostFit->GetMaximum()*1.15);
+              if(tag.Contains("Energy") || tag.Contains("LD")) hh->SetMaximum(hpostFit->GetMaximum()*1.15);
+              if(tag.Contains("SL")) hh->SetMaximum(hpostFit->GetMaximum()*1.15);
+              if(tag.Contains("OAShower")) hh->SetMaximum(hpostFit->GetMaximum()*1.15);
+              //hh->SetStats(1);
+              hh->SetFillStyle(4050);
+              //hh->SetFillColor(24);
+              hh->SetFillColorAlpha(24,0.3);
+              hh->SetLineColor(24);
+              hh->SetLineWidth(2);
+
+              hh->Draw("hist");
+              // Stats box
+              /*hh->SetName("Pre Fit");
+              gPad->Update();
+              TPaveStats *st = (TPaveStats*)hh->GetListOfFunctions()->FindObject("stats");
+              gPad->Modified(); gPad->Update();
+              st->SetY1NDC(0.7); 
+              st->SetY2NDC(0.9);
+              st->SetX1NDC(0.7); 
+              st->SetX2NDC(0.93);
+              */
+
+              hpostFit->SetFillStyle(3004);
+              hpostFit->SetFillColor(46);
+              hpostFit->SetLineColor(46);
+              hpostFit->SetLineWidth(2);
+
+              // Must use SAMES
+              hpostFit->Draw("SAMES hist");
+              /*hpostFit->SetName("Post Fit");
+              gPad->Update();
+              TPaveStats *st_hpostFit = (TPaveStats*)hpostFit->GetListOfFunctions()->FindObject("stats");
+              gPad->Modified(); gPad->Update();
+              st_hpostFit->SetY1NDC(0.47); 
+              st_hpostFit->SetY2NDC(0.67);
+              st_hpostFit->SetX1NDC(0.7); 
+              st_hpostFit->SetX2NDC(0.93);
+              */
+              auto lg = new TLegend(0.62,0.5,0.85,0.88);
+              lg->AddEntry(hh,"Before Fitting","f");
+              TLegendEntry* l1 = lg->AddEntry((TObject*)0, Form("( #mu: %.2f #sigma: %.2f )",hh->GetMean(),hh->GetRMS()), "");
+              l1->SetTextSize(0.03);
+              lg->AddEntry(hpostFit,"After Fitting","f");
+              TLegendEntry* l2 = lg->AddEntry((TObject*)0, Form("( #mu: %.2f #sigma: %.2f )",hpostFit->GetMean(),hpostFit->GetRMS()), "");
+              l2->SetTextSize(0.03);
+              l2->SetTextColor(46);
+              lg->Draw("same");
+              TLine *line1 = new TLine(0,0,0,hh->GetMaximum());
+              line1->SetLineColor(kBlack);
+              line1->SetLineStyle(kDashed);
+              line1->SetLineWidth(3);
+              line1->Draw("same");
+            }
+          }
           else {
             hh->Draw("hist");
           }
@@ -3605,60 +3670,33 @@ THStack * PlotUtils::NormalizeStack(THStack * hstk)
           cout << "ix: " << ix << "ratio: " << htmp->GetBinContent(ix) << endl;
         }
       }
-
-      if(tag.Contains("i088hRecPiZeroSliceKineticEnergyEvt_COMPOSE") && ii == 0){
-        cout << "i088hRecPiZeroSliceKineticEnergyEvt_COMPOSE" << endl;
+      // ============ Pi0 KE =========== //      
+      if(tag.Contains("i30") && ii == 0){
+        cout << tag << endl;
         const Int_t x0 = htmp->GetXaxis()->GetFirst();
         const Int_t x1 = htmp->GetXaxis()->GetLast();
         for(Int_t ix=x0; ix<=x1; ix++){
           cout << "ix: " << ix << "ratio: " << htmp->GetBinContent(ix) << endl;
         }
       }
-      
-      if(tag.Contains("i082hRecPiZeroRangeKineticEnergyEvtAnotherWeight_COMPOSE") && ii == 0){
-        cout << "i082hRecPiZeroRangeKineticEnergyEvtAnotherWeight_COMPOSE" << endl;
+      // ============ Pi0 Costheta =========== //      
+      if(tag.Contains("i40") && ii == 0){
+        cout << tag << endl;
         const Int_t x0 = htmp->GetXaxis()->GetFirst();
         const Int_t x1 = htmp->GetXaxis()->GetLast();
         for(Int_t ix=x0; ix<=x1; ix++){
           cout << "ix: " << ix << "ratio: " << htmp->GetBinContent(ix) << endl;
         }
       }
-
-      if(tag.Contains("i086hRecPiZeroRangeCosThetaEvtAnotherWeight_COMPOSE") && ii == 0){
-        cout << "i086hRecPiZeroRangeCosThetaEvtAnotherWeight_COMPOSE" << endl;
+      // ============ Pi0 Theta =========== //      
+      if(tag.Contains("i50") && ii == 0){
+        cout << tag << endl;
         const Int_t x0 = htmp->GetXaxis()->GetFirst();
         const Int_t x1 = htmp->GetXaxis()->GetLast();
         for(Int_t ix=x0; ix<=x1; ix++){
           cout << "ix: " << ix << "ratio: " << htmp->GetBinContent(ix) << endl;
         }
-      }
-
-      if(tag.Contains("i087hRecPiZeroRangeThetaEvtAnotherWeight_COMPOSE") && ii == 0){
-        cout << "i087hRecPiZeroRangeThetaEvtAnotherWeight_COMPOSE" << endl;
-        const Int_t x0 = htmp->GetXaxis()->GetFirst();
-        const Int_t x1 = htmp->GetXaxis()->GetLast();
-        for(Int_t ix=x0; ix<=x1; ix++){
-          cout << "ix: " << ix << "ratio: " << htmp->GetBinContent(ix) << endl;
-        }
-      }
-
-      if(tag.Contains("i086hRecPiZeroRangeCosThetaEvt_COMPOSE") && ii == 0){
-        cout << "i086hRecPiZeroRangeCosThetaEvt_COMPOSE" << endl;
-        const Int_t x0 = htmp->GetXaxis()->GetFirst();
-        const Int_t x1 = htmp->GetXaxis()->GetLast();
-        for(Int_t ix=x0; ix<=x1; ix++){
-          cout << "ix: " << ix << "ratio: " << htmp->GetBinContent(ix) << endl;
-        }
-      }
-
-      if(tag.Contains("i087hRecPiZeroRangeThetaEvt_COMPOSE") && ii == 0){
-        cout << "i087hRecPiZeroRangeThetaEvt_COMPOSE" << endl;
-        const Int_t x0 = htmp->GetXaxis()->GetFirst();
-        const Int_t x1 = htmp->GetXaxis()->GetLast();
-        for(Int_t ix=x0; ix<=x1; ix++){
-          cout << "ix: " << ix << "ratio: " << htmp->GetBinContent(ix) << endl;
-        }
-      }
+      }    
     }
 
     delete hsum;

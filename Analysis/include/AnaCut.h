@@ -20,13 +20,13 @@ class AnaCut
     bool CutBeamQuality(const bool kMC, bool DoAngleCut = true, bool kFill = false);
     bool CutBeamInstQuality(bool kMC);
     // Cut on end Z APA3
-    bool CutAPA3EndZ(const bool kMC, bool kFill = false);
+    bool CutAPA3EndZ(const bool kMC, bool kFill = false, const double weight = 1.0);
     // Cut on Michel Score (remove muons)
-    bool CutMichelScore(const bool kMC, bool kFill = false);
+    bool CutMichelScore(const bool kMC, bool kFill = false, const double weight = 1.0);
     // Cut on median dE/dx (remove protons)
     bool CutMediandEdx(const bool kMC);
     // Cut on median dE/dx (remove protons)
-    bool CutProtonChi2DOF(const bool kMC, bool kFill = false);
+    bool CutProtonChi2DOF(const bool kMC, bool kFill = false, const double weight = 1.0);
     // Cut on beam scrapers
     bool CutBeamScraper(const bool kMC);
 
@@ -54,16 +54,16 @@ class AnaCut
     // Event and final state particle selections
     bool CutTopology(const bool kMC, double & pi0KineticE, double & pi0costheta, bool kFill = false);
     void CountPFP(const bool kMC, const bool kFill);
-    bool IsProton(const int ii, const bool kMC);
-    bool IsTrack(const int ii, const bool kMC);  
-    bool IsPionTrack(const int ii, const bool kMC);  
-    bool PassProtonSubPID(const int ii);
-    bool PassPionSubPID(const int ii);
-    bool IsPiplus(const int ii, const bool kMC);
-    bool IsShower(const int ii, const bool kMC);
-    bool IsMichel(const int ii, const bool kMC);
-    bool IsPiZeroShower(const int ii, const bool kMC); 
-    bool IsPizero(const bool kMC, const bool kFill);
+    bool IsProton(const int ii, const bool kMC, const double weight = 1.0);
+    bool IsTrack(const int ii, const bool kMC, const double weight = 1.0);  
+    bool IsPionTrack(const int ii, const bool kMC, const double weight = 1.0);  
+    bool PassProtonSubPID(const int ii, const double weight = 1.0);
+    bool PassPionSubPID(const int ii, const double weight = 1.0);
+    bool IsPiplus(const int ii, const bool kMC, const double weight = 1.0);
+    bool IsShower(const int ii, const bool kMC, const double weight = 1.0);
+    bool IsMichel(const int ii, const bool kMC, const double weight = 1.0);
+    bool IsPiZeroShower(const int ii, const bool kMC, const double weight = 1.0); 
+    bool IsPizero(const bool kMC, const bool kFill, const double weight = 1.0);
 
 
   private:
@@ -78,6 +78,11 @@ class AnaCut
     int npi0;
     int truthParticleType;
     int recParticleType;
+
+    double OA;
+    int truthPi0Type;
+    TLorentzVector PiZeroVec;
+    
 
     // Cut values
     const double cut_EndZ_APA3 = 220.0; // in cm

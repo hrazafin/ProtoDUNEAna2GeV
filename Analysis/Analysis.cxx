@@ -70,7 +70,7 @@ int anaRec(const TString finName, TList *lout, const TString tag, const int nEnt
 
     // Gaus smearing 
     double radGaus = 0.0;
-    if(kMC && doXS){
+    if(kMC && true){
       // Select true pion beam for the unfolding process
       if(anaCut.CutBeamAllInOne(kMC)){
         double trackLen = anaUtils.GetRecoTrackLength();
@@ -99,6 +99,7 @@ int anaRec(const TString finName, TList *lout, const TString tag, const int nEnt
       
       // Fill XS hisotgrams
       anaUtils.FillXSTrueHistograms(true_avaPionBeam, true_avaPionCEXevt, true_avaDiffCEXevt);
+      anaUtils.FillXSNewTrueHistograms();
 
       // Set signal using truth info
       anaUtils.SetFullSignal();
@@ -177,9 +178,9 @@ int anaRec(const TString finName, TList *lout, const TString tag, const int nEnt
 
             double beam_inst_KE = sqrt(pow(beam_inst_P_smearing,2)+pow(AnaFunctions::PionMass(),2)) - AnaFunctions::PionMass();
             // Taking into account the front face energy lost 12.74 MeV is used here
-            //double Eloss = anaUtils.GetUpStreamEnergyLoss(kMC,beam_inst_KE);
-            //double ff_energy_reco = beam_inst_KE*1000 - 12.74; 2.65229
-            double ff_energy_reco = beam_inst_KE*1000 - 2.65229; //FIXME upper Syst
+            double Eloss = anaUtils.GetUpStreamEnergyLoss(kMC,beam_inst_KE);
+            double ff_energy_reco = beam_inst_KE*1000 - Eloss;//12.74;
+            //double ff_energy_reco = beam_inst_KE*1000 - 2.65229; //FIXME upper Syst
 
             double initialE_reco = bb.KEAtLength(ff_energy_reco, trackLenAccum[0]); 
 
@@ -392,6 +393,7 @@ int anaRec(const TString finName, TList *lout, const TString tag, const int nEnt
                     // ?? Indenpent of fake data use full MC to fill diff. XS unfolding matrix
                     //if(/*!isFakeData && */interactingE > 750 && interactingE < 800) {
                     if(/*!isFakeData && */interactingE > 650 && interactingE < 800) {
+                      
                       if(isFakeData) {recoMatch_avaDiffCEXevt++; reco_selectedDiffCEXevt++;}
                       uf.response_SliceID_Pi0KE.Fill(pi0KineticE*1000, LeadingPiZeroKE*1000, weight);
                       uf.response_SliceID_Pi0CosTheta.Fill(pi0costheta, LeadingPiZeroCosTheta, weight);
@@ -539,87 +541,6 @@ int anaRec(const TString finName, TList *lout, const TString tag, const int nEnt
 
     } // End of if(kMC) ...
 
-    //For data need to think more about the structure
-    if(!kMC && doXS){
-
-      //cout << "finName: " << finName << endl;
-      /*for(int ii=0; ii<lout->GetSize(); ii++){
-        const TString tag = lout->At(ii)->GetName();
-        if(tag.Contains("Data")) cout << "data tag name: " << tag << endl;
-      }*/
-      // fake data test!
-      //const int parType = kMC ? anaUtils.GetBeamParticleType(AnaIO::reco_beam_true_byHits_PDG) : anaUtils.gkBeamOthers;
-      //const int channelType = kMC ? anaUtils.GetChannelType((*AnaIO::true_beam_endProcess),AnaIO::true_beam_PDG, AnaIO::true_daughter_nPi0, AnaIO::true_daughter_nPiPlus, AnaIO::true_daughter_nPiMinus) : anaUtils.gkBackground;
-      //const int evtXStype = kMC ? anaUtils.GetFillXSEventType() : anaUtils.gkXSBmBkg;
-
-      // Get the reco track length from reco_beam_calo_X,Y,Z
-      double trackLen = anaUtils.GetRecoTrackLength();
-      vector<double> trackLenAccum = anaUtils.GetRecoTrackLengthAccumVect();
-      double pi0KineticE, pi0costheta;
-      //cout << "data trackLen: " << trackLen << endl;
-      if(trackLen != -999) {
-        // Calculate the reco beam energy at the entry point 
-        double beam_inst_KE = sqrt(pow(AnaIO::beam_inst_P,2)+pow(AnaFunctions::PionMass(),2)) - AnaFunctions::PionMass();
-        //double ff_energy_reco = beam_inst_KE*1000 - 12.74;
-        double ff_energy_reco = beam_inst_KE*1000 - 2.65229; //FIXME upper Syst; 
-
-        double initialE_reco = bb.KEAtLength(ff_energy_reco, trackLenAccum[0]); 
-        // Based on the reco beam accumulated length get the reco beam incident energy
-        // Refill the AnaIO::reco_beam_incidentEnergies (analog to AnaIO::true_beam_traj_KE in true version)
-        AnaIO::reco_beam_incidentEnergies->clear();
-        for(unsigned int idx = 0; idx < trackLenAccum.size(); idx++){
-          double energy_reco = bb.KEAtLength(ff_energy_reco, trackLenAccum[idx]);
-          AnaIO::reco_beam_incidentEnergies->push_back(energy_reco);
-        }
-        // Reco beam incident energy (vector) and interaction energy calculation (use reco_beam_calo_Z and reco_beam_incidentEnergies) 
-        AnaIO::reco_beam_new_incidentEnergies->clear();
-        double interactingE_reco = anaUtils.MakeRecoIncidentEnergies(AnaIO::reco_beam_calo_Z, AnaIO::reco_beam_incidentEnergies, AnaIO::reco_beam_new_incidentEnergies);
-
-        //int size_reco = AnaIO::reco_beam_new_incidentEnergies->size();
-
-        if(anaCut.CutBeamAllInOne(false)){ // Pass the beam cuts
-          // Fill the reco incident histograms
-          //for(int i = 0; i < size_reco; i++){
-          //  double energy_reco = (*AnaIO::reco_beam_new_incidentEnergies)[i];
-          //  //if(parType == anaUtils.gkBeamPiPlus) 
-          //  AnaIO::hRecoIncidentHistData->Fill(energy_reco,0.889673);
-          //}
-          //plotUtils.FillHist(AnaIO::hRecPiPlusEnergy_OVERLAY_After_EVTXS, interactingE_reco, parType);
-
-          if(interactingE_reco==-999) interactingE_reco = AnaIO::reco_beam_new_incidentEnergies->back();
- 
-          //double iniwt = anaUtils.CalBeamIniWeight((*AnaIO::reco_beam_new_incidentEnergies)[0]);
-          double iniwt = anaUtils.CalBeamIniWeight(initialE_reco);
-          double intwt = anaUtils.CalBeamIntWeight(interactingE_reco);
-
-          //cout << "interactingE_reco: " << interactingE_reco << "intwt: " << intwt << endl;
-          //cout << "initialE_reco: " << (*AnaIO::reco_beam_new_incidentEnergies)[0] << "iniwt: " << iniwt << endl;
-
-          //AnaIO::hRecoBeamInitialHistData->Fill((*AnaIO::reco_beam_new_incidentEnergies)[0],iniwt);
-          AnaIO::hRecoBeamInitialHistData->Fill(initialE_reco,iniwt);
-          AnaIO::hRecoBeamInteractingHistData->Fill(interactingE_reco,intwt);
-        }
-
-        if(anaCut.CutBeamAllInOne(false) && anaCut.CutTopology(false, pi0KineticE, pi0costheta)) {  // Pass the event topology
-          //0.638783
-          double intcexwt = anaUtils.CalCEXIntWeight(interactingE_reco);
-          plotUtils.FillHist(AnaIO::hRecPiPlusInteractingEnergyBckSub, interactingE_reco, anaUtils.gkXSBmBkg, intcexwt);
-          AnaIO::hRecoInteractingHistData->Fill(interactingE_reco,intcexwt);
-          double pi0KEweight = 1.0;//anaUtils.CalCEXPi0KEWeight(pi0KineticE*1000);
-          if(interactingE_reco > 650 && interactingE_reco < 800) {
-            //if(evtXStype == anaUtils.gkXSSignal && parType == anaUtils.gkBeamPiPlus) 
-            AnaIO::hRecoPi0KEHistData->Fill(pi0KineticE*1000, pi0KEweight);
-            AnaIO::hRecoPi0CosThetaHistData->Fill(pi0costheta, pi0KEweight);
-            double pi0theta = TMath::RadToDeg() * TMath::ACos(pi0costheta);
-            AnaIO::hRecoPi0ThetaHistData->Fill(pi0theta, pi0KEweight);
-
-          }
-          //plotUtils.FillHist(AnaIO::hRecPi0Energy_OVERLAY_After_EVTXS, pi0KineticE*1000, evtXStype);
-        }
-
-      }
-    }
- 
 
     //====================== Do Beam Cuts (both MC and data) ======================//
     // Do the beam cut and fill histogram
@@ -649,9 +570,42 @@ int anaRec(const TString finName, TList *lout, const TString tag, const int nEnt
     // Fill beam kinematics
     anaUtils.FillBeamKinematics(kMC);
 
-    // Get the reco track length from reco_beam_calo_X,Y,Z
+    // Get the reco pion beam track length from reco_beam_calo_X,Y,Z
     double trackLen = anaUtils.GetRecoTrackLength();
     vector<double> trackLenAccum = anaUtils.GetRecoTrackLengthAccumVect();
+    double pi0KineticE, pi0costheta;
+    // Fill data XS histograms
+    if(trackLen != -999 && !kMC) {
+      // Calculate the reco beam energy at the entry point 
+      double beam_inst_KE = sqrt(pow(AnaIO::beam_inst_P,2)+pow(AnaFunctions::PionMass(),2)) - AnaFunctions::PionMass();
+
+      double Eloss = anaUtils.GetUpStreamEnergyLoss(kMC, beam_inst_KE);
+      double ff_energy_reco = beam_inst_KE*1000 - Eloss;//12.74;
+      //double ff_energy_reco = beam_inst_KE*1000 - 2.65229; //FIXME upper Syst; 
+
+      double initialE_reco = bb.KEAtLength(ff_energy_reco, trackLenAccum[0]); 
+      // Based on the reco beam accumulated length get the reco beam incident energy
+      // Refill the AnaIO::reco_beam_incidentEnergies (analog to AnaIO::true_beam_traj_KE in true version)
+      AnaIO::reco_beam_incidentEnergies->clear();
+      for(unsigned int idx = 0; idx < trackLenAccum.size(); idx++){
+        double energy_reco = bb.KEAtLength(ff_energy_reco, trackLenAccum[idx]);
+        AnaIO::reco_beam_incidentEnergies->push_back(energy_reco);
+      }
+      // Reco beam incident energy (vector) and interaction energy calculation (use reco_beam_calo_Z and reco_beam_incidentEnergies) 
+      AnaIO::reco_beam_new_incidentEnergies->clear();
+      double interactingE_reco = anaUtils.MakeRecoIncidentEnergies(AnaIO::reco_beam_calo_Z, AnaIO::reco_beam_incidentEnergies, AnaIO::reco_beam_new_incidentEnergies);
+
+     
+      if(interactingE_reco==-999) interactingE_reco = AnaIO::reco_beam_new_incidentEnergies->back();
+
+      //double iniwt = anaUtils.CalBeamIniWeight((*AnaIO::reco_beam_new_incidentEnergies)[0]);
+      double iniwt = anaUtils.CalBeamIniWeight(initialE_reco);
+      double intwt = anaUtils.CalBeamIntWeight(interactingE_reco);
+
+      AnaIO::hRecoBeamInitialHistData->Fill(initialE_reco,iniwt);
+      AnaIO::hRecoBeamInteractingHistData->Fill(interactingE_reco,intwt);
+    }
+
     
     double interactingE_reco = -999;
     // Only use the event where reco pion beam track length is physical
@@ -681,9 +635,10 @@ int anaRec(const TString finName, TList *lout, const TString tag, const int nEnt
         
       }
       // Get the energy dependent energy loss (not used for now)
-      //double Eloss = anaUtils.GetUpStreamEnergyLoss(kMC, beam_inst_KE);
+      double Eloss = anaUtils.GetUpStreamEnergyLoss(kMC, beam_inst_KE);
       // Substract the constant energy loss after smearing
-      double ff_energy_reco = beam_inst_KE*1000 - 2.65229; // - 12.74; //FIXME upper Syst
+      double ff_energy_reco = beam_inst_KE*1000 - Eloss;//12.74; //FIXME upper Syst
+      //double ff_energy_reco = beam_inst_KE*1000 - 2.65229; // - 12.74; //FIXME upper Syst
       
       double initialE_reco = bb.KEAtLength(ff_energy_reco, trackLenAccum[0]); 
 
@@ -704,28 +659,48 @@ int anaRec(const TString finName, TList *lout, const TString tag, const int nEnt
 
       // Fill some histograms
       plotUtils.FillHist(AnaIO::hRecPiPlusEnergy_OVERLAY_After_EVTXS, interactingE_reco, parType, weight*bckweight);
+      // Beam int bck sacle
       plotUtils.FillHist(AnaIO::hRecPiPlusInteractingEnergy, interactingE_reco, parType, weight*bckweight);
       plotUtils.FillHist(AnaIO::hRecPiPlusInstMomentum, beam_inst_P_smearing*1000, parType, weight*bckweight);
       plotUtils.FillHist(AnaIO::hRecPiPlusFrontFaceEnergy, ff_energy_reco, parType, weight*bckweight);
+      // Beam ini bck scale
       plotUtils.FillHist(AnaIO::hRecPiPlusInitialEnergy, initialE_reco, parType, weight*bckweight);
       plotUtils.FillHist(AnaIO::hRecPiPlusInitialEnergyPosZCut, initialE_reco_Jake, parType, weight*bckweight);
       plotUtils.FillHist(AnaIO::hRecPiPlusTrackLength, trackLen, parType, weight*bckweight);
+      plotUtils.FillHist(AnaIO::hRecPiPlusInstMomentumNoSmearing, AnaIO::beam_inst_P*1000, parType, weight*bckweight);
+
     } // End of if(trackLen != -999)
 
     //====================== Do Event Topology Cuts (both MC and data) ======================//
 
     // Declare pi0 related variables
-    double pi0KineticE, pi0costheta;
+    //double pi0KineticE, pi0costheta;
     if(!anaCut.CutTopology(kMC,pi0KineticE,pi0costheta,true)) continue;
     // Count the number of CEX event after topology cuts
     CEXEventCount++;
+
     // Get the weight for evt bck reweight
     double XSevtweight = anaUtils.CalXSEvtWeight(kMC, interactingE_reco, evtXStype);
     // Get the signal fraction for data bck sub
-    double intcexwt = anaUtils.CalCEXIntWeight(interactingE_reco);
+    double intcexwt = 1.0; // anaUtils.CalCEXIntWeight(interactingE_reco);
     // Fill the beam interacting energy decomposed by event and particle type
+    // CEX int bck scale
     plotUtils.FillHist(AnaIO::hRecPiPlusInteractingEnergyEvt, interactingE_reco, evtXStype, weight*bckweight*XSevtweight);
     plotUtils.FillHist(AnaIO::hRecPiPlusInteractingEnergyPar, interactingE_reco, parType, weight*bckweight*XSevtweight);
+    
+    // Fill data XS histograms
+    if(trackLen != -999 && !kMC) {
+      if(doXS) plotUtils.FillHist(AnaIO::hRecPiPlusInteractingEnergyBckSub, interactingE_reco, anaUtils.gkXSBmBkg, intcexwt);
+      AnaIO::hRecoInteractingHistData->Fill(interactingE_reco,intcexwt);
+      double pi0KEweight = 1.0; //anaUtils.CalCEXPi0KEWeight(pi0KineticE*1000);
+      if(interactingE_reco > 650 && interactingE_reco < 800) {
+        //if(evtXStype == anaUtils.gkXSSignal && parType == anaUtils.gkBeamPiPlus) 
+        AnaIO::hRecoPi0KEHistData->Fill(pi0KineticE*1000, pi0KEweight);
+        AnaIO::hRecoPi0CosThetaHistData->Fill(pi0costheta, pi0KEweight);
+        double pi0theta = TMath::RadToDeg() * TMath::ACos(pi0costheta);
+        AnaIO::hRecoPi0ThetaHistData->Fill(pi0theta, pi0KEweight);
+      }
+    }
 
     // Fill signal only MC beam int 
     if(kMC && evtXStype == anaUtils.gkXSSignal) plotUtils.FillHist(AnaIO::hRecPiPlusInteractingEnergyBckSubCheck, interactingE_reco, evtXStype, weight*bckweight);
@@ -733,30 +708,58 @@ int anaRec(const TString finName, TList *lout, const TString tag, const int nEnt
     if(!kMC) plotUtils.FillHist(AnaIO::hRecPiPlusInteractingEnergyBckSubCheck, interactingE_reco, evtXStype, intcexwt);
     // Fill the pi0 kinetic energy for all pion beams
     plotUtils.FillHist(AnaIO::hRecPiZeroKineticEnergyEvt, pi0KineticE*1000, evtXStype, XSevtweight*weight);
+
+    //weight = weight*anaUtils.Pi0weight;
+    double pi0wt = 1.0;
+    /*if(pi0KineticE < 0.35 && kMC && evtXStype != anaUtils.gkXSSignal){
+      weight = weight*1.50172; pi0wt = 1.50172;
+    }
+    if(pi0KineticE > 0.35 && kMC && evtXStype != anaUtils.gkXSSignal){
+      weight = weight*1.04561; pi0wt = 1.04561;
+    }*/
+    if(pi0KineticE < 0.30 && kMC && evtXStype != anaUtils.gkXSSignal){
+      //weight = weight*1.78736; 
+      pi0wt = 1.78736;
+    }
+    if(pi0KineticE > 0.30 && kMC && evtXStype != anaUtils.gkXSSignal){
+      //weight = weight*0.957846; 
+      pi0wt = 0.957846;
+    }
     // Fill the pi0 kinetic energy for selected pion int energy regions
-    if(interactingE_reco> 750 && interactingE_reco < 800){
-      plotUtils.FillHist(AnaIO::hRecPiZeroSliceKineticEnergyEvt, pi0KineticE*1000, evtXStype, weight);
-      if(kMC) AnaIO::hRecPiZeroSliceKineticEnergyEvtMC->Fill(pi0KineticE*1000,weight);
-      if(!kMC) AnaIO::hRecPiZeroSliceKineticEnergyEvtData->Fill(pi0KineticE*1000,weight);
-    }
-    if(interactingE_reco> 650 && interactingE_reco < 700) plotUtils.FillHist(AnaIO::hRecPiZeroSlice2KineticEnergyEvt, pi0KineticE*1000, evtXStype, weight);
-    if(interactingE_reco> 800 && interactingE_reco < 850) plotUtils.FillHist(AnaIO::hRecPiZeroSlice3KineticEnergyEvt, pi0KineticE*1000, evtXStype, weight);
     if(interactingE_reco> 650 && interactingE_reco < 800) {
-      plotUtils.FillHist(AnaIO::hRecPiZeroRangeKineticEnergyEvt, pi0KineticE*1000, evtXStype, XSevtweight*weight);
-      plotUtils.FillHist(AnaIO::hRecPiZeroRangeCosThetaEvt, pi0costheta, evtXStype, XSevtweight*weight);
+      // ============== Pi0 KE =============//
+      // no weight
+      plotUtils.FillHist(AnaIO::hRecPiZeroRangeKineticEnergyEvtNoWeight, pi0KineticE*1000, evtXStype, pi0wt);
+      // only with bck reweight
+      plotUtils.FillHist(AnaIO::hRecPiZeroRangeKineticEnergyEvtOneWeight, pi0KineticE*1000, evtXStype, XSevtweight*pi0wt);
+      // only with beam mom. reweight
+      plotUtils.FillHist(AnaIO::hRecPiZeroRangeKineticEnergyEvtAnotherWeight, pi0KineticE*1000, evtXStype, weight*pi0wt);
+      // with both weight
+      plotUtils.FillHist(AnaIO::hRecPiZeroRangeKineticEnergyEvt, pi0KineticE*1000, evtXStype, XSevtweight*weight*pi0wt);
+
+      // ============== Pi0 costheta =============//
+      // no weight
+      plotUtils.FillHist(AnaIO::hRecPiZeroRangeCosThetaEvtNoWeight, pi0costheta, evtXStype, pi0wt);
+      // only with bck reweight
+      plotUtils.FillHist(AnaIO::hRecPiZeroRangeCosThetaEvtOneWeight, pi0costheta, evtXStype, XSevtweight*pi0wt);
+      // only with beam mom. reweight
+      plotUtils.FillHist(AnaIO::hRecPiZeroRangeCosThetaEvtAnotherWeight, pi0costheta, evtXStype, weight*pi0wt);
+      // with both weight
+      plotUtils.FillHist(AnaIO::hRecPiZeroRangeCosThetaEvt, pi0costheta, evtXStype, XSevtweight*weight*pi0wt);
+      
+      // ============== Pi0 theta =============//
       double pi0theta = TMath::RadToDeg() * TMath::ACos(pi0costheta);
-      plotUtils.FillHist(AnaIO::hRecPiZeroRangeThetaEvt, pi0theta, evtXStype, XSevtweight*weight);
+      // no weight
+      plotUtils.FillHist(AnaIO::hRecPiZeroRangeThetaEvtNoWeight, pi0theta, evtXStype, pi0wt);
+      // only with bck reweight
+      plotUtils.FillHist(AnaIO::hRecPiZeroRangeThetaEvtOneWeight, pi0theta, evtXStype, XSevtweight*pi0wt);
+      // only with beam mom. reweight
+      plotUtils.FillHist(AnaIO::hRecPiZeroRangeThetaEvtAnotherWeight, pi0theta, evtXStype, weight*pi0wt);
+      // with both weight
+      plotUtils.FillHist(AnaIO::hRecPiZeroRangeThetaEvt, pi0theta, evtXStype, XSevtweight*weight*pi0wt);
 
     }
-    if(interactingE_reco> 650 && interactingE_reco < 800) plotUtils.FillHist(AnaIO::hRecPiZeroRangeKineticEnergyEvtNoWeight, pi0KineticE*1000, evtXStype);
-    if(interactingE_reco> 650 && interactingE_reco < 800) plotUtils.FillHist(AnaIO::hRecPiZeroRangeKineticEnergyEvtOneWeight, pi0KineticE*1000, evtXStype, XSevtweight);
-    if(interactingE_reco> 650 && interactingE_reco < 800) {
-      plotUtils.FillHist(AnaIO::hRecPiZeroRangeKineticEnergyEvtAnotherWeight, pi0KineticE*1000, evtXStype, weight);
-      plotUtils.FillHist(AnaIO::hRecPiZeroRangeCosThetaEvtAnotherWeight, pi0costheta, evtXStype, weight);
-      double pi0theta = TMath::RadToDeg() * TMath::ACos(pi0costheta);
-      plotUtils.FillHist(AnaIO::hRecPiZeroRangeThetaEvtAnotherWeight, pi0theta, evtXStype, weight);
 
-    }
     // Fill hist related to the effiency calculation
     const double beamEndZ = AnaIO::reco_beam_calo_endZ;
     const int channelType = kMC ? anaUtils.GetChannelType((*AnaIO::true_beam_endProcess),AnaIO::true_beam_PDG, AnaIO::true_daughter_nPi0, AnaIO::true_daughter_nPiPlus, AnaIO::true_daughter_nPiMinus) : anaUtils.gkBackground;
@@ -764,73 +767,11 @@ int anaRec(const TString finName, TList *lout, const TString tag, const int nEnt
     
     // Do TKI calculation 
     //anaUtils.TruthMatchingTKI(anaUtils.RecPi0LTVet,anaUtils.RecProtonLTVet,anaUtils.TruthPi0LTVet,anaUtils.TruthProtonLTVet,kMC,anaUtils.GoodTruthMatch);
- 
+
     // Fill output tree
     tout->Fill();
   } // End of while loop
-/*
-  if(kMC){
-    TH1D * IncidentHist = plotUtils.GetIncidentHist(AnaIO::hTruthBeamInitialHist,AnaIO::hTruthBeamInteractingHist);
-    cout << "ana IncidentHist integral: " << IncidentHist->Integral(0,100000) << endl;
 
-    const Int_t x0_c = IncidentHist->GetXaxis()->GetFirst();
-    const Int_t x1_c = IncidentHist->GetXaxis()->GetLast();
-
-    for(Int_t ix=x0_c; ix<=x1_c; ix++){
-      double bin = IncidentHist->GetBinContent(ix);
-      double error = IncidentHist->GetBinError(ix);
-
-      AnaIO::hTruthCalcIncidentHist->SetBinContent(ix,bin);
-      AnaIO::hTruthCalcIncidentHist->SetBinError(ix,error);
-
-      AnaIO::hTruthBeamCalcIncidentHist->SetBinContent(ix,bin);
-      AnaIO::hTruthBeamCalcIncidentHist->SetBinError(ix,error);
-
-    }
-
-    TH1D * NewIncidentHist = plotUtils.GetIncidentHist(AnaIO::hNewTruthBeamInitialHist,AnaIO::hNewTruthBeamInteractingHist);
-    cout << "ana NewIncidentHist integral: " << NewIncidentHist->Integral(0,100000) << endl;
-
-    const Int_t x0_new = NewIncidentHist->GetXaxis()->GetFirst();
-    const Int_t x1_new = NewIncidentHist->GetXaxis()->GetLast();
-
-    for(Int_t ix=x0_new; ix<=x1_new; ix++){
-      double bin = NewIncidentHist->GetBinContent(ix);
-      double error = NewIncidentHist->GetBinError(ix);
-
-      AnaIO::hNewTruthBeamCalcIncidentHist->SetBinContent(ix,bin);
-      AnaIO::hNewTruthBeamCalcIncidentHist->SetBinError(ix,error);
-
-    }
-
-    TH1D * IncidentHist_50MeVbin = plotUtils.GetIncidentHist(AnaIO::hTruthBeamInitialHist_50MeVbin,AnaIO::hTruthBeamInteractingHist_50MeVbin);
-    cout << "ana IncidentHist integral: " << IncidentHist_50MeVbin->Integral(0,100000) << endl;
-
-    const Int_t x0_c_50MeVbin = IncidentHist_50MeVbin->GetXaxis()->GetFirst();
-    const Int_t x1_c_50MeVbin = IncidentHist_50MeVbin->GetXaxis()->GetLast();
-
-    for(Int_t ix=x0_c_50MeVbin; ix<=x1_c_50MeVbin; ix++){
-      double bin = IncidentHist_50MeVbin->GetBinContent(ix);
-      double error = IncidentHist_50MeVbin->GetBinError(ix);
-
-      //AnaIO::hTruthCalcIncidentHist_50MeVbin->SetBinContent(ix,bin);
-      //AnaIO::hTruthCalcIncidentHist_50MeVbin->SetBinError(ix,error);
-
-      AnaIO::hTruthBeamCalcIncidentHist_50MeVbin->SetBinContent(ix,bin);
-      AnaIO::hTruthBeamCalcIncidentHist_50MeVbin->SetBinError(ix,error);
-
-    }
-
-    cout << "int overall eff: " << uf.eff_num_Int->Integral(0,10000)/uf.eff_den_Int->Integral(0,10000) << endl;
-    cout << "beam int overall eff: " << uf.eff_num_BeamInt->Integral(0,10000)/uf.eff_den_BeamInt->Integral(0,10000) << endl;
-    cout << "ini overall eff: " << uf.eff_num_Ini->Integral(0,10000)/uf.eff_den_Ini->Integral(0,10000) << endl;
-    
-    cout << "Pi0KE overall eff: " << uf.eff_num_Pi0KE->Integral(0,10000)/uf.eff_den_Pi0KE->Integral(0,10000) << endl;
-    cout << "Pi0CosTheta overall eff: " << uf.eff_num_Pi0CosTheta->Integral(0,10000)/uf.eff_den_Pi0CosTheta->Integral(0,10000) << endl;
-    cout << "Pi0Theta overall eff: " << uf.eff_num_Pi0Theta->Integral(0,10000)/uf.eff_den_Pi0Theta->Integral(0,10000) << endl;
-
-  }
-*/
   // Print unfolding info
   cout << "--------------- Unfold beam initial ----------------" << endl;
   plotUtils.PrintXSUnfoldingInfo(true_avaPionBeam,recoMatch_avaPionBeam,reco_selectedPionBeam,reco_notPionBeam,reco_missedBeam);
@@ -875,307 +816,6 @@ int anaRec(const TString finName, TList *lout, const TString tag, const int nEnt
     lout->Add(&uf.response_SliceID_Pi0CosTheta);
     lout->Add(&uf.response_SliceID_Pi0Theta);
   }
-/*
-  if(kMC && doXS) {
-
-    TH1D *hini = (TH1D*)AnaIO::hRecoInitialHist->Clone("hini");
-    TH1D *hbeamint = (TH1D*)AnaIO::hRecoBeamInteractingHist->Clone("hbeamint");
-
-    TH1D *hinc = (TH1D*)AnaIO::hRecoIncidentHist->Clone("hinc");
-    TH1D *hint = (TH1D*)AnaIO::hRecoInteractingHist->Clone("hint");
-
-    TH1D *hpi0KE =(TH1D*)AnaIO::hRecoPi0KEHist->Clone("hpi0KE");
-    TH1D *hpi0CosTheta =(TH1D*)AnaIO::hRecoPi0CosThetaHist->Clone("hpi0CosTheta");
-    TH1D *hpi0Theta =(TH1D*)AnaIO::hRecoPi0ThetaHist->Clone("hpi0Theta");
-
-    //uf.pur_Inc->SetMaximum(1.0);
-    //lout->Add(uf.pur_Inc);
-    //lout->Add(uf.pur_Int);
-    lout->Add(uf.eff_Int);
-    lout->Add(uf.eff_Inc);
-    lout->Add(uf.eff_Ini);
-    lout->Add(uf.eff_BeamInt);
-    lout->Add(uf.eff_Pi0KE);
-    lout->Add(uf.eff_Pi0CosTheta);
-    lout->Add(uf.eff_Pi0Theta);
-
-    
-    //hinc->Multiply(uf.pur_Inc);
-    //hint->Multiply(uf.pur_Int);
-
-    //TH1D *hinc = (TH1D*)AnaIO::hTruthMatchedIncidentHist->Clone("hinc");  
-    //TH1D *hint = (TH1D*)AnaIO::hTruthMatchedInteractingHist->Clone("hint");
-
-    
-
-    //TH1D *hback = (TH1D*)AnaIO::hNonPionBeamInteractingHist->Clone("hback");
-    //TH1D *hback_inc = (TH1D*)AnaIO::hNonPionBeamIncidentHist->Clone("hback");
-
-
-    //hint->Multiply(uf.pur_Int);
-    //hint->Add(hback,-1);
-    //hinc->Add(hback_inc,-1);
-
-    //cout << "hint: " << hint->Integral(0,10000) << endl;
-    //cout << "hint bin: " << hint->GetBinContent(10) << endl;
-
-    //cout << "hback: " << hback->Integral(0,10000) << endl;
-    //cout << "hback bin: " << hback->GetBinContent(10) << endl;
-
-    RooUnfoldBayes unfold_Ini (&uf.response_SliceID_Ini, hini, 4);
-    RooUnfoldBayes unfold_BeamInt (&uf.response_SliceID_BeamInt, hbeamint, 4);
-
-    RooUnfoldBayes unfold_Inc (&uf.response_SliceID_Inc, hinc, 4);
-    RooUnfoldBayes unfold_Int (&uf.response_SliceID_Int, hint, 4);
-
-    RooUnfoldBayes unfold_Pi0KE (&uf.response_SliceID_Pi0KE, hpi0KE, 4);
-    RooUnfoldBayes unfold_Pi0CosTheta (&uf.response_SliceID_Pi0CosTheta, hpi0CosTheta, 4);
-    RooUnfoldBayes unfold_Pi0Theta (&uf.response_SliceID_Pi0Theta, hpi0Theta, 4);
-
-    //uf.response_SliceID_Inc.SetNameTitleDefault("response_Inc");
-    //uf.response_SliceID_Int.SetNameTitleDefault("response_Int");
-
-    lout->Add(uf.response_SliceID_Ini.HresponseNoOverflow());
-    lout->Add(uf.response_SliceID_BeamInt.HresponseNoOverflow());
-
-    lout->Add(uf.response_SliceID_Inc.HresponseNoOverflow());
-    lout->Add(uf.response_SliceID_Int.HresponseNoOverflow());
-    lout->Add(uf.response_SliceID_Pi0KE.HresponseNoOverflow());
-    lout->Add(uf.response_SliceID_Pi0CosTheta.HresponseNoOverflow());
-    lout->Add(uf.response_SliceID_Pi0Theta.HresponseNoOverflow());
-
-    lout->Add(&uf.response_SliceID_Ini);
-    lout->Add(&uf.response_SliceID_BeamInt);
-    lout->Add(&uf.response_SliceID_Inc);
-    lout->Add(&uf.response_SliceID_Int);
-    lout->Add(&uf.response_SliceID_Pi0KE);
-    lout->Add(&uf.response_SliceID_Pi0CosTheta);
-    lout->Add(&uf.response_SliceID_Pi0Theta);
-
-
-    TH1D *hini_uf = (TH1D*)unfold_Ini.Hreco();
-
-    cout << "hini_uf: " << hini_uf->Integral(0,10000) << endl;
-    const Int_t x0_ci = hini_uf->GetXaxis()->GetFirst();
-    const Int_t x1_ci = hini_uf->GetXaxis()->GetLast();
-
-    for(Int_t ix=x0_ci; ix<=x1_ci; ix++){
-      double bin = hini_uf->GetBinContent(ix);
-      double error = hini_uf->GetBinError(ix);
-
-      AnaIO::hUnFoldedInitialHist->SetBinContent(ix,bin);
-      AnaIO::hUnFoldedInitialHist->SetBinError(ix,error);
-
-    }
-
-    TH1D *hbeamint_uf = (TH1D*)unfold_BeamInt.Hreco();
-
-    cout << "hbeamint_uf: " << hbeamint_uf->Integral(0,10000) << endl;
-    const Int_t x0_cib = hbeamint_uf->GetXaxis()->GetFirst();
-    const Int_t x1_cib = hbeamint_uf->GetXaxis()->GetLast();
-
-    for(Int_t ix=x0_cib; ix<=x1_cib; ix++){
-      double bin = hbeamint_uf->GetBinContent(ix);
-      double error = hbeamint_uf->GetBinError(ix);
-
-      AnaIO::hUnFoldedBeamInteractingHist->SetBinContent(ix,bin);
-      AnaIO::hUnFoldedBeamInteractingHist->SetBinError(ix,error);
-
-    }
-
-    TH1D *hinc_uf = (TH1D*)unfold_Inc.Hreco();
-
-    cout << "hinc_uf: " << hinc_uf->Integral(0,10000) << endl;
-    const Int_t x0_c = hinc_uf->GetXaxis()->GetFirst();
-    const Int_t x1_c = hinc_uf->GetXaxis()->GetLast();
-
-    for(Int_t ix=x0_c; ix<=x1_c; ix++){
-      double bin = hinc_uf->GetBinContent(ix);
-      double error = hinc_uf->GetBinError(ix);
-
-      AnaIO::hUnFoldedIncidentHist->SetBinContent(ix,bin);
-      AnaIO::hUnFoldedIncidentHist->SetBinError(ix,error);
-
-    }
-
-    //AnaIO::hUnFoldedIncidentHist->Add(hback_inc,-1);
-
-
-    TH1D *hint_uf = (TH1D*)unfold_Int.Hreco();
-
-    cout << "hint_uf: " << hint_uf->Integral(0,10000) << endl;
-    const Int_t x0 = hint_uf->GetXaxis()->GetFirst();
-    const Int_t x1 = hint_uf->GetXaxis()->GetLast();
-
-    for(Int_t ix=x0; ix<=x1; ix++){
-      double bin = hint_uf->GetBinContent(ix);
-      double error = hint_uf->GetBinError(ix);
-
-      AnaIO::hUnFoldedInteractingHist->SetBinContent(ix,bin);
-      AnaIO::hUnFoldedInteractingHist->SetBinError(ix,error);
-
-    }
-    //AnaIO::hUnFoldedInteractingHist->Add(hback,-1);
-
-    TH1D *hpi0KE_uf = (TH1D*)unfold_Pi0KE.Hreco();
-    cout << "hpi0KE_uf: " << hpi0KE_uf->Integral(0,10000) << endl;
-    const Int_t x0_pi0 = hpi0KE_uf->GetXaxis()->GetFirst();
-    const Int_t x1_pi0 = hpi0KE_uf->GetXaxis()->GetLast();
-
-    for(Int_t ix=x0_pi0; ix<=x1_pi0; ix++){
-      double bin = hpi0KE_uf->GetBinContent(ix);
-      double error = hpi0KE_uf->GetBinError(ix);
-
-      AnaIO::hUnFoldedPi0KEHist->SetBinContent(ix,bin);
-      AnaIO::hUnFoldedPi0KEHist->SetBinError(ix,error);
-
-    }
-
-    TH1D *hpi0CosTheta_uf = (TH1D*)unfold_Pi0CosTheta.Hreco();
-    cout << "hpi0CosTheta_uf: " << hpi0CosTheta_uf->Integral(0,10000) << endl;
-    const Int_t x0_pi0costheta = hpi0CosTheta_uf->GetXaxis()->GetFirst();
-    const Int_t x1_pi0costheta = hpi0CosTheta_uf->GetXaxis()->GetLast();
-
-    for(Int_t ix=x0_pi0costheta; ix<=x1_pi0costheta; ix++){
-      double bin = hpi0CosTheta_uf->GetBinContent(ix);
-      double error = hpi0CosTheta_uf->GetBinError(ix);
-
-      AnaIO::hUnFoldedPi0CosThetaHist->SetBinContent(ix,bin);
-      AnaIO::hUnFoldedPi0CosThetaHist->SetBinError(ix,error);
-
-    }
-
-
-    TH1D *hpi0Theta_uf = (TH1D*)unfold_Pi0Theta.Hreco();
-    cout << "hpi0Theta_uf: " << hpi0Theta_uf->Integral(0,10000) << endl;
-    const Int_t x0_pi0theta = hpi0Theta_uf->GetXaxis()->GetFirst();
-    const Int_t x1_pi0theta = hpi0Theta_uf->GetXaxis()->GetLast();
-
-    for(Int_t ix=x0_pi0theta; ix<=x1_pi0theta; ix++){
-      double bin = hpi0Theta_uf->GetBinContent(ix);
-      double error = hpi0Theta_uf->GetBinError(ix);
-
-      AnaIO::hUnFoldedPi0ThetaHist->SetBinContent(ix,bin);
-      AnaIO::hUnFoldedPi0ThetaHist->SetBinError(ix,error);
-
-    }
-
-
-
-    TH1D * RecoIncidentHist = plotUtils.GetIncidentHist(AnaIO::hUnFoldedInitialHist,AnaIO::hUnFoldedBeamInteractingHist);
-    cout << "ana RecoIncidentHist integral: " << RecoIncidentHist->Integral(0,100000) << endl;
-
-    const Int_t x0_co = RecoIncidentHist->GetXaxis()->GetFirst();
-    const Int_t x1_co = RecoIncidentHist->GetXaxis()->GetLast();
-
-    for(Int_t ix=x0_co; ix<=x1_co; ix++){
-      double bin = RecoIncidentHist->GetBinContent(ix);
-      double error = RecoIncidentHist->GetBinError(ix);
-
-      AnaIO::hUnfoldedBeamIncidentHist->SetBinContent(ix,bin);
-      AnaIO::hUnfoldedBeamIncidentHist->SetBinError(ix,error);
-
-    }
-
-
-  } // End of if(kMC && doXS) ...
-
-  if(!kMC && doXS){
-    
-    TH1D *hiniData = (TH1D*)AnaIO::hRecoBeamInitialHistData->Clone("hiniData");
-    TH1D *hintData = (TH1D*)AnaIO::hRecoInteractingHistData->Clone("hintData");
-    TH1D *hbeamintData = (TH1D*)AnaIO::hRecoBeamInteractingHistData->Clone("hbeamintData");
-
-    TH1D *hpi0KEData =(TH1D*)AnaIO::hRecoPi0KEHistData->Clone("hpi0KEData");
-
-    
-    RooUnfoldBayes unfold_IniData (&uf.response_SliceID_Ini, hiniData, 4);
-    RooUnfoldBayes unfold_BeamIntData (&uf.response_SliceID_BeamInt, hbeamintData, 4);
-    RooUnfoldBayes unfold_IntData (&uf.response_SliceID_Int, hintData, 4);
-    RooUnfoldBayes unfold_Pi0KEData (&uf.response_SliceID_Pi0KE, hpi0KEData, 4);
-
-    
-    // Data
-    TH1D *hini_ufData = (TH1D*)unfold_IniData.Hreco();
-
-    cout << "hini_ufData: " << hini_ufData->Integral(0,10000) << endl;
-    const Int_t x0_cData = hini_ufData->GetXaxis()->GetFirst();
-    const Int_t x1_cData = hini_ufData->GetXaxis()->GetLast();
-
-    for(Int_t ix=x0_cData; ix<=x1_cData; ix++){
-      double bin = hini_ufData->GetBinContent(ix);
-      double error = hini_ufData->GetBinError(ix);
-
-      AnaIO::hUnFoldedBeamInitialHistData->SetBinContent(ix,bin);
-      AnaIO::hUnFoldedBeamInitialHistData->SetBinError(ix,error);
-
-    }
-
-    //AnaIO::hUnFoldedIncidentHist->Add(hback_inc,-1);
-
-
-    TH1D *hbeamint_ufData = (TH1D*)unfold_BeamIntData.Hreco();
-
-    cout << "hbeamint_ufData: " << hbeamint_ufData->Integral(0,10000) << endl;
-    const Int_t x0beamData = hbeamint_ufData->GetXaxis()->GetFirst();
-    const Int_t x1beamData = hbeamint_ufData->GetXaxis()->GetLast();
-
-    for(Int_t ix=x0beamData; ix<=x1beamData; ix++){
-      double bin = hbeamint_ufData->GetBinContent(ix);
-      double error = hbeamint_ufData->GetBinError(ix);
-
-      AnaIO::hUnFoldedBeamInteractingHistData->SetBinContent(ix,bin);
-      AnaIO::hUnFoldedBeamInteractingHistData->SetBinError(ix,error);
-
-    }
-
-    TH1D *hint_ufData = (TH1D*)unfold_IntData.Hreco();
-
-    cout << "hint_ufData: " << hint_ufData->Integral(0,10000) << endl;
-    const Int_t x0Data = hint_ufData->GetXaxis()->GetFirst();
-    const Int_t x1Data = hint_ufData->GetXaxis()->GetLast();
-
-    for(Int_t ix=x0Data; ix<=x1Data; ix++){
-      double bin = hint_ufData->GetBinContent(ix);
-      double error = hint_ufData->GetBinError(ix);
-
-      AnaIO::hUnFoldedInteractingHistData->SetBinContent(ix,bin);
-      AnaIO::hUnFoldedInteractingHistData->SetBinError(ix,error);
-    }
-    
-
-    TH1D *hpi0KE_ufData = (TH1D*)unfold_Pi0KEData.Hreco();
-    cout << "hpi0KE_ufData: " << hpi0KE_ufData->Integral(0,10000) << endl;
-    const Int_t x0_pi0Data = hpi0KE_ufData->GetXaxis()->GetFirst();
-    const Int_t x1_pi0Data = hpi0KE_ufData->GetXaxis()->GetLast();
-
-    for(Int_t ix=x0_pi0Data; ix<=x1_pi0Data; ix++){
-      double bin = hpi0KE_ufData->GetBinContent(ix);
-      double error = hpi0KE_ufData->GetBinError(ix);
-
-      AnaIO::hUnFoldedPi0KEHistData->SetBinContent(ix,bin);
-      AnaIO::hUnFoldedPi0KEHistData->SetBinError(ix,error);
-
-    }
-    
-
-    TH1D * RecoIncidentHistData = plotUtils.GetIncidentHist(AnaIO::hUnFoldedBeamInitialHistData,AnaIO::hUnFoldedBeamInteractingHistData);
-    cout << "ana RecoIncidentHistData integral: " << RecoIncidentHistData->Integral(0,100000) << endl;
-
-    const Int_t x0_co = RecoIncidentHistData->GetXaxis()->GetFirst();
-    const Int_t x1_co = RecoIncidentHistData->GetXaxis()->GetLast();
-
-    for(Int_t ix=x0_co; ix<=x1_co; ix++){
-      double bin = RecoIncidentHistData->GetBinContent(ix);
-      double error = RecoIncidentHistData->GetBinError(ix);
-
-      AnaIO::hUnfoldedBeamIncidentHistData->SetBinContent(ix,bin);
-      AnaIO::hUnfoldedBeamIncidentHistData->SetBinError(ix,error);
-
-    }
-
-  }
-*/
 
   // Print cut flow statistics
   int icut = 0;

@@ -79,7 +79,7 @@ class AnaUtils
     void TruthMatchingTKI(TLorentzVector dummypi0, TLorentzVector dummyproton, TLorentzVector dummypi0Truth, TLorentzVector dummyprotonTruth, const bool kMC,  const bool GoodTruthMatch);
 
     // Fill different reco FS particle theta and momentum and truth-matched resolution
-    void FillFSParticleKinematics(const int recIndex, const int truthParticleType, const int recParticleType);      
+    void FillFSParticleKinematics(const int recIndex, const bool kMC, const int truthParticleType, const int recParticleType);      
     // Get reco shower distance vector from vertex to start point 
     TVector3 GetRecShowerDistVector(const int ii);
 
@@ -112,6 +112,7 @@ class AnaUtils
 
     double CalWeight(const bool & kMC);
     double CalBckWeight(const bool & kMC);
+    double CalPi0OAWeight(const bool & kMC, const double & OA);
     double CalXSEvtWeight(const bool & kMC, const double & intE, const int & evtXStype);
     double CalBeamIniWeight(const double & iniE);
     double CalBeamIntWeight(const double & intE);
@@ -148,6 +149,7 @@ class AnaUtils
 
     void FillXSTrueHistograms(int &trueloop, int &truecexloop, int &truecex800loop);
     void FillXSRecoHistograms();
+    void FillXSNewTrueHistograms();
 
     //void FillEsliceHistograms(double KE_init, double KE_end, double KE_int, double weight, const vector<double> binning, int N_bin, bool fill_int);
     void FillEsliceHistograms(TH1D* hinit, TH1D* hend, TH1D* hinc, TH1D* hint, double KE_init, double KE_end, double KE_int, double weight, const vector<double> binning, int N_bin, bool fill_int);
@@ -158,6 +160,7 @@ class AnaUtils
 
     // Set the value of CVM
     void SetCVM();
+    void SetCVMind();
 
     //void Chi2FCN(int &npars, double *grad, double &value, double *par, int flag);
     //void KinematicFitting(double openAngle, double E1, double E2, double sigmaE1, double sigmaE2);
@@ -343,10 +346,10 @@ class AnaUtils
     double GetProtonCorrectedMom(double rawMom){
       TF1 *fpCor = new TF1("fpCor",CorrectionFCN,0,2,4);
       //TF1 *fpCor = new TF1("fpCor","pol5",0,2);
-      fpCor->SetParameter(0,-8.35387e+04);
-      fpCor->SetParameter(1,7.79370e+00);
-      fpCor->SetParameter(2,7.67495e-02);
-      fpCor->SetParameter(3,-5.68081e-03);
+      fpCor->SetParameter(0,-9.31149e+04);
+      fpCor->SetParameter(1,7.78711e+00);
+      fpCor->SetParameter(2,7.67714e-02);
+      fpCor->SetParameter(3,-4.52999e-03);
 
       const double factor = fpCor->Eval(rawMom);
       return rawMom/(1+factor);
@@ -354,10 +357,10 @@ class AnaUtils
 
     double GetShowerCorrectedE(double rawE){
       TF1 *fpCor = new TF1("fpCor",CorrectionFCN,0,1,4);
-      fpCor->SetParameter(0,-0.8323); 
-      fpCor->SetParameter(1,1.665); 
-      fpCor->SetParameter(2,0.06923);
-      fpCor->SetParameter(3,-0.1219);
+      fpCor->SetParameter(0,-0.903); 
+      fpCor->SetParameter(1,1.499); 
+      fpCor->SetParameter(2,0.06262);
+      fpCor->SetParameter(3,-0.1114);
 
       const double factor = fpCor->Eval(rawE);
       return rawE/(1+factor);
@@ -365,9 +368,9 @@ class AnaUtils
 
     double GetShowerCorrectedTheta(double rawTheta){
       TF1 *fpCor = new TF1("fpCor","gaus",0,180);
-      fpCor->SetParameter(0,5.033);
-      fpCor->SetParameter(1,66.61);
-      fpCor->SetParameter(2,26.44); 
+      fpCor->SetParameter(0,5.137);
+      fpCor->SetParameter(1,66.6);
+      fpCor->SetParameter(2,26.6); 
 
       const double factor = fpCor->Eval(rawTheta);
       return rawTheta - factor;
@@ -375,14 +378,14 @@ class AnaUtils
 
     double GetShowerCorrectedPhi(double rawPhi){
       TF1 *fpCor = new TF1("fpCor","pol7",0,180);
-      fpCor->SetParameter(0,-0.00806448);
-      fpCor->SetParameter(1,0.0978646);
-      fpCor->SetParameter(2,-0.000136381);
-      fpCor->SetParameter(3,-2.12771e-05);
-      fpCor->SetParameter(4,1.61586e-08);
-      fpCor->SetParameter(5,1.14406e-09);
-      fpCor->SetParameter(6,-3.82649e-13); 
-      fpCor->SetParameter(7,-1.78852e-14);
+      fpCor->SetParameter(0,-0.0405184);
+      fpCor->SetParameter(1,0.0887499);
+      fpCor->SetParameter(2,-4.89502e-05);
+      fpCor->SetParameter(3,-1.88413e-05);
+      fpCor->SetParameter(4,7.56592e-09);
+      fpCor->SetParameter(5,9.93019e-10);
+      fpCor->SetParameter(6,-1.80907e-13); 
+      fpCor->SetParameter(7,-1.52131e-14);
 
       const double factor = fpCor->Eval(rawPhi);
       return rawPhi - factor;
@@ -390,21 +393,21 @@ class AnaUtils
 
     double GetProtonCorrectedTheta(double rawTheta){
       TF1 *fpCor = new TF1("fpCor","gaus",0,180);
-      fpCor->SetParameter(0,4.329);
-      fpCor->SetParameter(1,50.98);
-      fpCor->SetParameter(2,25.21);  
+      fpCor->SetParameter(0,4.187);
+      fpCor->SetParameter(1,51.84);
+      fpCor->SetParameter(2,25.52);  
       const double factor = fpCor->Eval(rawTheta);
       return rawTheta - factor;
     }
 
     double GetProtonCorrectedPhi(double rawPhi){
       TF1 *fpCor = new TF1("fpCor","pol5",0,180);
-      fpCor->SetParameter(0,-1.12529);
-      fpCor->SetParameter(1,-0.00592945);
-      fpCor->SetParameter(2,0.000186931);
-      fpCor->SetParameter(3,-1.4181e-07);
-      fpCor->SetParameter(4,-4.49753e-09);
-      fpCor->SetParameter(5,1.38988e-11);   
+      fpCor->SetParameter(0,-1.00332);
+      fpCor->SetParameter(1,-0.00285624);
+      fpCor->SetParameter(2,0.000174655);
+      fpCor->SetParameter(3,-6.4209e-07);
+      fpCor->SetParameter(4,-4.23219e-09);
+      fpCor->SetParameter(5,2.95738e-11);   
       const double factor = fpCor->Eval(rawPhi);
       return rawPhi - factor;
     }
@@ -492,9 +495,13 @@ class AnaUtils
 
     // KF CVM 
     static std::map<std::pair <int,int>,vector<double>> CVM;
+    //static vector<double> CVMind;
+
     static int selected;
     static int total;
 
+    static double Pi0weight;
+    static int truthPi0TypeWeight;
   private:
     PlotUtils plotUtils;
     int nProton;
@@ -534,6 +541,12 @@ class AnaUtils
 
     const double slice_width = 1.0;
 
+    // == Binnings for cross sections
+    int N_binning_100MeV = 22;
+    vector<double> binning_100MeV = {0., 50., 100., 150., 200., 250., 300., 350., 400., 450., 500., 550., 600., 650., 700., 750., 800., 850., 900., 950., 1000.};
+    
+    vector<double> CVMind = {0.00825215,0.000305574,-0.00439822,0.000305574,0.00371694,-0.00167137,-0.00439822,-0.00167137,0.118882};
+
 };
 
 vector<double> AnaUtils::LdShowerEnergyTruth;
@@ -558,9 +571,13 @@ TLorentzVector AnaUtils::TruthPi0LTVet;
 TLorentzVector AnaUtils::TruthProtonLTVet;
 
 std::map<std::pair <int,int>,vector<double>> AnaUtils::CVM;
+//vector<double> AnaUtils::CVMind;
 
 int AnaUtils::selected = 0;
 int AnaUtils::total = 0;
+double AnaUtils::Pi0weight = 1.0;
+int AnaUtils::truthPi0TypeWeight = -999;
+
 
 bool AnaUtils::GoodTruthMatch = false;
 bool AnaUtils::GoodFit = false;
