@@ -211,9 +211,6 @@ void Get1pi0BckScale(vector<double> &Par, vector<double> &Parerr)
     TH1D * h2_low = new TH1D("h2_low1pi0",";Interacting Energy (MeV); Candidates", 20, 0, 1000); 
     TH1D * h2_high = new TH1D("h2_high1pi0",";Interacting Energy (MeV); Candidates", 20, 0, 1000); 
 
-    //const TString finName = "input/outana_1pi0New1117.root";
-    //const TString finName = "input/outana_Bck1pi0_benchmark.root";
-    //const TString finName = "input/outana_Bck1pi0_benchmark_12MeV.root";
     const TString finName = "input/Bck1pi0.root";
     
     TFile *file = TFile::Open(finName);
@@ -312,9 +309,6 @@ void Get0pi0BckScale(vector<double> &Par, vector<double> &Parerr, const double &
     TH1D * h2_low = new TH1D("h2_low0pi0",";Interacting Energy (MeV); Candidates", 20, 0, 1000); 
     TH1D * h2_high = new TH1D("h2_high0pi0",";Interacting Energy (MeV); Candidates", 20, 0, 1000); 
 
-    //const TString finName = "input/outana_0pi0New1117.root";
-    //const TString finName = "input/outana_Bck0pi0_benchmark.root";
-    //const TString finName = "input/outana_Bck0pi0_benchmark_12MeV.root";
     const TString finName = "input/Bck0pi0.root";
     
     TFile *file = TFile::Open(finName);
@@ -417,9 +411,6 @@ void GetSignalResults(const double &low1pi0Scale, const double &high1pi0Scale, c
     TH1D * h1pi0_s1 = new TH1D(Form("h1pi0_s1_%s",tag.Data()),";Interacting Energy (MeV); Candidates", 20, 0, 1000);
     TH1D * h1pi0_s2 = new TH1D(Form("h1pi0_s2_%s",tag.Data()),";Interacting Energy (MeV); Candidates", 20, 0, 1000);
     
-    //const TString finName = "input/outana_sigNew1117.root";
-    //const TString finName = "input/outana_Sig_benchmark.root";
-    //const TString finName = "input/outana_Sig_benchmark_12MeV.root";
     const TString finName = "input/Signal.root";
     
     TFile *file = TFile::Open(finName);
@@ -474,7 +465,7 @@ void GetSignalResults(const double &low1pi0Scale, const double &high1pi0Scale, c
       h2->SetBinContent(ix, ivaried);
       h2->SetBinError(ix, ivariederr);
 
-      cout << "ix: " << ix << " ratio: " << ientry_mc_sig/ivaried << endl;
+      //cout << "ix: " << ix << " ratio: " << ientry_mc_sig/ivaried << endl;
       //cout << "ivaried: " << ivaried << " ratio: " << ivaried/ivaried << endl;
       //cout << "0pi0: " << ientry_mc_0pi0 * weight_0pi0sample << " ratio: " << (ientry_mc_0pi0 * weight_0pi0sample)/ivaried << endl;
       //cout << "1pi0: " << ientry_mc_1pi0 * weight_1pi0sample + ientry_mc_mulpi0 * weight_1pi0sample  << " ratio: " << (ientry_mc_1pi0 * weight_1pi0sample + ientry_mc_mulpi0 * weight_1pi0sample)/ivaried << endl;
@@ -673,10 +664,7 @@ void GetSimulFitScale(vector<double> &Par, vector<double> &Parerr, int &bs1, int
     TH1D * h0_sample2 = new TH1D("h0_s2",";Interacting Energy (MeV); Candidates", 20, 0, 1000); 
     TH1D * h1_sample2 = new TH1D("h1_s2",";Interacting Energy (MeV); Candidates", 20, 0, 1000); 
     TH1D * h2_sample2 = new TH1D("h2_s2",";Interacting Energy (MeV); Candidates", 20, 0, 1000);
-  
-    //const TString finName_1pi0 = "input/outana_1pi0New1117.root";  // Same with benchmark
-    //const TString finName_1pi0 = "input/outana_Bck1pi0_benchmark.root";  
-    //const TString finName_1pi0 = "input/outana_Bck1pi0_benchmark_12MeV.root"; // Hadron Ana Meeting Plots
+
     const TString finName_1pi0 = "input/Bck1pi0.root";  
 
     TFile *file_1pi0 = TFile::Open(finName_1pi0);   
@@ -730,9 +718,6 @@ void GetSimulFitScale(vector<double> &Par, vector<double> &Parerr, int &bs1, int
     
     file_1pi0->Close();
 
-    //const TString finName_0pi0 = "input/outana_0pi0New1117.root";
-    //const TString finName_0pi0 = "input/outana_Bck0pi0_benchmark.root";
-    //const TString finName_0pi0 = "input/outana_Bck0pi0_benchmark_12MeV.root";
     const TString finName_0pi0 = "input/Bck0pi0.root";
     
     TFile *file_0pi0 = TFile::Open(finName_0pi0);
