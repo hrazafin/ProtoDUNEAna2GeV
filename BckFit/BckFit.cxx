@@ -122,13 +122,21 @@ int main(int argc, char * argv[])
     TH1D * hSacleFactor_1pi0 = new TH1D("hSacleFactor_1pi0",";Interacting Energy (MeV); Background Scaling Factors", sizeof(SFBin)/sizeof(double)-1, SFBin); 
     //hSacleFactor_1pi0->SetBinContent(1,2.13924); hSacleFactor_1pi0->SetBinError(1,0.573771);
     //hSacleFactor_1pi0->SetBinContent(2,0.688961); hSacleFactor_1pi0->SetBinError(2,0.161465);
-    hSacleFactor_1pi0->SetBinContent(1,2.54864); hSacleFactor_1pi0->SetBinError(1,0.745619);
-    hSacleFactor_1pi0->SetBinContent(2,0.622455); hSacleFactor_1pi0->SetBinError(2,0.153662);
+    //hSacleFactor_1pi0->SetBinContent(1,2.54864); hSacleFactor_1pi0->SetBinError(1,0.745619);
+    //hSacleFactor_1pi0->SetBinContent(2,0.622455); hSacleFactor_1pi0->SetBinError(2,0.153662);
+    // E-dep loss
+    hSacleFactor_1pi0->SetBinContent(1,2.42498); hSacleFactor_1pi0->SetBinError(1,0.791412);
+    hSacleFactor_1pi0->SetBinContent(2,0.730883); hSacleFactor_1pi0->SetBinError(2,0.157706);
+
     TH1D * hSacleFactor_0pi0 = new TH1D("hSacleFactor_0pi0",";Interacting Energy (MeV); Background Scaling Factors", sizeof(SFBin)/sizeof(double)-1, SFBin); 
     //hSacleFactor_0pi0->SetBinContent(1,1.01219); hSacleFactor_0pi0->SetBinError(1,0.0304626);
     //hSacleFactor_0pi0->SetBinContent(2,0.966249); hSacleFactor_0pi0->SetBinError(2,0.0179907);
-    hSacleFactor_0pi0->SetBinContent(1,1.0101); hSacleFactor_0pi0->SetBinError(1,0.0316139);
-    hSacleFactor_0pi0->SetBinContent(2,0.968285); hSacleFactor_0pi0->SetBinError(2,0.0177684);
+    //hSacleFactor_0pi0->SetBinContent(1,1.0101); hSacleFactor_0pi0->SetBinError(1,0.0316139);
+    //hSacleFactor_0pi0->SetBinContent(2,0.968285); hSacleFactor_0pi0->SetBinError(2,0.0177684);
+    // E-dep loss
+    hSacleFactor_0pi0->SetBinContent(1,0.998118); hSacleFactor_0pi0->SetBinError(1,0.0260341);
+    hSacleFactor_0pi0->SetBinContent(2,0.969136); hSacleFactor_0pi0->SetBinError(2,0.0192829);
+    
     TLatex tt;
     tt.SetNDC();
 
@@ -204,8 +212,9 @@ void Get1pi0BckScale(vector<double> &Par, vector<double> &Parerr)
     TH1D * h2_high = new TH1D("h2_high1pi0",";Interacting Energy (MeV); Candidates", 20, 0, 1000); 
 
     //const TString finName = "input/outana_1pi0New1117.root";
-    const TString finName = "input/outana_Bck1pi0_benchmark.root";
+    //const TString finName = "input/outana_Bck1pi0_benchmark.root";
     //const TString finName = "input/outana_Bck1pi0_benchmark_12MeV.root";
+    const TString finName = "input/Bck1pi0.root";
     
     TFile *file = TFile::Open(finName);
 
@@ -304,8 +313,9 @@ void Get0pi0BckScale(vector<double> &Par, vector<double> &Parerr, const double &
     TH1D * h2_high = new TH1D("h2_high0pi0",";Interacting Energy (MeV); Candidates", 20, 0, 1000); 
 
     //const TString finName = "input/outana_0pi0New1117.root";
-    const TString finName = "input/outana_Bck0pi0_benchmark.root";
+    //const TString finName = "input/outana_Bck0pi0_benchmark.root";
     //const TString finName = "input/outana_Bck0pi0_benchmark_12MeV.root";
+    const TString finName = "input/Bck0pi0.root";
     
     TFile *file = TFile::Open(finName);
 
@@ -408,8 +418,9 @@ void GetSignalResults(const double &low1pi0Scale, const double &high1pi0Scale, c
     TH1D * h1pi0_s2 = new TH1D(Form("h1pi0_s2_%s",tag.Data()),";Interacting Energy (MeV); Candidates", 20, 0, 1000);
     
     //const TString finName = "input/outana_sigNew1117.root";
-    const TString finName = "input/outana_Sig_benchmark.root";
+    //const TString finName = "input/outana_Sig_benchmark.root";
     //const TString finName = "input/outana_Sig_benchmark_12MeV.root";
+    const TString finName = "input/Signal.root";
     
     TFile *file = TFile::Open(finName);
 
@@ -427,7 +438,7 @@ void GetSignalResults(const double &low1pi0Scale, const double &high1pi0Scale, c
     for(int ix=0; ix<=nx+1; ix++){
       double weight_1pi0sample = low1pi0Scale;
       if(ix>break_s1) weight_1pi0sample = high1pi0Scale;
-
+      
       double weight_0pi0sample = low0pi0Scale;
       if(ix>break_s2) weight_0pi0sample = high0pi0Scale;
 
@@ -664,8 +675,9 @@ void GetSimulFitScale(vector<double> &Par, vector<double> &Parerr, int &bs1, int
     TH1D * h2_sample2 = new TH1D("h2_s2",";Interacting Energy (MeV); Candidates", 20, 0, 1000);
   
     //const TString finName_1pi0 = "input/outana_1pi0New1117.root";  // Same with benchmark
-    const TString finName_1pi0 = "input/outana_Bck1pi0_benchmark.root";  
+    //const TString finName_1pi0 = "input/outana_Bck1pi0_benchmark.root";  
     //const TString finName_1pi0 = "input/outana_Bck1pi0_benchmark_12MeV.root"; // Hadron Ana Meeting Plots
+    const TString finName_1pi0 = "input/Bck1pi0.root";  
 
     TFile *file_1pi0 = TFile::Open(finName_1pi0);   
 
@@ -719,8 +731,9 @@ void GetSimulFitScale(vector<double> &Par, vector<double> &Parerr, int &bs1, int
     file_1pi0->Close();
 
     //const TString finName_0pi0 = "input/outana_0pi0New1117.root";
-    const TString finName_0pi0 = "input/outana_Bck0pi0_benchmark.root";
+    //const TString finName_0pi0 = "input/outana_Bck0pi0_benchmark.root";
     //const TString finName_0pi0 = "input/outana_Bck0pi0_benchmark_12MeV.root";
+    const TString finName_0pi0 = "input/Bck0pi0.root";
     
     TFile *file_0pi0 = TFile::Open(finName_0pi0);
 
@@ -797,10 +810,18 @@ void GetSimulFitScale(vector<double> &Par, vector<double> &Parerr, int &bs1, int
     //bs1 = 13; bs2 = 15; // chisq = 12.10;
     //bs1 = 13; bs2 = 16; // chisq = 12.11;
 
-    bs1 = 14; bs2 = 13; // chisq = 11.98;
+    //bs1 = 14; bs2 = 13; // chisq = 11.98;
     
     
-
+    
+    //bs1 = 14; bs2 = 13; // chisq = 5.75;
+    bs1 = 14; bs2 = 14; // chisq = 5.71;
+    //bs1 = 14; bs2 = 15; // chisq = 5.66;
+    //bs1 = 14; bs2 = 16; // chisq = 5.63;
+    //bs1 = 14; bs2 = 17; // chisq = 5.63;
+    //bs1 = 14; bs2 = 18; // chisq = 5.62;
+    //bs1 = 14; bs2 = 19; // chisq = 5.64;
+    
     fitter.SetSimulHistograms(h0_sample1, h1_sample1, h2_sample1, h0_sample2, h1_sample2, h2_sample2, bs1, bs2);
 
 
