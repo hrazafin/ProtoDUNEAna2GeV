@@ -279,9 +279,13 @@ void AnaUtils::SetFullSignal()
     }
     
     // Check Pi0 inclusive events
-    if( AnaIO::true_beam_PDG == 211 && IsSignal(nProton,nPiZero,nPiPlus,nPiMinus,nParticleBkg,nPionAboveThreshold) == true){
+    if(AnaIO::true_beam_PDG == 211 && (*AnaIO::true_beam_endProcess) == "pi+Inelastic" && IsSignal(nProton,nPiZero,nPiPlus,nPiMinus,nParticleBkg,nPionAboveThreshold) == true){
       //double LeadingPiZeroE = sqrt(LeadingPiZeroP*LeadingPiZeroP+AnaFunctions::PiZeroMass()*AnaFunctions::PiZeroMass());
       if(LeadingPiZeroP > 0) AnaIO::Signal = true; 
+    }
+    // Check TKI event 
+    if(nProton > 0 && nPiZero > 0 && nPiPlus == 0 && nParticleBkg == 0){
+      if(LeadingProtonP < 1.0 && LeadingProtonP > 0.45 && SubLeadingProtonP < 0.45) DoTruthTKICalculation();
     }
   }
 }
@@ -306,7 +310,7 @@ vector<TLorentzVector> AnaUtils::GetFSParticlesTruth(bool kFill)
   nParticleBkg = 0;
   nPionAboveThreshold = 0;
   // Vectors to save particle info
-  TLorentzVector pPiZero, pProton, pSecondaryProton;
+  TLorentzVector pPiZero, pProton, pSecondaryProton, pPiPlus;
 
   // Get the size of final state particles
   const int np = pdg->size();
@@ -315,9 +319,13 @@ vector<TLorentzVector> AnaUtils::GetFSParticlesTruth(bool kFill)
 
   double Protonmom[np];
   double PiZeromom[np];
+  double PiPlusmom[np];
+
   double Gammamom[np];
   vector<TVector3> bufferProtonmom;
   vector<TVector3> bufferPiZeromom;
+  vector<TVector3> bufferPiPlusmom;
+
   bufferType.clear();
   // Now loop over FS particles
   for(int ii=0; ii<np; ii++){
@@ -354,15 +362,19 @@ vector<TLorentzVector> AnaUtils::GetFSParticlesTruth(bool kFill)
     }
     // PiPlus
     else if(itype == gkPiPlus){
-      if(kFill) AnaIO::hTruthPiPlusP->Fill(tmpp.Mag());
+      // Save particle's momentum magnitude
+      PiPlusmom[nPiPlus] = tmpp.Mag();
+      // Save momentum vector
+      bufferPiPlusmom.push_back(tmpp);
+
       nPiPlus++;
-      if(tmpp.Mag() > 0) nPionAboveThreshold++;
+      if(tmpp.Mag() > 0.10) nPionAboveThreshold++;
     }
     // PiMinus
     else if(itype == gkPiMinus){
       if(kFill) AnaIO::hTruthPiMinusP->Fill(tmpp.Mag());
       nPiMinus++;
-      if(tmpp.Mag() > 0) nPionAboveThreshold++;
+      if(tmpp.Mag() > 0.10) nPionAboveThreshold++;
     }
     // Neutron
     else if(itype == gkNeutron){
@@ -401,7 +413,7 @@ vector<TLorentzVector> AnaUtils::GetFSParticlesTruth(bool kFill)
     if(kFill) AnaIO::hTruthLeadingProtonP->Fill(Protonmom[leadingProtonID]);
     // Fill all proton momentum
     for(unsigned int ii = 0; ii < bufferProtonmom.size(); ii++){
-      if(kFill && bufferProtonmom[ii].Mag() > 0.2) AnaIO::hTruthProtonP->Fill(bufferProtonmom[ii].Mag());
+      if(kFill) AnaIO::hTruthProtonP->Fill(bufferProtonmom[ii].Mag());
     }
   }
   // At least two proton is found
@@ -410,6 +422,34 @@ vector<TLorentzVector> AnaUtils::GetFSParticlesTruth(bool kFill)
     pSecondaryProton.SetVectM(bufferProtonmom[subldProtonID], AnaFunctions::ProtonMass());
     // Fill subleading proton momentum
     if(kFill) AnaIO::hTruthSubLeadingProtonP->Fill(Protonmom[subldProtonID]);
+  }
+
+  //======================= PiPlus =======================
+  int leadingPiPlusID = 0, subldPiPlusID = -999;
+  // Sort piplus when more than one piplus are found
+  if(nPiPlus>1){
+    int PiPlussortid[nPiPlus];
+    // Sort index according to it's momentum
+    TMath::Sort(nPiPlus, PiPlusmom, PiPlussortid);
+    // Save sorted index
+    leadingPiPlusID = PiPlussortid[0];
+    subldPiPlusID = PiPlussortid[1];
+  }
+  // At least one piplus is found
+  if(nPiPlus>0){
+    // Save info to leading piplus TLorentzVector
+    pPiPlus.SetVectM(bufferPiPlusmom[leadingPiPlusID], AnaFunctions::PionMass());
+    // Fill leading piplus momentum
+    if(kFill) AnaIO::hTruthLeadingPiPlusP->Fill(PiPlusmom[leadingPiPlusID]);
+    // Fill all piplus momentum
+    for(unsigned int ii = 0; ii < bufferPiPlusmom.size(); ii++){
+      if(kFill) AnaIO::hTruthPiPlusP->Fill(bufferPiPlusmom[ii].Mag());
+    }
+  }
+  // At least two piplus is found
+  if(nPiPlus>1){
+    // Fill subleading piplus momentum
+    if(kFill) AnaIO::hTruthSubLeadingPiPlusP->Fill(PiPlusmom[subldPiPlusID]);
   }
 
   //======================== PiZero ========================
@@ -430,7 +470,9 @@ vector<TLorentzVector> AnaUtils::GetFSParticlesTruth(bool kFill)
     // Save info to pi0 TLorentzVector
     pPiZero.SetVectM(bufferPiZeromom[leadingPiZeroID], AnaFunctions::PiZeroMass());
     if(kFill) AnaIO::hTruthLeadingPiZeroP->Fill(PiZeromom[leadingPiZeroID]);
-    if(kFill && pPiZero.E() > 0.2) AnaIO::hTruthLeadingPiZeroE->Fill(pPiZero.E());
+    //if(kFill && pPiZero.E() > 0.2) AnaIO::hTruthLeadingPiZeroE->Fill(pPiZero.E());
+    if(kFill) AnaIO::hTruthLeadingPiZeroE->Fill(pPiZero.E());
+
   }
   if(nPiZero>1){
     if(kFill) AnaIO::hTruthSubLeadingPiZeroP->Fill(PiZeromom[subldPiZeroID]);
@@ -444,8 +486,8 @@ vector<TLorentzVector> AnaUtils::GetFSParticlesTruth(bool kFill)
     leadingGammaID = Gammasortid[0];
   }
   // Fill in MeV!
-  if(nGamma>0 && kFill) AnaIO::hTruthGammaMaxE->Fill(Gammamom[leadingGammaID]*1000);
-
+  if(nGamma > 0 && kFill) AnaIO::hTruthGammaMaxE->Fill(Gammamom[leadingGammaID]*1000);
+  //if(nGamma > 0 kFill) AnaIO::hTruthLeadingPi0GammaP->Fill(Gammamom[leadingGammaID]);
   // Fill vector of FS particles 
   vector<TLorentzVector> vec;
   vec.push_back(pPiZero);
@@ -534,9 +576,9 @@ vector<TLorentzVector> AnaUtils::GetFSPiZeroDecayDaughterTruth(const bool kFill)
     // Save info to gammas TLorentzVector
     LeadingGamma.SetVectM(bufferPiZeroGammamom[leadingGammaID], 0);
     SubldGamma.SetVectM(bufferPiZeroGammamom[subldGammaID], 0);
-    if(kFill && PiZeroGammamom[leadingGammaID] > 0.1)AnaIO::hTruthLeadingPi0GammaP->Fill(PiZeroGammamom[leadingGammaID]);
+    if(kFill)AnaIO::hTruthLeadingPi0GammaP->Fill(PiZeroGammamom[leadingGammaID]);
     if(kFill)AnaIO::hTruthLeadingPi0GammaPBin1->Fill(PiZeroGammamom[leadingGammaID]);
-    if(kFill && PiZeroGammamom[subldGammaID] > 0.1)AnaIO::hTruthSubLeadingPi0GammaP->Fill(PiZeroGammamom[subldGammaID]);
+    if(kFill)AnaIO::hTruthSubLeadingPi0GammaP->Fill(PiZeroGammamom[subldGammaID]);
     // Opening angle
     double OA = (bufferPiZeroGammamom[0].Angle(bufferPiZeroGammamom[1]))*TMath::RadToDeg();
     if(kFill)AnaIO::hTruthPi0OA->Fill(OA);
@@ -857,6 +899,31 @@ double AnaUtils::MakeRecoIncidentEnergies(vector<double> *reco_beam_traj_Z, vect
   return reco_beam_new_interactingEnergy;
 }
 
+double AnaUtils::GetInteractingE_CaloBased(const double & ffe){
+
+  const vector<double> * trackPitch_SCE = AnaIO::reco_beam_TrkPitch_SCE;
+  const vector<double> * dEdx_SCE = AnaIO::reco_beam_calibrated_dEdX_SCE;
+  const vector<double> * caloZ = AnaIO::reco_beam_calo_Z;
+
+  double intE = ffe;
+  for(unsigned int ii = 0; ii < trackPitch_SCE->size()-1; ii++){ //-1 to not count the last slice
+    double trkpit = (*trackPitch_SCE)[ii];
+    double dEdx = (*dEdx_SCE)[ii];
+    double z = (*caloZ)[ii];
+    if(dEdx < 0) continue;
+    double DeltaE = dEdx*trkpit;
+    
+    /*cout << "\nii: " << ii << endl;
+    cout << "trkpit: " << trkpit << endl;
+    cout << "dEdx: " << dEdx << endl;
+    cout << "DeltaE: " << DeltaE << endl;*/
+    if(z < 220.0) intE -= DeltaE;
+  }
+  
+  return intE;
+
+}
+
 
 double AnaUtils::GetRecoTrackLength()
 {
@@ -1024,7 +1091,8 @@ void AnaUtils::FillBeamKinematics(const int kMC)
 {
   // Get event type
   const int evtType = GetFillEventType();
-  
+  const int evtXStype = kMC ? GetFillXSEventType() : gkXSBmBkg;
+
   const TVector3 recBeamFull = GetRecBeamFull();
   if(kMC){
     const TVector3 truthBeamFull = GetTruthBeamFull();
@@ -1042,11 +1110,21 @@ void AnaUtils::FillBeamKinematics(const int kMC)
     plotUtils.FillHist(AnaIO::hBeamPhiRecVSTruth_REG_Correction,recBeamFull.Phi()*TMath::RadToDeg(),beamphiRes);
     plotUtils.FillHist(AnaIO::hBeamThetaRecVSTruth_REG_Correction,recBeamFull.Theta()*TMath::RadToDeg(),beamthetaRes);
 
+    const double recoLen = GetRecoTrackLength();
+    const double trueLen = GetTrueTrackLength();
+
+    const double beamtrackLenRes = (recoLen-trueLen)/recoLen;
+    plotUtils.FillHist(AnaIO::hBeamTrackLengthRes,recoLen,beamtrackLenRes);
+
   }
   // This evtType only works for MC, data will not have this info but fill it anyway
   plotUtils.FillHist(AnaIO::hRecBeamPhi,    recBeamFull.Phi()*TMath::RadToDeg(), evtType);
   plotUtils.FillHist(AnaIO::hRecBeamTheta,    recBeamFull.Theta()*TMath::RadToDeg(), evtType);
   plotUtils.FillHist(AnaIO::hRecBeamMomentum, recBeamFull.Mag(),                     evtType);
+
+  plotUtils.FillHist(AnaIO::hRecBeamPhi_XsEvt,    recBeamFull.Phi()*TMath::RadToDeg(), evtXStype);
+  plotUtils.FillHist(AnaIO::hRecBeamTheta_XsEvt,    recBeamFull.Theta()*TMath::RadToDeg(), evtXStype);
+  plotUtils.FillHist(AnaIO::hRecBeamMomentum_XsEvt, recBeamFull.Mag(),                     evtXStype);
 
 }
 
@@ -1205,7 +1283,7 @@ TLorentzVector AnaUtils::GetPi0MomentumRefBeam(const TLorentzVector RecPi0, cons
 
 void AnaUtils::FillFSParticleKinematics(const int recIndex, const bool kMC, const int truthParticleType, const int recParticleType)
 {
-  double weight = CalWeight(kMC);
+  double weight = 1.0;//CalWeight(kMC);
   // ---------------- Fill proton kinematics ----------------//
   if(recParticleType == gkProton){
     // Get the uncorrected proton momentum vector for comparison 
@@ -1228,8 +1306,8 @@ void AnaUtils::FillFSParticleKinematics(const int recIndex, const bool kMC, cons
       // Relative to beam
       const double momentumRes = recMomRefBeam.P()/truthMomRefBeam.P()-1;
       const double momentumRawRes = recMomRawRefBeam.P()/truthMomRefBeam.P()-1;
-      const double thetaRes    = (recMomRefBeam.Theta()-truthMomRefBeam.Theta())*TMath::RadToDeg();
-      //const double thetaResRaw    = (recMomRawRefBeam.Theta()-truthMomRefBeam.Theta())*TMath::RadToDeg();
+      //const double thetaRes    = (recMomRefBeam.Theta()-truthMomRefBeam.Theta())*TMath::RadToDeg();
+      const double thetaResRaw    = (recMomRawRefBeam.Theta()-truthMomRefBeam.Theta())*TMath::RadToDeg();
       // Lab frame
       const double thetaLabResRaw = (recMomLabRaw.Theta()-truthMomLab.Theta())*TMath::RadToDeg();
       const double phiLabResRaw = (recMomLabRaw.Phi()-truthMomLab.Phi())*TMath::RadToDeg();
@@ -1239,7 +1317,7 @@ void AnaUtils::FillFSParticleKinematics(const int recIndex, const bool kMC, cons
 
       plotUtils.FillHist(AnaIO::hProtonMomentumRes, truthMomRefBeam.P(), momentumRes);
       plotUtils.FillHist(AnaIO::hProtonMomentumRawRes, truthMomRefBeam.P(), momentumRawRes);
-      plotUtils.FillHist(AnaIO::hProtonThetaRes, truthMomRefBeam.Theta()*TMath::RadToDeg(), thetaRes);
+      plotUtils.FillHist(AnaIO::hProtonThetaRes, truthMomRefBeam.Theta()*TMath::RadToDeg(), thetaResRaw);
       plotUtils.FillHist(AnaIO::hProtonThetaLabRawRes, truthMomLab.Theta()*TMath::RadToDeg(), thetaLabResRaw);
       plotUtils.FillHist(AnaIO::hProtonPhiLabRawRes, truthMomLab.Phi()*TMath::RadToDeg(), phiLabResRaw);
       plotUtils.FillHist(AnaIO::hProtonThetaLabRes, truthMomLab.Theta()*TMath::RadToDeg(), thetaLabRes);
@@ -1276,13 +1354,13 @@ void AnaUtils::FillFSParticleKinematics(const int recIndex, const bool kMC, cons
   // ---------------- Fill piplus kinematics ----------------//
   if(recParticleType == gkPiPlus){
     // Get this reco particle momentum vector relative to beam
-    const TLorentzVector recMomRefBeam = GetMomentumRefBeam(false /*=>reco*/, recIndex, false/*=>piplus*/);
+    const TLorentzVector recMomRefBeam = GetMomentumRefBeam(false /*=>reco*/, recIndex, false/*=>piplus*/, false/*=>no correction*/);
     plotUtils.FillHist(AnaIO::hRecPiPlusMomentum,recMomRefBeam.P(), truthParticleType, weight);
     plotUtils.FillHist(AnaIO::hRecPiPlusTheta, recMomRefBeam.Theta()*TMath::RadToDeg(), truthParticleType, weight);
     // Truth-matching primary piplus
     if(truthParticleType == gkPiPlus){ // MC only (Data loop won't pass this)
       // Get the truth-matched particle truth momentum vector relative to beam
-      const TLorentzVector truthMomRefBeam = GetMomentumRefBeam(true /*=>truth-matched*/, recIndex, false /*=>piplus*/);
+      const TLorentzVector truthMomRefBeam = GetMomentumRefBeam(true /*=>truth-matched*/, recIndex, false /*=>piplus*/, false/*=>no correction*/);
       const double momentumRes = recMomRefBeam.P()/truthMomRefBeam.P()-1;
       const double thetaRes    = (recMomRefBeam.Theta()-truthMomRefBeam.Theta())*TMath::RadToDeg();
       plotUtils.FillHist(AnaIO::hPiPlusMomentumRes, truthMomRefBeam.P(), momentumRes);
@@ -1482,7 +1560,7 @@ TLorentzVector AnaUtils::GetRecPiZeroFromShowers(double &OA, bool kMC, bool kFil
 
     if(kDoKF && kFill) {
       const int evtXStype = kMC ? GetFillXSEventType() : gkXSBmBkg;
-      double weight = CalWeight(kMC);
+      double weight = 1.0;//CalWeight(kMC);
 
       double Pi0KE = PiZeroVec.E() - AnaFunctions::PiZeroMass();
 
@@ -1501,12 +1579,21 @@ TLorentzVector AnaUtils::GetRecPiZeroFromShowers(double &OA, bool kMC, bool kFil
       plotUtils.FillHist(AnaIO::hRecPi0KineticEnergyVSPi0Mass, Pi0KE, PiZeroVec_MassCal.M(), weight);
 
     }
+    // KF fit result
+    if(kDoKF && kFill){
+      if(truthPi0Type == gkTwoGammasSamePi0){
+        PiZeroTruthVec = TruthPi0Showers[0] + TruthPi0Showers[1];
+        const double pi0EResKF = PiZeroVec.E()/PiZeroTruthVec.E()-1;
+
+        plotUtils.FillHist(AnaIO::hPi0MomentumResFitKF, PiZeroTruthVec.E(), pi0EResKF);
+      }
+    }
     // Fill pi0 info
     if(kFill){
       const int evtXStype = kMC ? GetFillXSEventType() : gkXSBmBkg;
       
 
-      double weight = CalWeight(kMC);
+      double weight = 1.0;//CalWeight(kMC);
       Pi0weight = 1.0;//CalPi0OAWeight(kMC,OA);
 
       weight = weight*Pi0weight;
@@ -1601,7 +1688,7 @@ TLorentzVector AnaUtils::GetRecPiZeroFromShowers(double &OA, bool kMC, bool kFil
         if(PiZeroTruthVec.M() > 0.134 && PiZeroTruthVec.M() < 0.135){
           selected++;
           if(kFill) AnaIO::hPi0Selected->Fill(PiZeroVec.P());
-          AnaIO::hMatchedTruthPi0Momentum->Fill(PiZeroTruthVec.E());
+          AnaIO::hMatchedTruthPi0Energy->Fill(PiZeroTruthVec.E());
           
           AnaIO::hMatchedTruthPi0OA->Fill(openingAngleTruth);
           AnaIO::hMatchedTruthPi0Mass->Fill(PiZeroTruthVec.M());
@@ -1640,7 +1727,7 @@ vector<TLorentzVector> AnaUtils::GetTwoPi0Showers(double &separation, bool kMC, 
   const TLorentzVector slShowerRaw = showerArrayRaw[nindex[1]];
   
   if(kFill){
-    double weight = CalWeight(kMC);
+    double weight = 1.0;//CalWeight(kMC);
 
     plotUtils.FillHist(AnaIO::hRecLeadingShowerEnergy, ldShower.E(), showerTypeArray[nindex[0]], weight); 
     plotUtils.FillHist(AnaIO::hRecSubLeadingShowerEnergy, slShower.E(), showerTypeArray[nindex[1]], weight);
@@ -1666,21 +1753,71 @@ vector<TLorentzVector> AnaUtils::GetTwoPi0Showers(double &separation, bool kMC, 
     //const double openingAngle = ldShower.Angle(slShower.Vect());
     //cout << "default energy M2: " << ldShower.E() + 0.134977*0.134977/(2*slShower.E()*(1-cos(openingAngle))) << endl;
     //cout << "default OA: " << openingAngle*TMath::RadToDeg() << endl;
-    if(kMC){
+    if(kMC && kFill){
 
       int truthPi0Type_tmp = -999;
       vector<TLorentzVector> TruthPi0Showers = GetTwoTruthMatchedPi0Showers(truthPi0Type_tmp,kFill);
       double pi0Energy_Truth = TruthPi0Showers[0].E() + TruthPi0Showers[1].E();
 
       const double openingAngleRad = ldShower.Angle(slShower.Vect());
+      const double openingAngleRad_Truth = TruthPi0Showers[0].Angle(TruthPi0Showers[1].Vect());
+
+      // Method A (Pre Fit)
+      double pion_E_pre_m1 = ldShower.E() + slShower.E();
+      // Method A (Post Fit)
+      double pion_E_post_m1 = FittedVars[0] + FittedVars[1];
+
       // Method B (Pre Fit)
       double pion_E_pre_m2 = ldShower.E() + 0.134977*0.134977/(2*ldShower.E()*(1-cos(openingAngleRad)));
       // Method B (Post Fit)
       double pion_E_post_m2 = FittedVars[0] + 0.134977*0.134977/(2*FittedVars[0]*(1-cos(FittedVars[2])));
 
-      AnaIO::hPi0EnergyE1OA_PreFit->Fill(pion_E_pre_m2/pi0Energy_Truth-1);
-      AnaIO::hPi0EnergyE1OA_PostFit->Fill(pion_E_post_m2/pi0Energy_Truth-1);
+      // Method C (Pre Fit)
+      double alpha = abs(ldShower.E()-slShower.E())/(ldShower.E()+slShower.E());
+      double p_pi0 = 0.134977*sqrt(2/((1-alpha*alpha)*(1-cos(openingAngleRad))));
+      double e_pi0 = p_pi0;//sqrt(0.134977*0.134977+p_pi0*p_pi0);
+      double pion_E_pre_m3 = e_pi0;
+      
+      // Method C (Post Fit)
+      double alpha_post = abs(FittedVars[0]-FittedVars[1])/(FittedVars[0]+FittedVars[1]);
+      double p_pi0_post = 0.134977*sqrt(2/((1-alpha_post*alpha_post)*(1-cos(FittedVars[2]))));
+      double e_pi0_post = p_pi0_post;//sqrt(0.134977*0.134977+p_pi0_post*p_pi0_post);
+      double pion_E_post_m3 = e_pi0_post;
 
+      if(truthPi0Type_tmp == gkTwoGammasSamePi0){
+
+        AnaIO::hLDShower_PreFit->Fill(ldShower.E()/TruthPi0Showers[0].E()-1);
+        AnaIO::hLDShower_PostFit->Fill(FittedVars[0]/TruthPi0Showers[0].E()-1);
+
+        AnaIO::hSLShower_PreFit->Fill(slShower.E()/TruthPi0Showers[1].E()-1);
+        AnaIO::hSLShower_PostFit->Fill(FittedVars[1]/TruthPi0Showers[1].E()-1);
+
+        AnaIO::hOAShower_PreFit->Fill(openingAngleRad/openingAngleRad_Truth-1);
+        AnaIO::hOAShower_PostFit->Fill(FittedVars[2]/openingAngleRad_Truth-1);
+        
+        AnaIO::hPi0EnergyE1E2_PreFit->Fill(pion_E_pre_m1/pi0Energy_Truth-1);
+        AnaIO::hPi0EnergyE1E2_PostFit->Fill(pion_E_post_m1/pi0Energy_Truth-1);
+
+        AnaIO::hPi0EnergyE1OA_PreFit->Fill(pion_E_pre_m2/pi0Energy_Truth-1);
+        AnaIO::hPi0EnergyE1OA_PostFit->Fill(pion_E_post_m2/pi0Energy_Truth-1);
+
+        AnaIO::hPi0EnergyAsym_PreFit->Fill(pion_E_pre_m3/pi0Energy_Truth-1);
+        AnaIO::hPi0EnergyAsym_PostFit->Fill(pion_E_post_m3/pi0Energy_Truth-1);
+
+
+        AnaIO::hShowerE1Compare_REG->Fill(ldShower.E()/TruthPi0Showers[0].E()-1,FittedVars[0]/TruthPi0Showers[0].E()-1);
+        AnaIO::hShowerE2Compare_REG->Fill(slShower.E()/TruthPi0Showers[1].E()-1,FittedVars[1]/TruthPi0Showers[1].E()-1);
+        AnaIO::hShowerOACompare_REG->Fill(openingAngleRad*TMath::RadToDeg()-openingAngleRad_Truth*TMath::RadToDeg(), FittedVars[2]*TMath::RadToDeg()-openingAngleRad_Truth*TMath::RadToDeg());
+
+        AnaIO::hPi0EnergyComparem1_REG->Fill(pion_E_pre_m1/pi0Energy_Truth-1,pion_E_post_m1/pi0Energy_Truth-1);
+        AnaIO::hPi0EnergyComparem2_REG->Fill(pion_E_pre_m2/pi0Energy_Truth-1,pion_E_post_m2/pi0Energy_Truth-1);
+
+
+        const double pi0EResKF = pion_E_post_m2/pi0Energy_Truth-1;
+        plotUtils.FillHist(AnaIO::hPi0MomentumResFitKF_M2, pi0Energy_Truth, pi0EResKF);
+
+
+      }
     }
     
     // Set the shower energy after KF
@@ -2145,9 +2282,9 @@ vector<double> FittedVars = DoKF(AnaUtils::LdShowerEnergyRaw[ii],AnaUtils::SlSho
       AnaIO::hPi0MassCompare->Fill(sqrt(2*AnaUtils::LdShowerEnergyRaw[ii]*AnaUtils::SlShowerEnergyRaw[ii]*(1-cos(AnaUtils::OpenAngle[ii]))));
       AnaIO::hPi0MassComparePost->Fill(sqrt(2*FittedVars[0]*FittedVars[1]*(1-cos(FittedVars[2]))));
 
-      AnaIO::hShowerE1Compare_REG->Fill(AnaUtils::LdShowerEnergyRaw[ii]/AnaUtils::LdShowerEnergyTruth[ii]-1,FittedVars[0]/AnaUtils::LdShowerEnergyTruth[ii]-1);
-      AnaIO::hShowerE2Compare_REG->Fill(AnaUtils::SlShowerEnergyRaw[ii]/AnaUtils::SlShowerEnergyTruth[ii]-1,FittedVars[1]/AnaUtils::SlShowerEnergyTruth[ii]-1);
-      AnaIO::hShowerOACompare_REG->Fill(AnaUtils::OpenAngle[ii]*TMath::RadToDeg()-AnaUtils::OpenAngleTruth[ii]*TMath::RadToDeg(), FittedVars[2]*TMath::RadToDeg()-AnaUtils::OpenAngleTruth[ii]*TMath::RadToDeg());
+      AnaIO::hPi0ShowerE1Compare_REG->Fill(AnaUtils::LdShowerEnergyRaw[ii]/AnaUtils::LdShowerEnergyTruth[ii]-1,FittedVars[0]/AnaUtils::LdShowerEnergyTruth[ii]-1);
+      AnaIO::hPi0ShowerE2Compare_REG->Fill(AnaUtils::SlShowerEnergyRaw[ii]/AnaUtils::SlShowerEnergyTruth[ii]-1,FittedVars[1]/AnaUtils::SlShowerEnergyTruth[ii]-1);
+      AnaIO::hPi0ShowerOACompare_REG->Fill(AnaUtils::OpenAngle[ii]*TMath::RadToDeg()-AnaUtils::OpenAngleTruth[ii]*TMath::RadToDeg(), FittedVars[2]*TMath::RadToDeg()-AnaUtils::OpenAngleTruth[ii]*TMath::RadToDeg());
       // Print out some info
       /*cout << "LD shower E (truth): " << AnaUtils::LdShowerEnergyTruth[ii] << endl;
       cout << "LD shower E: " << AnaUtils::LdShowerEnergyRaw[ii] << endl;
@@ -2638,9 +2775,11 @@ void AnaUtils::FillXSTrueHistograms(int &true_avaPionBeam, int &true_avaPionCEXe
   bool isFakeData = IsFakeData();
   // Get the MC weight for each event
   double weight = CalWeight(true);
+  double g4rw = CalG4RW();
+  weight = weight*g4rw;
 
   // Select true pion beam
-  if(AnaIO::true_beam_PDG == 211 && isFakeData){
+  if(AnaIO::true_beam_PDG == 211 && !isFakeData){
     // Clear the incident beam energy vector
     AnaIO::true_beam_incidentEnergies->clear();
     // Fill the beam traj Z position with/without SCE correction
@@ -2665,7 +2804,7 @@ void AnaUtils::FillXSTrueHistograms(int &true_avaPionBeam, int &true_avaPionCEXe
       // Another method
       //double initialE = GetTrueFrontFaceEnergy();
       //interactingE = GetTrueIntEnergy();
-      if(initialE > 1050.0) return;
+      //if(initialE > 1050.0) return;
       
       double ffe = -999, intE = -999;
       if(trackLen!= -999){
@@ -2739,12 +2878,73 @@ void AnaUtils::FillXSTrueHistograms(int &true_avaPionBeam, int &true_avaPionCEXe
         // Get the theta angle between pz and p in degree
         double theta = TMath::RadToDeg() * TMath::ACos(costheta);
 
+        // Get true beam momentum vector
+        //const TVector3 truthBeamFull = GetTruthBeamFull();
+        // Get the angle between pi0 vector and pi+ beam
+        //double angle = truthBeamFull.Angle(vecFSParticle[0].Vect());
+        //double cos_angle = TMath::Cos(angle);
+        
         // Select different pion beam interacting slice for Diff. xsec calculation
         if(interactingE > 650 && interactingE < 800){
           true_avaDiffCEXevt++;
           AnaIO::hTruthDiffCEXInteractingHist_650to800MeV->Fill(LeadingPiZeroKE*1000, weight);
           AnaIO::hTruthDiffCEXInteractingHistTheta_650to800MeV->Fill(theta, weight);
           AnaIO::hTruthDiffCEXInteractingHistCosTheta_650to800MeV->Fill(costheta, weight);
+
+          // Select pi0 KE for three regions
+          if(LeadingPiZeroKE*1000 > 650){ // High pi0 KE region
+
+            AnaIO::hTruthCEXDaughters_High->Fill(AnaIO::true_daughter_nProton,0);
+            AnaIO::hTruthCEXDaughters_High->Fill(AnaIO::true_daughter_nNeutron,1);
+            AnaIO::hTruthCEXDaughters_High->Fill(AnaIO::true_daughter_nNucleus,2);
+            AnaIO::hTruthPi0DaughtersCosTheta_High->Fill(LeadingPiZeroPz/LeadingPiZeroP);
+
+            /*cout << "\nhigh region" << endl;
+            cout << AnaIO::true_daughter_nNucleus << endl;
+            for(auto pdg : (*AnaIO::true_beam_daughter_PDG)){
+              cout << pdg << endl;
+            }
+            cout << "grand daughter" << endl;
+            for(auto pdg : (*AnaIO::true_beam_grand_daughter_PDG)){
+              cout << pdg << endl;
+            }*/
+          }
+          
+          if(LeadingPiZeroKE*1000 > 200 && LeadingPiZeroKE*1000 < 400){ // Middle pi0 KE region
+          
+            AnaIO::hTruthCEXDaughters_Middle->Fill(AnaIO::true_daughter_nProton,0);
+            AnaIO::hTruthCEXDaughters_Middle->Fill(AnaIO::true_daughter_nNeutron,1);
+            AnaIO::hTruthCEXDaughters_Middle->Fill(AnaIO::true_daughter_nNucleus,2);
+            AnaIO::hTruthPi0DaughtersCosTheta_Middle->Fill(LeadingPiZeroPz/LeadingPiZeroP);
+            /*cout << "\nmid region" << endl;
+            cout << AnaIO::true_daughter_nNucleus << endl;
+
+            for(auto pdg : (*AnaIO::true_beam_daughter_PDG)){
+              cout << pdg << endl;
+            }
+            cout << "grand daughter" << endl;
+            for(auto pdg : (*AnaIO::true_beam_grand_daughter_PDG)){
+              cout << pdg << endl;
+            }*/
+          }
+
+          if(LeadingPiZeroKE*1000 < 150){ // Low pi0 KE Region
+            
+            AnaIO::hTruthCEXDaughters_Low->Fill(AnaIO::true_daughter_nProton,0);
+            AnaIO::hTruthCEXDaughters_Low->Fill(AnaIO::true_daughter_nNeutron,1);
+            AnaIO::hTruthCEXDaughters_Low->Fill(AnaIO::true_daughter_nNucleus,2);
+            AnaIO::hTruthPi0DaughtersCosTheta_Low->Fill(LeadingPiZeroPz/LeadingPiZeroP);
+            /*cout << "\nlow region" << endl;
+            cout << AnaIO::true_daughter_nNucleus << endl;
+
+            for(auto pdg : (*AnaIO::true_beam_daughter_PDG)){
+              cout << pdg << endl;
+            }
+            cout << "grand daughter" << endl;
+            for(auto pdg : (*AnaIO::true_beam_grand_daughter_PDG)){
+              cout << pdg << endl;
+            }*/
+          }
 
         }
         if(interactingE > 650 && interactingE < 700) {
@@ -2769,7 +2969,7 @@ void AnaUtils::FillXSTrueHistograms(int &true_avaPionBeam, int &true_avaPionCEXe
           AnaIO::hTruthDiffCEXInteractingHist_900MeV->Fill(LeadingPiZeroKE*1000, weight);
           AnaIO::hTruthDiffCEXInteractingHistTheta_900MeV->Fill(theta, weight);
           AnaIO::hTruthDiffCEXInteractingHistCosTheta_900MeV->Fill(costheta, weight);
-          
+          /*
           // Select pi0 KE for three regions
           if(LeadingPiZeroKE*1000 > 800){ // High pi0 KE region
 
@@ -2793,7 +2993,7 @@ void AnaUtils::FillXSTrueHistograms(int &true_avaPionBeam, int &true_avaPionCEXe
             AnaIO::hTruthCEXDaughters_Low->Fill(AnaIO::true_daughter_nNeutron,1);
             AnaIO::hTruthCEXDaughters_Low->Fill(AnaIO::true_daughter_nNucleus,2);
             AnaIO::hTruthPi0DaughtersCosTheta_Low->Fill(LeadingPiZeroPz/LeadingPiZeroP);
-          }
+          }*/
         }
 
         if(interactingE > 450 && interactingE < 500) {
@@ -2821,9 +3021,11 @@ void AnaUtils::FillXSNewTrueHistograms(){
   bool isFakeData = IsFakeData();
   // Get the MC weight for each event
   double weight = CalWeight(true);
+  double g4rw = CalG4RW();
+  weight = weight*g4rw;
 
   // Select true pion beam
-  if(AnaIO::true_beam_PDG == 211 && isFakeData){
+  if(AnaIO::true_beam_PDG == 211 && !isFakeData){
 
     //AnaIO::true_beam_incidentEnergies->clear();
     // Calculate the true track length at each space point and the front-face energy and interacting energy 
@@ -2866,6 +3068,8 @@ vector<vector<double>> AnaUtils::ComputeTrueIncidentHist(const double & initialE
   vector<double> weightvect;
   // Get the MC weight for each event
   double weight = CalWeight(true);
+  double g4rw = CalG4RW();
+  weight = weight*g4rw;
 
   double interactingE_tmp = interactingE;
   double intE_tmp = intE;
@@ -2927,13 +3131,13 @@ double AnaUtils::CalWeight(const bool & kMC){
   double weight = 1.;
   //return weight;
   
-  double mufrac = 1.71;
+  double mufrac = 1.53;
   
-  double mom_mu0 = 1.0033;
-  double mom_sigma0 = 0.0609;
-  double mom_mu = 1.01818;
-  double mom_sigma = 0.07192;
-  double wlimit = 3; 
+  double mom_mu0 = 1.00362;//1.0033;
+  double mom_sigma0 = 0.0595377;//0.0609;
+  double mom_mu = 1.01604;//1.01818;
+  double mom_sigma = 0.0708354;//0.07192;
+  double wlimit = 3.5;//3; 
   
   if(kMC){
     // momentum reweight (outlier weights are set to 1e-5)
@@ -2950,9 +3154,12 @@ double AnaUtils::CalWeight(const bool & kMC){
     if (AnaIO::true_beam_PDG == -13 && AnaIO::reco_beam_true_byE_matched) { // kMuon
       weight *= mufrac;
     } 
-  } 
-  
+  }
+  //double g4rw = CalG4RW();
+
+  //return weight*g4rw;
   return weight;
+
 } 
 
 double AnaUtils::CalBckWeight(const bool & kMC){
@@ -3029,17 +3236,33 @@ double AnaUtils::CalXSEvtWeight(const bool & kMC, const double & intE, const int
     else weight = 1.;
   }*/
 
-  // With dep E Loss
-  if (kMC){
+  // With dep E Loss Feb.
+  /*if (kMC){
     // 0pi0
     if(evtXStype == gkXSEvtBkgInel){
-      if(intE < 700.0) weight = 0.998118;
-      else weight = 0.969136;
+      if(intE < 700.0) weight = 0.997976;
+      else weight = 0.969012;
     }
     // 1pi0
     else if(evtXStype == gkXSEvtBkgSinglePi0 || evtXStype == gkXSEvtBkgMultiPi0){
-      if(intE < 700.0) weight = 2.42498;
-      else weight = 0.730883;
+      if(intE < 700.0) weight = 2.39891;
+      else weight = 0.706501;
+    }
+    // No weight for other bck
+    else weight = 1.;
+  }*/
+
+  // With dep E Loss Apr. (new)
+  if (kMC){
+    // 0pi0
+    if(evtXStype == gkXSEvtBkgInel){
+      if(intE < 700.0) weight = 1.01585;
+      else weight = 0.965132;
+    }
+    // 1pi0
+    else if(evtXStype == gkXSEvtBkgSinglePi0 || evtXStype == gkXSEvtBkgMultiPi0){
+      if(intE < 700.0) weight = 2.20256;
+      else weight = 0.713314;
     }
     // No weight for other bck
     else weight = 1.;
@@ -3078,8 +3301,16 @@ double AnaUtils::CalBeamIniWeight(const double & iniE){
   //                   1.0, 0.839761, 0.865995, 0.870306, 0.883158, 0.887925, 0.888798, 0.888868};
 
   // Feb 2023
+  //double IniWeight[] = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 
+  //                   0.0, 0.801123, 0.859177, 0.86919, 0.880718, 0.886977, 0.889779, 0.887032};
+  // April 2023 new
+  //double IniWeight[] = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 
+  //                   0.0, 0.858606, 0.870282, 0.882274, 0.887159, 0.892445, 0.894791, 0.889779};
+
+  // April 2023 new latest
   double IniWeight[] = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 
-                     0.0, 0.801123, 0.859177, 0.86919, 0.880718, 0.886977, 0.889779, 0.887032};
+                     0.0, 0.841146, 0.870546, 0.879581, 0.88791, 0.893029, 0.894007, 0.891124};
+
   Int_t binx = AnaIO::hRecPiPlusInitialEnergy->GetXaxis()->FindBin(iniE);
   weight *= IniWeight[binx-1];
 
@@ -3101,8 +3332,11 @@ double AnaUtils::CalBeamIntWeight(const double & intE){
   //                    0.884379, 0.906827, 0.920416, 0.930346, 0.941464, 0.943562, 0.944133, 0.944218};
   
   // Feb 2023
-  double IntWeight[] = {0.439768, 1.0, 0.0, 0.240104, 0.325475, 0.547874, 0.525402, 0.569011, 0.663258, 0.755661, 0.820706, 0.858978, 
-                     0.886342, 0.901809, 0.920025, 0.931599, 0.945724, 0.945179, 0.943406, 0.938913};
+  //double IntWeight[] = {0.439768, 1.0, 0.0, 0.240104, 0.325475, 0.547874, 0.525402, 0.569011, 0.663258, 0.755661, 0.820706, 0.858978, 
+  //                   0.886342, 0.901809, 0.920025, 0.931599, 0.945724, 0.945179, 0.943406, 0.938913};
+  // April 2023 new
+  double IntWeight[] = {0, 1.0, 0.0, 0.200557, 0.372566, 0.586148, 0.553071, 0.6047, 0.67587, 0.770301, 0.831756, 0.867062, 
+                     0.891131, 0.907382, 0.923663, 0.934314, 0.946617, 0.947189, 0.947067, 0.938439};
 
   Int_t binx = AnaIO::hRecPiPlusInteractingEnergy->GetXaxis()->FindBin(intE);
   weight *= IntWeight[binx-1];
@@ -3127,9 +3361,9 @@ double AnaUtils::CalCEXIntWeight(const double & intE){
   //double IntWeight[] = {0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 0.748344, 0.602063, 0.841422, 0.815263, 0.67177, 0.553415, 
   //                  0.596665, 0.544498, 0.703856, 0.690155, 0.731224, 0.720228, 0.704154, 1};
 
-  double IntWeight[] = {0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 0.502596, 0.86949, 0.806547, 0.698333, 0.537983, 
-                    0.557109, 0.520353, 0.720488, 0.714472, 0.729086, 0.733267, 0.691573, 0.888091};
-
+  double IntWeight[] = {0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 0.69794, 0.818919, 0.775484, 0.800257, 0.53928, 
+                    0.719739, 0.530114, 0.753455, 0.752041, 0.76991, 0.74918, 0.743382, 1.0};
+    
   Int_t binx = AnaIO::hRecPiPlusInteractingEnergyEvt->GetXaxis()->FindBin(intE);
   weight *= IntWeight[binx-1];
 
@@ -3151,6 +3385,64 @@ double AnaUtils::CalCEXPi0KEWeight(const double & intE){
   weight *= IntWeight[binx-1];
 
   return weight;
+}
+
+double AnaUtils::CalG4RW(){
+  /*vector<vector<double>> cex;
+  
+  double g4rw = 1.0;
+  if (AnaIO::true_beam_PDG == 211) {
+    for (int i=0; i<11; ++i) {
+      double g4rw_cex = 0;
+      cex.push_back((*AnaIO::g4rw_full_grid_piplus_coeffs)[i]);
+      if (cex[i].size() > 0) {
+        double sum = 0; 
+        for (size_t j = 0; j < cex[i].size(); ++j) {
+          sum += cex[i][j];
+          g4rw_cex += cex[i][j] * pow(weight[i], j);
+        }
+        
+        if (abs(sum-1)>0.1) {
+          cout<<"out"<<i<<"\t"<<sum<<endl;
+          cout<<(*AnaIO::g4rw_full_grid_piplus_weights)[i][9]<<endl;
+          cout<<AnaIO::run<<"\t"<<AnaIO::subrun<<"\t"<<AnaIO::event<<endl;
+          g4rw_cex = 1;
+        }
+        g4rw *= g4rw_cex;
+      }
+    }
+  }*/
+  vector<double> cex_0_400 = (*AnaIO::g4rw_full_grid_piplus_coeffs)[4];
+  vector<double> cex_400_800 = (*AnaIO::g4rw_full_grid_piplus_coeffs)[5];
+  vector<double> cex_800_2000 = (*AnaIO::g4rw_full_grid_piplus_coeffs)[6];
+
+  double w_cex_0_400 = 1.0;//w1; // KE 0 ~ 476.44931 MeV
+  double w_cex_400_800 = 1.0;//w2; // KE 476.44931 ~ 1865.2940 MeV
+  double w_cex_800_2000 = 1.0;//w2; // KE 476.44931 ~ 1865.2940 MeV
+  
+  double g4rw = 1;
+  if (AnaIO::true_beam_PDG == 211 && (cex_0_400.size() > 0) && (cex_400_800.size() > 0) && (cex_800_2000.size() > 0)&& (w_cex_0_400 != 1 || w_cex_400_800 != 1 || w_cex_800_2000 != 1)){
+    if((*AnaIO::true_beam_endProcess) == "pi+Inelastic" && AnaIO::true_daughter_nPi0 == 1 && AnaIO::true_daughter_nPiPlus == 0 &&  AnaIO::true_daughter_nPiMinus == 0){
+    //if((*AnaIO::true_beam_endProcess) == "pi+Inelastic"){
+    double g4rw_cex_0_400 = 0;
+    for (size_t i = 0; i < cex_0_400.size(); ++i) {
+      g4rw_cex_0_400 += cex_0_400[i] * pow(w_cex_0_400, i);
+    }
+    double g4rw_cex_400_800 = 0;
+    for (size_t i = 0; i < cex_400_800.size(); ++i) {
+      g4rw_cex_400_800 += cex_400_800[i] * pow(w_cex_400_800, i);
+    }
+    double g4rw_cex_800_2000 = 0;
+    for (size_t i = 0; i < cex_800_2000.size(); ++i) {
+      g4rw_cex_800_2000 += cex_800_2000[i] * pow(w_cex_800_2000, i);
+    }
+    g4rw *= g4rw_cex_0_400;
+    g4rw *= g4rw_cex_400_800;
+    g4rw *= g4rw_cex_800_2000;
+    }
+  }
+
+  return g4rw;
 }
 
 
@@ -3343,7 +3635,7 @@ void AnaUtils::FillUpStreamEnergyLossHistAfterCut(double beam_inst_KE, double tr
   if(beam_inst_KE > 1.0 && beam_inst_KE < 1.1) AnaIO::hUpStreamELoss1000MeVAfterScraperCuts->Fill(UpStreamELoss);
 }
 
-void AnaUtils::FillBeamVariablesAfterAllCuts(int parType, int channelType)
+void AnaUtils::FillBeamVariablesAfterAllCuts(const bool kMC, int parType, int channelType)
 {
   const double beamEndZ = AnaIO::reco_beam_calo_endZ;
 
@@ -3413,5 +3705,37 @@ void AnaUtils::FillBeamVariablesAfterAllCuts(int parType, int channelType)
   
   //if((*AnaIO::reco_beam_true_byHits_endProcess) == "Decay") plotUtils.FillHist(AnaIO::hBeamDirDiff,angleDiff,parType);
   
+  // Track pitch 
+  const vector<double> * trackPitch_SCE = AnaIO::reco_beam_TrkPitch_SCE;
+  const vector<double> * trackPitch_NoSCE = AnaIO::reco_beam_TrkPitch_NoSCE;
+
+  for(unsigned int ii = 0; ii < trackPitch_SCE->size(); ii++){
+    double trkpit = (*trackPitch_SCE)[ii];
+    AnaIO::hRecBeamTrackPitch_SCE->Fill(trkpit);
+
+    double trkpit_noSCE = (*trackPitch_NoSCE)[ii];
+    AnaIO::hRecBeamTrackPitch_NoSCE->Fill(trkpit_noSCE);
+  }
+
+  // dEdx 
+  const vector<double> * dEdx_SCE = AnaIO::reco_beam_calibrated_dEdX_SCE;
+  const vector<double> * dEdx_NoSCE = AnaIO::reco_beam_dEdX_NoSCE;
+
+  for(unsigned int ii = 0; ii < dEdx_SCE->size(); ii++){
+
+    double dEdx = (*dEdx_SCE)[ii];
+    AnaIO::hRecBeamdEdx_SCE->Fill(dEdx);
+
+    double dEdx_noSCE = (*dEdx_NoSCE)[ii];
+    AnaIO::hRecBeamdEdx_NoSCE->Fill(dEdx_noSCE);
+
+    double DeltaE = dEdx*(*trackPitch_SCE)[ii];
+    double DeltaE_noSCE = dEdx_noSCE*(*trackPitch_NoSCE)[ii];
+
+    AnaIO::hRecBeamDeltaE_SCE->Fill(DeltaE);
+    AnaIO::hRecBeamDeltaE_NoSCE->Fill(DeltaE_noSCE);
+
+  }
+
 }
 

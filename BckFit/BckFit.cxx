@@ -70,12 +70,13 @@
 #include <cstdlib>
 #include <ctime>
 
-#include "TemplateFitter.h"
-#include "TemplateFitter.cxx"
+#include "include/TemplateFitter.h"
+#include "include/TemplateFitter.cxx"
 
 
 using namespace std;
-double plotScale = 0.499375;
+//double plotScale = 0.499375;
+double plotScale = 0.49691;
 
 double GetChi2(TH1D * hdata, TH1D * hmc);
 void Get1pi0BckScale(vector<double> &Par, vector<double> &Parerr);
@@ -119,23 +120,21 @@ int main(int argc, char * argv[])
     // ==== Scale factors in summary ====== //
     const double SFBin[] = {0, 700, 1000};
 
-    TH1D * hSacleFactor_1pi0 = new TH1D("hSacleFactor_1pi0",";Interacting Energy (MeV); Background Scaling Factors", sizeof(SFBin)/sizeof(double)-1, SFBin); 
-    //hSacleFactor_1pi0->SetBinContent(1,2.13924); hSacleFactor_1pi0->SetBinError(1,0.573771);
-    //hSacleFactor_1pi0->SetBinContent(2,0.688961); hSacleFactor_1pi0->SetBinError(2,0.161465);
-    //hSacleFactor_1pi0->SetBinContent(1,2.54864); hSacleFactor_1pi0->SetBinError(1,0.745619);
-    //hSacleFactor_1pi0->SetBinContent(2,0.622455); hSacleFactor_1pi0->SetBinError(2,0.153662);
+    TH1D * hSacleFactor_1pi0 = new TH1D("hSacleFactor_1pi0",";#pi^{+} Interacting Energy (MeV); Background Scaling Factors", sizeof(SFBin)/sizeof(double)-1, SFBin); 
+   
     // E-dep loss
-    hSacleFactor_1pi0->SetBinContent(1,2.42498); hSacleFactor_1pi0->SetBinError(1,0.791412);
-    hSacleFactor_1pi0->SetBinContent(2,0.730883); hSacleFactor_1pi0->SetBinError(2,0.157706);
+    //hSacleFactor_1pi0->SetBinContent(1,2.39891); hSacleFactor_1pi0->SetBinError(1,0.757427);
+    //hSacleFactor_1pi0->SetBinContent(2,0.706501); hSacleFactor_1pi0->SetBinError(2,0.168342);
+    hSacleFactor_1pi0->SetBinContent(1,2.20256); hSacleFactor_1pi0->SetBinError(1,0.750211);
+    hSacleFactor_1pi0->SetBinContent(2,0.713314); hSacleFactor_1pi0->SetBinError(2,0.161685);
 
-    TH1D * hSacleFactor_0pi0 = new TH1D("hSacleFactor_0pi0",";Interacting Energy (MeV); Background Scaling Factors", sizeof(SFBin)/sizeof(double)-1, SFBin); 
-    //hSacleFactor_0pi0->SetBinContent(1,1.01219); hSacleFactor_0pi0->SetBinError(1,0.0304626);
-    //hSacleFactor_0pi0->SetBinContent(2,0.966249); hSacleFactor_0pi0->SetBinError(2,0.0179907);
-    //hSacleFactor_0pi0->SetBinContent(1,1.0101); hSacleFactor_0pi0->SetBinError(1,0.0316139);
-    //hSacleFactor_0pi0->SetBinContent(2,0.968285); hSacleFactor_0pi0->SetBinError(2,0.0177684);
+    TH1D * hSacleFactor_0pi0 = new TH1D("hSacleFactor_0pi0",";#pi^{+} Interacting Energy (MeV); Background Scaling Factors", sizeof(SFBin)/sizeof(double)-1, SFBin); 
+    
     // E-dep loss
-    hSacleFactor_0pi0->SetBinContent(1,0.998118); hSacleFactor_0pi0->SetBinError(1,0.0260341);
-    hSacleFactor_0pi0->SetBinContent(2,0.969136); hSacleFactor_0pi0->SetBinError(2,0.0192829);
+    //hSacleFactor_0pi0->SetBinContent(1,0.997976); hSacleFactor_0pi0->SetBinError(1,0.0260323);
+    //hSacleFactor_0pi0->SetBinContent(2,0.969012); hSacleFactor_0pi0->SetBinError(2,0.019283);
+    hSacleFactor_0pi0->SetBinContent(1,1.01585); hSacleFactor_0pi0->SetBinError(1,0.0258158);
+    hSacleFactor_0pi0->SetBinContent(2,0.965132); hSacleFactor_0pi0->SetBinError(2,0.0191821);
     
     TLatex tt;
     tt.SetNDC();
@@ -147,6 +146,15 @@ int main(int argc, char * argv[])
     hSacleFactor_1pi0->SetMarkerStyle(kFullCircle);
     hSacleFactor_1pi0->SetMaximum(3.0);
     hSacleFactor_1pi0->SetMinimum(0.0);
+    hSacleFactor_1pi0->SetTitle(" ");
+    hSacleFactor_1pi0->GetYaxis()->CenterTitle();
+    hSacleFactor_1pi0->GetYaxis()->SetTitleFont(22);
+    hSacleFactor_1pi0->GetYaxis()->SetTitleSize(0.05);
+    hSacleFactor_1pi0->GetYaxis()->SetTitleOffset(0.9);
+    hSacleFactor_1pi0->GetXaxis()->CenterTitle();
+    hSacleFactor_1pi0->GetXaxis()->SetTitleFont(22);
+    hSacleFactor_1pi0->GetXaxis()->SetTitleSize(0.05);
+    hSacleFactor_1pi0->GetXaxis()->SetTitleOffset(0.9);
 
     //hSacleFactor_1pi0->Draw("ex0p");
     hSacleFactor_1pi0->Draw("e1");
@@ -169,15 +177,23 @@ int main(int argc, char * argv[])
     //line2->Draw("sames");
 
     auto lg = new TLegend(0.65,0.60,0.85,0.88);
-    lg->AddEntry(hSacleFactor_1pi0,"sideband 1 (#pi^{0} #geq 1)","p");
-    lg->AddEntry(hSacleFactor_0pi0,"sideband 2 (#pi^{0} = 0)","p");
+    lg->AddEntry(hSacleFactor_1pi0,"Pion Prod. (#pi^{0} #geq 1)","lp");
+    lg->AddEntry(hSacleFactor_0pi0,"Pion Prod. (#pi^{0} = 0)","lp");
     lg->SetBorderSize(0);
     lg->Draw("sames");
 
     tt.SetTextSize(0.035);
     tt.DrawLatex(0.125,0.925,"DUNE:ProtoDUNE-SP");
+    tt.DrawLatex(0.725,0.925,"1GeV/c Pion Data");
+
+    tt.DrawLatex(0.135,0.245,"#color[4]{#bf{#it{#alpha^{<700MeV}_{#pi^{0}#geq 1} = 2.20#pm0.75}}}");
+    tt.DrawLatex(0.135,0.195,"#color[4]{#bf{#it{#alpha^{>700MeV}_{#pi^{0}#geq 1} = 0.71#pm0.17}}}");
     
-    ctmp1->Print("output/BckFactor.png");
+    tt.DrawLatex(0.375,0.245,"#color[4]{#bf{#it{#alpha^{<700MeV}_{#pi^{0}= 0} = 1.02#pm0.03}}}");
+    tt.DrawLatex(0.375,0.195,"#color[4]{#bf{#it{#alpha^{>700MeV}_{#pi^{0}= 0} = 0.97#pm0.02}}}");
+    
+
+    ctmp1->Print("output/BckFactor.pdf");
 
 
 }
@@ -204,14 +220,14 @@ void Get1pi0BckScale(vector<double> &Par, vector<double> &Parerr)
     Par.clear(); Parerr.clear(); 
 
     // Declare data and MC histograms (placeholder)
-    TH1D * h0 = new TH1D("h01pi0",";Interacting Energy (MeV); Candidates", 20, 0, 1000); 
-    TH1D * h1 = new TH1D("h11pi0",";Interacting Energy (MeV); Candidates", 20, 0, 1000); 
-    TH1D * h2 = new TH1D("h21pi0",";Interacting Energy (MeV); Candidates", 20, 0, 1000);
+    TH1D * h0 = new TH1D("h01pi0",";#pi^{+} Interacting Energy (MeV); Candidates", 20, 0, 1000); 
+    TH1D * h1 = new TH1D("h11pi0",";#pi^{+} Interacting Energy (MeV); Candidates", 20, 0, 1000); 
+    TH1D * h2 = new TH1D("h21pi0",";#pi^{+} Interacting Energy (MeV); Candidates", 20, 0, 1000);
     // Scale components
-    TH1D * h2_low = new TH1D("h2_low1pi0",";Interacting Energy (MeV); Candidates", 20, 0, 1000); 
-    TH1D * h2_high = new TH1D("h2_high1pi0",";Interacting Energy (MeV); Candidates", 20, 0, 1000); 
+    TH1D * h2_low = new TH1D("h2_low1pi0",";#pi^{+} Interacting Energy (MeV); Candidates", 20, 0, 1000); 
+    TH1D * h2_high = new TH1D("h2_high1pi0",";#pi^{+} Interacting Energy (MeV); Candidates", 20, 0, 1000); 
 
-    const TString finName = "input/Bck1pi0.root";
+    const TString finName = "input/Bck1pi0_newFS.root";
     
     TFile *file = TFile::Open(finName);
 
@@ -220,8 +236,8 @@ void Get1pi0BckScale(vector<double> &Par, vector<double> &Parerr)
       exit(1);
     }
 
-    TH2D * h2d_mc = (TH2D*) file->Get("mc/i076PiPlusInteractingEnergyEvt_COMPOSE;1");
-    TH2D * h2d_data = (TH2D*) file->Get("data/i076PiPlusInteractingEnergyEvt_COMPOSE;1");
+    TH2D * h2d_mc = (TH2D*) file->Get("mc/i076hRecPiPlusInteractingEnergyEvt_COMPOSE_XsEvt;1");
+    TH2D * h2d_data = (TH2D*) file->Get("data/i076hRecPiPlusInteractingEnergyEvt_COMPOSE_XsEvt;1");
 
     int nx = h2d_mc->GetNbinsX();
     int ny = h2d_data->GetNbinsY();
@@ -302,14 +318,14 @@ void Get0pi0BckScale(vector<double> &Par, vector<double> &Parerr, const double &
     Par.clear(); Parerr.clear(); 
 
     // Declare data and MC histograms (placeholder)
-    TH1D * h0 = new TH1D("h00pi0",";Interacting Energy (MeV); Candidates", 20, 0, 1000); 
-    TH1D * h1 = new TH1D("h10pi0",";Interacting Energy (MeV); Candidates", 20, 0, 1000); 
-    TH1D * h2 = new TH1D("h20pi0",";Interacting Energy (MeV); Candidates", 20, 0, 1000);
+    TH1D * h0 = new TH1D("h00pi0",";#pi^{+} Interacting Energy (MeV); Candidates", 20, 0, 1000); 
+    TH1D * h1 = new TH1D("h10pi0",";#pi^{+} Interacting Energy (MeV); Candidates", 20, 0, 1000); 
+    TH1D * h2 = new TH1D("h20pi0",";#pi^{+} Interacting Energy (MeV); Candidates", 20, 0, 1000);
     // Scale components
-    TH1D * h2_low = new TH1D("h2_low0pi0",";Interacting Energy (MeV); Candidates", 20, 0, 1000); 
-    TH1D * h2_high = new TH1D("h2_high0pi0",";Interacting Energy (MeV); Candidates", 20, 0, 1000); 
+    TH1D * h2_low = new TH1D("h2_low0pi0",";#pi^{+} Interacting Energy (MeV); Candidates", 20, 0, 1000); 
+    TH1D * h2_high = new TH1D("h2_high0pi0",";#pi^{+} Interacting Energy (MeV); Candidates", 20, 0, 1000); 
 
-    const TString finName = "input/Bck0pi0.root";
+    const TString finName = "input/Bck0pi0_newFS.root";
     
     TFile *file = TFile::Open(finName);
 
@@ -318,8 +334,8 @@ void Get0pi0BckScale(vector<double> &Par, vector<double> &Parerr, const double &
       exit(1);
     }
 
-    TH2D * h2d_mc = (TH2D*) file->Get("mc/i076PiPlusInteractingEnergyEvt_COMPOSE;1");
-    TH2D * h2d_data = (TH2D*) file->Get("data/i076PiPlusInteractingEnergyEvt_COMPOSE;1");
+    TH2D * h2d_mc = (TH2D*) file->Get("mc/i076hRecPiPlusInteractingEnergyEvt_COMPOSE_XsEvt;1");
+    TH2D * h2d_data = (TH2D*) file->Get("data/i076hRecPiPlusInteractingEnergyEvt_COMPOSE_XsEvt;1");
 
     int nx = h2d_mc->GetNbinsX();
     int ny = h2d_data->GetNbinsY();
@@ -403,15 +419,15 @@ void Get0pi0BckScale(vector<double> &Par, vector<double> &Parerr, const double &
 void GetSignalResults(const double &low1pi0Scale, const double &high1pi0Scale, const double &low0pi0Scale, const double &high0pi0Scale, TString tag, const int &break_s1, const int &break_s2)
 {
     // Declare data and MC histograms (placeholder)
-    TH1D * h0 = new TH1D(Form("h0_%s",tag.Data()),";Interacting Energy (MeV); Candidates", 20, 0, 1000); 
-    TH1D * h1 = new TH1D(Form("h1_%s",tag.Data()),";Interacting Energy (MeV); Candidates", 20, 0, 1000); 
-    TH1D * h2 = new TH1D(Form("h2_%s",tag.Data()),";Interacting Energy (MeV); Candidates", 20, 0, 1000);
+    TH1D * h0 = new TH1D(Form("h0_%s",tag.Data()),";#pi^{+} Interacting Energy (MeV); Candidates", 20, 0, 1000); 
+    TH1D * h1 = new TH1D(Form("h1_%s",tag.Data()),";#pi^{+} Interacting Energy (MeV); Candidates", 20, 0, 1000); 
+    TH1D * h2 = new TH1D(Form("h2_%s",tag.Data()),";#pi^{+} Interacting Energy (MeV); Candidates", 20, 0, 1000);
 
-    TH1D * h0pi0 = new TH1D(Form("h0pi0_%s",tag.Data()),";Interacting Energy (MeV); Candidates", 20, 0, 1000); 
-    TH1D * h1pi0_s1 = new TH1D(Form("h1pi0_s1_%s",tag.Data()),";Interacting Energy (MeV); Candidates", 20, 0, 1000);
-    TH1D * h1pi0_s2 = new TH1D(Form("h1pi0_s2_%s",tag.Data()),";Interacting Energy (MeV); Candidates", 20, 0, 1000);
+    TH1D * h0pi0 = new TH1D(Form("h0pi0_%s",tag.Data()),";#pi^{+} Interacting Energy (MeV); Candidates", 20, 0, 1000); 
+    TH1D * h1pi0_s1 = new TH1D(Form("h1pi0_s1_%s",tag.Data()),";#pi^{+} Interacting Energy (MeV); Candidates", 20, 0, 1000);
+    TH1D * h1pi0_s2 = new TH1D(Form("h1pi0_s2_%s",tag.Data()),";#pi^{+} Interacting Energy (MeV); Candidates", 20, 0, 1000);
     
-    const TString finName = "input/Signal.root";
+    const TString finName = "input/Signal_newFS.root";
     
     TFile *file = TFile::Open(finName);
 
@@ -420,8 +436,8 @@ void GetSignalResults(const double &low1pi0Scale, const double &high1pi0Scale, c
       exit(1);
     }
 
-    TH2D * h2d_mc = (TH2D*) file->Get("mc/i076PiPlusInteractingEnergyEvt_COMPOSE;1");
-    TH2D * h2d_data = (TH2D*) file->Get("data/i076PiPlusInteractingEnergyEvt_COMPOSE;1");
+    TH2D * h2d_mc = (TH2D*) file->Get("mc/i076hRecPiPlusInteractingEnergyEvt_COMPOSE_XsEvt;1");
+    TH2D * h2d_data = (TH2D*) file->Get("data/i076hRecPiPlusInteractingEnergyEvt_COMPOSE_XsEvt;1");
 
     int nx = h2d_mc->GetNbinsX();
     int ny = h2d_data->GetNbinsY();
@@ -513,6 +529,16 @@ void DrawOutput(TH1D *h0, TH1D *h1, TH1D *h2, TH1D *h2_low, TH1D *h2_high, const
     h0->SetMarkerSize(1);
     h0->SetMarkerColor(kBlack);
     h0->SetLineColor(kBlack);
+    h0->SetTitle(" ");
+    h0->GetYaxis()->CenterTitle();
+    h0->GetYaxis()->SetTitleFont(22);
+    h0->GetYaxis()->SetTitleSize(0.05);
+    h0->GetYaxis()->SetTitleOffset(0.9);
+    h0->GetXaxis()->CenterTitle();
+    h0->GetXaxis()->SetTitleFont(22);
+    h0->GetXaxis()->SetTitleSize(0.05);
+    h0->GetXaxis()->SetTitleOffset(0.9);
+    
 
     h0->Draw("e1");
     TH1D * hmc = (TH1D*)h1->Clone();
@@ -529,8 +555,9 @@ void DrawOutput(TH1D *h0, TH1D *h1, TH1D *h2, TH1D *h2_low, TH1D *h2_high, const
 
     tt.SetTextSize(0.035);
     tt.DrawLatex(0.125,0.925,"DUNE:ProtoDUNE-SP");
+    tt.DrawLatex(0.725,0.925,"1GeV/c Pion Data");
 
-    c1->Print("output/ori_"+tag+".png");
+    c1->Print("output/ori_"+tag+".pdf");
 
     TCanvas * c2 = new TCanvas(Form("c2_%s",tag.Data()), "", 1200, 800);
 
@@ -551,7 +578,7 @@ void DrawOutput(TH1D *h0, TH1D *h1, TH1D *h2, TH1D *h2_low, TH1D *h2_high, const
     hmc_fit->Draw("hists sames");
 
     hmc->SetLineColor(kGreen+3);
-    hmc->SetLineStyle(9);
+    hmc->SetLineStyle(7);
     hmc->SetLineWidth(3);
     hmc->Draw("hists sames");
 
@@ -566,8 +593,9 @@ void DrawOutput(TH1D *h0, TH1D *h1, TH1D *h2, TH1D *h2_low, TH1D *h2_high, const
 
     tt.SetTextSize(0.035);
     tt.DrawLatex(0.125,0.925,"DUNE:ProtoDUNE-SP");
+    tt.DrawLatex(0.725,0.925,"1GeV/c Pion Data");
 
-    c2->Print("output/fit_"+tag+".png");
+    c2->Print("output/fit_"+tag+".pdf");
 
 }
 
@@ -584,11 +612,20 @@ void DrawOutputSignal(TH1D *h0, TH1D *h1, TH1D *h2, TH1D *h0pi0, TH1D *h1pi0_s1,
     h0->SetMarkerColor(kBlack);
     h0->SetLineColor(kBlack);
     h0->SetMaximum(h0->GetMaximum()*1.5);
-
+    h0->SetTitle(" ");
+    h0->GetYaxis()->CenterTitle();
+    h0->GetYaxis()->SetTitleFont(22);
+    h0->GetYaxis()->SetTitleSize(0.05);
+    h0->GetYaxis()->SetTitleOffset(0.9);
+    h0->GetXaxis()->CenterTitle();
+    h0->GetXaxis()->SetTitleFont(22);
+    h0->GetXaxis()->SetTitleSize(0.05);
+    h0->GetXaxis()->SetTitleOffset(0.9);
+    
     h0->Draw("e1");
     TH1D * hmc = (TH1D*)h1->Clone();
     hmc->SetLineColor(kGreen+3);
-    hmc->SetLineStyle(9);
+    hmc->SetLineStyle(7);
     hmc->SetLineWidth(3);
 
     hmc->Draw("hists sames");
@@ -624,8 +661,16 @@ void DrawOutputSignal(TH1D *h0, TH1D *h1, TH1D *h2, TH1D *h0pi0, TH1D *h1pi0_s1,
 
     tt.SetTextSize(0.035);
     tt.DrawLatex(0.125,0.925,"DUNE:ProtoDUNE-SP");
+    tt.DrawLatex(0.725,0.925,"1GeV/c Pion Data");
 
-    c1->Print("output/ori_"+tag+".png");
+    tt.DrawLatex(0.155,0.505,"#color[4]{#bf{#it{#alpha^{<700MeV}_{#pi^{0}#geq 1} = 2.20#pm0.75}}}");
+    tt.DrawLatex(0.155,0.455,"#color[4]{#bf{#it{#alpha^{>700MeV}_{#pi^{0}#geq 1} = 0.71#pm0.17}}}");
+    
+    tt.DrawLatex(0.155,0.355,"#color[4]{#bf{#it{#alpha^{<700MeV}_{#pi^{0}= 0} = 1.02#pm0.03}}}");
+    tt.DrawLatex(0.155,0.305,"#color[4]{#bf{#it{#alpha^{>700MeV}_{#pi^{0}= 0} = 0.97#pm0.02}}}");
+    
+
+    c1->Print("output/ori_"+tag+".pdf");
 
     TCanvas * c2 = new TCanvas(Form("c2_%s",tag.Data()), "", 1200, 800);
 
@@ -646,8 +691,9 @@ void DrawOutputSignal(TH1D *h0, TH1D *h1, TH1D *h2, TH1D *h0pi0, TH1D *h1pi0_s1,
 
     tt.SetTextSize(0.035);
     tt.DrawLatex(0.125,0.925,"DUNE:ProtoDUNE-SP");
+    tt.DrawLatex(0.725,0.925,"1GeV/c Pion Data");
 
-    c2->Print("output/fit_"+tag+".png");
+    c2->Print("output/fit_"+tag+".pdf");
 
 }
 
@@ -657,15 +703,15 @@ void GetSimulFitScale(vector<double> &Par, vector<double> &Parerr, int &bs1, int
     Par.clear(); Parerr.clear(); 
 
     // Declare data and MC histograms (placeholder)
-    TH1D * h0_sample1 = new TH1D("h0_s1",";Interacting Energy (MeV); Candidates", 20, 0, 1000); 
-    TH1D * h1_sample1 = new TH1D("h1_s1",";Interacting Energy (MeV); Candidates", 20, 0, 1000); 
-    TH1D * h2_sample1 = new TH1D("h2_s1",";Interacting Energy (MeV); Candidates", 20, 0, 1000);
+    TH1D * h0_sample1 = new TH1D("h0_s1",";#pi^{+} Interacting Energy (MeV); Candidates", 20, 0, 1000); 
+    TH1D * h1_sample1 = new TH1D("h1_s1",";#pi^{+} Interacting Energy (MeV); Candidates", 20, 0, 1000); 
+    TH1D * h2_sample1 = new TH1D("h2_s1",";#pi^{+} Interacting Energy (MeV); Candidates", 20, 0, 1000);
 
-    TH1D * h0_sample2 = new TH1D("h0_s2",";Interacting Energy (MeV); Candidates", 20, 0, 1000); 
-    TH1D * h1_sample2 = new TH1D("h1_s2",";Interacting Energy (MeV); Candidates", 20, 0, 1000); 
-    TH1D * h2_sample2 = new TH1D("h2_s2",";Interacting Energy (MeV); Candidates", 20, 0, 1000);
+    TH1D * h0_sample2 = new TH1D("h0_s2",";#pi^{+} Interacting Energy (MeV); Candidates", 20, 0, 1000); 
+    TH1D * h1_sample2 = new TH1D("h1_s2",";#pi^{+} Interacting Energy (MeV); Candidates", 20, 0, 1000); 
+    TH1D * h2_sample2 = new TH1D("h2_s2",";#pi^{+} Interacting Energy (MeV); Candidates", 20, 0, 1000);
 
-    const TString finName_1pi0 = "input/Bck1pi0.root";  
+    const TString finName_1pi0 = "input/Bck1pi0_newFS.root";  
 
     TFile *file_1pi0 = TFile::Open(finName_1pi0);   
 
@@ -673,9 +719,9 @@ void GetSimulFitScale(vector<double> &Par, vector<double> &Parerr, int &bs1, int
       cout << "file file not open" << endl;
       exit(1);
     }
-
-    TH2D * h2d_mc_1pi0 = (TH2D*) file_1pi0->Get("mc/i076PiPlusInteractingEnergyEvt_COMPOSE;1");
-    TH2D * h2d_data_1pi0 = (TH2D*) file_1pi0->Get("data/i076PiPlusInteractingEnergyEvt_COMPOSE;1");
+    //i076PiPlusInteractingEnergyEvt_COMPOSE
+    TH2D * h2d_mc_1pi0 = (TH2D*) file_1pi0->Get("mc/i076hRecPiPlusInteractingEnergyEvt_COMPOSE_XsEvt;1");
+    TH2D * h2d_data_1pi0 = (TH2D*) file_1pi0->Get("data/i076hRecPiPlusInteractingEnergyEvt_COMPOSE_XsEvt;1");
 
     int nx = h2d_mc_1pi0->GetNbinsX();
     int ny = h2d_data_1pi0->GetNbinsY();
@@ -718,7 +764,7 @@ void GetSimulFitScale(vector<double> &Par, vector<double> &Parerr, int &bs1, int
     
     file_1pi0->Close();
 
-    const TString finName_0pi0 = "input/Bck0pi0.root";
+    const TString finName_0pi0 = "input/Bck0pi0_newFS.root";
     
     TFile *file_0pi0 = TFile::Open(finName_0pi0);
 
@@ -727,8 +773,8 @@ void GetSimulFitScale(vector<double> &Par, vector<double> &Parerr, int &bs1, int
       exit(1);
     }
 
-    TH2D * h2d_mc_0pi0 = (TH2D*) file_0pi0->Get("mc/i076PiPlusInteractingEnergyEvt_COMPOSE;1");
-    TH2D * h2d_data_0pi0 = (TH2D*) file_0pi0->Get("data/i076PiPlusInteractingEnergyEvt_COMPOSE;1");
+    TH2D * h2d_mc_0pi0 = (TH2D*) file_0pi0->Get("mc/i076hRecPiPlusInteractingEnergyEvt_COMPOSE_XsEvt;1");
+    TH2D * h2d_data_0pi0 = (TH2D*) file_0pi0->Get("data/i076hRecPiPlusInteractingEnergyEvt_COMPOSE_XsEvt;1");
 
     for(int ix=0; ix<=nx+1; ix++){
 
@@ -774,38 +820,11 @@ void GetSimulFitScale(vector<double> &Par, vector<double> &Parerr, int &bs1, int
     h1_sample1->Scale(plotScale); h2_sample1->Scale(plotScale);
     h1_sample2->Scale(plotScale); h2_sample2->Scale(plotScale);
 
-    // Some tests to see which break is the best
-    // Fix sample 2 = 13
-    //bs1 = 13; bs2 = 13; // chisq = 11.95;
-    //bs1 = 12; bs2 = 13; // chisq = 16.37;
-    //bs1 = 11; bs2 = 13; // chisq = 21.87;
-
-    //bs1 = 14; bs2 = 13; // chisq = 15.94;
-    //bs1 = 15; bs2 = 13; // chisq = 19.80;
-
-    // Fix sample 1 = 13
-    //bs1 = 13; bs2 = 12; // chisq = 12.04;
-    //bs1 = 13; bs2 = 11; // chisq = 12.04;
-    //bs1 = 13; bs2 = 10; // chisq = 11.82;
-    //bs1 = 13; bs2 = 9; // chisq = 12.25;
-    //bs1 = 13; bs2 = 8; // chisq = 12.39;
-    //bs1 = 13; bs2 = 7; // chisq = 12.03;
-
-    //bs1 = 13; bs2 = 14; // chisq = 12.04;
-    //bs1 = 13; bs2 = 15; // chisq = 12.10;
-    //bs1 = 13; bs2 = 16; // chisq = 12.11;
-
-    //bs1 = 14; bs2 = 13; // chisq = 11.98;
+    // Some info to see which break is the best
     
-    
-    
-    //bs1 = 14; bs2 = 13; // chisq = 5.75;
-    bs1 = 14; bs2 = 14; // chisq = 5.71;
-    //bs1 = 14; bs2 = 15; // chisq = 5.66;
-    //bs1 = 14; bs2 = 16; // chisq = 5.63;
-    //bs1 = 14; bs2 = 17; // chisq = 5.63;
-    //bs1 = 14; bs2 = 18; // chisq = 5.62;
-    //bs1 = 14; bs2 = 19; // chisq = 5.64;
+    bs1 = 14; bs2 = 14; // chisq = 4.44;
+
+
     
     fitter.SetSimulHistograms(h0_sample1, h1_sample1, h2_sample1, h0_sample2, h1_sample2, h2_sample2, bs1, bs2);
 

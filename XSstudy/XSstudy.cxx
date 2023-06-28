@@ -78,12 +78,12 @@
 using namespace std;
 //double plotScale = 0.561778;
 
-void DrawHistOutput(TH1D *h_truth, TH1D *h_reco, TH1D *h_unfold, TH1D *h_unfold_data, const bool &rebin);
+void DrawHistOutput(TH1D *h_truth, TH1D *h_reco, TH1D *h_data, TH1D *h_unfold, TH1D *h_unfold_data, const bool &rebin);
 TH1D * GetIncidentHist(TH1D * InitialHist, TH1D * InteractingHist);
-void DrawTotalXSPlots(TH1D *hinc_truth, TH1D *hint_truth, TH1D *hinc_reco, TH1D *hint_reco, TH1D *hinc_data, TH1D *hint_data, TGraph* g_cex, double & totalCEXXS_800_truth, double & totalCEXXS_800_reco, double & totalCEXXS_800_data, bool doTruth = true, bool doReco = true, bool doData = true);
-void DrawDiffXSPlots(TH1D *hpi0KE_truth, TH1D *hpi0KE_reco, TH1D *hpi0KE_data, TGraph* g_775, double Int_800_truth, double Int_800err_truth, double Int_800_reco, double Int_800err_reco, double Int_800_data, double Int_800err_data, double totalCEXXS_800_truth, double totalCEXXS_800_reco, double totalCEXXS_800_data, TString name, bool doTruth = true, bool doReco = true, bool doData = true);
-TH1D * TotalCEXXSCal(TH1D * hh, TH1D * InteractingHist, const bool & Eslice, const bool & widerBin, const bool & newMethod);
-TH1D * DiffCEXXSCal(TH1D * DiffCEXInteractingHist, const double &diffInt,  const double &diffInterror, const double &scale_bin, const double &scale_totalXS);
+void DrawTotalXSPlots(TList *lout, TH1D *hbeamint_truth, TH1D *hinc_truth, TH1D *hint_truth, TH1D *hbeamint_reco, TH1D *hinc_reco, TH1D *hint_reco, TH1D *hbeamint_data, TH1D *hinc_data, TH1D *hint_data, TGraph* g_cex, double & totalCEXXS_800_truth, double & totalCEXXS_800_reco, double & totalCEXXS_800_data, double & totalCEXXS_800_truth_error, double & totalCEXXS_800_reco_error, double & totalCEXXS_800_data_error, bool doTruth = true, bool doReco = true, bool doData = true);
+void DrawDiffXSPlots(TList *lout, TH1D *hpi0KE_truth, TH1D *hpi0KE_reco, TH1D *hpi0KE_data, TGraph* g_775, double Int_800_truth, double Int_800err_truth, double Int_800_reco, double Int_800err_reco, double Int_800_data, double Int_800err_data, double totalCEXXS_800_truth, double totalCEXXS_800_reco, double totalCEXXS_800_data, double totalCEXXS_800_truth_error, double totalCEXXS_800_reco_error, double totalCEXXS_800_data_error, TString name, bool doTruth = true, bool doReco = true, bool doData = true);
+TH1D * TotalCEXXSCal(TList *lout, TH1D * hbeamint, TH1D * hh, TH1D * InteractingHist, const bool & Eslice, const bool & widerBin, const bool & newMethod, const TString tag);
+TH1D * DiffCEXXSCal(TList *lout, TH1D * DiffCEXInteractingHist, const double &diffInt,  const double &diffInterror, const double &scale_bin, const double &scale_totalXS, const double &scale_totalXS_error, const TString tag);
 void SetTitleFormat(TH1 * hh);
 void DrawDataMCRatio(TH1D * hratio, bool xsec, const TString tag);
 void WeightBeamData(TH1D * hbeam_data, const bool IsRange, const TString name);
@@ -106,8 +106,11 @@ int main(int argc, char * argv[])
 { 
   gStyle->SetOptStat(0);
 
-  TString finName = "input/outana.root";
-  
+  //TString finName = "input/outana_trkLenhigh.root";
+  //TString finName = "input/outana_April_last_DataTree_final.root";
+  //TString finName = "input/outana_MCXSnorminal.root";
+  //TString finName = "input/outana_withThresholdnew.root";
+  TString finName = "input/outana.root"; 
   if(IsRange && !IsKF) finName = "input/outana_noKF.root";
 
   //if(IsRange && IsKF) finName = "input/outana.root";
@@ -119,11 +122,12 @@ int main(int argc, char * argv[])
     exit(1);
   }
 
+
   // ========== Initial Histogram ========== //
   RooUnfoldResponse *response_SliceID_Ini = (RooUnfoldResponse*)file->Get("mc/response_SliceID_Ini");
   TH1D *hini_truth = (TH1D*) file->Get("mc/i000hTruthBeamInitialHist"); // Truth
   TH1D *hini = (TH1D*) file->Get("mc/i016hRecoInitialHist"); // Fake data
-  TH1D *hini_data = (TH1D*) file->Get("mc/i019hRecoBeamInitialHistData"); // Data
+  TH1D *hini_data = (TH1D*) file->Get("data/i019hRecoBeamInitialHistData"); // Data
 
   // Data bck sub
   //WeightBeamData(hini_data, IsRange, "Ini");
@@ -137,16 +141,18 @@ int main(int argc, char * argv[])
   // Draw Hist using tmp hist to rebin
   TH1D *hini_truth_tmp = (TH1D*)hini_truth->Clone();
   TH1D *hini_tmp = (TH1D*)hini->Clone();
+  TH1D *hini_data_tmp = (TH1D*)hini_data->Clone();
+
   TH1D *hini_uf_tmp = (TH1D*)hini_uf->Clone();
   TH1D *hini_uf_data_tmp = (TH1D*)hini_uf_data->Clone();
 
-  DrawHistOutput(hini_truth_tmp, hini_tmp, hini_uf_tmp, hini_uf_data_tmp, true); // rebin == true
+  DrawHistOutput(hini_truth_tmp, hini_tmp, hini_data_tmp, hini_uf_tmp, hini_uf_data_tmp, true); // rebin == true
 
   // ========== BeamInt Histogram ========== //
   RooUnfoldResponse *response_SliceID_BeamInt = (RooUnfoldResponse*)file->Get("mc/response_SliceID_BeamInt");
   TH1D *hbeamint_truth = (TH1D*) file->Get("mc/i002hTruthBeamInteractingHist");
   TH1D *hbeamint = (TH1D*) file->Get("mc/i016hRecoBeamInteractingHist");
-  TH1D *hbeamint_data = (TH1D*) file->Get("mc/i020hRecoBeamInteractingHistData");
+  TH1D *hbeamint_data = (TH1D*) file->Get("data/i020hRecoBeamInteractingHistData");
 
   // Data bck sub
   //WeightBeamData(hbeamint_data, IsRange, "BeamInt");
@@ -160,21 +166,23 @@ int main(int argc, char * argv[])
   // Draw Hist
   TH1D *hbeamint_truth_tmp = (TH1D*)hbeamint_truth->Clone();
   TH1D *hbeamint_tmp = (TH1D*)hbeamint->Clone();
+  TH1D *hbeamint_data_tmp = (TH1D*)hbeamint_data->Clone();
+
   TH1D *hbeamint_uf_tmp = (TH1D*)hbeamint_uf->Clone();
   TH1D *hbeamint_uf_data_tmp = (TH1D*)hbeamint_uf_data->Clone();
 
-  DrawHistOutput(hbeamint_truth_tmp, hbeamint_tmp, hbeamint_uf_tmp, hbeamint_uf_data_tmp, true); // rebin == true
+  DrawHistOutput(hbeamint_truth_tmp, hbeamint_tmp, hbeamint_data_tmp, hbeamint_uf_tmp, hbeamint_uf_data_tmp, true); // rebin == true
 
   // ========== Int Histogram ========== //
   RooUnfoldResponse *response_SliceID_Int = (RooUnfoldResponse*)file->Get("mc/response_SliceID_Int");
   TH1D *hint_truth = (TH1D*) file->Get("mc/i004hTruthCEXInteractingHist");
   TH1D *hint = (TH1D*) file->Get("mc/i018hRecoInteractingHist");
-  TH1D *hint_data = (TH1D*) file->Get("mc/i018hRecoInteractingHistData");
+  TH1D *hint_data = (TH1D*) file->Get("data/i018hRecoInteractingHistData");
 
   // Data bck sub
   WeightBeamData(hint_data, IsRange, "CEXInt");
   
-  RooUnfoldBayes unfold_Int (response_SliceID_Int, hint, 8);
+  RooUnfoldBayes unfold_Int (response_SliceID_Int, hint, 4);
   RooUnfoldBayes unfold_Int_Data (response_SliceID_Int, hint_data, 4);
 
   TH1D *hint_uf = (TH1D*)unfold_Int.Hreco();
@@ -183,7 +191,7 @@ int main(int argc, char * argv[])
   //hint_uf_data->Scale(0.5);
 
 
-  DrawHistOutput(hint_truth, hint, hint_uf, hint_uf_data, false); // rebin == false
+  DrawHistOutput(hint_truth, hint, hint_data, hint_uf, hint_uf_data, false); // rebin == false
 
   // ======= GEANT4 Input XS ======== //
   const TString xcesfinName = "../Analysis/input/LAr_PiPlus_exclusive_cross_section.root";
@@ -217,7 +225,6 @@ int main(int argc, char * argv[])
 
   TGraph *g_775 = new TGraph(40,x_775,y_775);
 
-
   // ======== Calculate incident histogram ======== //
   // Truth
   TH1D * hinc_truth = GetIncidentHist(hini_truth,hbeamint_truth);
@@ -230,23 +237,29 @@ int main(int argc, char * argv[])
   hinc_uf->Rebin(50); //hint_uf->Rebin(50);
   hinc_uf_data->Rebin(50); //hint_uf_data->Rebin(50);
 
+    // Declare output list
+  TList * datalout = 0x0;
+  datalout = new TList;
+  
   // ======== Draw Total CEX XS plots ======== //
   double totalCEXXS_800_truth = 0, totalCEXXS_800_reco = 0, totalCEXXS_800_data = 0;
+  double totalCEXXS_800_truth_error = 0, totalCEXXS_800_reco_error = 0, totalCEXXS_800_data_error = 0;
+
   // Overlay
-  DrawTotalXSPlots(hinc_truth,hint_truth,hinc_uf,hint_uf,hinc_uf_data,hint_uf_data,g_cex,totalCEXXS_800_truth,totalCEXXS_800_reco,totalCEXXS_800_data);
+  DrawTotalXSPlots(datalout,hbeamint_truth,hinc_truth,hint_truth,hbeamint_uf,hinc_uf,hint_uf,hbeamint_uf_data,hinc_uf_data,hint_uf_data,g_cex,totalCEXXS_800_truth,totalCEXXS_800_reco,totalCEXXS_800_data,totalCEXXS_800_truth_error,totalCEXXS_800_reco_error,totalCEXXS_800_data_error,true,true,true);
   // Truth
-  DrawTotalXSPlots(hinc_truth,hint_truth,hinc_uf,hint_uf,hinc_uf_data,hint_uf_data,g_cex,totalCEXXS_800_truth,totalCEXXS_800_reco,totalCEXXS_800_data,true,false,false);
+  DrawTotalXSPlots(datalout,hbeamint_truth,hinc_truth,hint_truth,hbeamint_uf,hinc_uf,hint_uf,hbeamint_uf_data,hinc_uf_data,hint_uf_data,g_cex,totalCEXXS_800_truth,totalCEXXS_800_reco,totalCEXXS_800_data,totalCEXXS_800_truth_error,totalCEXXS_800_reco_error,totalCEXXS_800_data_error,true,false,false);
   // Reco
-  DrawTotalXSPlots(hinc_truth,hint_truth,hinc_uf,hint_uf,hinc_uf_data,hint_uf_data,g_cex,totalCEXXS_800_truth,totalCEXXS_800_reco,totalCEXXS_800_data,false,true,false);
+  DrawTotalXSPlots(datalout,hbeamint_truth,hinc_truth,hint_truth,hbeamint_uf,hinc_uf,hint_uf,hbeamint_uf_data,hinc_uf_data,hint_uf_data,g_cex,totalCEXXS_800_truth,totalCEXXS_800_reco,totalCEXXS_800_data,totalCEXXS_800_truth_error,totalCEXXS_800_reco_error,totalCEXXS_800_data_error,false,true,false);
   // Data
-  DrawTotalXSPlots(hinc_truth,hint_truth,hinc_uf,hint_uf,hinc_uf_data,hint_uf_data,g_cex,totalCEXXS_800_truth,totalCEXXS_800_reco,totalCEXXS_800_data,false,false,true);
+  DrawTotalXSPlots(datalout,hbeamint_truth,hinc_truth,hint_truth,hbeamint_uf,hinc_uf,hint_uf,hbeamint_uf_data,hinc_uf_data,hint_uf_data,g_cex,totalCEXXS_800_truth,totalCEXXS_800_reco,totalCEXXS_800_data,totalCEXXS_800_truth_error,totalCEXXS_800_reco_error,totalCEXXS_800_data_error,false,false,true);
 
   // ======== Pi0 KE Histogram (KE PI+ = 650to800 MeV)======= //
   RooUnfoldResponse *response_SliceID_Pi0KE = (RooUnfoldResponse*)file->Get("mc/response_SliceID_Pi0KE");
   TH1D *hpi0KE_truth = (TH1D*) file->Get("mc/i006hTruthDiffCEXInteractingHist_800MeV");
   if(IsRange) hpi0KE_truth = (TH1D*) file->Get("mc/i006hTruthDiffCEXInteractingHist_650to800MeV");
   TH1D *hpi0KE = (TH1D*) file->Get("mc/i030hRecoPi0KEHist");
-  TH1D *hpi0KE_data = (TH1D*) file->Get("mc/i030hRecoPi0KEHistData");
+  TH1D *hpi0KE_data = (TH1D*) file->Get("data/i030hRecoPi0KEHistData");
 
   // Data bck sub
   WeightPi0Data(hpi0KE_data, IsRange, IsKF, "KE");
@@ -258,22 +271,33 @@ int main(int argc, char * argv[])
   TH1D *hpi0KE_uf_data = (TH1D*)unfold_Pi0KE_Data.Hreco();
   hpi0KE_uf->Scale(0.5);
   //hpi0KE_uf_data->Scale(0.5);
+  //hpi0KE_truth->Rebin(2); hpi0KE->Rebin(2); hpi0KE_uf->Rebin(2); hpi0KE_uf_data->Rebin(2);
+  TH1D *hpi0KE_truth_tmp = (TH1D*)hpi0KE_truth->Clone();
+  TH1D *hpi0KE_tmp = (TH1D*)hpi0KE->Clone();
+  TH1D *hpi0KE_data_tmp = (TH1D*)hpi0KE_data->Clone();
 
-  DrawHistOutput(hpi0KE_truth, hpi0KE, hpi0KE_uf, hpi0KE_uf_data, false); // rebin == false
+  TH1D *hpi0KE_uf_tmp = (TH1D*)hpi0KE_uf->Clone();
+  TH1D *hpi0KE_uf_data_tmp = (TH1D*)hpi0KE_uf_data->Clone();
+  hpi0KE_truth_tmp->Rebin(2); hpi0KE_tmp->Rebin(2); hpi0KE_data_tmp->Rebin(2); hpi0KE_uf_tmp->Rebin(2); hpi0KE_uf_data_tmp->Rebin(2);
+
+  DrawHistOutput(hpi0KE_truth_tmp, hpi0KE_tmp, hpi0KE_data_tmp, hpi0KE_uf_tmp, hpi0KE_uf_data_tmp, false); // rebin == false
 
   double Int_800_truth = hint_truth->GetBinContent(16);
   if(IsRange) Int_800_truth = hint_truth->GetBinContent(14) + hint_truth->GetBinContent(15) + hint_truth->GetBinContent(16);
-  double Int_800err_truth = hint_truth->GetBinError(16);
+  //double Int_800err_truth = hint_truth->GetBinError(16);
+  double Int_800err_truth = sqrt(pow(hint_truth->GetBinError(14),2)+pow(hint_truth->GetBinError(15),2)+pow(hint_truth->GetBinError(16),2));
 
   double Int_800_reco = hint_uf->GetBinContent(16);
   if(IsRange) Int_800_reco = hint_uf->GetBinContent(14) + hint_uf->GetBinContent(15) + hint_uf->GetBinContent(16);
-  double Int_800err_reco = hint_uf->GetBinError(16);
+  //double Int_800err_reco = hint_uf->GetBinError(16);
+  double Int_800err_reco = sqrt(pow(hint_uf->GetBinError(14),2)+pow(hint_uf->GetBinError(15),2)+pow(hint_uf->GetBinError(16),2));
 
   double Int_800_data = hint_uf_data->GetBinContent(16);
   if(IsRange) Int_800_data = hint_uf_data->GetBinContent(14) + hint_uf_data->GetBinContent(15) + hint_uf_data->GetBinContent(16);
-  double Int_800err_data = hint_uf_data->GetBinError(16);
+  //double Int_800err_data = hint_uf_data->GetBinError(16);
+  double Int_800err_data = sqrt(pow(hint_uf_data->GetBinError(14),2)+pow(hint_uf_data->GetBinError(15),2)+pow(hint_uf_data->GetBinError(16),2));
 
-  if(!IsRange) DrawDiffXSPlots(hpi0KE_truth,hpi0KE_uf,hpi0KE_uf_data,g_775,Int_800_truth,Int_800err_truth, Int_800_reco, Int_800err_reco, Int_800_data, Int_800err_data, totalCEXXS_800_truth, totalCEXXS_800_reco, totalCEXXS_800_data, "775");
+  if(!IsRange) DrawDiffXSPlots(datalout,hpi0KE_truth,hpi0KE_uf,hpi0KE_uf_data,g_775,Int_800_truth,Int_800err_truth, Int_800_reco, Int_800err_reco, Int_800_data, Int_800err_data, totalCEXXS_800_truth, totalCEXXS_800_reco, totalCEXXS_800_data, totalCEXXS_800_truth_error, totalCEXXS_800_reco_error, totalCEXXS_800_data_error, "775");
 
   // ======= Plot Pi0KE ======== //
 
@@ -294,20 +318,20 @@ int main(int argc, char * argv[])
   TGraph *g_650to800 = new TGraph(40,x_650to800,y_650to800);
 
   // overlay
-  if(IsRange) DrawDiffXSPlots(hpi0KE_truth,hpi0KE_uf,hpi0KE_uf_data,g_650to800,Int_800_truth,Int_800err_truth, Int_800_reco, Int_800err_reco, Int_800_data, Int_800err_data, totalCEXXS_800_truth, totalCEXXS_800_reco, totalCEXXS_800_data, "650to800");
+  if(IsRange) DrawDiffXSPlots(datalout,hpi0KE_truth,hpi0KE_uf,hpi0KE_uf_data,g_650to800,Int_800_truth,Int_800err_truth, Int_800_reco, Int_800err_reco, Int_800_data, Int_800err_data, totalCEXXS_800_truth, totalCEXXS_800_reco, totalCEXXS_800_data, totalCEXXS_800_truth_error, totalCEXXS_800_reco_error, totalCEXXS_800_data_error, "650to800");
   // truth
-  if(IsRange) DrawDiffXSPlots(hpi0KE_truth,hpi0KE_uf,hpi0KE_uf_data,g_650to800,Int_800_truth,Int_800err_truth, Int_800_reco, Int_800err_reco, Int_800_data, Int_800err_data, totalCEXXS_800_truth, totalCEXXS_800_reco, totalCEXXS_800_data, "650to800",true,false,false);
+  if(IsRange) DrawDiffXSPlots(datalout,hpi0KE_truth,hpi0KE_uf,hpi0KE_uf_data,g_650to800,Int_800_truth,Int_800err_truth, Int_800_reco, Int_800err_reco, Int_800_data, Int_800err_data, totalCEXXS_800_truth, totalCEXXS_800_reco, totalCEXXS_800_data, totalCEXXS_800_truth_error, totalCEXXS_800_reco_error, totalCEXXS_800_data_error, "650to800",true,false,false);
   // reco
-  if(IsRange) DrawDiffXSPlots(hpi0KE_truth,hpi0KE_uf,hpi0KE_uf_data,g_650to800,Int_800_truth,Int_800err_truth, Int_800_reco, Int_800err_reco, Int_800_data, Int_800err_data, totalCEXXS_800_truth, totalCEXXS_800_reco, totalCEXXS_800_data, "650to800",false,true,false);
+  if(IsRange) DrawDiffXSPlots(datalout,hpi0KE_truth,hpi0KE_uf,hpi0KE_uf_data,g_650to800,Int_800_truth,Int_800err_truth, Int_800_reco, Int_800err_reco, Int_800_data, Int_800err_data, totalCEXXS_800_truth, totalCEXXS_800_reco, totalCEXXS_800_data, totalCEXXS_800_truth_error, totalCEXXS_800_reco_error, totalCEXXS_800_data_error, "650to800",false,true,false);
   // data
-  if(IsRange) DrawDiffXSPlots(hpi0KE_truth,hpi0KE_uf,hpi0KE_uf_data,g_650to800,Int_800_truth,Int_800err_truth, Int_800_reco, Int_800err_reco, Int_800_data, Int_800err_data, totalCEXXS_800_truth, totalCEXXS_800_reco, totalCEXXS_800_data, "650to800",false,false,true);
+  if(IsRange) DrawDiffXSPlots(datalout,hpi0KE_truth,hpi0KE_uf,hpi0KE_uf_data,g_650to800,Int_800_truth,Int_800err_truth, Int_800_reco, Int_800err_reco, Int_800_data, Int_800err_data, totalCEXXS_800_truth, totalCEXXS_800_reco, totalCEXXS_800_data, totalCEXXS_800_truth_error, totalCEXXS_800_reco_error, totalCEXXS_800_data_error, "650to800",false,false,true);
 
 
   // ======== Pi0 CosTheta Histogram (KE PI+ = 650to800 MeV)======= //
   RooUnfoldResponse *response_SliceID_Pi0CosTheta = (RooUnfoldResponse*)file->Get("mc/response_SliceID_Pi0CosTheta");
   TH1D *hpi0CosTheta_truth = (TH1D*) file->Get("mc/i666hTruthDiffCEXInteractingHistCosTheta_650to800MeV");
   TH1D *hpi0CosTheta = (TH1D*) file->Get("mc/i032hRecoPi0CosThetaHist");
-  TH1D *hpi0CosTheta_data = (TH1D*) file->Get("mc/i032hRecoPi0CosThetaHistData");
+  TH1D *hpi0CosTheta_data = (TH1D*) file->Get("data/i032hRecoPi0CosThetaHistData");
 
   // Data bck sub
   WeightPi0Data(hpi0CosTheta_data, IsRange, IsKF, "CosTheta");
@@ -320,7 +344,7 @@ int main(int argc, char * argv[])
   hpi0CosTheta_uf->Scale(0.5);
   //hpi0CosTheta_uf_data->Scale(0.5);
 
-  DrawHistOutput(hpi0CosTheta_truth, hpi0CosTheta, hpi0CosTheta_uf, hpi0CosTheta_uf_data, false); // rebin == false
+  DrawHistOutput(hpi0CosTheta_truth, hpi0CosTheta, hpi0CosTheta_data, hpi0CosTheta_uf, hpi0CosTheta_uf_data, false); // rebin == false
 
   TH1D * g_cex_650to800MeV_CosTheta = (TH1D*)fileXS->Get("inel_cex_1dcosThetapi0650to800_MeV");
   const Int_t x0_diff650to800_CosTheta = g_cex_650to800MeV_CosTheta->GetXaxis()->GetFirst();
@@ -337,20 +361,20 @@ int main(int argc, char * argv[])
   g_650to800_CosTheta->RemovePoint(1);
 
   // overlay
-  if(IsRange) DrawDiffXSPlots(hpi0CosTheta_truth,hpi0CosTheta_uf,hpi0CosTheta_uf_data,g_650to800_CosTheta,Int_800_truth,Int_800err_truth, Int_800_reco, Int_800err_reco, Int_800_data, Int_800err_data, totalCEXXS_800_truth, totalCEXXS_800_reco, totalCEXXS_800_data, "650to800CosTheta");
+  if(IsRange) DrawDiffXSPlots(datalout,hpi0CosTheta_truth,hpi0CosTheta_uf,hpi0CosTheta_uf_data,g_650to800_CosTheta,Int_800_truth,Int_800err_truth, Int_800_reco, Int_800err_reco, Int_800_data, Int_800err_data, totalCEXXS_800_truth, totalCEXXS_800_reco, totalCEXXS_800_data, totalCEXXS_800_truth_error, totalCEXXS_800_reco_error, totalCEXXS_800_data_error, "650to800CosTheta");
   // truth
-  if(IsRange) DrawDiffXSPlots(hpi0CosTheta_truth,hpi0CosTheta_uf,hpi0CosTheta_uf_data,g_650to800_CosTheta,Int_800_truth,Int_800err_truth, Int_800_reco, Int_800err_reco, Int_800_data, Int_800err_data, totalCEXXS_800_truth, totalCEXXS_800_reco, totalCEXXS_800_data, "650to800CosTheta",true,false,false);
+  if(IsRange) DrawDiffXSPlots(datalout,hpi0CosTheta_truth,hpi0CosTheta_uf,hpi0CosTheta_uf_data,g_650to800_CosTheta,Int_800_truth,Int_800err_truth, Int_800_reco, Int_800err_reco, Int_800_data, Int_800err_data, totalCEXXS_800_truth, totalCEXXS_800_reco, totalCEXXS_800_data, totalCEXXS_800_truth_error, totalCEXXS_800_reco_error, totalCEXXS_800_data_error, "650to800CosTheta",true,false,false);
   // reco
-  if(IsRange) DrawDiffXSPlots(hpi0CosTheta_truth,hpi0CosTheta_uf,hpi0CosTheta_uf_data,g_650to800_CosTheta,Int_800_truth,Int_800err_truth, Int_800_reco, Int_800err_reco, Int_800_data, Int_800err_data, totalCEXXS_800_truth, totalCEXXS_800_reco, totalCEXXS_800_data, "650to800CosTheta",false,true,false);
+  if(IsRange) DrawDiffXSPlots(datalout,hpi0CosTheta_truth,hpi0CosTheta_uf,hpi0CosTheta_uf_data,g_650to800_CosTheta,Int_800_truth,Int_800err_truth, Int_800_reco, Int_800err_reco, Int_800_data, Int_800err_data, totalCEXXS_800_truth, totalCEXXS_800_reco, totalCEXXS_800_data, totalCEXXS_800_truth_error, totalCEXXS_800_reco_error, totalCEXXS_800_data_error, "650to800CosTheta",false,true,false);
   // data
-  if(IsRange) DrawDiffXSPlots(hpi0CosTheta_truth,hpi0CosTheta_uf,hpi0CosTheta_uf_data,g_650to800_CosTheta,Int_800_truth,Int_800err_truth, Int_800_reco, Int_800err_reco, Int_800_data, Int_800err_data, totalCEXXS_800_truth, totalCEXXS_800_reco, totalCEXXS_800_data, "650to800CosTheta",false,false,true);
+  if(IsRange) DrawDiffXSPlots(datalout,hpi0CosTheta_truth,hpi0CosTheta_uf,hpi0CosTheta_uf_data,g_650to800_CosTheta,Int_800_truth,Int_800err_truth, Int_800_reco, Int_800err_reco, Int_800_data, Int_800err_data, totalCEXXS_800_truth, totalCEXXS_800_reco, totalCEXXS_800_data, totalCEXXS_800_truth_error, totalCEXXS_800_reco_error, totalCEXXS_800_data_error, "650to800CosTheta",false,false,true);
 
 
   // ======== Pi0 Theta Histogram (KE PI+ = 650to800 MeV)======= //
   RooUnfoldResponse *response_SliceID_Pi0Theta = (RooUnfoldResponse*)file->Get("mc/response_SliceID_Pi0Theta");
   TH1D *hpi0Theta_truth = (TH1D*) file->Get("mc/i066hTruthDiffCEXInteractingHistTheta_650to800MeV");
   TH1D *hpi0Theta = (TH1D*) file->Get("mc/i034hRecoPi0ThetaHist");
-  TH1D *hpi0Theta_data = (TH1D*) file->Get("mc/i034hRecoPi0ThetaHistData");
+  TH1D *hpi0Theta_data = (TH1D*) file->Get("data/i034hRecoPi0ThetaHistData");
 
   // Data bck sub
   WeightPi0Data(hpi0Theta_data, IsRange, IsKF, "Theta");
@@ -363,7 +387,7 @@ int main(int argc, char * argv[])
   hpi0Theta_uf->Scale(0.5);
   //hpi0Theta_uf_data->Scale(0.5);
 
-  DrawHistOutput(hpi0Theta_truth, hpi0Theta, hpi0Theta_uf, hpi0Theta_uf_data, false); // rebin == false
+  DrawHistOutput(hpi0Theta_truth, hpi0Theta, hpi0Theta_data, hpi0Theta_uf, hpi0Theta_uf_data, false); // rebin == false
 
   TH1D * g_cex_650to800MeV_Theta = (TH1D*)fileXS->Get("inel_cex_1dThetapi0650to800_MeV");
   const Int_t x0_diff650to800_Theta = g_cex_650to800MeV_Theta->GetXaxis()->GetFirst();
@@ -378,15 +402,27 @@ int main(int argc, char * argv[])
   TGraph *g_650to800_Theta = new TGraph(40,x_650to800_Theta,y_650to800_Theta);
   
   // overlay
-  if(IsRange) DrawDiffXSPlots(hpi0Theta_truth,hpi0Theta_uf,hpi0Theta_uf_data,g_650to800_Theta,Int_800_truth,Int_800err_truth, Int_800_reco, Int_800err_reco, Int_800_data, Int_800err_data, totalCEXXS_800_truth, totalCEXXS_800_reco, totalCEXXS_800_data, "650to800Theta");
+  if(IsRange) DrawDiffXSPlots(datalout,hpi0Theta_truth,hpi0Theta_uf,hpi0Theta_uf_data,g_650to800_Theta,Int_800_truth,Int_800err_truth, Int_800_reco, Int_800err_reco, Int_800_data, Int_800err_data, totalCEXXS_800_truth, totalCEXXS_800_reco, totalCEXXS_800_data, totalCEXXS_800_truth_error, totalCEXXS_800_reco_error, totalCEXXS_800_data_error, "650to800Theta");
   // truth
-  if(IsRange) DrawDiffXSPlots(hpi0Theta_truth,hpi0Theta_uf,hpi0Theta_uf_data,g_650to800_Theta,Int_800_truth,Int_800err_truth, Int_800_reco, Int_800err_reco, Int_800_data, Int_800err_data, totalCEXXS_800_truth, totalCEXXS_800_reco, totalCEXXS_800_data, "650to800Theta",true,false,false);
+  if(IsRange) DrawDiffXSPlots(datalout,hpi0Theta_truth,hpi0Theta_uf,hpi0Theta_uf_data,g_650to800_Theta,Int_800_truth,Int_800err_truth, Int_800_reco, Int_800err_reco, Int_800_data, Int_800err_data, totalCEXXS_800_truth, totalCEXXS_800_reco, totalCEXXS_800_data, totalCEXXS_800_truth_error, totalCEXXS_800_reco_error, totalCEXXS_800_data_error, "650to800Theta",true,false,false);
   // reco
-  if(IsRange) DrawDiffXSPlots(hpi0Theta_truth,hpi0Theta_uf,hpi0Theta_uf_data,g_650to800_Theta,Int_800_truth,Int_800err_truth, Int_800_reco, Int_800err_reco, Int_800_data, Int_800err_data, totalCEXXS_800_truth, totalCEXXS_800_reco, totalCEXXS_800_data, "650to800Theta",false,true,false);
+  if(IsRange) DrawDiffXSPlots(datalout,hpi0Theta_truth,hpi0Theta_uf,hpi0Theta_uf_data,g_650to800_Theta,Int_800_truth,Int_800err_truth, Int_800_reco, Int_800err_reco, Int_800_data, Int_800err_data, totalCEXXS_800_truth, totalCEXXS_800_reco, totalCEXXS_800_data, totalCEXXS_800_truth_error, totalCEXXS_800_reco_error, totalCEXXS_800_data_error, "650to800Theta",false,true,false);
   // data
-  if(IsRange) DrawDiffXSPlots(hpi0Theta_truth,hpi0Theta_uf,hpi0Theta_uf_data,g_650to800_Theta,Int_800_truth,Int_800err_truth, Int_800_reco, Int_800err_reco, Int_800_data, Int_800err_data, totalCEXXS_800_truth, totalCEXXS_800_reco, totalCEXXS_800_data, "650to800Theta",false,false,true);
+  if(IsRange) DrawDiffXSPlots(datalout,hpi0Theta_truth,hpi0Theta_uf,hpi0Theta_uf_data,g_650to800_Theta,Int_800_truth,Int_800err_truth, Int_800_reco, Int_800err_reco, Int_800_data, Int_800err_data, totalCEXXS_800_truth, totalCEXXS_800_reco, totalCEXXS_800_data, totalCEXXS_800_truth_error, totalCEXXS_800_reco_error, totalCEXXS_800_data_error, "650to800Theta",false,false,true);
 
   
+  // Declare output root file
+  TFile * fout = new TFile("output/outXShists.root","recreate");
+  // Create data subdirectory
+  TDirectory * ld_data = gDirectory->mkdir("data");
+  ld_data->cd();
+  // Write list to the root file
+  datalout->Write();
+  gDirectory->cd("../");
+  // Save the info
+  fout->Save();
+  fout->Close();
+
 
   // Close files
   f_CrossSection->Close();
@@ -396,10 +432,10 @@ int main(int argc, char * argv[])
 
 }
 
-void DrawHistOutput(TH1D *h_truth, TH1D *h_reco, TH1D *h_unfold, TH1D *h_unfold_data, const bool &rebin){
+void DrawHistOutput(TH1D *h_truth, TH1D *h_reco, TH1D *h_data, TH1D *h_unfold, TH1D *h_unfold_data, const bool &rebin){
   // Rebin the histogram
   if(rebin){
-    h_truth->Rebin(50); h_reco->Rebin(50); h_unfold->Rebin(50); h_unfold_data->Rebin(50); 
+    h_truth->Rebin(50); h_reco->Rebin(50); h_data->Rebin(50); h_unfold->Rebin(50); h_unfold_data->Rebin(50); 
   }
   TString tag = h_truth->GetName();
 
@@ -411,7 +447,9 @@ void DrawHistOutput(TH1D *h_truth, TH1D *h_reco, TH1D *h_unfold, TH1D *h_unfold_
   SetTitleFormat(h_truth);
 
   h_truth->SetLineColor(kRed);
+  h_truth->SetLineWidth(2);
   h_truth->SetMaximum(h_truth->GetMaximum()*1.5);
+  if(tag.Contains("i006")) h_truth->SetMaximum(1500);
   h_truth->SetMinimum(0.0);
   h_truth->GetYaxis()->SetTitle("Candidates");
   h_truth->GetXaxis()->SetTitle("T_{#pi^{+}} (MeV)");
@@ -419,21 +457,38 @@ void DrawHistOutput(TH1D *h_truth, TH1D *h_reco, TH1D *h_unfold, TH1D *h_unfold_
   if(tag.Contains("i066")) h_truth->GetXaxis()->SetTitle("#theta_{#pi^{0}} (deg.)");
   if(tag.Contains("i666")) h_truth->GetXaxis()->SetTitle("cos#theta_{#pi^{0}}");
 
-  h_truth->Draw("hist");
+  h_truth->SetFillStyle(1001);
+  h_truth->SetLineWidth(3);
+  h_truth->SetFillColorAlpha(kRed,0.3);
 
-  h_reco->SetMarkerStyle(8);
-  h_reco->SetMarkerSize(1);
+  h_truth->Draw("hist");
+/*
+  h_reco->SetMarkerStyle(22);
+  h_reco->SetMarkerSize(1.5);
   h_reco->SetMarkerColor(kBlue);
   h_reco->SetLineColor(kBlue);
   h_reco->SetLineWidth(1);
   h_reco->Draw("e1 sames");
+*/
+  h_data->SetFillStyle(1001);
+  h_data->SetLineWidth(3);
+  h_data->SetLineStyle(7);
+  h_data->SetFillColorAlpha(kBlue,0.3);
+  h_data->Draw("e1 hist sames");
 
-  h_unfold->SetMarkerStyle(8);
-  h_unfold->SetMarkerSize(1);
+
+  cout << "tag: " << tag << endl;
+  if(tag.Contains("i000") || tag.Contains("i002")) cout << "eff: " << h_reco->Integral(0,10000)/h_truth->Integral(0,10000) << endl;
+  else cout << "eff: " << h_reco->Integral(0,10000)/2/h_truth->Integral(0,10000) << endl;
+  
+/*
+  h_unfold->SetMarkerStyle(23);
+  h_unfold->SetMarkerSize(1.5);
   h_unfold->SetMarkerColor(kGreen+3);
   h_unfold->SetLineColor(kGreen+3);
   h_unfold->SetLineWidth(1);
   h_unfold->Draw("e1 sames");
+*/
 
   h_unfold_data->SetMarkerStyle(8);
   h_unfold_data->SetMarkerSize(1);
@@ -442,28 +497,33 @@ void DrawHistOutput(TH1D *h_truth, TH1D *h_reco, TH1D *h_unfold, TH1D *h_unfold_
   h_unfold_data->SetLineWidth(1);
   h_unfold_data->Draw("e1 sames");
 
-  TLegend * legend = new TLegend(0.15, 0.48, 0.48, 0.88);
-  if(tag.Contains("650to800") && !tag.Contains("CosTheta")) legend = new TLegend(0.55, 0.48, 0.88, 0.88);
-  legend->AddEntry(h_truth, "MC Truth", "l");
-  legend->AddEntry(h_reco, "MC Reco. - BckSub", "lep");
-  legend->AddEntry(h_unfold, "MC Reco - Unfolded", "lep");
-  legend->AddEntry(h_unfold_data, "Data - Unfolded", "lep");
+  TLegend * legend = new TLegend(0.15, 0.62, 0.48, 0.88);
+  if(tag.Contains("650to800") && !tag.Contains("CosTheta")) legend = new TLegend(0.55, 0.62, 0.88, 0.88);
+  legend->AddEntry(h_truth, "MC Truth", "lf");
+  legend->AddEntry(h_data, "Data - BckSub.", "lf");
+  //legend->AddEntry(h_unfold, "MC Reco - Unfolded", "lp");
+  legend->AddEntry(h_unfold_data, "Data - Unfolded", "lp");
   legend->SetBorderSize(0);
   legend->Draw("same");
 
   tt.SetTextSize(0.035);
   tt.DrawLatex(0.125,0.925,"DUNE:ProtoDUNE-SP");
-  if(tag.Contains("i006")||tag.Contains("i066")) tt.DrawLatex(0.600,0.925,"Beam T_{#pi^{+}} = 650 - 800 MeV Data");
+  if(tag.Contains("i006")||tag.Contains("i066")||tag.Contains("i666")) tt.DrawLatex(0.600,0.925,"Beam T_{#pi^{+}} = 650 - 800 MeV Data");
   else tt.DrawLatex(0.725,0.925,"1GeV/c Pion Data");
-  if(tag.Contains("i006")||tag.Contains("i066")) tt.DrawLatex(0.22,0.825,"#bf{#it{Preliminary}}");
-  else tt.DrawLatex(0.725,0.825,"#bf{#it{Preliminary}}");
-
-  //c1->Print("output/hint_uf.png");
-  c1->Print("output/"+tag+".png");
+  if(tag.Contains("i006")||tag.Contains("i066")) {
+    tt.DrawLatex(0.155,0.825,"#bf{#it{Preliminary}}");
+    tt.DrawLatex(0.155,0.775,"#color[4]{#pi^{+} #bf{+ Ar} #rightarrow #pi^{0} #bf{+ (nucleons)}}");
+  }
+  else {
+    tt.DrawLatex(0.705,0.825,"#bf{#it{Preliminary}}");
+    tt.DrawLatex(0.635,0.775,"#color[4]{#pi^{+} #bf{+ Ar} #rightarrow #pi^{0} #bf{+ (nucleons)}}");
+  }
+  //c1->Print("output/hint_uf.pdf");
+  c1->Print("output/"+tag+".pdf");
 
 }
 
-void DrawTotalXSPlots(TH1D *hinc_truth, TH1D *hint_truth, TH1D *hinc_reco, TH1D *hint_reco, TH1D *hinc_data, TH1D *hint_data, TGraph* g_cex, double & totalCEXXS_800_truth, double & totalCEXXS_800_reco, double & totalCEXXS_800_data, bool doTruth, bool doReco, bool doData){
+void DrawTotalXSPlots(TList *lout, TH1D *hbeamint_truth, TH1D *hinc_truth, TH1D *hint_truth, TH1D *hbeamint_reco, TH1D *hinc_reco, TH1D *hint_reco, TH1D *hbeamint_data, TH1D *hinc_data, TH1D *hint_data, TGraph* g_cex, double & totalCEXXS_800_truth, double & totalCEXXS_800_reco, double & totalCEXXS_800_data, double & totalCEXXS_800_truth_error, double & totalCEXXS_800_reco_error, double & totalCEXXS_800_data_error, bool doTruth, bool doReco, bool doData){
 
   TLatex tt;
   tt.SetNDC();
@@ -476,16 +536,19 @@ void DrawTotalXSPlots(TH1D *hinc_truth, TH1D *hint_truth, TH1D *hinc_reco, TH1D 
   TCanvas * c1 = new TCanvas(Form("c1_%s_%s",name.Data(),label.Data()), Form("c1_%s_%s",name.Data(),label.Data()), 1200, 800);
   
   // Truth
-  TH1D * hcex_truth = TotalCEXXSCal(hinc_truth,hint_truth,true,false,false);
+  TH1D * hcex_truth = TotalCEXXSCal(lout,hbeamint_truth,hinc_truth,hint_truth,true,false,false,"truth");
   // Reco
-  TH1D * hcex_reco = TotalCEXXSCal(hinc_reco,hint_reco,true,false,false);
+  TH1D * hcex_reco = TotalCEXXSCal(lout,hbeamint_reco,hinc_reco,hint_reco,true,false,false,"reco");
   // Data
-  TH1D * hcex_data = TotalCEXXSCal(hinc_data,hint_data,true,false,false);
+  TH1D * hcex_data = TotalCEXXSCal(lout,hbeamint_data,hinc_data,hint_data,true,false,false,"data");
 
   totalCEXXS_800_truth = (hcex_truth->GetBinContent(14) + hcex_truth->GetBinContent(15) + hcex_truth->GetBinContent(16))/3.0;
   totalCEXXS_800_reco = (hcex_reco->GetBinContent(14) + hcex_reco->GetBinContent(15) + hcex_reco->GetBinContent(16))/3.0;
   totalCEXXS_800_data = (hcex_data->GetBinContent(14) + hcex_data->GetBinContent(15) + hcex_data->GetBinContent(16))/3.0;
  
+  totalCEXXS_800_truth_error = sqrt(pow(hcex_truth->GetBinError(14),2)+pow(hcex_truth->GetBinError(15),2)+pow(hcex_truth->GetBinError(16),2))/3.0;
+  totalCEXXS_800_reco_error = sqrt(pow(hcex_reco->GetBinError(14),2)+pow(hcex_reco->GetBinError(15),2)+pow(hcex_reco->GetBinError(16),2))/3.0;
+  totalCEXXS_800_data_error = sqrt(pow(hcex_data->GetBinError(14),2)+pow(hcex_data->GetBinError(15),2)+pow(hcex_data->GetBinError(16),2))/3.0;
 
   SetTitleFormat(hcex_truth);
   SetTitleFormat(hcex_reco);
@@ -534,12 +597,24 @@ void DrawTotalXSPlots(TH1D *hinc_truth, TH1D *hint_truth, TH1D *hinc_reco, TH1D 
   if(doData) DrawSystError(hcex_data); // it works but not done
 
   if(doData) hcex_data->Draw("E1 sames");
+  if(doData) {
+    hcex_reco->SetLineWidth(2);
+    hcex_reco->SetLineColor(kGray+2);
+    hcex_reco->SetMarkerSize(0);
+    hcex_reco->SetFillColorAlpha(kGray+1, 0.4);
+    hcex_reco->Draw("e2 sames");
+    TH1D *hcex_reco_overlay = (TH1D*)hcex_reco->Clone("hcex_reco");
+    hcex_reco_overlay->SetFillStyle(0);
+    hcex_reco_overlay->SetLineWidth(2);
+    hcex_reco_overlay->Draw("HIST sames");
+  }
 
   g_cex->SetLineColor(kRed);
+  g_cex->SetLineWidth(2);
   g_cex->Draw("sames C");
 
   TLegend * legend = new TLegend(0.15, 0.48, 0.48, 0.88);
-  legend->AddEntry(g_cex, "Geant4 Prediction", "l");
+  legend->AddEntry(g_cex, "Geant4 v4.10.6", "l");
   legend->AddEntry(hcex_truth, "MC Truth", "lep");
   legend->AddEntry(hcex_reco, "MC Reco", "lep");
   legend->AddEntry(hcex_data, "Data", "lep");
@@ -591,6 +666,7 @@ void DrawTotalXSPlots(TH1D *hinc_truth, TH1D *hint_truth, TH1D *hinc_reco, TH1D 
     }
   }
   hratio->SetTitle(" ");
+
   DrawDataMCRatio(hratio,true,"");
   c1->cd();
 
@@ -601,18 +677,18 @@ void DrawTotalXSPlots(TH1D *hinc_truth, TH1D *hint_truth, TH1D *hinc_reco, TH1D 
   //tt.DrawLatex(0.705,0.775,"#bf{#it{(Stats. Error Only)}}");
   tt.DrawLatex(0.685,0.775,"#bf{#it{(Stats. + Syst. Error)}}");
 
-  if(doTruth && !doReco && !doData) c1->Print("output/truth_TotalCEXXS.png");
-  if(!doTruth && doReco && !doData) c1->Print("output/reco_TotalCEXXS.png");
+  if(doTruth && !doReco && !doData) c1->Print("output/truth_TotalCEXXS.pdf");
+  if(!doTruth && doReco && !doData) c1->Print("output/reco_TotalCEXXS.pdf");
    
-  if(!doTruth && !doReco && doData) c1->Print("output/data_TotalCEXXS.png");
+  if(!doTruth && !doReco && doData) c1->Print("output/data_TotalCEXXS.pdf");
 
-  if(doTruth && doReco && doData) c1->Print("output/overlay_TotalCEXXS.png");
+  if(doTruth && doReco && doData) c1->Print("output/overlay_TotalCEXXS.pdf");
 
   
 }
 
 
-void DrawDiffXSPlots(TH1D *hpi0KE_truth, TH1D *hpi0KE_reco, TH1D *hpi0KE_data, TGraph* g_775, double Int_800_truth, double Int_800err_truth, double Int_800_reco, double Int_800err_reco, double Int_800_data, double Int_800err_data, double totalCEXXS_800_truth, double totalCEXXS_800_reco, double totalCEXXS_800_data, TString name, bool doTruth, bool doReco, bool doData){
+void DrawDiffXSPlots(TList *lout, TH1D *hpi0KE_truth, TH1D *hpi0KE_reco, TH1D *hpi0KE_data, TGraph* g_775, double Int_800_truth, double Int_800err_truth, double Int_800_reco, double Int_800err_reco, double Int_800_data, double Int_800err_data, double totalCEXXS_800_truth, double totalCEXXS_800_reco, double totalCEXXS_800_data, double totalCEXXS_800_truth_error, double totalCEXXS_800_reco_error, double totalCEXXS_800_data_error, TString name, bool doTruth, bool doReco, bool doData){
 
   TLatex tt;
   tt.SetNDC();
@@ -632,9 +708,13 @@ void DrawDiffXSPlots(TH1D *hpi0KE_truth, TH1D *hpi0KE_reco, TH1D *hpi0KE_data, T
   double scale_totalXS_reco = totalCEXXS_800_reco;
   double scale_totalXS_data = totalCEXXS_800_data;
 
-  TH1D * hdiffcex_truth = DiffCEXXSCal(hpi0KE_truth,Int_800_truth,Int_800err_truth, scale_bin, scale_totalXS_truth);
-  TH1D * hdiffcex_reco = DiffCEXXSCal(hpi0KE_reco,Int_800_reco,Int_800err_reco, scale_bin, scale_totalXS_reco);
-  TH1D * hdiffcex_data = DiffCEXXSCal(hpi0KE_data,Int_800_data,Int_800err_data, scale_bin, scale_totalXS_data);
+  double scale_totalXS_truth_error = totalCEXXS_800_truth_error;
+  double scale_totalXS_reco_error = totalCEXXS_800_reco_error;
+  double scale_totalXS_data_error = totalCEXXS_800_data_error;
+
+  TH1D * hdiffcex_truth = DiffCEXXSCal(lout,hpi0KE_truth,Int_800_truth,Int_800err_truth, scale_bin, scale_totalXS_truth, scale_totalXS_truth_error, "truth");
+  TH1D * hdiffcex_reco = DiffCEXXSCal(lout,hpi0KE_reco,Int_800_reco,Int_800err_reco, scale_bin, scale_totalXS_reco, scale_totalXS_reco_error, "reco");
+  TH1D * hdiffcex_data = DiffCEXXSCal(lout,hpi0KE_data,Int_800_data,Int_800err_data, scale_bin, scale_totalXS_data, scale_totalXS_data_error, "data");
   if(!name.Contains("Theta")){
     hdiffcex_truth->Rebin(2);
     hdiffcex_reco->Rebin(2);
@@ -706,14 +786,26 @@ void DrawDiffXSPlots(TH1D *hpi0KE_truth, TH1D *hpi0KE_reco, TH1D *hpi0KE_data, T
 
 
   if(doData) hdiffcex_data->Draw("E1 sames");
+  if(doData) {
+    hdiffcex_reco->SetLineWidth(2);
+    hdiffcex_reco->SetLineColor(kGray+2);
+    hdiffcex_reco->SetMarkerSize(0);
+    hdiffcex_reco->SetFillColorAlpha(kGray+1, 0.4);
+    hdiffcex_reco->Draw("e2 sames");
+    TH1D *hdiffcex_reco_overlay = (TH1D*)hdiffcex_reco->Clone("hdiffcex_reco");
+    hdiffcex_reco_overlay->SetFillStyle(0);
+    hdiffcex_reco_overlay->SetLineWidth(2);
+    hdiffcex_reco_overlay->Draw("HIST sames");
+  }
 
   g_775->SetLineColor(kRed);
+  g_775->SetLineWidth(2);
   g_775->Draw("sames C");
 
   TLegend * legend = new TLegend(0.55, 0.48, 0.88, 0.88);
   if(name.Contains("CosTheta")) legend = new TLegend(0.15, 0.48, 0.48, 0.88);
 
-  legend->AddEntry(g_775, "Geant4 Prediction", "l");
+  legend->AddEntry(g_775, "Geant4 v4.10.6", "l");
   legend->AddEntry(hdiffcex_truth, "MC Truth", "lep");
   legend->AddEntry(hdiffcex_reco, "MC Reco", "lep");
   legend->AddEntry(hdiffcex_data, "Data", "lep");
@@ -777,14 +869,14 @@ void DrawDiffXSPlots(TH1D *hpi0KE_truth, TH1D *hpi0KE_reco, TH1D *hpi0KE_data, T
   if(!name.Contains("CosTheta")) tt.DrawLatex(0.22,0.775,"#bf{#it{(Stats. Error Only)}}");
   if(name.Contains("CosTheta")) tt.DrawLatex(0.605,0.775,"#bf{#it{(Stats. Error Only)}}");
 
-  //c2->Print("output/plot_Diff"+name+"CEXXS.png");
+  //c2->Print("output/plot_Diff"+name+"CEXXS.pdf");
 
-  if(doTruth && !doReco && !doData) c2->Print("output/truth_Diff"+name+"CEXXS.png");
-  if(!doTruth && doReco && !doData) c2->Print("output/reco_Diff"+name+"CEXXS.png");
+  if(doTruth && !doReco && !doData) c2->Print("output/truth_Diff"+name+"CEXXS.pdf");
+  if(!doTruth && doReco && !doData) c2->Print("output/reco_Diff"+name+"CEXXS.pdf");
    
-  if(!doTruth && !doReco && doData) c2->Print("output/data_Diff"+name+"CEXXS.png");
+  if(!doTruth && !doReco && doData) c2->Print("output/data_Diff"+name+"CEXXS.pdf");
 
-  if(doTruth && doReco && doData) c2->Print("output/overlay_Diff"+name+"CEXXS.png");
+  if(doTruth && doReco && doData) c2->Print("output/overlay_Diff"+name+"CEXXS.pdf");
 
 }
 
@@ -805,7 +897,7 @@ void SetTitleFormat(TH1 * hh){
 
 
 
-TH1D * TotalCEXXSCal(TH1D * hh, TH1D * InteractingHist, const bool & Eslice, const bool & widerBin, const bool & newMethod)
+TH1D * TotalCEXXSCal(TList *lout, TH1D * hbeamint, TH1D * hh, TH1D * InteractingHist, const bool & Eslice, const bool & widerBin, const bool & newMethod, const TString tag)
 {
   TH1D *xsec = (TH1D*)hh->Clone();
   // Scale down it to zero for later calculation
@@ -827,26 +919,28 @@ TH1D * TotalCEXXSCal(TH1D * hh, TH1D * InteractingHist, const bool & Eslice, con
   const Int_t x1 = hh->GetXaxis()->GetLast();
 
   // Loop over each bin and combine the incident and interacting histograms to get xsec
-  for(Int_t ix=x0; ix<=x1; ix++){
-
+  for(Int_t ix=x0+9; ix<x1; ix++){
+    double correction = 1.0;//InteractingHist->GetBinContent(ix)/hbeamint->GetBinContent(ix);
+    cout << "correction: " << correction << endl;
     // Read off the entry for each bin of the two histograms
     double incE = hh->GetBinContent(ix);
     double intE = InteractingHist->GetBinContent(ix);
+    //double intE = hbeamint->GetBinContent(ix);
     // Calculate the ratio in the full log form
     double ratio = 0;
     if(incE > intE) ratio = log(incE/(incE-intE));//*meandEdx[ix-1]*sigma_factor*1e27;
 
-    if(Eslice) ratio = ratio * meandEdx[ix-1]*sigma_factor*1e27;
+    if(Eslice) ratio = correction * ratio * meandEdx[ix-1]*sigma_factor*1e27;
 
-    //if(incE != 0) cout << "ix: "<< ix << "incE: " << incE << "intE: " << intE << " ratio: " << ratio << "meandEdx[ix]: " << meandEdx[ix-1] << endl;
+    if(incE != 0) cout << "ix: "<< ix << "incE: " << incE << "intE: " << intE << " ratio: " << ratio << "meandEdx[ix]: " << meandEdx[ix-1] << endl;
 
     // Simple ratio form 
     //double ratio = intE/incE;
 
     // If the incE entry is not zero set the bin content
     if(incE != 0) xsec->SetBinContent(ix,ratio);
-    if( Eslice && ratio > 150) xsec->SetBinContent(ix,9999);
-    if( Eslice && ratio < 50) xsec->SetBinContent(ix,9999);
+    //if( Eslice && ratio > 150) xsec->SetBinContent(ix,9999);
+    //if( Eslice && ratio < 50) xsec->SetBinContent(ix,9999);
 
     // Error propagation method 1
     //double error = sqrt(intE+pow(intE,2)/incE)/incE;
@@ -869,10 +963,22 @@ TH1D * TotalCEXXSCal(TH1D * hh, TH1D * InteractingHist, const bool & Eslice, con
    /*for(Int_t ix=x0; ix<=x1; ix++){
     cout << "ix: "<< ix << "bin content: " << xsec->GetBinContent(ix) << endl;
    }*/
+  if(tag.Contains("data")){
+    xsec->SetName("data_TotalCEXxsec");
+    lout->Add(xsec);
+  } 
+  if(tag.Contains("reco")){
+    xsec->SetName("reco_TotalCEXxsec");
+    lout->Add(xsec);
+  }
+  if(tag.Contains("truth")){
+    xsec->SetName("truth_TotalCEXxsec");
+    lout->Add(xsec);
+  }  
   return xsec;
 }
 
-TH1D * DiffCEXXSCal(TH1D * DiffCEXInteractingHist, const double &diffInt,  const double &diffInterror, const double &scale_bin, const double &scale_totalXS)
+TH1D * DiffCEXXSCal(TList *lout, TH1D * DiffCEXInteractingHist, const double &diffInt,  const double &diffInterror, const double &scale_bin, const double &scale_totalXS, const double &scale_totalXS_error, const TString tag)
 {
   TH1D *DiffCEXxsec = (TH1D*)DiffCEXInteractingHist->Clone();
   DiffCEXxsec->Scale(0);
@@ -885,12 +991,12 @@ TH1D * DiffCEXXSCal(TH1D * DiffCEXInteractingHist, const double &diffInt,  const
     double intE = DiffCEXInteractingHist->GetBinContent(ix);
     if(intE != 0 ){
       //double ratio = log(incE/(incE-intE));
-      double ratio = intE/incE;
+      double ratio = intE/incE*scale_totalXS;
       DiffCEXxsec->SetBinContent(ix,ratio);
       //double error = sqrt(intE+pow(intE,2)/incE)/incE;
       double einc = diffInterror;
       double eint = DiffCEXInteractingHist->GetBinError(ix);
-      double error = sqrt(ratio*ratio*(pow(einc/incE,2)+pow(eint/intE,2)));
+      double error = sqrt(ratio*ratio*(pow(einc/incE,2)+pow(eint/intE,2)+pow(scale_totalXS_error/scale_totalXS,2)));
       DiffCEXxsec->SetBinError(ix,error);
       //cout << "error: " << error << endl;
       //cout << "ix: " << ix << endl;
@@ -899,8 +1005,28 @@ TH1D * DiffCEXXSCal(TH1D * DiffCEXInteractingHist, const double &diffInt,  const
   }
   // Normalise to total cross section at that slice
   DiffCEXxsec->Scale(1/scale_bin);
-  DiffCEXxsec->Scale(scale_totalXS);
-  
+  //DiffCEXxsec->Scale(scale_totalXS);
+  if(tag.Contains("data")){
+    TString name = DiffCEXxsec->GetName();
+    if(name.Contains("Pi0KE")) DiffCEXxsec->SetName("data_DiffCEXxsec_Pi0KE");
+    if(name.Contains("Pi0CosTheta")) DiffCEXxsec->SetName("data_DiffCEXxsec_Pi0CosTheta");
+    if(name.Contains("Pi0Theta")) DiffCEXxsec->SetName("data_DiffCEXxsec_Pi0Theta");
+    lout->Add(DiffCEXxsec);
+  }
+  if(tag.Contains("reco")){
+    TString name = DiffCEXxsec->GetName();
+    if(name.Contains("Pi0KE")) DiffCEXxsec->SetName("reco_DiffCEXxsec_Pi0KE");
+    if(name.Contains("Pi0CosTheta")) DiffCEXxsec->SetName("reco_DiffCEXxsec_Pi0CosTheta");
+    if(name.Contains("Pi0Theta")) DiffCEXxsec->SetName("reco_DiffCEXxsec_Pi0Theta");
+    lout->Add(DiffCEXxsec);
+  }
+  if(tag.Contains("truth")){
+    TString name = DiffCEXxsec->GetName();
+    if(name.Contains("Pi0KE")) DiffCEXxsec->SetName("truth_DiffCEXxsec_Pi0KE");
+    if(name.Contains("Pi0CosTheta")) DiffCEXxsec->SetName("truth_DiffCEXxsec_Pi0CosTheta");
+    if(name.Contains("Pi0Theta")) DiffCEXxsec->SetName("truth_DiffCEXxsec_Pi0Theta");
+    lout->Add(DiffCEXxsec);
+  }
   return DiffCEXxsec;
 }
 
@@ -1025,8 +1151,12 @@ double CalCEXIntWeight(const int & binx, const bool IsRange){
   if(IsRange){
     //double IntWeight[] = {0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 0.68125, 0.811044, 0.829454, 0.84448, 0.600005, 
     //                0.731605, 0.683442, 0.650626, 0.651113, 0.668391, 0.633431, 0.65286, 1.0};
-    double IntWeight[] = {0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 0.681394, 0.811332, 0.768364, 0.771537, 0.483201, 
-                    0.597788, 0.496897, 0.699494, 0.705544, 0.718769, 0.687874, 0.693459, 1.0};
+    // Feb
+    //double IntWeight[] = {0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 0.681394, 0.811332, 0.768364, 0.771537, 0.483201, 
+    //                0.597788, 0.496897, 0.699494, 0.705544, 0.718769, 0.687874, 0.693459, 1.0};
+    // April
+    double IntWeight[] = {0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 0.69794, 0.818919, 0.775483, 0.800256, 0.49334, 
+                    0.653571, 0.504115, 0.740037, 0.727999, 0.725943, 0.717317, 0.742088, 1.0};
     
     weight *= IntWeight[binx-1];
   }
@@ -1045,9 +1175,21 @@ double CalCEXPi0KEWeight(const int & binx, const bool IsRange, const bool IsKF){
   double weight = 1.;
   if(IsRange && IsKF){
     //==  small bin beam wt
-    double IntWeight[] = {0.0, 0.409994, 0.357135, 0.382372, 0.465516, 0.597296, 0.672419, 0.564701, 0.61694, 0.571107, 0.791561, 
-                      0.733454, 0.945928, 0.941008, 0.785822, 1.0, 1,0, 0.0, 0.0, 0.0};
-    
+    //double IntWeight[] = {0.0, 0.409994, 0.357135, 0.382372, 0.465516, 0.597296, 0.672419, 0.564701, 0.61694, 0.571107, 0.791561, 
+    //                  0.733454, 0.945928, 0.941008, 0.785822, 1.0, 1,0, 0.0, 0.0, 0.0};
+    //double IntWeight[] = {0.0, 0.539643, 0.378196, 0.398281, 0.504129, 0.658985, 0.715681, 0.638402, 0.66754, 0.70573, 0.791561, 
+    //                  0.733454, 0.945928, 0.941008, 0.785822, 1.0, 1,0, 0.0, 0.0, 0.0};
+    // no wt
+    //double IntWeight[] = {0.0, 0.627507, 0.429589, 0.45521, 0.562079, 0.702244, 0.776978, 0.695155, 0.6979, 0.763299, 0.812858, 
+    //                  0.780085, 0.950007, 0.946627, 0.863655, 1.0, 1,0, 0.0, 0.0, 0.0};
+    // beam wt
+    //double IntWeight[] = {0.0, 0.585378, 0.422816, 0.443579, 0.550453, 0.699467, 0.75336, 0.681768, 0.709005, 0.744256, 0.82169, 
+    //                  0.769536, 0.955012, 0.950875, 0.816588, 1.0, 1,0, 0.0, 0.0, 0.0};
+   
+    double IntWeight[] = {0.0, 0.586469, 0.388012, 0.412948, 0.519354, 0.665045, 0.740563, 0.651374, 0.654317, 0.72544, 0.780647, 
+                      0.74401, 0.93965, 0.935617, 0.838449, 1.0, 1,0, 0.0, 0.0, 0.0};
+
+
     weight *= IntWeight[binx-1];
   }
   else if(IsRange && !IsKF){
@@ -1075,8 +1217,18 @@ double CalCEXPi0CosThetaWeight(const int & binx, const bool IsRange, const bool 
   double weight = 1.;
   if(IsRange && IsKF){
     // beam wt
-    double IntWeight[] = {0.367657, 0.577443, 0.446119, 0.738655, 0.459862, 0.467202, 0.518055, 0.435467, 0.522927, 0.702523};
+    //double IntWeight[] = {0.367657, 0.577443, 0.446119, 0.738655, 0.459862, 0.467202, 0.518055, 0.435467, 0.522927, 0.702523};
+    //double IntWeight[] = {0.367657, 0.577443, 0.596655, 0.738655, 0.459862, 0.467202, 0.547708, 0.513704, 0.586615, 0.732868};
+    // no wt
+    //double IntWeight[] = {0.402573, 0.57405, 0.627507, 0.787512, 0.528985, 0.519493, 0.639224, 0.597047, 0.627748, 0.773835};
+    // beam wt
+    //double IntWeight[] = {0.411856, 0.622053, 0.640499, 0.772938, 0.506272, 0.513948, 0.593623, 0.560292, 0.631538, 0.768512};
     
+    // pi0 wt 0410
+    double IntWeight[] = {0.361952, 0.531519, 0.586469, 0.757284, 0.485984, 0.475453, 0.597117, 0.553845, 0.58418, 0.739109};
+    // no weight
+    //double IntWeight[] = {0.5, 0.666667, 0.714286, 0.846154, 0.625, 0.586207, 0.685714, 0.655738, 0.651786, 0.767717};
+
     weight *= IntWeight[binx-1];
   }
   else if(IsRange && !IsKF){
@@ -1101,7 +1253,17 @@ double CalCEXPi0ThetaWeight(const int & binx, const bool IsRange, const bool IsK
   double weight = 1.;
   if(IsRange && IsKF){
     // beam wt
-    double IntWeight[] = {0.763616, 0.6884, 0.51305, 0.494907, 0.424725, 0.535193, 0.567364, 0.577443, 0.367657, 0.0};
+    //double IntWeight[] = {0.763616, 0.6884, 0.51305, 0.494907, 0.424725, 0.535193, 0.567364, 0.577443, 0.367657, 0.0};
+    //double IntWeight[] = {0.783151, 0.72413, 0.578315, 0.551875, 0.44398, 0.535193, 0.632291, 0.577443, 0.367657, 0.0};
+    // no wt
+    //double IntWeight[] = {0.818232, 0.767555, 0.619857, 0.635357, 0.514164, 0.611244, 0.669043, 0.57405, 0.402573, 0.0};
+    // beam wt
+    //double IntWeight[] = {0.813937, 0.760516, 0.623557, 0.597683, 0.490585, 0.581027, 0.674375, 0.622053, 0.411856, 0.0};
+
+    // pi0 wt 0410
+    double IntWeight[] = {0.787775, 0.732404, 0.576011, 0.593378, 0.469896, 0.569643, 0.629882, 0.531519, 0.361952, 0.0};
+    // no weight
+    //double IntWeight[] = {0.8, 0.765363, 0.644628, 0.689189, 0.574468, 0.7, 0.75, 0.666667, 0.5, 0.0};
 
     weight *= IntWeight[binx-1];
   }
@@ -1158,15 +1320,16 @@ void DrawSystError(TH1D * hh){
   const Int_t x0 = hsyst->GetXaxis()->GetFirst();
   const Int_t x1 = hsyst->GetXaxis()->GetLast();
   for(Int_t ix=x0; ix<=x1; ix++){
-    double syst[] = {0, 0, 0, 0, 0, 0, 0, 0, 4.69, 4.69, 2.37, 1.51, 0.67, 0.34, 0.28, 0.45, 0.44, 4.88};
+    double syst[] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 35.574,25.271,16.661,17.593,15.142,13.621,14.135,14.484,21.067,18.678};
     double stats = hsyst->GetBinError(ix);
     double systs = syst[ix-1];
     //hsyst->SetBinError(ix, sqrt(stats*stats + systs*systs));
-    hsyst->SetBinError(ix, stats + systs);
+    hsyst->SetBinError(ix, sqrt(stats*stats + systs*systs));
 
   }
   //hsyst->SetMarkerColor(kRed);
   //hsyst->SetLineColor(kRed);
+  //hsyst->GetXaxis()->SetRangeUser(450,950);
   hsyst->Draw("E1 sames");
   //gStyle->SetErrorX(0);
 }

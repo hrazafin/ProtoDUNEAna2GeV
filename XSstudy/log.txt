@@ -1,0 +1,393 @@
+/data/dune/users/yangk/workdir/pduneAnalysis/bin/mkexe.sh
+================== Compiling XSstudy with XSstudy -lRooUnfold -I/data/dune/users/yangk/workdir/pduneAnalysis/RooUnfold/build -L/data/dune/users/yangk/workdir/pduneAnalysis/RooUnfold/build =================
+
+g++ XSstudy.cxx -g -O3 -Wall -Werror -std=c++17 -I/cvmfs/larsoft.opensciencegrid.org/products/root/v6_22_06a/Linux64bit+3.10-2.17-e20-p383b-prof/include -Wl,--no-as-needed -L./ -L/cvmfs/larsoft.opensciencegrid.org/products/root/v6_22_06a/Linux64bit+3.10-2.17-e20-p383b-prof/lib -lCore -lImt -lRIO -lNet -lHist -lGraf -lGraf3d -lGpad -lROOTVecOps -lTree -lTreePlayer -lRint -lPostscript -lMatrix -lPhysics -lMathCore -lThread -lMultiProc -lROOTDataFrame -pthread -lm -ldl -rdynamic -lTree -lMinuit -lASImage -o XSstudy -lRooUnfold -I/data/dune/users/yangk/workdir/pduneAnalysis/RooUnfold/build -L/data/dune/users/yangk/workdir/pduneAnalysis/RooUnfold/build
+
+
+checked: /data/dune/users/yangk/workdir/pduneAnalysis/bin/mkexe.sh XSstudy done!
+
+
+[1mRooFit v3.60 -- Developed by Wouter Verkerke and David Kirkby[0m 
+                Copyright (C) 2000-2013 NIKHEF, University of California & Stanford University
+                All rights reserved, please read http://roofit.sourceforge.net/license.txt
+
+Now unfolding...
+Iteration : 0
+Chi^2 of change 1736.06
+Iteration : 1
+Chi^2 of change 50.2573
+Iteration : 2
+Chi^2 of change 33.631
+Iteration : 3
+Chi^2 of change 24.9634
+Calculating covariances due to number of measured events
+Now unfolding...
+Iteration : 0
+Chi^2 of change 1746.84
+Iteration : 1
+Chi^2 of change 51.406
+Iteration : 2
+Chi^2 of change 30.3084
+Iteration : 3
+Chi^2 of change 21.071
+Calculating covariances due to number of measured events
+tag: i000hTruthBeamInitialHist
+eff: 0.433599
+Now unfolding...
+Iteration : 0
+Chi^2 of change 1074.18
+Iteration : 1
+Chi^2 of change 144.086
+Iteration : 2
+Chi^2 of change 85.278
+Iteration : 3
+Chi^2 of change 58.0394
+Calculating covariances due to number of measured events
+Now unfolding...
+Iteration : 0
+Chi^2 of change 965.458
+Iteration : 1
+Chi^2 of change 97.8655
+Iteration : 2
+Chi^2 of change 60.925
+Iteration : 3
+Chi^2 of change 44.7839
+Calculating covariances due to number of measured events
+tag: i002hTruthBeamInteractingHist
+eff: 0.433599
+Now unfolding...
+Iteration : 0
+Chi^2 of change 32.7378
+Iteration : 1
+Chi^2 of change 0.178083
+Iteration : 2
+Chi^2 of change 0.0939598
+Iteration : 3
+Chi^2 of change 0.0625914
+Calculating covariances due to number of measured events
+Now unfolding...
+Iteration : 0
+Chi^2 of change 73.7072
+Iteration : 1
+Chi^2 of change 12.6514
+Iteration : 2
+Chi^2 of change 4.97776
+Iteration : 3
+Chi^2 of change 2.4234
+Calculating covariances due to number of measured events
+tag: i004hTruthCEXInteractingHist
+eff: 0.0463485
+correction: 1
+ix: 10incE: 390187intE: 296.127 ratio: 76.6821meandEdx[ix]: 2.11628
+correction: 1
+ix: 11incE: 531583intE: 401.068 ratio: 76.5915meandEdx[ix]: 2.12627
+correction: 1
+ix: 12incE: 708211intE: 539.506 ratio: 77.7326meandEdx[ix]: 2.13724
+correction: 1
+ix: 13incE: 927530intE: 796.968 ratio: 88.1505meandEdx[ix]: 2.14869
+correction: 1
+ix: 14incE: 1.20144e+06intE: 1067.39 ratio: 91.6393meandEdx[ix]: 2.16033
+correction: 1
+ix: 15incE: 1.52768e+06intE: 1281.17 ratio: 86.9676meandEdx[ix]: 2.17195
+correction: 1
+ix: 16incE: 1.81534e+06intE: 1625.07 ratio: 93.3253meandEdx[ix]: 2.18344
+correction: 1
+ix: 17incE: 1.79419e+06intE: 1581.83 ratio: 92.3877meandEdx[ix]: 2.19472
+correction: 1
+ix: 18incE: 1.33089e+06intE: 1178.14 ratio: 93.2289meandEdx[ix]: 2.20573
+correction: 1
+ix: 19incE: 646345intE: 610.919 ratio: 100.031meandEdx[ix]: 2.21646
+correction: 1
+ix: 20incE: 135191intE: 103.43 ratio: 81.3426meandEdx[ix]: 2.2269
+correction: 1
+ix: 10incE: 322055intE: 279.504 ratio: 87.6943meandEdx[ix]: 2.11628
+correction: 1
+ix: 11incE: 464628intE: 411.045 ratio: 89.8142meandEdx[ix]: 2.12627
+correction: 1
+ix: 12incE: 638933intE: 553.655 ratio: 88.4252meandEdx[ix]: 2.13724
+correction: 1
+ix: 13incE: 867047intE: 799.56 ratio: 94.6092meandEdx[ix]: 2.14869
+correction: 1
+ix: 14incE: 1.18782e+06intE: 1068.09 ratio: 92.7518meandEdx[ix]: 2.16033
+correction: 1
+ix: 15incE: 1.55083e+06intE: 1301.64 ratio: 87.038meandEdx[ix]: 2.17195
+correction: 1
+ix: 16incE: 1.82424e+06intE: 1618.61 ratio: 92.5009meandEdx[ix]: 2.18344
+correction: 1
+ix: 17incE: 1.78967e+06intE: 1592.4 ratio: 93.2404meandEdx[ix]: 2.19472
+correction: 1
+ix: 18incE: 1.32214e+06intE: 1222.52 ratio: 97.3836meandEdx[ix]: 2.20573
+correction: 1
+ix: 19incE: 655775intE: 607.459 ratio: 98.0334meandEdx[ix]: 2.21646
+correction: 1
+ix: 10incE: 318424intE: 221.437 ratio: 70.2617meandEdx[ix]: 2.11628
+correction: 1
+ix: 11incE: 461012intE: 359.244 ratio: 79.1071meandEdx[ix]: 2.12627
+correction: 1
+ix: 12incE: 649071intE: 544.402 ratio: 85.5883meandEdx[ix]: 2.13724
+correction: 1
+ix: 13incE: 890322intE: 775.707 ratio: 89.385meandEdx[ix]: 2.14869
+correction: 1
+ix: 14incE: 1.21273e+06intE: 1147.56 ratio: 97.6093meandEdx[ix]: 2.16033
+correction: 1
+ix: 15incE: 1.57117e+06intE: 1302.2 ratio: 85.9477meandEdx[ix]: 2.17195
+correction: 1
+ix: 16incE: 1.8306e+06intE: 1588.58 ratio: 90.4685meandEdx[ix]: 2.18344
+correction: 1
+ix: 17incE: 1.77952e+06intE: 1531.63 ratio: 90.192meandEdx[ix]: 2.19472
+correction: 1
+ix: 18incE: 1.32125e+06intE: 1378.85 ratio: 109.917meandEdx[ix]: 2.20573
+correction: 1
+ix: 19incE: 661205intE: 586.817 ratio: 93.9227meandEdx[ix]: 2.21646
+correction: 1
+ix: 10incE: 390187intE: 296.127 ratio: 76.6821meandEdx[ix]: 2.11628
+correction: 1
+ix: 11incE: 531583intE: 401.068 ratio: 76.5915meandEdx[ix]: 2.12627
+correction: 1
+ix: 12incE: 708211intE: 539.506 ratio: 77.7326meandEdx[ix]: 2.13724
+correction: 1
+ix: 13incE: 927530intE: 796.968 ratio: 88.1505meandEdx[ix]: 2.14869
+correction: 1
+ix: 14incE: 1.20144e+06intE: 1067.39 ratio: 91.6393meandEdx[ix]: 2.16033
+correction: 1
+ix: 15incE: 1.52768e+06intE: 1281.17 ratio: 86.9676meandEdx[ix]: 2.17195
+correction: 1
+ix: 16incE: 1.81534e+06intE: 1625.07 ratio: 93.3253meandEdx[ix]: 2.18344
+correction: 1
+ix: 17incE: 1.79419e+06intE: 1581.83 ratio: 92.3877meandEdx[ix]: 2.19472
+correction: 1
+ix: 18incE: 1.33089e+06intE: 1178.14 ratio: 93.2289meandEdx[ix]: 2.20573
+correction: 1
+ix: 19incE: 646345intE: 610.919 ratio: 100.031meandEdx[ix]: 2.21646
+correction: 1
+ix: 20incE: 135191intE: 103.43 ratio: 81.3426meandEdx[ix]: 2.2269
+correction: 1
+ix: 10incE: 322055intE: 279.504 ratio: 87.6943meandEdx[ix]: 2.11628
+correction: 1
+ix: 11incE: 464628intE: 411.045 ratio: 89.8142meandEdx[ix]: 2.12627
+correction: 1
+ix: 12incE: 638933intE: 553.655 ratio: 88.4252meandEdx[ix]: 2.13724
+correction: 1
+ix: 13incE: 867047intE: 799.56 ratio: 94.6092meandEdx[ix]: 2.14869
+correction: 1
+ix: 14incE: 1.18782e+06intE: 1068.09 ratio: 92.7518meandEdx[ix]: 2.16033
+correction: 1
+ix: 15incE: 1.55083e+06intE: 1301.64 ratio: 87.038meandEdx[ix]: 2.17195
+correction: 1
+ix: 16incE: 1.82424e+06intE: 1618.61 ratio: 92.5009meandEdx[ix]: 2.18344
+correction: 1
+ix: 17incE: 1.78967e+06intE: 1592.4 ratio: 93.2404meandEdx[ix]: 2.19472
+correction: 1
+ix: 18incE: 1.32214e+06intE: 1222.52 ratio: 97.3836meandEdx[ix]: 2.20573
+correction: 1
+ix: 19incE: 655775intE: 607.459 ratio: 98.0334meandEdx[ix]: 2.21646
+correction: 1
+ix: 10incE: 318424intE: 221.437 ratio: 70.2617meandEdx[ix]: 2.11628
+correction: 1
+ix: 11incE: 461012intE: 359.244 ratio: 79.1071meandEdx[ix]: 2.12627
+correction: 1
+ix: 12incE: 649071intE: 544.402 ratio: 85.5883meandEdx[ix]: 2.13724
+correction: 1
+ix: 13incE: 890322intE: 775.707 ratio: 89.385meandEdx[ix]: 2.14869
+correction: 1
+ix: 14incE: 1.21273e+06intE: 1147.56 ratio: 97.6093meandEdx[ix]: 2.16033
+correction: 1
+ix: 15incE: 1.57117e+06intE: 1302.2 ratio: 85.9477meandEdx[ix]: 2.17195
+correction: 1
+ix: 16incE: 1.8306e+06intE: 1588.58 ratio: 90.4685meandEdx[ix]: 2.18344
+correction: 1
+ix: 17incE: 1.77952e+06intE: 1531.63 ratio: 90.192meandEdx[ix]: 2.19472
+correction: 1
+ix: 18incE: 1.32125e+06intE: 1378.85 ratio: 109.917meandEdx[ix]: 2.20573
+correction: 1
+ix: 19incE: 661205intE: 586.817 ratio: 93.9227meandEdx[ix]: 2.21646
+correction: 1
+ix: 10incE: 390187intE: 296.127 ratio: 76.6821meandEdx[ix]: 2.11628
+correction: 1
+ix: 11incE: 531583intE: 401.068 ratio: 76.5915meandEdx[ix]: 2.12627
+correction: 1
+ix: 12incE: 708211intE: 539.506 ratio: 77.7326meandEdx[ix]: 2.13724
+correction: 1
+ix: 13incE: 927530intE: 796.968 ratio: 88.1505meandEdx[ix]: 2.14869
+correction: 1
+ix: 14incE: 1.20144e+06intE: 1067.39 ratio: 91.6393meandEdx[ix]: 2.16033
+correction: 1
+ix: 15incE: 1.52768e+06intE: 1281.17 ratio: 86.9676meandEdx[ix]: 2.17195
+correction: 1
+ix: 16incE: 1.81534e+06intE: 1625.07 ratio: 93.3253meandEdx[ix]: 2.18344
+correction: 1
+ix: 17incE: 1.79419e+06intE: 1581.83 ratio: 92.3877meandEdx[ix]: 2.19472
+correction: 1
+ix: 18incE: 1.33089e+06intE: 1178.14 ratio: 93.2289meandEdx[ix]: 2.20573
+correction: 1
+ix: 19incE: 646345intE: 610.919 ratio: 100.031meandEdx[ix]: 2.21646
+correction: 1
+ix: 20incE: 135191intE: 103.43 ratio: 81.3426meandEdx[ix]: 2.2269
+correction: 1
+ix: 10incE: 322055intE: 279.504 ratio: 87.6943meandEdx[ix]: 2.11628
+correction: 1
+ix: 11incE: 464628intE: 411.045 ratio: 89.8142meandEdx[ix]: 2.12627
+correction: 1
+ix: 12incE: 638933intE: 553.655 ratio: 88.4252meandEdx[ix]: 2.13724
+correction: 1
+ix: 13incE: 867047intE: 799.56 ratio: 94.6092meandEdx[ix]: 2.14869
+correction: 1
+ix: 14incE: 1.18782e+06intE: 1068.09 ratio: 92.7518meandEdx[ix]: 2.16033
+correction: 1
+ix: 15incE: 1.55083e+06intE: 1301.64 ratio: 87.038meandEdx[ix]: 2.17195
+correction: 1
+ix: 16incE: 1.82424e+06intE: 1618.61 ratio: 92.5009meandEdx[ix]: 2.18344
+correction: 1
+ix: 17incE: 1.78967e+06intE: 1592.4 ratio: 93.2404meandEdx[ix]: 2.19472
+correction: 1
+ix: 18incE: 1.32214e+06intE: 1222.52 ratio: 97.3836meandEdx[ix]: 2.20573
+correction: 1
+ix: 19incE: 655775intE: 607.459 ratio: 98.0334meandEdx[ix]: 2.21646
+correction: 1
+ix: 10incE: 318424intE: 221.437 ratio: 70.2617meandEdx[ix]: 2.11628
+correction: 1
+ix: 11incE: 461012intE: 359.244 ratio: 79.1071meandEdx[ix]: 2.12627
+correction: 1
+ix: 12incE: 649071intE: 544.402 ratio: 85.5883meandEdx[ix]: 2.13724
+correction: 1
+ix: 13incE: 890322intE: 775.707 ratio: 89.385meandEdx[ix]: 2.14869
+correction: 1
+ix: 14incE: 1.21273e+06intE: 1147.56 ratio: 97.6093meandEdx[ix]: 2.16033
+correction: 1
+ix: 15incE: 1.57117e+06intE: 1302.2 ratio: 85.9477meandEdx[ix]: 2.17195
+correction: 1
+ix: 16incE: 1.8306e+06intE: 1588.58 ratio: 90.4685meandEdx[ix]: 2.18344
+correction: 1
+ix: 17incE: 1.77952e+06intE: 1531.63 ratio: 90.192meandEdx[ix]: 2.19472
+correction: 1
+ix: 18incE: 1.32125e+06intE: 1378.85 ratio: 109.917meandEdx[ix]: 2.20573
+correction: 1
+ix: 19incE: 661205intE: 586.817 ratio: 93.9227meandEdx[ix]: 2.21646
+correction: 1
+ix: 10incE: 390187intE: 296.127 ratio: 76.6821meandEdx[ix]: 2.11628
+correction: 1
+ix: 11incE: 531583intE: 401.068 ratio: 76.5915meandEdx[ix]: 2.12627
+correction: 1
+ix: 12incE: 708211intE: 539.506 ratio: 77.7326meandEdx[ix]: 2.13724
+correction: 1
+ix: 13incE: 927530intE: 796.968 ratio: 88.1505meandEdx[ix]: 2.14869
+correction: 1
+ix: 14incE: 1.20144e+06intE: 1067.39 ratio: 91.6393meandEdx[ix]: 2.16033
+correction: 1
+ix: 15incE: 1.52768e+06intE: 1281.17 ratio: 86.9676meandEdx[ix]: 2.17195
+correction: 1
+ix: 16incE: 1.81534e+06intE: 1625.07 ratio: 93.3253meandEdx[ix]: 2.18344
+correction: 1
+ix: 17incE: 1.79419e+06intE: 1581.83 ratio: 92.3877meandEdx[ix]: 2.19472
+correction: 1
+ix: 18incE: 1.33089e+06intE: 1178.14 ratio: 93.2289meandEdx[ix]: 2.20573
+correction: 1
+ix: 19incE: 646345intE: 610.919 ratio: 100.031meandEdx[ix]: 2.21646
+correction: 1
+ix: 20incE: 135191intE: 103.43 ratio: 81.3426meandEdx[ix]: 2.2269
+correction: 1
+ix: 10incE: 322055intE: 279.504 ratio: 87.6943meandEdx[ix]: 2.11628
+correction: 1
+ix: 11incE: 464628intE: 411.045 ratio: 89.8142meandEdx[ix]: 2.12627
+correction: 1
+ix: 12incE: 638933intE: 553.655 ratio: 88.4252meandEdx[ix]: 2.13724
+correction: 1
+ix: 13incE: 867047intE: 799.56 ratio: 94.6092meandEdx[ix]: 2.14869
+correction: 1
+ix: 14incE: 1.18782e+06intE: 1068.09 ratio: 92.7518meandEdx[ix]: 2.16033
+correction: 1
+ix: 15incE: 1.55083e+06intE: 1301.64 ratio: 87.038meandEdx[ix]: 2.17195
+correction: 1
+ix: 16incE: 1.82424e+06intE: 1618.61 ratio: 92.5009meandEdx[ix]: 2.18344
+correction: 1
+ix: 17incE: 1.78967e+06intE: 1592.4 ratio: 93.2404meandEdx[ix]: 2.19472
+correction: 1
+ix: 18incE: 1.32214e+06intE: 1222.52 ratio: 97.3836meandEdx[ix]: 2.20573
+correction: 1
+ix: 19incE: 655775intE: 607.459 ratio: 98.0334meandEdx[ix]: 2.21646
+correction: 1
+ix: 10incE: 318424intE: 221.437 ratio: 70.2617meandEdx[ix]: 2.11628
+correction: 1
+ix: 11incE: 461012intE: 359.244 ratio: 79.1071meandEdx[ix]: 2.12627
+correction: 1
+ix: 12incE: 649071intE: 544.402 ratio: 85.5883meandEdx[ix]: 2.13724
+correction: 1
+ix: 13incE: 890322intE: 775.707 ratio: 89.385meandEdx[ix]: 2.14869
+correction: 1
+ix: 14incE: 1.21273e+06intE: 1147.56 ratio: 97.6093meandEdx[ix]: 2.16033
+correction: 1
+ix: 15incE: 1.57117e+06intE: 1302.2 ratio: 85.9477meandEdx[ix]: 2.17195
+correction: 1
+ix: 16incE: 1.8306e+06intE: 1588.58 ratio: 90.4685meandEdx[ix]: 2.18344
+correction: 1
+ix: 17incE: 1.77952e+06intE: 1531.63 ratio: 90.192meandEdx[ix]: 2.19472
+correction: 1
+ix: 18incE: 1.32125e+06intE: 1378.85 ratio: 109.917meandEdx[ix]: 2.20573
+correction: 1
+ix: 19incE: 661205intE: 586.817 ratio: 93.9227meandEdx[ix]: 2.21646
+Now unfolding...
+Iteration : 0
+Chi^2 of change 8.91568e-29
+Iteration : 1
+Chi^2 of change 9.8161e-29
+Iteration : 2
+Chi^2 of change 1.22845e-28
+Iteration : 3
+Chi^2 of change 8.91044e-29
+Calculating covariances due to number of measured events
+Now unfolding...
+Iteration : 0
+Chi^2 of change 39.2392
+Iteration : 1
+Chi^2 of change 12.2932
+Iteration : 2
+Chi^2 of change 7.07113
+Iteration : 3
+Chi^2 of change 4.78155
+Calculating covariances due to number of measured events
+tag: i006hTruthDiffCEXInteractingHist_650to800MeV
+eff: 0.0534021
+Now unfolding...
+Iteration : 0
+Chi^2 of change 1.81446e-28
+Iteration : 1
+Chi^2 of change 6.96747e-29
+Iteration : 2
+Chi^2 of change 9.6463e-29
+Iteration : 3
+Chi^2 of change 2.78482e-29
+Calculating covariances due to number of measured events
+Now unfolding...
+Iteration : 0
+Chi^2 of change 26.8818
+Iteration : 1
+Chi^2 of change 5.51567
+Iteration : 2
+Chi^2 of change 2.39315
+Iteration : 3
+Chi^2 of change 1.57181
+Calculating covariances due to number of measured events
+tag: i666hTruthDiffCEXInteractingHistCosTheta_650to800MeV
+eff: 0.0534021
+Now unfolding...
+Iteration : 0
+Chi^2 of change 4.26887e-28
+Iteration : 1
+Chi^2 of change 2.8169e-28
+Iteration : 2
+Chi^2 of change 2.89527e-29
+Iteration : 3
+Chi^2 of change 7.20584e-29
+Calculating covariances due to number of measured events
+Now unfolding...
+Iteration : 0
+Chi^2 of change 121.729
+Iteration : 1
+Chi^2 of change 3.63259
+Iteration : 2
+Chi^2 of change 1.04558
+Iteration : 3
+Chi^2 of change 0.450485
+Calculating covariances due to number of measured events
+tag: i066hTruthDiffCEXInteractingHistTheta_650to800MeV
+eff: 0.0534021

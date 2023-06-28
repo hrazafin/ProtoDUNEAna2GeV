@@ -70,13 +70,13 @@
 #include <cstdlib>
 #include <ctime>
 
-#include "TemplateFitter.h"
-#include "TemplateFitter.cxx"
+#include "include/TemplateFitter.h"
+#include "include/TemplateFitter.cxx"
 
 
 using namespace std;
-double plotScale = 0.499375;
-
+//double plotScale = 0.499375;
+double plotScale = 0.57804;
 double GetChi2(TH1D * hdata, TH1D * hmc);
 void DrawOutput(TH1D *h0, TH1D *h1, TH1D *h2, TH1D *h2_low, TH1D *h2_high, TH1D *h2_mid, const double &lowScale, const double &highScale, TString tag);
 void GetPi0EnergyScale(const TString tag, double & low_scale, double & high_scale);
@@ -104,8 +104,7 @@ void GetPi0EnergyScale(const TString tag, double & low_scale, double & high_scal
   TH1D * h2_high = new TH1D(Form("h2_high_%s",tag.Data()),";Pi0 Kinetic Energy (MeV); Candidates", 20, 0, 0.5); 
   TH1D * h2_mid = new TH1D(Form("h2_mid_%s",tag.Data()),";Pi0 Kinetic Energy (MeV); Candidates", 20, 0, 0.5); 
 
-  //const TString finName = "input/outana_noKF.root";
-  const TString finName = "input/outana_withKF_new.root";
+  const TString finName = "input/outana.root";
     
   TFile *file = TFile::Open(finName);
 
@@ -248,7 +247,7 @@ void DrawOutput(TH1D *h0, TH1D *h1, TH1D *h2, TH1D *h2_low, TH1D *h2_high, TH1D 
     tt.SetTextSize(0.035);
     tt.DrawLatex(0.125,0.925,"DUNE:ProtoDUNE-SP");
 
-    c1->Print("output/ori_"+tag+".png");
+    c1->Print("output/ori_"+tag+".pdf");
 
     TCanvas * c2 = new TCanvas(Form("c2_%s",tag.Data()), "", 1200, 800);
 
@@ -286,13 +285,13 @@ void DrawOutput(TH1D *h0, TH1D *h1, TH1D *h2, TH1D *h2_low, TH1D *h2_high, TH1D 
     tt.SetTextSize(0.035);
     tt.DrawLatex(0.125,0.925,"DUNE:ProtoDUNE-SP");
 
-    c2->Print("output/fit_"+tag+".png");
+    c2->Print("output/fit_"+tag+".pdf");
 
 }
 
 void SidebandDefinition(){
-  const TString finName = "input/outana_sideband.root";
-    
+  const TString finName = "input/outana.root";
+
   TFile *file = TFile::Open(finName);
 
   if(!file->IsOpen()){
@@ -307,11 +306,20 @@ void SidebandDefinition(){
 
   TCanvas * c1 = new TCanvas("c1_sideband", "", 1200, 800);
   
-
-  sideband->SetFillColor(kBlue-3);
+  sideband->SetFillColor(kGreen-2);
   
   sideband->GetYaxis()->SetTitle("#pi^{0} Mass (GeV/c^{2})");
-  sideband->GetXaxis()->SetTitle("Kinetic Energy (GeV)");
+  sideband->GetXaxis()->SetTitle("#pi^{0} Kinetic Energy (GeV)");
+
+  sideband->SetTitle(" ");
+  sideband->GetYaxis()->CenterTitle();
+  sideband->GetYaxis()->SetTitleFont(22);
+  sideband->GetYaxis()->SetTitleSize(0.05);
+  sideband->GetYaxis()->SetTitleOffset(0.9);
+  sideband->GetXaxis()->CenterTitle();
+  sideband->GetXaxis()->SetTitleFont(22);
+  sideband->GetXaxis()->SetTitleSize(0.05);
+  sideband->GetXaxis()->SetTitleOffset(0.9);
 
   sideband->Draw("BOX");
 
@@ -347,21 +355,22 @@ void SidebandDefinition(){
 
   line2->Draw("sames");
 
-  tt.DrawLatex(0.755,0.255,"#color[3]{#bf{#it{Signal}}}");
+  tt.DrawLatex(0.755,0.255,"#color[4]{#bf{#it{Signal}}}");
 
-  tt.DrawLatex(0.705,0.785,"#color[2]{#bf{#it{#alpha_{2} = 0.96}}}");
-  tt.DrawLatex(0.705,0.625,"#color[6]{#bf{#it{Sideband 2}}}");
-  tt.DrawLatex(0.705,0.125,"#color[6]{#bf{#it{Sideband 2}}}");
+  tt.DrawLatex(0.685,0.785,"#color[4]{#bf{#it{#alpha_{2}=0.96#pm0.17}}}");
+  tt.DrawLatex(0.705,0.625,"#color[2]{#bf{#it{Sideband 2}}}");
+  tt.DrawLatex(0.705,0.125,"#color[2]{#bf{#it{Sideband 2}}}");
 
-  tt.DrawLatex(0.135,0.785,"#color[2]{#bf{#it{#alpha_{1} = 1.79}}}");
+  tt.DrawLatex(0.125,0.785,"#color[4]{#bf{#it{#alpha_{1}=1.76#pm0.26}}}");
 
-  tt.DrawLatex(0.135,0.625,"#color[6]{#bf{#it{Sideband 1}}}");
-  tt.DrawLatex(0.135,0.125,"#color[6]{#bf{#it{Sideband 1}}}");
+  tt.DrawLatex(0.135,0.625,"#color[2]{#bf{#it{Sideband 1}}}");
+  tt.DrawLatex(0.135,0.125,"#color[2]{#bf{#it{Sideband 1}}}");
 
 
   tt.SetTextSize(0.035);
   tt.DrawLatex(0.125,0.925,"DUNE:ProtoDUNE-SP");
+  tt.DrawLatex(0.725,0.925,"1GeV/c Pion Data");
 
-  c1->Print("output/sideband.png");
+  c1->Print("output/sideband.pdf");
 
 }

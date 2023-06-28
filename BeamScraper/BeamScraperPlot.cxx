@@ -83,14 +83,13 @@ void DrawUpStreamELossAfterCuts(TH2D * h2d_InstE);
 void SetProtoDUNELabel();
 void SetBeamInstELabel(const TString name);
 void SetTitleFormat(TH1 * hh);
+void SetTitleFormat(TH2 * hh);
+TGraphErrors * ConvertTH1DtoGraph(TH1D * hist);
 
 int main(int argc, char * argv[])
 {
     
-    //const TString finName = "input/benchmark_WithoutSmearing.root"; // Scaper plots (No SM only affect ElossSW)
-    //const TString finName = "input/benchmark_WithSmearing.root"; // Scaper plots (With SM only affect ElossSW)
-    const TString finName = "input/benchmark_WithSmearing_InstPSM.root"; // Scaper plots (plus InstP SM)
-    
+    const TString finName = "input/outana.root";
     TFile *file = TFile::Open(finName);
 
     if(!file->IsOpen()){
@@ -247,7 +246,7 @@ void Draw1D(TH1D* hh, TF1* f1){
   hh->Draw("hists");
   f1->Draw("sames C");
   
-  c1->Print("output/"+tag+".png");
+  c1->Print("output/"+tag+".pdf");
 
 }
 void DrawOutput(TH2D* h2d_beam, TH2D* h2d_scraper, const double & x_mean, const double & y_mean, const double & radius, const double & multi){
@@ -281,7 +280,7 @@ void DrawOutput(TH2D* h2d_beam, TH2D* h2d_scraper, const double & x_mean, const 
     h2d_beam->SetLineColor(kGreen);
     h2d_beam->GetXaxis()->SetTitle("X_{inst} (cm)");
     h2d_beam->GetYaxis()->SetTitle("Y_{inst} (cm)");
-
+    SetTitleFormat(h2d_beam);
     h2d_scraper->SetMarkerStyle(7);
     h2d_scraper->SetMarkerColor(kRed);
     h2d_scraper->SetLineColor(kRed);
@@ -327,8 +326,8 @@ void DrawOutput(TH2D* h2d_beam, TH2D* h2d_scraper, const double & x_mean, const 
 
     tt.SetTextSize(0.035);
     tt.DrawLatex(0.125,0.925,"DUNE:ProtoDUNE-SP");
-
-    c1->Print("output/"+tagbeam+".png");
+    //tt.DrawLatex(0.725,0.925,"1GeV/c Pion Data");
+    c1->Print("output/"+tagbeam+".pdf");
 }   
 
 void DrawBeamScraperDef(TH1D* hh, bool kCut){
@@ -353,7 +352,7 @@ void DrawBeamScraperDef(TH1D* hh, bool kCut){
     st->SetY2NDC(0.85);
     st->SetX1NDC(0.65); 
     st->SetX2NDC(0.88);
-    st->SetTextColor(kRed);
+    st->SetTextColor(kBlack);
 
     f1->Draw("sames C");
 
@@ -386,7 +385,7 @@ void DrawBeamScraperDef(TH1D* hh, bool kCut){
     SetProtoDUNELabel();
     SetBeamInstELabel(tag);
     
-    c1->Print("output/"+tag+".png");
+    c1->Print("output/"+tag+".pdf");
 }
 
 void DrawUpStreamELossAfterCuts(TH2D * h2d_InstE){
@@ -396,7 +395,10 @@ void DrawUpStreamELossAfterCuts(TH2D * h2d_InstE){
   const double xmin = h2d_InstE->GetXaxis()->GetBinLowEdge(1);
   const double xmax = h2d_InstE->GetXaxis()->GetBinUpEdge(nx);
 
-  TH1D * hFitElossSW = new TH1D("hFitElossSW",";KE_{Beam  Inst.}^{reco.} (MeV);#mu(KE_{Beam  Inst.}^{reco.} - KE_{ff}^{true}) (MeV)", 16, 400, 1200); 
+  //TH1D * hFitElossSW = new TH1D("hFitElossSW",";KE_{Beam  Inst.}^{reco.} (MeV);#mu(KE_{Beam  Inst.}^{reco.} - KE_{ff}^{true}) (MeV)", 16, 400, 1200); 
+  TH1D * hFitElossSW = new TH1D("hFitElossSW",";Beam Inst. KE (MeV);Upstream Energy Loss (MeV)", 16, 400, 1200); 
+  TH1D * hFitElossSW_statsE = new TH1D("hFitElossSW_statsE",";Beam Inst. KE (MeV);UpStream Energy Loss (MeV)", 16, 400, 1200); 
+
   SetTitleFormat(hFitElossSW);
 
   for(int iy = 1; iy <= ny-1; iy++){
@@ -408,36 +410,52 @@ void DrawUpStreamELossAfterCuts(TH2D * h2d_InstE){
     }
     TF1 *f1 = FitGausFunc(htmp,-300,300);
     hFitElossSW->SetBinContent(iy+6,f1->GetParameter("Mean"));
+    hFitElossSW_statsE->SetBinContent(iy+6,f1->GetParameter("Mean"));
     // Sigma band
     hFitElossSW->SetBinError(iy+6,f1->GetParameter("Sigma"));
     // Stats Error
-    //hFitElossSW->SetBinError(iy+6,1/sqrt(htmp->Integral()));
+    hFitElossSW_statsE->SetBinError(iy+6,f1->GetParError(1));
+
   }
 
  
   TCanvas * ctmp1 = new TCanvas("ctmp1", "", 1200, 800);
-  TF1 *f_pol2 = new TF1("f_pol2", "pol2", 650, 1100);
+  TF1 *f_pol2 = new TF1("f_pol2", "pol2", 700, 1050);
 
   gStyle->SetOptStat(0);
   gStyle->SetOptFit(1);
+  hFitElossSW->SetMaximum(120);
+  hFitElossSW->SetMinimum(-55);
 
   hFitElossSW->SetMarkerColor(kBlack);
   hFitElossSW->SetMarkerStyle(kFullCircle);
   hFitElossSW->SetMaximum(120);
+  hFitElossSW->SetStats(0);
+  hFitElossSW->Draw("AXIS");
 
-  hFitElossSW->Draw("e1");
+  auto graph = ConvertTH1DtoGraph(hFitElossSW);
+  graph->SetLineWidth(0);
+  graph->SetLineColor(kOrange);
+  graph->SetMarkerSize(0);
+  graph->SetFillColorAlpha(kOrange, 0.35);
+  graph->Draw("3");
 
   hFitElossSW->Fit("f_pol2","0");
-
+/*
   gPad->Update();
   TPaveStats *st = (TPaveStats*) gPad->GetPrimitive("stats");
   gPad->Modified(); gPad->Update(); // make sure it’s (re)drawn
 
-  st->SetY1NDC(0.65); 
-  st->SetY2NDC(0.85);
+  st->SetY1NDC(0.68); 
+  st->SetY2NDC(0.88);
   st->SetX1NDC(0.65); 
   st->SetX2NDC(0.88);
-  st->SetTextColor(kRed);
+  st->SetTextColor(kBlue);
+*/
+  hFitElossSW_statsE->SetMarkerColor(kBlack);
+  hFitElossSW_statsE->SetMarkerStyle(kFullCircle);
+  hFitElossSW_statsE->SetMaximum(120);
+  hFitElossSW_statsE->Draw("e1 sames");
 
   f_pol2->Draw("sames C");
 
@@ -447,33 +465,48 @@ void DrawUpStreamELossAfterCuts(TH2D * h2d_InstE){
   line->Draw("sames");
 
 
-  //TLine *line1 = new TLine(400,12.74,1200,12.74);
-  TLine *line1 = new TLine(400,11.966,1200,11.966);
+  //TLine *line1 = new TLine(400,11.966,1200,11.966);
+  TLine *line1 = new TLine(400,13.583,1200,13.583);
 
   line1->SetLineColor(kBlue);
   line1->SetLineStyle(kDashed);
   line1->SetLineWidth(2);
   line1->Draw("sames");
-
-  TLine *line2 = new TLine(400,2.652,1200,2.652);
+  
+  //TLine *line2 = new TLine(400,2.652,1200,2.652);
+  TLine *line2 = new TLine(400,3.830,1200,3.830);
 
   line2->SetLineColor(kGreen+3);
   line2->SetLineStyle(kDashed);
   line2->SetLineWidth(2);
-  line2->Draw("sames");
+  //line2->Draw("sames");
 
-  auto lg = new TLegend(0.15,0.55,0.62,0.88);
+  auto lg = new TLegend(0.15,0.68,0.55,0.88);
   lg->AddEntry(hFitElossSW,"#Delta KE_{upstream}","lp");
+  lg->AddEntry(graph,"1 #sigma band","f");
   lg->AddEntry(f_pol2,"Fitted Poly2","l");
-  lg->AddEntry(line1,"Constant Eloss (11.966 MeV) - Before Smearing","l");
-  lg->AddEntry(line2,"Constant Eloss (2.652 MeV) - After Smearing","l");
+  lg->AddEntry(line1,"Mean Energy Loss (13.58 MeV)","l");
+  //lg->AddEntry(line1,"Constant Eloss (13.583 MeV) - Before Smearing","l");
+  //lg->AddEntry(line2,"Constant Eloss (3.702 MeV) - After Smearing","l");
+
+  //lg->AddEntry(line1,"Constant Eloss (11.966 MeV) - Before Smearing","l");
+  //lg->AddEntry(line2,"Constant Eloss (2.652 MeV) - After Smearing","l");
 
   lg->SetBorderSize(0);
   lg->Draw("sames");
 
-  SetProtoDUNELabel();
+  TLatex tt;
+  tt.SetNDC();
+  tt.SetTextSize(0.035);
+  tt.DrawLatex(0.125,0.925,"DUNE:ProtoDUNE-SP");
+  tt.DrawLatex(0.725,0.925,"1GeV/c Pion Data");
 
-  ctmp1->Print("output/ElossSW.png");
+  tt.DrawLatex(0.665,0.845,"#color[4]{p_{0} = 171.8 #pm 13.1}");
+  tt.DrawLatex(0.665,0.785,"#color[4]{p_{1} = -0.575 #pm 0.030}");
+  tt.DrawLatex(0.665,0.725,"#color[4]{p_{2} = 4.3e-4 #pm 1.71e-5}");
+
+
+  ctmp1->Print("output/ElossSW.pdf");
 
 
   // Print const E loss before and after smearing
@@ -492,6 +525,7 @@ void SetProtoDUNELabel(){
   tt.SetNDC();
   tt.SetTextSize(0.035);
   tt.DrawLatex(0.125,0.925,"DUNE:ProtoDUNE-SP");
+  //tt.DrawLatex(0.725,0.925,"1GeV/c Pion Data");
 }
 
 void SetBeamInstELabel(const TString name){
@@ -508,13 +542,60 @@ void SetTitleFormat(TH1 * hh){
   hh->SetTitle(" ");
   hh->GetYaxis()->CenterTitle();
   // Bold text
-  //hh->GetYaxis()->SetTitleFont(22);
+  hh->GetYaxis()->SetTitleFont(22);
   hh->GetYaxis()->SetTitleSize(0.04);
   hh->GetYaxis()->SetTitleOffset(0.99);
   hh->GetXaxis()->CenterTitle();
-  //hh->GetXaxis()->SetTitleFont(22);
+  hh->GetXaxis()->SetTitleFont(22);
   hh->GetXaxis()->SetTitleSize(0.04);
   hh->GetXaxis()->SetTitleOffset(0.99);
   //hh->GetXaxis()->SetLabelOffset(999);
   //hh->GetXaxis()->SetLabelSize(0);
+}
+
+void SetTitleFormat(TH2 * hh){
+  hh->SetTitle(" ");
+  hh->GetYaxis()->CenterTitle();
+  // Bold text
+  hh->GetYaxis()->SetTitleFont(22);
+  hh->GetYaxis()->SetTitleSize(0.04);
+  hh->GetYaxis()->SetTitleOffset(1.35);
+  hh->GetXaxis()->CenterTitle();
+  hh->GetXaxis()->SetTitleFont(22);
+  hh->GetXaxis()->SetTitleSize(0.04);
+  hh->GetXaxis()->SetTitleOffset(0.99);
+  //hh->GetXaxis()->SetLabelOffset(999);
+  //hh->GetXaxis()->SetLabelSize(0);
+}
+
+TGraphErrors * ConvertTH1DtoGraph(TH1D * hist){
+
+    int n = hist->GetNbinsX(); 
+
+    double x[n], y[n], ex[n], ey[n]; // define arrays to store the x and y values, as well as the error bars
+
+    for (int i=1; i<=n; i++) {
+        if(i==7) x[i-1] = hist->GetBinLowEdge(i);
+        else if (i==13) x[i-1] = hist->GetBinLowEdge(i)+50.0;
+        else x[i-1] = hist->GetBinCenter(i); // get the bin center for x
+        y[i-1] = hist->GetBinContent(i); // get the bin content for y
+        ex[i-1] = hist->GetBinWidth(i)*0.0; // set the error bar for x to half the bin width
+        ey[i-1] = hist->GetBinError(i);//
+    }
+
+    TGraphErrors *graph = new TGraphErrors(n,x,y,ex,ey);
+
+    Int_t npoints = graph->GetN();
+    for (Int_t i=0; i<npoints; i++) {
+        Double_t x, y;
+        graph->GetPoint(i, x, y);
+        if (y == 0) {
+            graph->RemovePoint(i);
+            npoints--;
+            i--;
+        }
+    }
+    
+
+    return graph;
 }

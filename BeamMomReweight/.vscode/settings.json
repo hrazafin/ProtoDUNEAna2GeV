@@ -1,0 +1,13 @@
+{
+    "files.associations": {
+        "cmath": "cpp",
+        "new": "cpp",
+        "ostream": "cpp",
+        "MomentumFit.C": "cpp",
+        "MomentumReweight.C": "cpp",
+        "system_error": "cpp",
+        "complex": "cpp",
+        "MuonReweight.C": "cpp",
+        "iostream": "cpp"
+    }
+}

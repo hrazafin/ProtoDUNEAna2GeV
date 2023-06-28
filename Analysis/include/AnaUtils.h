@@ -26,6 +26,7 @@ class AnaUtils
     // Get truth interacting histogram for xsec calculation
     double MakeTrueIncidentEnergies(vector<double> *true_beam_traj_Z, vector<double> *true_beam_traj_KE, vector<double> *true_beam_new_incidentEnergies);
     double MakeRecoIncidentEnergies(vector<double> *reco_beam_traj_Z, vector<double> *reco_beam_traj_KE, vector<double> *reco_beam_new_incidentEnergies);
+    double GetInteractingE_CaloBased(const double & ffe);
     
     // Get reco track length from the space points
     double GetRecoTrackLength();
@@ -112,6 +113,7 @@ class AnaUtils
 
     double CalWeight(const bool & kMC);
     double CalBckWeight(const bool & kMC);
+    double CalG4RW();
     double CalPi0OAWeight(const bool & kMC, const double & OA);
     double CalXSEvtWeight(const bool & kMC, const double & intE, const int & evtXStype);
     double CalBeamIniWeight(const double & iniE);
@@ -135,13 +137,16 @@ class AnaUtils
     void SetBeamInstKEandFrontFaceKE(double &beam_inst_KE, double &true_ffKE, bool kFill = false);
     void FillUpStreamEnergyLossHistBeforeCut(double beam_inst_KE, double true_ffKE);
     void FillUpStreamEnergyLossHistAfterCut(double beam_inst_KE, double true_ffKE);
-    void FillBeamVariablesAfterAllCuts(int parType, int channelType);
+    void FillBeamVariablesAfterAllCuts(const bool kMC, int parType, int channelType);
 
     double GetLoss(double InstE){
       TF1 *fpCor = new TF1("fpCor","pol2",-400,1400);
-      fpCor->SetParameter(0,170.777);
-      fpCor->SetParameter(1,-0.595308);
-      fpCor->SetParameter(2,0.000456932);
+      //fpCor->SetParameter(0,170.777);
+      //fpCor->SetParameter(1,-0.595308);
+      //fpCor->SetParameter(2,0.000456932);
+      fpCor->SetParameter(0,171.812);
+      fpCor->SetParameter(1,-0.574581);
+      fpCor->SetParameter(2,0.000433532);
       const double factor = fpCor->Eval(InstE);
       return factor;
     }

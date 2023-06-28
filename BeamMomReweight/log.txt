@@ -1,0 +1,34 @@
+/data/dune/users/yangk/workdir/pduneAnalysis/bin/mkexe.sh
+================== Compiling BeamMomReweight with BeamMomReweight -lRooUnfold -I/data/dune/users/yangk/workdir/pduneAnalysis/RooUnfold/build -L/data/dune/users/yangk/workdir/pduneAnalysis/RooUnfold/build =================
+
+g++ BeamMomReweight.cxx -g -O3 -Wall -Werror -std=c++17 -I/cvmfs/larsoft.opensciencegrid.org/products/root/v6_22_06a/Linux64bit+3.10-2.17-e20-p383b-prof/include -Wl,--no-as-needed -L./ -L/cvmfs/larsoft.opensciencegrid.org/products/root/v6_22_06a/Linux64bit+3.10-2.17-e20-p383b-prof/lib -lCore -lImt -lRIO -lNet -lHist -lGraf -lGraf3d -lGpad -lROOTVecOps -lTree -lTreePlayer -lRint -lPostscript -lMatrix -lPhysics -lMathCore -lThread -lMultiProc -lROOTDataFrame -pthread -lm -ldl -rdynamic -lTree -lMinuit -lASImage -o BeamMomReweight -lRooUnfold -I/data/dune/users/yangk/workdir/pduneAnalysis/RooUnfold/build -L/data/dune/users/yangk/workdir/pduneAnalysis/RooUnfold/build
+
+
+checked: /data/dune/users/yangk/workdir/pduneAnalysis/bin/mkexe.sh BeamMomReweight done!
+
+
+[1mRooFit v3.60 -- Developed by Wouter Verkerke and David Kirkby[0m 
+                Copyright (C) 2000-2013 NIKHEF, University of California & Stanford University
+                All rights reserved, please read http://roofit.sourceforge.net/license.txt
+
+Input file:
+/data/dune/users/yangk/protoDUNE_mc_reco_flattree_prod4a_ntuple.root
+
+fin is open!
+Done creating splines for particle with pdgcode 13
+Done creating splines for particle with pdgcode 211
+Done creating splines for particle with pdgcode 321
+Done creating splines for particle with pdgcode 2212
+Successuflly get mc tree with name: pduneana/beamana
+Input file:
+/data/dune/users/yangk/protoDUNE_data_reco_flattree_prod4_ntuple.root
+
+fin is open!
+Done creating splines for particle with pdgcode 13
+Done creating splines for particle with pdgcode 211
+Done creating splines for particle with pdgcode 321
+Done creating splines for particle with pdgcode 2212
+Successuflly get data tree with name: pduneana/beamana
+plotScale: 1.63501
+plotScale_longtrk: 0.698653
+PlotUtils::IniColorCB creating new color

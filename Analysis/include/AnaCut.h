@@ -9,7 +9,7 @@ class AnaCut
     AnaCut() {};
     ~AnaCut() {};
     // All beam cut for both MC and data including 1.beam ID cut; 2.primary beam type cut; 3.beam position cut; 4.APA3 cut
-    bool CutBeamAllInOne(const bool kMC, bool kFill = false);
+    bool CutBeamAllInOne(const bool kMC, const bool kFill = false);
     // Cut on beam PDG code
     bool CutBeamPDG(const bool kMC);
     // Cut on Pandora slice
@@ -17,12 +17,12 @@ class AnaCut
     // Cut on Calo size
     bool CutCaloSize();
     // Cut on beam quality
-    bool CutBeamQuality(const bool kMC, bool DoAngleCut = true, bool kFill = false);
+    bool CutBeamQuality(const bool kMC, bool DoAngleCut = true, const bool kFill = false);
     bool CutBeamInstQuality(bool kMC);
     // Cut on end Z APA3
-    bool CutAPA3EndZ(const bool kMC, bool kFill = false, const double weight = 1.0);
+    bool CutAPA3EndZ(const bool kMC, const bool kFill = false, const double weight = 1.0);
     // Cut on Michel Score (remove muons)
-    bool CutMichelScore(const bool kMC, bool kFill = false, const double weight = 1.0);
+    bool CutMichelScore(const bool kMC, const bool kFill = false, const double weight = 1.0);
     // Cut on median dE/dx (remove protons)
     bool CutMediandEdx(const bool kMC);
     // Cut on median dE/dx (remove protons)
@@ -52,19 +52,21 @@ class AnaCut
     // --------------------------------- Legacy Cuts (not used anymore replaced by beam quality cuts) ----------------------- //
 
     // Event and final state particle selections
-    bool CutTopology(const bool kMC, double & pi0KineticE, double & pi0costheta, bool kFill = false);
+    bool CutTopology(const bool kMC, double & pi0KineticE, double & pi0costheta, const bool kFill = false);
     void CountPFP(const bool kMC, const bool kFill);
-    bool IsProton(const int ii, const bool kMC, const double weight = 1.0);
-    bool IsTrack(const int ii, const bool kMC, const double weight = 1.0);  
-    bool IsPionTrack(const int ii, const bool kMC, const double weight = 1.0);  
-    bool PassProtonSubPID(const int ii, const double weight = 1.0);
-    bool PassPionSubPID(const int ii, const double weight = 1.0);
-    bool IsPiplus(const int ii, const bool kMC, const double weight = 1.0);
-    bool IsShower(const int ii, const bool kMC, const double weight = 1.0);
-    bool IsMichel(const int ii, const bool kMC, const double weight = 1.0);
-    bool IsPiZeroShower(const int ii, const bool kMC, const double weight = 1.0); 
-    bool IsPizero(const bool kMC, const bool kFill, const double weight = 1.0);
+    bool IsProton(const int ii, const bool kMC, const double weight = 1.0, const bool kFill = false);
+    bool IsTrack(const int ii, const bool kMC, const double weight = 1.0, const bool kFill = false);  
+    bool IsPionTrack(const int ii, const bool kMC, const double weight = 1.0, const bool kFill = false);  
+    bool PassProtonSubPID(const int ii, const double weight = 1.0, const bool kFill = false);
+    bool PassPionSubPID(const int ii, const double weight = 1.0, const bool kFill = false);
+    bool IsPiplus(const int ii, const bool kMC, const double weight = 1.0, const bool kFill = false);
+    bool IsShower(const int ii, const bool kMC, const double weight = 1.0, const bool kFill = false);
+    bool IsMichel(const int ii, const bool kMC, const double weight = 1.0, const bool kFill = false);
+    bool IsPiZeroShower(const int ii, const bool kMC, const double weight = 1.0, const bool kFill = false); 
+    bool IsPizero(const bool kMC, const bool kFill = false, const double weight = 1.0);
 
+    int GetNPi0(){return npi0;}
+    int GetNPiPlus(){return npiplus;}
 
   private:
 

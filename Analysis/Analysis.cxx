@@ -6,7 +6,7 @@
 
 TRandom3 *grdm = new TRandom3(1); // fixed seed
 
-int anaRec(const TString finName, TList *lout, const TString tag, const int nEntryToStop, BetheBloch & bb, Unfold & uf)
+int anaRec(const TString finName, TList *lout, const TString tag, const int nEntryToStop, BetheBloch & bb, Unfold & uf, double &BeamWeightedCount)
 {
   //======================================== Basic Settings ======================================== 
   cout << "Input file:" << endl;
@@ -41,6 +41,8 @@ int anaRec(const TString finName, TList *lout, const TString tag, const int nEnt
   double BeamCount = 0;
   double CEXEventCount = 0;
 
+  BeamWeightedCount = 0;
+
   // Pion beam truth
   int true_avaPionBeam = 0;
   // Pion beam reco
@@ -56,7 +58,7 @@ int anaRec(const TString finName, TList *lout, const TString tag, const int nEnt
 
   // Control XS measurement
   bool doXS = true;
-
+  
   // Loop over TTree
   while(tree->GetEntry(ientry)){
 
@@ -76,7 +78,9 @@ int anaRec(const TString finName, TList *lout, const TString tag, const int nEnt
         double trackLen = anaUtils.GetRecoTrackLength();
         // Only use the event where reco pion beam track length is physical
         if(trackLen != -999) {
-          radGaus = grdm->Gaus(-0.00955164,0.0176993);
+          radGaus = grdm->Gaus(-0.00853979,0.0151846);
+          // official 
+          //radGaus = grdm->Gaus(-0.00955164,0.0176993);
           //radGausffe = grdm->Gaus(0.00541435,0.0367387);
         }
       }
@@ -84,6 +88,11 @@ int anaRec(const TString finName, TList *lout, const TString tag, const int nEnt
     
     //====================== Extract truth information (MC only)======================//
     if(kMC){
+
+      // Set signal using truth info
+      anaUtils.SetFullSignal();
+      AnaIO::hTruthSignal->Fill(AnaIO::Signal);
+
       // Get true beam particle type from it's pdg code
       int TruthBeamType = anaUtils.GetParticleType(AnaIO::true_beam_PDG); 
       // Fill the TruthBeamType histogram
@@ -95,15 +104,15 @@ int anaRec(const TString finName, TList *lout, const TString tag, const int nEnt
         const bool matched = AnaIO::reco_beam_true_byHits_matched; 
         const TString process = (*AnaIO::reco_beam_true_byHits_process); 
         if (process == "primary" && matched && origin == 4 && pdg == 211)  AnaIO::hBeamEndZ_TrueAvailable->Fill(AnaIO::true_beam_endZ);
+        // No need to have a matched reco beam
+        if (process == "primary" && origin == 4 && pdg == 211) AnaIO::hTruthBeamMomentum->Fill(AnaIO::true_beam_endP);
       }
       
       // Fill XS hisotgrams
       anaUtils.FillXSTrueHistograms(true_avaPionBeam, true_avaPionCEXevt, true_avaDiffCEXevt);
       anaUtils.FillXSNewTrueHistograms();
 
-      // Set signal using truth info
-      anaUtils.SetFullSignal();
-      AnaIO::hTruthSignal->Fill(AnaIO::Signal);
+      
       // If this MC event is a signal 
       if(AnaIO::Signal){
         // Get FS particle type vector
@@ -133,6 +142,7 @@ int anaRec(const TString finName, TList *lout, const TString tag, const int nEnt
       // Get the MC weight for each event
       double weight = anaUtils.CalWeight(kMC);
       //double bckweight = anaUtils.CalBckWeight(kMC);
+      double g4rw = anaUtils.CalG4RW();
 
       // Test truth matched beam is true pion beam (and yes it is)
       if(AnaIO::reco_beam_true_byHits_PDG == 211){
@@ -150,6 +160,7 @@ int anaRec(const TString finName, TList *lout, const TString tag, const int nEnt
         double interactingE = anaUtils.MakeTrueIncidentEnergies(AnaIO::true_beam_traj_Z, AnaIO::true_beam_traj_KE, AnaIO::true_beam_incidentEnergies);
         double LeadingPiZeroCosTheta = -999, LeadingPiZeroTheta = -999, LeadingPiZeroKE = -999, LeadingPiZeroP = -999;
         if(AnaIO::true_beam_incidentEnergies->size() != 0){
+          
           // Get truth-matched beam particle types
           const int parType = kMC ? anaUtils.GetBeamParticleType(AnaIO::reco_beam_true_byHits_PDG) : anaUtils.gkBeamOthers;
           //const int channelType = kMC ? anaUtils.GetChannelType((*AnaIO::true_beam_endProcess),AnaIO::true_beam_PDG, AnaIO::true_daughter_nPi0, AnaIO::true_daughter_nPiPlus, AnaIO::true_daughter_nPiMinus) : anaUtils.gkBackground;
@@ -183,6 +194,7 @@ int anaRec(const TString finName, TList *lout, const TString tag, const int nEnt
             //double ff_energy_reco = beam_inst_KE*1000 - 2.65229; //FIXME upper Syst
 
             double initialE_reco = bb.KEAtLength(ff_energy_reco, trackLenAccum[0]); 
+            //initialE_reco = ff_energy_reco;
 
             // Based on the reco beam accumulated length get the reco beam incident energy
             // Using BetheBloch formular to refill the AnaIO::reco_beam_incidentEnergies (analog to AnaIO::true_beam_traj_KE in true version)
@@ -193,14 +205,28 @@ int anaRec(const TString finName, TList *lout, const TString tag, const int nEnt
               // Fill the incident histogram
               AnaIO::reco_beam_incidentEnergies->push_back(energy_reco);
             }
+            /*cout << "beam_inst_KE: " << beam_inst_KE*1000 << endl;
+            cout << "Eloss: " << Eloss << endl;
+            cout << "ff_energy_reco: " << ff_energy_reco << endl;
+            cout << "initialE_reco: " << initialE_reco << endl;
+            cout << "AnaIO::reco_beam_incidentEnergies[0]: " << (*AnaIO::reco_beam_incidentEnergies)[1] << endl;
+            */
             // Reco beam incident energy (vector) and interaction energy calculation (use reco_beam_calo_Z and reco_beam_incidentEnergies) 
             AnaIO::reco_beam_new_incidentEnergies->clear();
             // Slicing the beam into thiner slice using wire pitch spacing
             double interactingE_reco = anaUtils.MakeRecoIncidentEnergies(AnaIO::reco_beam_calo_Z, AnaIO::reco_beam_incidentEnergies, AnaIO::reco_beam_new_incidentEnergies);
             
+            //double intE_calo = anaUtils.GetInteractingE_CaloBased(ff_energy_reco);
+            //interactingE_reco = intE_calo;
+            //AnaIO::hRecIntEdiff->Fill(intE_calo-interactingE_reco);
+            //cout << "intE_calo: " << intE_calo << endl;
+            //cout << "interactingE_reco: " << interactingE_reco << endl;
+            //cout << "reco_beam_interactingEnergy: " << AnaIO::reco_beam_interactingEnergy << endl;
+
             //double XSevtweight = 1.0;//anaUtils.CalXSEvtWeight(kMC, interactingE_reco, evtXStype);
 
-            if(AnaIO::reco_beam_new_incidentEnergies->size() != 0){
+            //if(AnaIO::reco_beam_new_incidentEnergies->size() != 0){
+            if(interactingE_reco > 0){
 
               // Get the new reco beam incident energy vector size
               int size_reco = AnaIO::reco_beam_new_incidentEnergies->size();
@@ -211,7 +237,7 @@ int anaRec(const TString finName, TList *lout, const TString tag, const int nEnt
 
               int size_diff = size_reco - size_true;
               double interval_reco = (*AnaIO::reco_beam_new_incidentEnergies)[0] - interactingE_reco;
-              double interval_true = (*AnaIO::true_beam_incidentEnergies)[1] - interactingE;
+              double interval_true = (*AnaIO::true_beam_incidentEnergies)[0] - interactingE;
 
               double interval_diff = interval_reco - interval_true;
 
@@ -224,7 +250,7 @@ int anaRec(const TString finName, TList *lout, const TString tag, const int nEnt
                   // Fill the efficiency for incident energy vector
                   uf.eff_den_Inc->Fill((*AnaIO::true_beam_incidentEnergies)[i]);
                 }
-                uf.eff_den_Ini->Fill((*AnaIO::true_beam_incidentEnergies)[1]);
+                uf.eff_den_Ini->Fill((*AnaIO::true_beam_incidentEnergies)[0]);
                 if(interactingE!=-999) uf.eff_den_BeamInt->Fill(interactingE);
                 else uf.eff_den_BeamInt->Fill(AnaIO::true_beam_incidentEnergies->back());
               }
@@ -242,7 +268,7 @@ int anaRec(const TString finName, TList *lout, const TString tag, const int nEnt
                   if(interactingE_reco!=-999) AnaIO::hRecoBeamInteractingHist->Fill(interactingE_reco, weight);
                   else AnaIO::hRecoBeamInteractingHist->Fill(AnaIO::reco_beam_new_incidentEnergies->back(), weight);
 
-                  if(interactingE_reco!=-999) interactingE_reco = AnaIO::reco_beam_new_incidentEnergies->back();
+                  //if(interactingE_reco==-999) interactingE_reco = AnaIO::reco_beam_new_incidentEnergies->back();
                   // Sungbin's new method
                   anaUtils.FillEsliceHistograms(AnaIO::hNewRecoInitialHist, AnaIO::hNewRecoBeamInteractingHist, AnaIO::hNewRecoIncidentHist, AnaIO::hNewRecoInteractingHist, initialE_reco, interactingE_reco, -1, weight, binning_100MeV, N_binning_100MeV, false);
                   // Fill the reco incident histogram
@@ -260,15 +286,15 @@ int anaRec(const TString finName, TList *lout, const TString tag, const int nEnt
                 // Non-fake data used to train unfolding matrix
                 else{
                   // Initial hist unfolding
-                  //uf.response_SliceID_Ini.Fill((*AnaIO::reco_beam_new_incidentEnergies)[0],(*AnaIO::true_beam_incidentEnergies)[1]);
-                  uf.response_SliceID_Ini.Fill(initialE_reco,(*AnaIO::true_beam_incidentEnergies)[1], weight);
+                  //uf.response_SliceID_Ini.Fill((*AnaIO::reco_beam_new_incidentEnergies)[0],(*AnaIO::true_beam_incidentEnergies)[0]);
+                  uf.response_SliceID_Ini.Fill(initialE_reco,(*AnaIO::true_beam_incidentEnergies)[0], weight);
 
                   if(interactingE_reco!=-999 && interactingE!=-999) uf.response_SliceID_BeamInt.Fill(interactingE_reco,interactingE, weight);
                   else if(interactingE_reco==-999 && interactingE!=-999) uf.response_SliceID_BeamInt.Fill(AnaIO::reco_beam_new_incidentEnergies->back(),interactingE, weight);
                   else if(interactingE_reco!=-999 && interactingE==-999) uf.response_SliceID_BeamInt.Fill(interactingE_reco,AnaIO::true_beam_incidentEnergies->back(), weight);
                   else uf.response_SliceID_BeamInt.Fill(AnaIO::reco_beam_new_incidentEnergies->back(),AnaIO::true_beam_incidentEnergies->back(), weight);
 
-                  uf.eff_num_Ini->Fill((*AnaIO::true_beam_incidentEnergies)[1]);
+                  uf.eff_num_Ini->Fill((*AnaIO::true_beam_incidentEnergies)[0]);
                   if(interactingE!=-999) uf.eff_num_BeamInt->Fill(interactingE);
                   else uf.eff_num_BeamInt->Fill(AnaIO::true_beam_incidentEnergies->back());
 
@@ -327,9 +353,9 @@ int anaRec(const TString finName, TList *lout, const TString tag, const int nEnt
               else{ // Not pass the beam cuts
                 if(isFakeData) reco_notPionBeam++;
                 if(!isFakeData){
-                  uf.response_SliceID_Ini.Miss((*AnaIO::true_beam_incidentEnergies)[1], weight);
-                  if(interactingE!=-999) uf.response_SliceID_BeamInt.Miss(interactingE, weight);
-                  else uf.response_SliceID_BeamInt.Miss(AnaIO::true_beam_incidentEnergies->back(), weight);
+                  uf.response_SliceID_Ini.Miss((*AnaIO::true_beam_incidentEnergies)[0], weight*g4rw);
+                  if(interactingE!=-999) uf.response_SliceID_BeamInt.Miss(interactingE, weight*g4rw);
+                  else uf.response_SliceID_BeamInt.Miss(AnaIO::true_beam_incidentEnergies->back(), weight*g4rw);
 
                   for(unsigned int i = 0; i < AnaIO::true_beam_incidentEnergies->size(); i++){
                     uf.response_SliceID_Inc.Miss((*AnaIO::true_beam_incidentEnergies)[i]);
@@ -338,8 +364,8 @@ int anaRec(const TString finName, TList *lout, const TString tag, const int nEnt
               }
               
               // Select pion inelastic events with signal topology on FS particles
-              if((*AnaIO::true_beam_endProcess) == "pi+Inelastic" &&  AnaIO::true_daughter_nPi0 == 1 && AnaIO::true_daughter_nPiPlus == 0 &&  AnaIO::true_daughter_nPiMinus == 0){
-                
+              //if((*AnaIO::true_beam_endProcess) == "pi+Inelastic" &&  AnaIO::true_daughter_nPi0 == 1 && AnaIO::true_daughter_nPiPlus == 0 &&  AnaIO::true_daughter_nPiMinus == 0){
+              if(AnaIO::Signal){
                 // Count fake data size for signal
                 if(isFakeData) recoMatch_avaPionCEXevt++;
                 // Non-fake data to fill efficiency for interacting energy
@@ -355,7 +381,8 @@ int anaRec(const TString finName, TList *lout, const TString tag, const int nEnt
                 // Declear pi0 KE
                 double pi0KineticE, pi0costheta;
                 // Do event topology cut and fill interacting histogram
-                if(anaCut.CutBeamAllInOne(kMC) && anaCut.CutTopology(kMC, pi0KineticE, pi0costheta) && parType == anaUtils.gkBeamPiPlus && evtXStype == anaUtils.gkXSSignal) {  // Pass the event topology
+                //if(anaCut.CutBeamAllInOne(kMC) && anaCut.CutTopology(kMC, pi0KineticE, pi0costheta) && parType == anaUtils.gkBeamPiPlus && evtXStype == anaUtils.gkXSSignal) {  // Pass the event topology
+                if(anaCut.CutBeamAllInOne(kMC) && anaCut.CutTopology(kMC, pi0KineticE, pi0costheta) && evtXStype == anaUtils.gkXSSignal) {  // Pass the event topology
                   //anaCut.CutTopology(kMC, pi0KineticE);
                   plotUtils.FillHist(AnaIO::hRecPiPlusInteractingEnergyBckSub, interactingE_reco, evtXStype, weight);
                   // Fake data used to fill interacting histogram
@@ -431,18 +458,20 @@ int anaRec(const TString finName, TList *lout, const TString tag, const int nEnt
                   
                 }
                 else{ // Not pass beam cuts or not pass event topology or both
+                  if((*AnaIO::true_beam_endProcess) == "pi+Inelastic" &&  AnaIO::true_daughter_nPi0 == 1 && AnaIO::true_daughter_nPiPlus == 0 &&  AnaIO::true_daughter_nPiMinus == 0){
+
                   if(isFakeData) reco_notPionCEXevt++;
                   // Fill missing response matrix
                   //if(!isFakeData) {
                     //if(interactingE != -999) 
-                    uf.response_SliceID_Int.Miss(interactingE, weight);
+                  uf.response_SliceID_Int.Miss(interactingE, weight*g4rw);
                     //cout << "Not pass beam cuts interactingE: " << interactingE << endl;               
                   //}
                   //if(/*!isFakeData && */interactingE > 750 && interactingE < 800) {
                   if(/*!isFakeData && */interactingE > 650 && interactingE < 800) {
-                    uf.response_SliceID_Pi0KE.Miss(LeadingPiZeroKE*1000, weight);
-                    uf.response_SliceID_Pi0CosTheta.Miss(LeadingPiZeroCosTheta, weight);
-                    uf.response_SliceID_Pi0Theta.Miss(LeadingPiZeroTheta, weight);
+                    uf.response_SliceID_Pi0KE.Miss(LeadingPiZeroKE*1000, weight*g4rw);
+                    uf.response_SliceID_Pi0CosTheta.Miss(LeadingPiZeroCosTheta, weight*g4rw);
+                    uf.response_SliceID_Pi0Theta.Miss(LeadingPiZeroTheta, weight*g4rw);
                     AnaIO::pi0theta->Fill(LeadingPiZeroTheta, weight);
 
                     //cout << "Not pass beam cuts LeadingPiZeroCosTheta: " << LeadingPiZeroCosTheta << endl;
@@ -454,6 +483,7 @@ int anaRec(const TString finName, TList *lout, const TString tag, const int nEnt
 
                     if(isFakeData) {recoMatch_avaDiffCEXevt++;reco_notDiffCEXevt++;}
                   }
+                  }
                 }
               }
             }
@@ -461,9 +491,9 @@ int anaRec(const TString finName, TList *lout, const TString tag, const int nEnt
               if(isFakeData) {reco_missedBeam++;}
             
               if(!isFakeData){
-                uf.response_SliceID_Ini.Miss((*AnaIO::true_beam_incidentEnergies)[1], weight);
-                if(interactingE!=-999) uf.response_SliceID_BeamInt.Miss(interactingE, weight);
-                else uf.response_SliceID_BeamInt.Miss(AnaIO::true_beam_incidentEnergies->back(), weight);
+                uf.response_SliceID_Ini.Miss((*AnaIO::true_beam_incidentEnergies)[0], weight*g4rw);
+                if(interactingE!=-999) uf.response_SliceID_BeamInt.Miss(interactingE, weight*g4rw);
+                else uf.response_SliceID_BeamInt.Miss(AnaIO::true_beam_incidentEnergies->back(), weight*g4rw);
 
                 for(unsigned int i = 0; i < AnaIO::true_beam_incidentEnergies->size(); i++){
                   uf.response_SliceID_Inc.Miss((*AnaIO::true_beam_incidentEnergies)[i]);
@@ -473,16 +503,16 @@ int anaRec(const TString finName, TList *lout, const TString tag, const int nEnt
 
                 //if(!isFakeData) {
                   //if(interactingE != -999) 
-                  uf.response_SliceID_Int.Miss(interactingE, weight);
+                uf.response_SliceID_Int.Miss(interactingE, weight*g4rw);
                   //cout << "Not 0 beam size interactingE: " << interactingE << endl;               
                 //}
                 
                 if(isFakeData) {recoMatch_avaPionCEXevt++; reco_missedevt++;}
                 //if(/*!isFakeData && */interactingE > 750 && interactingE < 800) {
                 if(/*!isFakeData && */interactingE > 650 && interactingE < 800) {
-                  uf.response_SliceID_Pi0KE.Miss(LeadingPiZeroKE*1000, weight);
-                  uf.response_SliceID_Pi0CosTheta.Miss(LeadingPiZeroCosTheta, weight);
-                  uf.response_SliceID_Pi0Theta.Miss(LeadingPiZeroTheta, weight);
+                  uf.response_SliceID_Pi0KE.Miss(LeadingPiZeroKE*1000, weight*g4rw);
+                  uf.response_SliceID_Pi0CosTheta.Miss(LeadingPiZeroCosTheta, weight*g4rw);
+                  uf.response_SliceID_Pi0Theta.Miss(LeadingPiZeroTheta, weight*g4rw);
                       AnaIO::pi0theta->Fill(LeadingPiZeroTheta, weight);
 
                   //cout << "Not 0 beam size LeadingPiZeroCosTheta: " << LeadingPiZeroCosTheta << endl;               
@@ -502,9 +532,9 @@ int anaRec(const TString finName, TList *lout, const TString tag, const int nEnt
             if(isFakeData) {recoMatch_avaPionBeam++; reco_missedBeam++;}
             
             if(!isFakeData){
-              uf.response_SliceID_Ini.Miss((*AnaIO::true_beam_incidentEnergies)[1], weight);
-              if(interactingE!=-999) uf.response_SliceID_BeamInt.Miss(interactingE, weight);
-              else uf.response_SliceID_BeamInt.Miss(AnaIO::true_beam_incidentEnergies->back(), weight);
+              uf.response_SliceID_Ini.Miss((*AnaIO::true_beam_incidentEnergies)[0], weight*g4rw);
+              if(interactingE!=-999) uf.response_SliceID_BeamInt.Miss(interactingE, weight*g4rw);
+              else uf.response_SliceID_BeamInt.Miss(AnaIO::true_beam_incidentEnergies->back(), weight*g4rw);
 
               for(unsigned int i = 0; i < AnaIO::true_beam_incidentEnergies->size(); i++){
                 uf.response_SliceID_Inc.Miss((*AnaIO::true_beam_incidentEnergies)[i]);
@@ -513,7 +543,7 @@ int anaRec(const TString finName, TList *lout, const TString tag, const int nEnt
             if((*AnaIO::true_beam_endProcess) == "pi+Inelastic" &&  AnaIO::true_daughter_nPi0 == 1 && AnaIO::true_daughter_nPiPlus == 0 &&  AnaIO::true_daughter_nPiMinus == 0){
               //if(!isFakeData) {
                 //if(interactingE != -999) 
-                uf.response_SliceID_Int.Miss(interactingE, weight);
+              uf.response_SliceID_Int.Miss(interactingE, weight*g4rw);
                 //cout << "Unphysical reco track length interactingE: " << interactingE << endl;               
 
               //}
@@ -521,9 +551,9 @@ int anaRec(const TString finName, TList *lout, const TString tag, const int nEnt
               if(isFakeData) {recoMatch_avaPionCEXevt++; reco_missedevt++;}
               //if(/*!isFakeData && */interactingE > 750 && interactingE < 800) {
               if(/*!isFakeData && */interactingE > 650 && interactingE < 800) {
-                uf.response_SliceID_Pi0KE.Miss(LeadingPiZeroKE*1000, weight);
-                uf.response_SliceID_Pi0CosTheta.Miss(LeadingPiZeroCosTheta, weight);
-                uf.response_SliceID_Pi0Theta.Miss(LeadingPiZeroTheta, weight);
+                uf.response_SliceID_Pi0KE.Miss(LeadingPiZeroKE*1000, weight*g4rw);
+                uf.response_SliceID_Pi0CosTheta.Miss(LeadingPiZeroCosTheta, weight*g4rw);
+                uf.response_SliceID_Pi0Theta.Miss(LeadingPiZeroTheta, weight*g4rw);
                       AnaIO::pi0theta->Fill(LeadingPiZeroTheta, weight);
 
                 //cout << "Unphysical reco track length LeadingPiZeroCosTheta: " << LeadingPiZeroCosTheta << endl;               
@@ -558,15 +588,30 @@ int anaRec(const TString finName, TList *lout, const TString tag, const int nEnt
     // No need to include bck weight for now (always = 1.0)
     double bckweight = anaUtils.CalBckWeight(kMC);
 
+    /*double weiarr_mc[20] = {
+      1.2,1.2,1.2,1.2,1.2,1.2,1.2,1.2,1.2,1.2,
+      1.2,1.2,1.2,1.2,1.2,1.2,1.2,1.2,1.2,1.2,
+    };*/
+    //double g4rw = anaUtils.CalG4RW(weiarr_mc);
+    /*cout << "g4rw: " << g4rw << endl;
+    cout << "run: " << AnaIO::run << endl;
+    cout << "subrun: " << AnaIO::subrun << endl;
+    cout << "event: " << AnaIO::event << endl;*/
+    //if((*AnaIO::true_beam_endProcess) != "pi+Inelastic") cout << "not Inelastic g4rw: " << g4rw << endl;
+    
+    //if(AnaIO::true_daughter_nPi0 == 1 && AnaIO::true_daughter_nPiPlus == 0 &&  AnaIO::true_daughter_nPiMinus == 0){}
+    //else {cout << "not CEX g4rw: " << g4rw << endl;}
+
     // Count beam after beam cut before other cuts
-    //BeamCount++;
-    BeamCount += 1.0*weight*bckweight;
+    BeamCount++;
+    BeamWeightedCount += 1.0*weight*bckweight;
 
     // Get final state particles vector in this event and fill histogram
-    anaUtils.GetFSParticlesTruth(true);
-    // Get final state pi0 decay daughter in this event and fill histogram
-    if(anaUtils.GetNParticles()[2] > 0) anaUtils.GetFSPiZeroDecayDaughterTruth(true);
-
+    if(kMC){
+      anaUtils.GetFSParticlesTruth(true);
+      // Get final state pi0 decay daughter in this event and fill histogram
+      if(anaUtils.GetNParticles()[2] > 0) anaUtils.GetFSPiZeroDecayDaughterTruth(true);
+    }
     // Fill beam kinematics
     anaUtils.FillBeamKinematics(kMC);
 
@@ -584,6 +629,7 @@ int anaRec(const TString finName, TList *lout, const TString tag, const int nEnt
       //double ff_energy_reco = beam_inst_KE*1000 - 2.65229; //FIXME upper Syst; 
 
       double initialE_reco = bb.KEAtLength(ff_energy_reco, trackLenAccum[0]); 
+      //initialE_reco = ff_energy_reco;
       // Based on the reco beam accumulated length get the reco beam incident energy
       // Refill the AnaIO::reco_beam_incidentEnergies (analog to AnaIO::true_beam_traj_KE in true version)
       AnaIO::reco_beam_incidentEnergies->clear();
@@ -595,15 +641,18 @@ int anaRec(const TString finName, TList *lout, const TString tag, const int nEnt
       AnaIO::reco_beam_new_incidentEnergies->clear();
       double interactingE_reco = anaUtils.MakeRecoIncidentEnergies(AnaIO::reco_beam_calo_Z, AnaIO::reco_beam_incidentEnergies, AnaIO::reco_beam_new_incidentEnergies);
 
-     
-      if(interactingE_reco==-999) interactingE_reco = AnaIO::reco_beam_new_incidentEnergies->back();
+      //double intE_calo = anaUtils.GetInteractingE_CaloBased(ff_energy_reco);
+      //interactingE_reco = intE_calo;
+      double beaminteractingE_reco = interactingE_reco; 
+      if(interactingE_reco==-999) beaminteractingE_reco = AnaIO::reco_beam_new_incidentEnergies->back();
+      if(beaminteractingE_reco > 0){
+        //double iniwt = anaUtils.CalBeamIniWeight((*AnaIO::reco_beam_new_incidentEnergies)[0]);
+        double iniwt = anaUtils.CalBeamIniWeight(initialE_reco);
+        double intwt = anaUtils.CalBeamIntWeight(beaminteractingE_reco);
 
-      //double iniwt = anaUtils.CalBeamIniWeight((*AnaIO::reco_beam_new_incidentEnergies)[0]);
-      double iniwt = anaUtils.CalBeamIniWeight(initialE_reco);
-      double intwt = anaUtils.CalBeamIntWeight(interactingE_reco);
-
-      AnaIO::hRecoBeamInitialHistData->Fill(initialE_reco,iniwt);
-      AnaIO::hRecoBeamInteractingHistData->Fill(interactingE_reco,intwt);
+        AnaIO::hRecoBeamInitialHistData->Fill(initialE_reco,iniwt);
+        AnaIO::hRecoBeamInteractingHistData->Fill(beaminteractingE_reco,intwt);
+      }
     }
 
     
@@ -633,6 +682,9 @@ int anaRec(const TString finName, TList *lout, const TString tag, const int nEnt
         if(beam_inst_KE > 1.0 && beam_inst_KE < 1.05) plotUtils.FillHist(AnaIO::hUpStreamELossAfterSmearingAndWeight,UpStreamELoss,6,weight);
         if(beam_inst_KE > 1.05 && beam_inst_KE < 1.1) plotUtils.FillHist(AnaIO::hUpStreamELossAfterSmearingAndWeight,UpStreamELoss,7,weight);
         
+        plotUtils.FillHist(AnaIO::hUpStreamELossRes, beam_inst_KE*1000, UpStreamELoss/(beam_inst_KE*1000),weight);
+        
+        
       }
       // Get the energy dependent energy loss (not used for now)
       double Eloss = anaUtils.GetUpStreamEnergyLoss(kMC, beam_inst_KE);
@@ -641,6 +693,7 @@ int anaRec(const TString finName, TList *lout, const TString tag, const int nEnt
       //double ff_energy_reco = beam_inst_KE*1000 - 2.65229; // - 12.74; //FIXME upper Syst
       
       double initialE_reco = bb.KEAtLength(ff_energy_reco, trackLenAccum[0]); 
+      //initialE_reco = ff_energy_reco;
 
       AnaIO::reco_beam_incidentEnergies->clear();
       for(unsigned int idx = 0; idx < trackLenAccum.size(); idx++){
@@ -652,23 +705,42 @@ int anaRec(const TString finName, TList *lout, const TString tag, const int nEnt
       AnaIO::reco_beam_new_incidentEnergies->clear();
       // Get the interacting energy
       interactingE_reco = anaUtils.MakeRecoIncidentEnergies(AnaIO::reco_beam_calo_Z, AnaIO::reco_beam_incidentEnergies, AnaIO::reco_beam_new_incidentEnergies);
+      //double intE_calo = anaUtils.GetInteractingE_CaloBased(ff_energy_reco);
+      //interactingE_reco = intE_calo;
+      double beaminteractingE_reco = interactingE_reco; 
       // If beam ends after APA3 use the last slide as the interacting energy
-      if(interactingE_reco==-999) interactingE_reco = AnaIO::reco_beam_new_incidentEnergies->back();
+      if(interactingE_reco==-999) beaminteractingE_reco = AnaIO::reco_beam_new_incidentEnergies->back();
       // Direct intial energy obtained from Jake's method
       double initialE_reco_Jake = (*AnaIO::reco_beam_new_incidentEnergies)[0];
+      if(beaminteractingE_reco > 0){
+        // Fill some histograms
+        plotUtils.FillHist(AnaIO::hRecPiPlusEnergy_OVERLAY_After_EVTXS, beaminteractingE_reco, parType, weight*bckweight);
+        // Beam int bck sacle
+        plotUtils.FillHist(AnaIO::hRecPiPlusInteractingEnergy, beaminteractingE_reco, parType, weight*bckweight);
+        plotUtils.FillHist(AnaIO::hRecPiPlusInstMomentum, beam_inst_P_smearing*1000, parType, weight*bckweight);
+        plotUtils.FillHist(AnaIO::hRecPiPlusFrontFaceEnergy, ff_energy_reco, parType, weight*bckweight);
+        // Beam ini bck scale
+        plotUtils.FillHist(AnaIO::hRecPiPlusInitialEnergy, initialE_reco, parType, weight*bckweight);
+        plotUtils.FillHist(AnaIO::hRecPiPlusInitialEnergyPosZCut, initialE_reco_Jake, parType, weight*bckweight);
+        plotUtils.FillHist(AnaIO::hRecPiPlusTrackLength, trackLen, parType, weight*bckweight);
+        plotUtils.FillHist(AnaIO::hRecPiPlusInstMomentumNoSmearing, AnaIO::beam_inst_P*1000, parType, weight*bckweight);
+        // Raw hists
+        plotUtils.FillHist(AnaIO::hRawInstMomentumRaw, AnaIO::beam_inst_P*1000, parType, 1.0);
+        double beam_inst_KE_raw = sqrt(pow(AnaIO::beam_inst_P,2)+pow(AnaFunctions::PionMass(),2)) - AnaFunctions::PionMass();
+        plotUtils.FillHist(AnaIO::hRawInstEnergyRaw, beam_inst_KE_raw*1000, parType, 1.0);
+        // No smearing and shift
+        plotUtils.FillHist(AnaIO::hRecPiPlusInstEnergyNoSmearing, beam_inst_KE_raw*1000, parType, weight*bckweight);
 
-      // Fill some histograms
-      plotUtils.FillHist(AnaIO::hRecPiPlusEnergy_OVERLAY_After_EVTXS, interactingE_reco, parType, weight*bckweight);
-      // Beam int bck sacle
-      plotUtils.FillHist(AnaIO::hRecPiPlusInteractingEnergy, interactingE_reco, parType, weight*bckweight);
-      plotUtils.FillHist(AnaIO::hRecPiPlusInstMomentum, beam_inst_P_smearing*1000, parType, weight*bckweight);
-      plotUtils.FillHist(AnaIO::hRecPiPlusFrontFaceEnergy, ff_energy_reco, parType, weight*bckweight);
-      // Beam ini bck scale
-      plotUtils.FillHist(AnaIO::hRecPiPlusInitialEnergy, initialE_reco, parType, weight*bckweight);
-      plotUtils.FillHist(AnaIO::hRecPiPlusInitialEnergyPosZCut, initialE_reco_Jake, parType, weight*bckweight);
-      plotUtils.FillHist(AnaIO::hRecPiPlusTrackLength, trackLen, parType, weight*bckweight);
-      plotUtils.FillHist(AnaIO::hRecPiPlusInstMomentumNoSmearing, AnaIO::beam_inst_P*1000, parType, weight*bckweight);
+        double ff_energy_reco_raw = beam_inst_KE_raw*1000 - Eloss;
+        plotUtils.FillHist(AnaIO::hRawFrontFaceERaw, ff_energy_reco_raw, parType, 1.0);
+        // No smearing and shift
+        plotUtils.FillHist(AnaIO::hRecPiPlusFrontFaceENoSmearing, ff_energy_reco_raw, parType, weight*bckweight);
+        
+        // With all correction and weight (same with i052hRecPiPlusFrontFaceEnergy but different bin)
+        plotUtils.FillHist(AnaIO::hRecPiPlusFrontFaceE, ff_energy_reco, parType, weight*bckweight);
 
+  
+      }
     } // End of if(trackLen != -999)
 
     //====================== Do Event Topology Cuts (both MC and data) ======================//
@@ -679,15 +751,21 @@ int anaRec(const TString finName, TList *lout, const TString tag, const int nEnt
     // Count the number of CEX event after topology cuts
     CEXEventCount++;
 
-    // Get the weight for evt bck reweight
+    // Get the weight for evt bck reweight (FIXME)
     double XSevtweight = anaUtils.CalXSEvtWeight(kMC, interactingE_reco, evtXStype);
     // Get the signal fraction for data bck sub
     double intcexwt = 1.0; // anaUtils.CalCEXIntWeight(interactingE_reco);
     // Fill the beam interacting energy decomposed by event and particle type
-    // CEX int bck scale
-    plotUtils.FillHist(AnaIO::hRecPiPlusInteractingEnergyEvt, interactingE_reco, evtXStype, weight*bckweight*XSevtweight);
-    plotUtils.FillHist(AnaIO::hRecPiPlusInteractingEnergyPar, interactingE_reco, parType, weight*bckweight*XSevtweight);
-    
+    if(interactingE_reco > 0){
+      // CEX int bck scale
+      plotUtils.FillHist(AnaIO::hRecPiPlusInteractingEnergyEvt, interactingE_reco, evtXStype, weight*bckweight*XSevtweight);
+      plotUtils.FillHist(AnaIO::hRecPiPlusInteractingEnergyEvt_NoTune, interactingE_reco, evtXStype, weight*bckweight*1.0);
+      plotUtils.FillHist(AnaIO::hRecPiPlusInteractingEnergyPar, interactingE_reco, parType, weight*bckweight*XSevtweight);
+      plotUtils.FillHist(AnaIO::hRecPiPlusInteractingEnergyPar_NoTune, interactingE_reco, parType, weight*bckweight*1.0);
+    }
+
+    //intcexwt = anaUtils.CalCEXIntWeight(interactingE_reco);
+
     // Fill data XS histograms
     if(trackLen != -999 && !kMC) {
       if(doXS) plotUtils.FillHist(AnaIO::hRecPiPlusInteractingEnergyBckSub, interactingE_reco, anaUtils.gkXSBmBkg, intcexwt);
@@ -707,29 +785,35 @@ int anaRec(const TString finName, TList *lout, const TString tag, const int nEnt
     // Fill bck substracted data beam int
     if(!kMC) plotUtils.FillHist(AnaIO::hRecPiPlusInteractingEnergyBckSubCheck, interactingE_reco, evtXStype, intcexwt);
     // Fill the pi0 kinetic energy for all pion beams
+    plotUtils.FillHist(AnaIO::hRecPiZeroKineticEnergyEvtNoWeight, pi0KineticE*1000, evtXStype, 1.0);
     plotUtils.FillHist(AnaIO::hRecPiZeroKineticEnergyEvt, pi0KineticE*1000, evtXStype, XSevtweight*weight);
 
     //weight = weight*anaUtils.Pi0weight;
     double pi0wt = 1.0;
-    /*if(pi0KineticE < 0.35 && kMC && evtXStype != anaUtils.gkXSSignal){
-      weight = weight*1.50172; pi0wt = 1.50172;
-    }
-    if(pi0KineticE > 0.35 && kMC && evtXStype != anaUtils.gkXSSignal){
-      weight = weight*1.04561; pi0wt = 1.04561;
-    }*/
+
     if(pi0KineticE < 0.30 && kMC && evtXStype != anaUtils.gkXSSignal){
       //weight = weight*1.78736; 
-      pi0wt = 1.78736;
+      //pi0wt = 1.78736;
+      //pi0wt = 1.48402;
+      pi0wt = 1.7628;
+      
     }
     if(pi0KineticE > 0.30 && kMC && evtXStype != anaUtils.gkXSSignal){
       //weight = weight*0.957846; 
-      pi0wt = 0.957846;
+      //pi0wt = 0.957846;
+      //pi0wt = 0.789352;
+      pi0wt = 0.96339;
+
     }
+
     // Fill the pi0 kinetic energy for selected pion int energy regions
+    //if(interactingE_reco> 650 && interactingE_reco < 800 && anaCut.GetNPi0() == 1) {
     if(interactingE_reco> 650 && interactingE_reco < 800) {
       // ============== Pi0 KE =============//
       // no weight
       plotUtils.FillHist(AnaIO::hRecPiZeroRangeKineticEnergyEvtNoWeight, pi0KineticE*1000, evtXStype, pi0wt);
+      plotUtils.FillHist(AnaIO::hRecPiZeroRangeKineticEnergyEvtNoWeight_LargeBin, pi0KineticE*1000, evtXStype, pi0wt);
+      plotUtils.FillHist(AnaIO::hRecPiZeroRangeKineticEnergyEvtRaw_LargeBin, pi0KineticE*1000, evtXStype, 1.0);
       // only with bck reweight
       plotUtils.FillHist(AnaIO::hRecPiZeroRangeKineticEnergyEvtOneWeight, pi0KineticE*1000, evtXStype, XSevtweight*pi0wt);
       // only with beam mom. reweight
@@ -785,6 +869,8 @@ int anaRec(const TString finName, TList *lout, const TString tag, const int nEnt
   // Print info
   cout << "All entries: " << ientry << endl;
   cout << "BeamCount: " << BeamCount << endl;
+  cout << "BeamWeightedCount: " << BeamWeightedCount << endl;
+
   cout << "CEXEventCount: " << CEXEventCount << endl;
   // Kinematic Fitting for Pi0 shower
   //if(kMC) anaUtils.DoKinematicFitting();
@@ -830,15 +916,16 @@ int anaRec(const TString finName, TList *lout, const TString tag, const int nEnt
   nsel = plotUtils.PrintStat(tag+Form(" %d. Michel score",  icut++), AnaIO::hCutMichelScorePass, 1, 1, nsel);
   nsel = plotUtils.PrintStat(tag+Form(" %d. Chi2/DOF",  icut++), AnaIO::hCutProtonChi2Pass, 1, 1, nsel);
   nsel = plotUtils.PrintStat(tag+Form(" %d. Beam Scraper",  icut++), AnaIO::hCutBeamScraperPass, 1, 1, nsel);
-
-  // FS particle cuts
-  //nsel = plotUtils.PrintStat(tag+Form(" %d. Nproton",  icut++), AnaIO::hCutnproton, 1, 1, nsel); // TKI proton selection
-  nsel = plotUtils.PrintStat(tag+Form(" %d. Nshower",  icut++), AnaIO::hCutnshower, 2, 100000, nsel);
-  nsel = plotUtils.PrintStat(tag+Form(" %d. Npiplus",  icut++), AnaIO::hCutnpiplus, 0, 0, nsel);
-  nsel = plotUtils.PrintStat(tag+Form(" %d. Nmichel",  icut++), AnaIO::hCutnmichel, 0, 0, nsel);
-  nsel = plotUtils.PrintStat(tag+Form(" %d. Npi0",  icut++), AnaIO::hCutnpi0, 1, 1, nsel);
-  //nsel = plotUtils.PrintStat(tag+Form(" %d. KF Pass",  icut++), AnaIO::hCutKFPass, 1, 1, nsel);
-
+  // Only print for CEX signal otherwise will exit
+  //if(anaCut.GetNPiPlus() == 0 && anaCut.GetNPi0() == 1){
+    // FS particle cuts
+    //nsel = plotUtils.PrintStat(tag+Form(" %d. Nproton",  icut++), AnaIO::hCutnproton, 1, 1, nsel); // TKI proton selection
+    nsel = plotUtils.PrintStat(tag+Form(" %d. Nshower",  icut++), AnaIO::hCutnshower, 2, 100000, nsel);
+    nsel = plotUtils.PrintStat(tag+Form(" %d. Npiplus",  icut++), AnaIO::hCutnpiplus, 0, 0, nsel);
+    nsel = plotUtils.PrintStat(tag+Form(" %d. Nmichel",  icut++), AnaIO::hCutnmichel, 0, 0, nsel);
+    nsel = plotUtils.PrintStat(tag+Form(" %d. Npi0",  icut++), AnaIO::hCutnpi0, 1, 1, nsel);
+    //nsel = plotUtils.PrintStat(tag+Form(" %d. KF Pass",  icut++), AnaIO::hCutKFPass, 1, 1, nsel);
+  //}
   cout << "Proton Cuts: " << endl;
   int icut_proton = 0;
   double nsel_proton = -999;
@@ -868,35 +955,49 @@ int anaRec(const TString finName, TList *lout, const TString tag, const int nEnt
 
   cout << "\n------------- Beam Purity and Efficiency--------------------" << endl;
   int icut_beam_pe = 0;
-  if(kMC) plotUtils.PrintPi0PurityandEff(tag+Form(" %d. Beam PDG",  icut_beam_pe++), AnaIO::hBeamEndZ_TrueAvailable, AnaIO::hBeamEndZ_CutPDG);
-  if(kMC) plotUtils.PrintPi0PurityandEff(tag+Form(" %d. Beam Pandora",  icut_beam_pe++), AnaIO::hBeamEndZ_TrueAvailable, AnaIO::hBeamEndZ_CutPandora);
-  if(kMC) plotUtils.PrintPi0PurityandEff(tag+Form(" %d. Beam CaloSize",  icut_beam_pe++), AnaIO::hBeamEndZ_TrueAvailable, AnaIO::hBeamEndZ_CutCaloSize);
-  if(kMC) plotUtils.PrintPi0PurityandEff(tag+Form(" %d. Beam Quality",  icut_beam_pe++), AnaIO::hBeamEndZ_TrueAvailable, AnaIO::hBeamEndZ_CutBeamQuality);
-  if(kMC) plotUtils.PrintPi0PurityandEff(tag+Form(" %d. Beam APA3",  icut_beam_pe++), AnaIO::hBeamEndZ_TrueAvailable, AnaIO::hBeamEndZ_CutAPA3);
-  if(kMC) plotUtils.PrintPi0PurityandEff(tag+Form(" %d. Beam Michel",  icut_beam_pe++), AnaIO::hBeamEndZ_TrueAvailable, AnaIO::hBeamEndZ_CutMichelScore);
-  if(kMC) plotUtils.PrintPi0PurityandEff(tag+Form(" %d. Beam Chi2",  icut_beam_pe++), AnaIO::hBeamEndZ_TrueAvailable, AnaIO::hBeamEndZ_CutChi2DOF);
-  if(kMC) plotUtils.PrintPi0PurityandEff(tag+Form(" %d. Beam Scraper",  icut_beam_pe++), AnaIO::hBeamEndZ_TrueAvailable, AnaIO::hBeamEndZ_CutBeamScraper);
+  //if(kMC) plotUtils.PrintPi0PurityandEff(tag+Form(" %d. Beam PDG",  icut_beam_pe++), AnaIO::hBeamEndZ_TrueAvailable, AnaIO::hBeamEndZ_CutPDG);
+  if(kMC) plotUtils.PrintPi0PurityandEff(tag+Form(" %d. Beam PDG",  icut_beam_pe++), AnaIO::hTruthMatchedBeamSample, AnaIO::hBeamEndZ_CutPDG);
+  if(kMC) plotUtils.PrintPi0PurityandEff(tag+Form(" %d. Beam Pandora",  icut_beam_pe++), AnaIO::hTruthMatchedBeamSample, AnaIO::hBeamEndZ_CutPandora);
+  if(kMC) plotUtils.PrintPi0PurityandEff(tag+Form(" %d. Beam CaloSize",  icut_beam_pe++), AnaIO::hTruthMatchedBeamSample, AnaIO::hBeamEndZ_CutCaloSize);
+  if(kMC) plotUtils.PrintPi0PurityandEff(tag+Form(" %d. Beam Quality",  icut_beam_pe++), AnaIO::hTruthMatchedBeamSample, AnaIO::hBeamEndZ_CutBeamQuality);
+  if(kMC) plotUtils.PrintPi0PurityandEff(tag+Form(" %d. Beam APA3",  icut_beam_pe++), AnaIO::hTruthMatchedBeamSample, AnaIO::hBeamEndZ_CutAPA3);
+  if(kMC) plotUtils.PrintPi0PurityandEff(tag+Form(" %d. Beam Michel",  icut_beam_pe++), AnaIO::hTruthMatchedBeamSample, AnaIO::hBeamEndZ_CutMichelScore);
+  if(kMC) plotUtils.PrintPi0PurityandEff(tag+Form(" %d. Beam Chi2",  icut_beam_pe++), AnaIO::hTruthMatchedBeamSample, AnaIO::hBeamEndZ_CutChi2DOF);
+  if(kMC) plotUtils.PrintPi0PurityandEff(tag+Form(" %d. Beam Scraper",  icut_beam_pe++), AnaIO::hTruthMatchedBeamSample, AnaIO::hBeamEndZ_CutBeamScraper);
   
   cout << "\n------------- Proton Purity and Efficiency--------------------" << endl;
   int icut_proton_pe = 0;
-  if(kMC) plotUtils.PrintPi0PurityandEff(tag+Form(" %d. Proton track score",  icut_proton_pe++), AnaIO::hTruthProtonP, AnaIO::hProtonMom_CutTrackScore);
-  if(kMC) plotUtils.PrintPi0PurityandEff(tag+Form(" %d. Proton nhits",  icut_proton_pe++), AnaIO::hTruthProtonP, AnaIO::hProtonMom_CutnHits);
-  if(kMC) plotUtils.PrintPi0PurityandEff(tag+Form(" %d. Proton SubPID",  icut_proton_pe++), AnaIO::hTruthProtonP, AnaIO::hProtonMom_CutSubPID);
+  //if(kMC) plotUtils.PrintPi0PurityandEff(tag+Form(" %d. No Cut",  icut_proton_pe++), AnaIO::hTruthProtonP, AnaIO::hProtonMom_NoCut);
+  if(kMC) plotUtils.PrintPi0PurityandEff(tag+Form(" %d. No Cut",  icut_proton_pe++), AnaIO::hTruthMatchedProtonSample, AnaIO::hProtonMom_NoCut);
+  if(kMC) plotUtils.PrintPi0PurityandEff(tag+Form(" %d. Proton track score",  icut_proton_pe++), AnaIO::hTruthMatchedProtonSample, AnaIO::hProtonMom_CutTrackScore);
+  if(kMC) plotUtils.PrintPi0PurityandEff(tag+Form(" %d. Proton nhits",  icut_proton_pe++), AnaIO::hTruthMatchedProtonSample, AnaIO::hProtonMom_CutnHits);
+  if(kMC) plotUtils.PrintPi0PurityandEff(tag+Form(" %d. Proton SubPID",  icut_proton_pe++), AnaIO::hTruthMatchedProtonSample, AnaIO::hProtonMom_CutSubPID);
+
+  cout << "\n------------- PiPlus Purity and Efficiency--------------------" << endl;
+  int icut_piplus_pe = 0;
+  if(kMC) plotUtils.PrintPi0PurityandEff(tag+Form(" %d. No Cut",  icut_piplus_pe++), AnaIO::hTruthMatchedPiPlusSample, AnaIO::hPiPlusMom_NoCut);
+  if(kMC) plotUtils.PrintPi0PurityandEff(tag+Form(" %d. PiPlus track score",  icut_piplus_pe++), AnaIO::hTruthMatchedPiPlusSample, AnaIO::hPiPlusMom_CutTrackScore);
+  if(kMC) plotUtils.PrintPi0PurityandEff(tag+Form(" %d. PiPlus nhits",  icut_piplus_pe++), AnaIO::hTruthMatchedPiPlusSample, AnaIO::hPiPlusMom_CutnHits);
+  if(kMC) plotUtils.PrintPi0PurityandEff(tag+Form(" %d. PiPlus SubPID",  icut_piplus_pe++), AnaIO::hTruthMatchedPiPlusSample, AnaIO::hPiPlusMom_CutSubPID);
 
   cout << "\n------------- Shower Purity and Efficiency--------------------" << endl;
   int icut_shower_pe = 0;
-  if(kMC) plotUtils.PrintShowerPurityandEff(tag+Form(" %d. Shower EM score",  icut_shower_pe++), AnaIO::hTruthLeadingPi0GammaP,AnaIO::hTruthSubLeadingPi0GammaP, AnaIO::hShowerEnergy_CutEMscore);
-  if(kMC) plotUtils.PrintShowerPurityandEff(tag+Form(" %d. Shower nhits",  icut_shower_pe++), AnaIO::hTruthLeadingPi0GammaP,AnaIO::hTruthSubLeadingPi0GammaP, AnaIO::hShowerEnergy_CutnHits);
-  if(kMC) plotUtils.PrintShowerPurityandEff(tag+Form(" %d. Shower startZ",  icut_shower_pe++), AnaIO::hTruthLeadingPi0GammaP,AnaIO::hTruthSubLeadingPi0GammaP, AnaIO::hShowerEnergy_CutStartZ);
-  if(kMC) plotUtils.PrintShowerPurityandEff(tag+Form(" %d. Shower distance",  icut_shower_pe++), AnaIO::hTruthLeadingPi0GammaP,AnaIO::hTruthSubLeadingPi0GammaP, AnaIO::hShowerEnergy_CutDistance);
-  if(kMC) plotUtils.PrintShowerPurityandEff(tag+Form(" %d. Shower IP",  icut_shower_pe++), AnaIO::hTruthLeadingPi0GammaP,AnaIO::hTruthSubLeadingPi0GammaP, AnaIO::hShowerEnergy_CutIP);
+  //if(kMC) plotUtils.PrintShowerPurityandEff(tag+Form(" %d. No Cut",  icut_shower_pe++), AnaIO::hTruthLeadingPi0GammaP,AnaIO::hTruthSubLeadingPi0GammaP, AnaIO::hShowerEnergy_NoCut);
+  if(kMC) plotUtils.PrintPi0PurityandEff(tag+Form(" %d. No Cut",  icut_shower_pe++), AnaIO::hTruthMatchedShowerSample, AnaIO::hShowerEnergy_NoCut);
+  if(kMC) plotUtils.PrintPi0PurityandEff(tag+Form(" %d. Shower EM score",  icut_shower_pe++), AnaIO::hTruthMatchedShowerSample, AnaIO::hShowerEnergy_CutEMscore);
+  if(kMC) plotUtils.PrintPi0PurityandEff(tag+Form(" %d. Shower nhits",  icut_shower_pe++), AnaIO::hTruthMatchedShowerSample, AnaIO::hShowerEnergy_CutnHits);
+  if(kMC) plotUtils.PrintPi0PurityandEff(tag+Form(" %d. Shower startZ",  icut_shower_pe++), AnaIO::hTruthMatchedShowerSample, AnaIO::hShowerEnergy_CutStartZ);
+  if(kMC) plotUtils.PrintPi0PurityandEff(tag+Form(" %d. Shower distance",  icut_shower_pe++), AnaIO::hTruthMatchedShowerSample, AnaIO::hShowerEnergy_CutDistance);
+  if(kMC) plotUtils.PrintPi0PurityandEff(tag+Form(" %d. Shower IP",  icut_shower_pe++), AnaIO::hTruthMatchedShowerSample, AnaIO::hShowerEnergy_CutIP);
 
   cout << "\n------------- Pi0 Purity and Efficiency--------------------" << endl;
   int icut_pi0_pe = 0;
-  if(kMC) plotUtils.PrintPi0PurityandEff(tag+Form(" %d. No Cut",  icut_pi0_pe++), AnaIO::hTruthLeadingPiZeroE, AnaIO::hPi0Energy_NoCut);
-  if(kMC) plotUtils.PrintPi0PurityandEff(tag+Form(" %d. Pi0 Mass",  icut_pi0_pe++), AnaIO::hTruthLeadingPiZeroE, AnaIO::hPi0Energy_CutMass);
-  if(kMC) plotUtils.PrintPi0PurityandEff(tag+Form(" %d. Pi0 OA",  icut_pi0_pe++), AnaIO::hTruthLeadingPiZeroE, AnaIO::hPi0Energy_CutOA);
+  //if(kMC) plotUtils.PrintPi0PurityandEff(tag+Form(" %d. No Cut",  icut_pi0_pe++), AnaIO::hTruthLeadingPiZeroE, AnaIO::hPi0Energy_NoCut);
+  if(kMC) plotUtils.PrintPi0PurityandEff(tag+Form(" %d. No Cut",  icut_pi0_pe++), AnaIO::hTruthMatchedPi0Sample, AnaIO::hPi0Energy_NoCut);
+  if(kMC) plotUtils.PrintPi0PurityandEff(tag+Form(" %d. Pi0 Mass",  icut_pi0_pe++), AnaIO::hTruthMatchedPi0Sample, AnaIO::hPi0Energy_CutMass);
+  if(kMC) plotUtils.PrintPi0PurityandEff(tag+Form(" %d. Pi0 OA",  icut_pi0_pe++), AnaIO::hTruthMatchedPi0Sample, AnaIO::hPi0Energy_CutOA);
 
+/*
   cout << "\n------------- Exclusive Channel Purity and Efficiency (1p0n only)--------------------" << endl;
   if(kMC) plotUtils.PrintPi0PurityandEff(tag+Form(" %d. Exclusive 1p0n",  0), AnaIO::hTruthDalphat1p0n, AnaIO::hRecdalphat);
 
@@ -905,20 +1006,37 @@ int anaRec(const TString finName, TList *lout, const TString tag, const int nEnt
 
   cout << "\n------------- Charge Exchange Channel Purity and Efficiency --------------------" << endl;
   if(kMC) plotUtils.PrintPi0PurityandEff(tag+Form(" %d. Charge Exchange",  0), AnaIO::hBeamEndZ_ChannelsTrueSignal, AnaIO::hBeamEndZ_Channels_afterEvtTop);
+*/
 
-  cout << "\n------------- Charge Exchange Channel Purity and Efficiency new Def--------------------" << endl;
+  cout << "\n------------- Charge Exchange Channel Purity and Efficiency --------------------" << endl;
   int icut_chex_pe = 0;
-  if(kMC) plotUtils.PrintPi0PurityandEff(tag+Form(" %d. ChEx Beam PDG",  icut_chex_pe++), AnaIO::hBeamEndZ_ChargeExcChannel, AnaIO::hBeamEndZ_Channels_BeamPDG);
-  if(kMC) plotUtils.PrintPi0PurityandEff(tag+Form(" %d. ChEx Beam Pandora",  icut_chex_pe++), AnaIO::hBeamEndZ_ChargeExcChannel, AnaIO::hBeamEndZ_Channels_BeamPandora);
-  if(kMC) plotUtils.PrintPi0PurityandEff(tag+Form(" %d. ChEx Beam Calo",  icut_chex_pe++), AnaIO::hBeamEndZ_ChargeExcChannel, AnaIO::hBeamEndZ_Channels_BeamCalo);
-  if(kMC) plotUtils.PrintPi0PurityandEff(tag+Form(" %d. ChEx Beam Qaulity",  icut_chex_pe++), AnaIO::hBeamEndZ_ChargeExcChannel, AnaIO::hBeamEndZ_Channels_BeamQuality);
-  if(kMC) plotUtils.PrintPi0PurityandEff(tag+Form(" %d. ChEx Beam APA3",  icut_chex_pe++), AnaIO::hBeamEndZ_ChargeExcChannel, AnaIO::hBeamEndZ_Channels_BeamAPA3);
-  if(kMC) plotUtils.PrintPi0PurityandEff(tag+Form(" %d. ChEx Beam Michel",  icut_chex_pe++), AnaIO::hBeamEndZ_ChargeExcChannel, AnaIO::hBeamEndZ_Channels_BeamMichel);
-  if(kMC) plotUtils.PrintPi0PurityandEff(tag+Form(" %d. ChEx Beam Chi2",  icut_chex_pe++), AnaIO::hBeamEndZ_ChargeExcChannel, AnaIO::hBeamEndZ_Channels_BeamChi2);
-  if(kMC) plotUtils.PrintPi0PurityandEff(tag+Form(" %d. ChEx Beam Scraper",  icut_chex_pe++), AnaIO::hBeamEndZ_ChargeExcChannel, AnaIO::hBeamEndZ_Channels_BeamScraper);
-  if(kMC) plotUtils.PrintPi0PurityandEff(tag+Form(" %d. ChEx Two Showers",  icut_chex_pe++), AnaIO::hBeamEndZ_ChargeExcChannel, AnaIO::hBeamEndZ_Channels_TwoShowers);
-  if(kMC) plotUtils.PrintPi0PurityandEff(tag+Form(" %d. ChEx No PiPlus",  icut_chex_pe++), AnaIO::hBeamEndZ_ChargeExcChannel, AnaIO::hBeamEndZ_Channels_NoPiPlus);
-  if(kMC) plotUtils.PrintPi0PurityandEff(tag+Form(" %d. ChEx One Pi0",  icut_chex_pe++), AnaIO::hBeamEndZ_ChargeExcChannel, AnaIO::hBeamEndZ_Channels_OnePi0);
+  if(kMC) plotUtils.PrintPi0PurityandEff(tag+Form(" %d. ChEx Beam PDG",  icut_chex_pe++), AnaIO::hTruthMatchedChannelCEXSample, AnaIO::hBeamEndZ_Channels_BeamPDG);
+  if(kMC) plotUtils.PrintPi0PurityandEff(tag+Form(" %d. ChEx Beam Pandora",  icut_chex_pe++), AnaIO::hTruthMatchedChannelCEXSample, AnaIO::hBeamEndZ_Channels_BeamPandora);
+  if(kMC) plotUtils.PrintPi0PurityandEff(tag+Form(" %d. ChEx Beam Calo",  icut_chex_pe++), AnaIO::hTruthMatchedChannelCEXSample, AnaIO::hBeamEndZ_Channels_BeamCalo);
+  if(kMC) plotUtils.PrintPi0PurityandEff(tag+Form(" %d. ChEx Beam Qaulity",  icut_chex_pe++), AnaIO::hTruthMatchedChannelCEXSample, AnaIO::hBeamEndZ_Channels_BeamQuality);
+  if(kMC) plotUtils.PrintPi0PurityandEff(tag+Form(" %d. ChEx Beam APA3",  icut_chex_pe++), AnaIO::hTruthMatchedChannelCEXSample, AnaIO::hBeamEndZ_Channels_BeamAPA3);
+  if(kMC) plotUtils.PrintPi0PurityandEff(tag+Form(" %d. ChEx Beam Michel",  icut_chex_pe++), AnaIO::hTruthMatchedChannelCEXSample, AnaIO::hBeamEndZ_Channels_BeamMichel);
+  if(kMC) plotUtils.PrintPi0PurityandEff(tag+Form(" %d. ChEx Beam Chi2",  icut_chex_pe++), AnaIO::hTruthMatchedChannelCEXSample, AnaIO::hBeamEndZ_Channels_BeamChi2);
+  if(kMC) plotUtils.PrintPi0PurityandEff(tag+Form(" %d. ChEx Beam Scraper",  icut_chex_pe++), AnaIO::hTruthMatchedChannelCEXSample, AnaIO::hBeamEndZ_Channels_BeamScraper);
+  if(kMC) plotUtils.PrintPi0PurityandEff(tag+Form(" %d. ChEx Two Showers",  icut_chex_pe++), AnaIO::hTruthMatchedChannelCEXSample, AnaIO::hBeamEndZ_Channels_TwoShowers);
+  if(kMC) plotUtils.PrintPi0PurityandEff(tag+Form(" %d. ChEx No PiPlus",  icut_chex_pe++), AnaIO::hTruthMatchedChannelCEXSample, AnaIO::hBeamEndZ_Channels_NoPiPlus);
+  if(kMC) plotUtils.PrintPi0PurityandEff(tag+Form(" %d. ChEx No Michel",  icut_chex_pe++), AnaIO::hTruthMatchedChannelCEXSample, AnaIO::hBeamEndZ_Channels_NoMichel);
+  if(kMC) plotUtils.PrintPi0PurityandEff(tag+Form(" %d. ChEx One Pi0",  icut_chex_pe++), AnaIO::hTruthMatchedChannelCEXSample, AnaIO::hBeamEndZ_Channels_OnePi0);
+
+  cout << "\n------------- Charge Exchange XSevt Purity and Efficiency --------------------" << endl;
+  int icut_XSchex_pe = 0;
+  if(kMC) plotUtils.PrintPi0PurityandEff(tag+Form(" %d. ChEx Beam PDG",  icut_XSchex_pe++), AnaIO::hTruthMatchedXsEvtCEXSample, AnaIO::hBeamEndZ_XsEvt_BeamPDG);
+  if(kMC) plotUtils.PrintPi0PurityandEff(tag+Form(" %d. ChEx Beam Pandora",  icut_XSchex_pe++), AnaIO::hTruthMatchedXsEvtCEXSample, AnaIO::hBeamEndZ_XsEvt_BeamPandora);
+  if(kMC) plotUtils.PrintPi0PurityandEff(tag+Form(" %d. ChEx Beam Calo",  icut_XSchex_pe++), AnaIO::hTruthMatchedXsEvtCEXSample, AnaIO::hBeamEndZ_XsEvt_BeamCalo);
+  if(kMC) plotUtils.PrintPi0PurityandEff(tag+Form(" %d. ChEx Beam Qaulity",  icut_XSchex_pe++), AnaIO::hTruthMatchedXsEvtCEXSample, AnaIO::hBeamEndZ_XsEvt_BeamQuality);
+  if(kMC) plotUtils.PrintPi0PurityandEff(tag+Form(" %d. ChEx Beam APA3",  icut_XSchex_pe++), AnaIO::hTruthMatchedXsEvtCEXSample, AnaIO::hBeamEndZ_XsEvt_BeamAPA3);
+  if(kMC) plotUtils.PrintPi0PurityandEff(tag+Form(" %d. ChEx Beam Michel",  icut_XSchex_pe++), AnaIO::hTruthMatchedXsEvtCEXSample, AnaIO::hBeamEndZ_XsEvt_BeamMichel);
+  if(kMC) plotUtils.PrintPi0PurityandEff(tag+Form(" %d. ChEx Beam Chi2",  icut_XSchex_pe++), AnaIO::hTruthMatchedXsEvtCEXSample, AnaIO::hBeamEndZ_XsEvt_BeamChi2);
+  if(kMC) plotUtils.PrintPi0PurityandEff(tag+Form(" %d. ChEx Beam Scraper",  icut_XSchex_pe++), AnaIO::hTruthMatchedXsEvtCEXSample, AnaIO::hBeamEndZ_XsEvt_BeamScraper);
+  if(kMC) plotUtils.PrintPi0PurityandEff(tag+Form(" %d. ChEx Two Showers",  icut_XSchex_pe++), AnaIO::hTruthMatchedXsEvtCEXSample, AnaIO::hBeamEndZ_XsEvt_TwoShowers);
+  if(kMC) plotUtils.PrintPi0PurityandEff(tag+Form(" %d. ChEx No PiPlus",  icut_XSchex_pe++), AnaIO::hTruthMatchedXsEvtCEXSample, AnaIO::hBeamEndZ_XsEvt_NoPiPlus);
+  if(kMC) plotUtils.PrintPi0PurityandEff(tag+Form(" %d. ChEx No Michel",  icut_XSchex_pe++), AnaIO::hTruthMatchedXsEvtCEXSample, AnaIO::hBeamEndZ_XsEvt_NoMichel);
+  if(kMC) plotUtils.PrintPi0PurityandEff(tag+Form(" %d. ChEx One Pi0",  icut_XSchex_pe++), AnaIO::hTruthMatchedXsEvtCEXSample, AnaIO::hBeamEndZ_XsEvt_OnePi0);
 
 
 
@@ -976,11 +1094,11 @@ int main(int argc, char * argv[])
   BetheBloch bb(211);
   Unfold uf(20, 0, 1000);
   // MC Analysis
-  double mcBeamCount = anaRec(mcfinName,mclout,"mc", nEntryToStop, bb, uf);
-  cout << "test intgral mc: " <<  AnaIO::hRecoBeamInitialHistData->Integral(0,10000) << endl;
+  double mcBeamWeightedCount = 0;
+  double mcBeamCount = anaRec(mcfinName,mclout,"mc", nEntryToStop, bb, uf, mcBeamWeightedCount);
   // Data Analysis
-  double dataBeamCount = anaRec(datafinName,datalout,"data", nEntryToStop, bb, uf);
-  cout << "test intgral data: " <<  AnaIO::hRecoBeamInitialHistData->Integral(0,10000) << endl;
+  double dataBeamWeightedCount = 0;
+  double dataBeamCount = anaRec(datafinName,datalout,"data", nEntryToStop, bb, uf, dataBeamWeightedCount);
   
   // Process histograms
   PlotUtils plotUtils;
@@ -1006,8 +1124,12 @@ int main(int argc, char * argv[])
   fout->Close();
   // Calculate the Data/MC normalisation constant
   double plotScale = dataBeamCount/mcBeamCount;
+  double plotScale_wt = dataBeamWeightedCount/mcBeamWeightedCount;
+
   cout << "plotScale: " << plotScale << endl;
+  cout << "plotScale_wt: " << plotScale_wt << endl;
+
   // Draw all histograms
-  plotUtils.DrawHist(mclout,plotScale,datalout,"output");
+  plotUtils.DrawHist(mclout,plotScale,plotScale_wt,datalout,"output");
 
 }

@@ -1,0 +1,32 @@
+/data/dune/users/yangk/workdir/pduneAnalysis/bin/mkexe.sh
+================== Compiling BeamScraperPlot with BeamScraperPlot =================
+
+g++ BeamScraperPlot.cxx -g -O3 -Wall -Werror -std=c++17 -I/cvmfs/larsoft.opensciencegrid.org/products/root/v6_22_06a/Linux64bit+3.10-2.17-e20-p383b-prof/include -Wl,--no-as-needed -L./ -L/cvmfs/larsoft.opensciencegrid.org/products/root/v6_22_06a/Linux64bit+3.10-2.17-e20-p383b-prof/lib -lCore -lImt -lRIO -lNet -lHist -lGraf -lGraf3d -lGpad -lROOTVecOps -lTree -lTreePlayer -lRint -lPostscript -lMatrix -lPhysics -lMathCore -lThread -lMultiProc -lROOTDataFrame -pthread -lm -ldl -rdynamic -lTree -lMinuit -lASImage -o BeamScraperPlot
+
+
+checked: /data/dune/users/yangk/workdir/pduneAnalysis/bin/mkexe.sh BeamScraperPlot done!
+
+
+[1mRooFit v3.60 -- Developed by Wouter Verkerke and David Kirkby[0m 
+                Copyright (C) 2000-2013 NIKHEF, University of California & Stanford University
+                All rights reserved, please read http://roofit.sourceforge.net/license.txt
+
+mu_raw: -0.00854067 sigma_raw: 0.0151838
+mu: 1.52576e-05 sigma: 0.0044273
+
+****************************************
+Minimizer is Linear / Migrad
+Chi2                      =    0.0386559
+NDf                       =            4
+p0                        =      171.812   +/-   768.358     
+p1                        =    -0.574581   +/-   1.77638     
+p2                        =  0.000433532   +/-   0.00101471  
+Const. Energy loss from histogram (no fit): 13.5833
+ FCN=1934.26 FROM MIGRAD    STATUS=CONVERGED     120 CALLS         121 TOTAL
+                     EDM=8.48426e-07    STRATEGY= 1      ERROR MATRIX ACCURATE 
+  EXT PARAMETER                                   STEP         FIRST   
+  NO.   NAME      VALUE            ERROR          SIZE      DERIVATIVE 
+   1  Constant     4.93727e+03   2.65757e+01   4.54405e-01  -3.91091e-05
+   2  Mean         3.70156e+00   1.18303e-01   2.53163e-03   8.47134e-03
+   3  Sigma        2.70964e+01   9.09949e-02   1.25065e-05  -1.16989e+00
+Const. Energy loss (after fit and smearing): 3.70156

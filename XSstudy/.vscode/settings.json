@@ -5,6 +5,12 @@
         "ratio": "cpp",
         "array": "cpp",
         "string": "cpp",
-        "cmath": "cpp"
+        "cmath": "cpp",
+        "iostream": "cpp",
+        "new": "cpp",
+        "typeindex": "cpp",
+        "typeinfo": "cpp",
+        "macro_XSplots.C": "cpp",
+        "complex": "cpp"
     }
 }
