@@ -90,7 +90,7 @@ class AnaCut
     const double cut_EndZ_APA3 = 220.0; // in cm
     const double cut_MichelScore = 0.55;
     // Beam quality cuts
-    const double MCmeanStartX = -30.85; // in cm
+    /*const double MCmeanStartX = -30.85; // in cm
     const double MCmeanStartY = 422.4;  
     const double MCmeanStartZ = 0.1146; 
     const double MCmeanThetaX = 101.6 * TMath::DegToRad(); // in rad.
@@ -108,7 +108,28 @@ class AnaCut
     const double DATAmeanThetaZ = 17.79 * TMath::DegToRad();
     const double DATAsigmaStartX = 4.636;
     const double DATAsigmaStartY = 5.217;
-    const double DATAsigmaStartZ = 1.326;
+    const double DATAsigmaStartZ = 1.326;*/
+
+    //for 2 GeV with Richie parameter
+    const double MCmeanStartX = -36.44; // in cm
+    const double MCmeanStartY = 416.9;
+    const double MCmeanStartZ = 30;
+    const double MCmeanThetaX = 101.6 * TMath::DegToRad(); // in rad.
+    const double MCmeanThetaY = 101.3 * TMath::DegToRad();
+    const double MCmeanThetaZ = 16.51 * TMath::DegToRad();
+    const double MCsigmaStartX = 4.846;
+    const double MCsigmaStartY = 4.605;
+    const double MCsigmaStartZ = 0.199;
+
+    const double DATAmeanStartX = -32.77; // in cm
+    const double DATAmeanStartY = 418.2;
+    const double DATAmeanStartZ = 30;
+    const double DATAmeanThetaX = 100.4 * TMath::DegToRad(); // in rad.
+    const double DATAmeanThetaY = 102.9 * TMath::DegToRad();
+    const double DATAmeanThetaZ = 16.93 * TMath::DegToRad();
+    const double DATAsigmaStartX = 4.613;
+    const double DATAsigmaStartY = 4.608;
+    const double DATAsigmaStartZ = 0.203;
 
     const double MCmeanInstX = -29.28;
     const double MCsigmaInstX = 4.127;

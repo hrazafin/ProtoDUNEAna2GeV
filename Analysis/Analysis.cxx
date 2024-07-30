@@ -10,14 +10,19 @@ int anaRec(const TString finName, TList *lout, const TString tag, const int nEnt
 {
   //======================================== Basic Settings ======================================== 
   cout << "Input file:" << endl;
-  gSystem->Exec(Form("readlink -f %s", finName.Data()));
+  //gSystem->Exec(Form("readlink -f %s", finName.Data()));
   cout << endl;
   // Control MC or data sample
   bool kMC = true;
   if(!finName.Contains("_mc_"))  kMC = false;
 
-  // Open the input file
-  TFile * fin = new TFile(finName);
+  // Open the input file via xrootd
+  TFile * fin;
+  if (kMC)
+    fin = TFile::Open("root://fndca1.fnal.gov:1094/pnfs/fnal.gov/usr/dune/persistent/users/hrazafin/protoDUNE/2GeV_MC_Data/PDSPProd4a_MC_2GeV_reco1_sce_datadriven_ntuple_v09_81_00.root");
+  else
+    fin = TFile::Open("root://fndca1.fnal.gov:1094/pnfs/fnal.gov/usr/dune/persistent/users/hrazafin/protoDUNE/2GeV_MC_Data/PDSPProd4_data_2GeV_reco2_ntuple_v09_42_03_01.root");
+
   if(!fin->IsOpen()){
     cout << "fin not open!" << endl;
     exit(1);
@@ -61,6 +66,146 @@ int anaRec(const TString finName, TList *lout, const TString tag, const int nEnt
   
   // Loop over TTree
   while(tree->GetEntry(ientry)){
+    //startZ correction begin**********************************
+    //if (AnaIO::reco_beam_calo_endX == -999 || AnaIO::reco_beam_calo_endY == -999 || AnaIO::reco_beam_calo_endZ == -999) continue; 
+    for (long unsigned int calo=0; calo<AnaIO::reco_beam_calo_X->size();calo++){
+      if (calo==0)      AnaIO::reco_beam_startZ=AnaIO::reco_beam_calo_Z->at(0);
+      if (AnaIO::reco_beam_calo_Z->at(calo)>40) break;
+      if (abs(AnaIO::reco_beam_startZ-30)<abs(AnaIO::reco_beam_calo_Z->at(calo)-30)) continue;
+      AnaIO::reco_beam_startX=AnaIO::reco_beam_calo_X->at(calo);
+      AnaIO::reco_beam_startY=AnaIO::reco_beam_calo_Y->at(calo);
+      AnaIO::reco_beam_startZ=AnaIO::reco_beam_calo_Z->at(calo);
+    }
+     
+    AnaIO::reco_beam_endX = AnaIO::reco_beam_calo_endX;
+    AnaIO::reco_beam_endY = AnaIO::reco_beam_calo_endY;
+    AnaIO::reco_beam_endZ = AnaIO::reco_beam_calo_endZ;
+   
+    AnaIO::reco_beam_calo_startX = AnaIO::reco_beam_startX;
+    AnaIO::reco_beam_calo_startY = AnaIO::reco_beam_startY;
+    AnaIO::reco_beam_calo_startZ = AnaIO::reco_beam_startZ;
+
+    /*
+    TVector3 BeamDir(AnaIO::reco_beam_calo_endX-AnaIO::reco_beam_calo_startX,
+                  AnaIO::reco_beam_calo_endY-AnaIO::reco_beam_calo_startY,
+                  AnaIO::reco_beam_calo_endZ-AnaIO::reco_beam_calo_startZ);
+    TVector3 DetX(1,0,0);
+    TVector3 DetY(0,1,0);
+    TVector3 DetZ(0,0,1);
+
+    const double thetaX = BeamDir.Angle(DetX)*TMath::RadToDeg();
+    const double thetaY = BeamDir.Angle(DetY)*TMath::RadToDeg();
+    const double thetaZ = BeamDir.Angle(DetZ)*TMath::RadToDeg();
+    
+    //Check theta odd :
+    cout <<"********************************************" << endl;
+    if (thetaX > 112 && thetaX <124){
+        cout <<"value of ODD reco_beam_calo_startX =" << AnaIO::reco_beam_startX << endl;
+        cout <<"value of ODD reco_beam_calo_endX =" << AnaIO::reco_beam_endX << endl;
+	}
+    if (thetaX > 92 && thetaX <108){
+        cout <<"value of NORMAL reco_beam_calo_startX =" << AnaIO::reco_beam_startX << endl;
+        cout <<"value of NORMAL reco_beam_calo_endX =" << AnaIO::reco_beam_endX << endl;
+        }
+    
+    cout <<"______________________________________________" << endl;
+    if (thetaY > 114 && thetaY <122){
+        cout <<"value of ODD reco_beam_calo_startY =" << AnaIO::reco_beam_startY << endl;
+        cout <<"value of ODD reco_beam_calo_endY =" << AnaIO::reco_beam_endY << endl;
+        }
+    if (thetaY > 95 && thetaY <108){
+        cout <<"value of NORMAL reco_beam_calo_startY =" << AnaIO::reco_beam_startY << endl;
+        cout <<"value of NORMAL reco_beam_calo_endY =" << AnaIO::reco_beam_endY << endl;
+        }
+    
+    cout <<"______________________________________________" << endl;
+    if (thetaZ > 118 && thetaZ <122){
+        cout <<"value of ODD reco_beam_calo_startZ =" << AnaIO::reco_beam_startZ << endl;
+        cout <<"value of ODD reco_beam_calo_endZ =" << AnaIO::reco_beam_endZ << endl;
+        }
+    if (thetaZ > 10 && thetaZ <25){
+        cout <<"value of NORMAL reco_beam_calo_startZ =" << AnaIO::reco_beam_startZ << endl;
+        cout <<"value of NORMAL reco_beam_calo_endZ =" << AnaIO::reco_beam_endZ << endl;
+        }*/
+    
+    //Check for - 999 events
+    /*
+    cout <<"********************************************" << endl;
+    if (AnaIO::reco_beam_calo_endX == -999){
+        cout << "ientry = "<<ientry << " value of ODD reco_beam_calo_endX = " << AnaIO::reco_beam_endX << endl;
+        cout << "reco_beam_endX = " << AnaIO::reco_beam_endX << " reco_beam_calo_startX = " << AnaIO::reco_beam_calo_startX << endl;
+        cout << "thetaX = " << thetaX << " thetaY = " << thetaY<< " thetaZ = " << thetaZ << endl;
+        if (AnaIO::reco_beam_calo_X->size() >= 2) {
+          cout << "reco_beam_calo_X -1 = " <<AnaIO::reco_beam_calo_X->at(AnaIO::reco_beam_calo_X->size() -1) <<" reco_beam_calo_Y -1 = " <<AnaIO::reco_beam_calo_Y->at(AnaIO::reco_beam_calo_Y->size() -1) <<"  reco_beam_calo_Z -1 = " << AnaIO::reco_beam_calo_Z->at(AnaIO::reco_beam_calo_Z->size() -1) << endl;
+          cout << "Size reco_beam_calo_X -2 = " <<AnaIO::reco_beam_calo_X->at(AnaIO::reco_beam_calo_X->size() -2) <<" Size reco_beam_calo_Y -2 = " <<AnaIO::reco_beam_calo_Y->at(AnaIO::reco_beam_calo_Y->size() -2) <<" Size reco_beam_calo_Z -2 = " <<AnaIO::reco_beam_calo_Z->at(AnaIO::reco_beam_calo_Z->size() -2) << endl; }
+        else {
+          cout << "calo size smaller than 2, calo size X is = " << AnaIO::reco_beam_calo_X->size() << endl;
+        }
+	cout << "Calo size is empty val = " << AnaIO::reco_beam_calo_wire->empty() << endl;
+        }
+
+    cout <<"______________________________________________" << endl;
+
+    if (AnaIO::reco_beam_calo_endY == -999){
+        cout << "ientry = "<<ientry << " value of ODD reco_beam_calo_endY = " << AnaIO::reco_beam_endY << endl;
+        cout << "reco_beam_endY = " << AnaIO::reco_beam_endY << " reco_beam_calo_startY = " << AnaIO::reco_beam_calo_startY << endl;
+        cout << "thetaX = " << thetaX << " thetaY = " << thetaY<< " thetaZ = " << thetaZ << endl;
+        if (AnaIO::reco_beam_calo_X->size() >= 2) {
+          cout << "reco_beam_calo_X -1 = " <<AnaIO::reco_beam_calo_X->at(AnaIO::reco_beam_calo_X->size() -1) <<" reco_beam_calo_Y -1 = " <<AnaIO::reco_beam_calo_Y->at(AnaIO::reco_beam_calo_Y->size() -1) <<"  reco_beam_calo_Z -1 = " << AnaIO::reco_beam_calo_Z->at(AnaIO::reco_beam_calo_Z->size() -1) << endl;
+          cout << "Size reco_beam_calo_X -2 = " <<AnaIO::reco_beam_calo_X->at(AnaIO::reco_beam_calo_X->size() -2) <<" Size reco_beam_calo_Y -2 = " <<AnaIO::reco_beam_calo_Y->at(AnaIO::reco_beam_calo_Y->size() -2) <<" Size reco_beam_calo_Z -2 = " <<AnaIO::reco_beam_calo_Z->at(AnaIO::reco_beam_calo_Z->size() -2) << endl; }
+        else {
+          cout << "calo size smaller than 2, calo size X is = " << AnaIO::reco_beam_calo_X->size() << endl;
+        }
+	cout << "Calo size is empty val = " << AnaIO::reco_beam_calo_wire->empty() << endl;
+        }
+
+    cout <<"______________________________________________" << endl;
+    if (AnaIO::reco_beam_calo_endZ == -999){
+        cout << "ientry = "<<ientry << " value of ODD reco_beam_calo_endZ = " << AnaIO::reco_beam_endZ << endl;
+        cout << "reco_beam_endZ = " << AnaIO::reco_beam_endZ << " reco_beam_calo_startZ = " << AnaIO::reco_beam_calo_startZ << endl;
+        cout << "thetaX = " << thetaX << " thetaY = " << thetaY<< " thetaZ = " << thetaZ << endl;
+        if (AnaIO::reco_beam_calo_X->size() >= 2) {
+          cout << "reco_beam_calo_X -1 = " <<AnaIO::reco_beam_calo_X->at(AnaIO::reco_beam_calo_X->size() -1) <<" reco_beam_calo_Y -1 = " <<AnaIO::reco_beam_calo_Y->at(AnaIO::reco_beam_calo_Y->size() -1) <<"  reco_beam_calo_Z -1 = " << AnaIO::reco_beam_calo_Z->at(AnaIO::reco_beam_calo_Z->size() -1) << endl;
+          cout << "Size reco_beam_calo_X -2 = " <<AnaIO::reco_beam_calo_X->at(AnaIO::reco_beam_calo_X->size() -2) <<" Size reco_beam_calo_Y -2 = " <<AnaIO::reco_beam_calo_Y->at(AnaIO::reco_beam_calo_Y->size() -2) <<" Size reco_beam_calo_Z -2 = " <<AnaIO::reco_beam_calo_Z->at(AnaIO::reco_beam_calo_Z->size() -2) << endl; }
+        else {
+          cout << "calo size smaller than 2, calo size X is = " << AnaIO::reco_beam_calo_X->size() << endl;
+        }
+	cout << "Calo size is empty val = " << AnaIO::reco_beam_calo_wire->empty() << endl;
+        }
+    cout <<"********************************************" << endl;
+    */
+    //--------Beam_inst_correction-------
+    //cout << "*** Before Cut beam_inst_X = " << AnaIO::beam_inst_X << " beam_inst_Y = " << AnaIO::beam_inst_Y << endl;
+    double cosDirX=AnaIO::beam_inst_dirX/AnaIO::beam_inst_dirZ;
+    double cosDirY=AnaIO::beam_inst_dirY/AnaIO::beam_inst_dirZ;
+     
+    //cout << "cosDirX = " << cosDirX << " cosDirY= " <<cosDirY<< endl;
+
+    double newX=(30-AnaIO::beam_inst_Z)*cosDirX+AnaIO::beam_inst_X;
+    double newY=(30-AnaIO::beam_inst_Z)*cosDirY+AnaIO::beam_inst_Y;
+      AnaIO::beam_inst_X=newX;
+      AnaIO::beam_inst_Y=newY;
+      AnaIO::beam_inst_Z=30;
+
+    //cout << "***** After Cut beam_inst_X = " << AnaIO::beam_inst_X << " beam_inst_Y = " << AnaIO::beam_inst_Y << endl;
+
+    double dZCalo=AnaIO::reco_beam_endZ-AnaIO::reco_beam_startZ;
+    double dXCalo=AnaIO::reco_beam_endX-AnaIO::reco_beam_startX;
+    double dYCalo=AnaIO::reco_beam_endY-AnaIO::reco_beam_startY;
+
+    double reco_beam_trkLen_30cm=TMath::Sqrt(dXCalo*dXCalo+dYCalo*dYCalo+dZCalo*dZCalo);
+    AnaIO::reco_beam_trackDirX=dXCalo/reco_beam_trkLen_30cm;
+    AnaIO::reco_beam_trackDirY=dYCalo/reco_beam_trkLen_30cm;
+    AnaIO::reco_beam_trackDirZ=dZCalo/reco_beam_trkLen_30cm;
+    
+    AnaIO::hrendX->Fill(AnaIO::reco_beam_calo_endX);
+    AnaIO::hrendY->Fill(AnaIO::reco_beam_calo_endY);
+    AnaIO::hrendZ->Fill(AnaIO::reco_beam_calo_endZ);
+
+    AnaIO::hreco_beam_trackDirX->Fill(AnaIO::reco_beam_trackDirX);
+    AnaIO::hreco_beam_trackDirY->Fill(AnaIO::reco_beam_trackDirY);
+    AnaIO::hreco_beam_trackDirZ->Fill(AnaIO::reco_beam_trackDirZ);
+    //startZ correction end*******************************************
 
     // Break 
     if(nEntryToStop > 0 && ientry>=nEntryToStop){
@@ -151,7 +296,8 @@ int anaRec(const TString finName, TList *lout, const TString tag, const int nEnt
 
       // == Binnings for cross sections (SungBin's method)
       int N_binning_100MeV = 20;
-      vector<double> binning_100MeV = {0., 50., 100., 150., 200., 250., 300., 350., 400., 450., 500., 550., 600., 650., 700., 750., 800., 850., 900., 950., 1000.};
+      //vector<double> binning_100MeV = {0., 50., 100., 150., 200., 250., 300., 350., 400., 450., 500., 550., 600., 650., 700., 750., 800., 850., 900., 950., 1000.};
+      vector<double> binning_100MeV = {0.,100.,300.,400.,500.,600.,700.,800.,900.,1000.,1100.,1200.,1300.,1400.,1500.,1600.,1700.,1800.,1900.,2000.,2100.,2200.};
     
       // Select true pion beam for the unfolding process
       if(AnaIO::true_beam_PDG == 211){     
@@ -372,7 +518,7 @@ int anaRec(const TString finName, TList *lout, const TString tag, const int nEnt
                 if(!isFakeData) uf.eff_den_Int->Fill(interactingE);
                 
                 //if(interactingE > 750 && interactingE < 800) {
-                if(interactingE > 650 && interactingE < 800) {
+                if(interactingE > 1750 && interactingE < 1800) {
                   uf.eff_den_Pi0KE->Fill(LeadingPiZeroKE*1000);
                   uf.eff_den_Pi0CosTheta->Fill(LeadingPiZeroCosTheta);
                   uf.eff_den_Pi0Theta->Fill(LeadingPiZeroTheta);
@@ -418,8 +564,8 @@ int anaRec(const TString finName, TList *lout, const TString tag, const int nEnt
                   */
                   //if(anaCut.CutTopology(kMC, pi0KineticE) && evtXStype == anaUtils.gkXSSignal){
                     // ?? Indenpent of fake data use full MC to fill diff. XS unfolding matrix
-                    //if(/*!isFakeData && */interactingE > 750 && interactingE < 800) {
-                    if(/*!isFakeData && */interactingE > 650 && interactingE < 800) {
+                    if(/*!isFakeData && */interactingE > 1650 && interactingE < 1800) {
+                    //if(/*!isFakeData && */interactingE > 650 && interactingE < 800) {
                       
                       if(isFakeData) {recoMatch_avaDiffCEXevt++; reco_selectedDiffCEXevt++;}
                       uf.response_SliceID_Pi0KE.Fill(pi0KineticE*1000, LeadingPiZeroKE*1000, weight);
@@ -467,8 +613,8 @@ int anaRec(const TString finName, TList *lout, const TString tag, const int nEnt
                   uf.response_SliceID_Int.Miss(interactingE, weight*g4rw);
                     //cout << "Not pass beam cuts interactingE: " << interactingE << endl;               
                   //}
-                  //if(/*!isFakeData && */interactingE > 750 && interactingE < 800) {
-                  if(/*!isFakeData && */interactingE > 650 && interactingE < 800) {
+                  if(/*!isFakeData && */interactingE > 1650 && interactingE < 1800) {
+                  //if(/*!isFakeData && */interactingE > 650 && interactingE < 800) {
                     uf.response_SliceID_Pi0KE.Miss(LeadingPiZeroKE*1000, weight*g4rw);
                     uf.response_SliceID_Pi0CosTheta.Miss(LeadingPiZeroCosTheta, weight*g4rw);
                     uf.response_SliceID_Pi0Theta.Miss(LeadingPiZeroTheta, weight*g4rw);
@@ -509,7 +655,7 @@ int anaRec(const TString finName, TList *lout, const TString tag, const int nEnt
                 
                 if(isFakeData) {recoMatch_avaPionCEXevt++; reco_missedevt++;}
                 //if(/*!isFakeData && */interactingE > 750 && interactingE < 800) {
-                if(/*!isFakeData && */interactingE > 650 && interactingE < 800) {
+                if(/*!isFakeData && */interactingE > 1750 && interactingE < 1800) {
                   uf.response_SliceID_Pi0KE.Miss(LeadingPiZeroKE*1000, weight*g4rw);
                   uf.response_SliceID_Pi0CosTheta.Miss(LeadingPiZeroCosTheta, weight*g4rw);
                   uf.response_SliceID_Pi0Theta.Miss(LeadingPiZeroTheta, weight*g4rw);
@@ -550,7 +696,7 @@ int anaRec(const TString finName, TList *lout, const TString tag, const int nEnt
               
               if(isFakeData) {recoMatch_avaPionCEXevt++; reco_missedevt++;}
               //if(/*!isFakeData && */interactingE > 750 && interactingE < 800) {
-              if(/*!isFakeData && */interactingE > 650 && interactingE < 800) {
+              if(/*!isFakeData && */interactingE > 1750 && interactingE < 1800) {
                 uf.response_SliceID_Pi0KE.Miss(LeadingPiZeroKE*1000, weight*g4rw);
                 uf.response_SliceID_Pi0CosTheta.Miss(LeadingPiZeroCosTheta, weight*g4rw);
                 uf.response_SliceID_Pi0Theta.Miss(LeadingPiZeroTheta, weight*g4rw);
@@ -604,6 +750,8 @@ int anaRec(const TString finName, TList *lout, const TString tag, const int nEnt
 
     // Count beam after beam cut before other cuts
     BeamCount++;
+    BeamWeightedCount = 0;
+    //BeamWeightedCount += 1.0*weight;
     BeamWeightedCount += 1.0*weight*bckweight;
 
     // Get final state particles vector in this event and fill histogram
@@ -673,14 +821,23 @@ int anaRec(const TString finName, TList *lout, const TString tag, const int nEnt
         // Calculate the upstream energy loss
         double UpStreamELoss = beam_inst_KE*1000 - true_ffKE;
         // Fill the upstream energy loss after smearing
-        if(beam_inst_KE > 0.7 && beam_inst_KE < 0.75) plotUtils.FillHist(AnaIO::hUpStreamELossAfterSmearingAndWeight,UpStreamELoss,0,weight);
+        /*if(beam_inst_KE > 0.7 && beam_inst_KE < 0.75) plotUtils.FillHist(AnaIO::hUpStreamELossAfterSmearingAndWeight,UpStreamELoss,0,weight);
         if(beam_inst_KE > 0.75 && beam_inst_KE < 0.8) plotUtils.FillHist(AnaIO::hUpStreamELossAfterSmearingAndWeight,UpStreamELoss,1,weight);
         if(beam_inst_KE > 0.8 && beam_inst_KE < 0.85) plotUtils.FillHist(AnaIO::hUpStreamELossAfterSmearingAndWeight,UpStreamELoss,2,weight);
         if(beam_inst_KE > 0.85 && beam_inst_KE < 0.9) plotUtils.FillHist(AnaIO::hUpStreamELossAfterSmearingAndWeight,UpStreamELoss,3,weight);
         if(beam_inst_KE > 0.9 && beam_inst_KE < 0.95) plotUtils.FillHist(AnaIO::hUpStreamELossAfterSmearingAndWeight,UpStreamELoss,4,weight);
         if(beam_inst_KE > 0.95 && beam_inst_KE < 1.0) plotUtils.FillHist(AnaIO::hUpStreamELossAfterSmearingAndWeight,UpStreamELoss,5,weight);
         if(beam_inst_KE > 1.0 && beam_inst_KE < 1.05) plotUtils.FillHist(AnaIO::hUpStreamELossAfterSmearingAndWeight,UpStreamELoss,6,weight);
-        if(beam_inst_KE > 1.05 && beam_inst_KE < 1.1) plotUtils.FillHist(AnaIO::hUpStreamELossAfterSmearingAndWeight,UpStreamELoss,7,weight);
+        if(beam_inst_KE > 1.05 && beam_inst_KE < 1.1) plotUtils.FillHist(AnaIO::hUpStreamELossAfterSmearingAndWeight,UpStreamELoss,7,weight);*/
+        
+        if(beam_inst_KE > 1.7 && beam_inst_KE < 1.75) plotUtils.FillHist(AnaIO::hUpStreamELossAfterSmearingAndWeight,UpStreamELoss,0,weight);
+        if(beam_inst_KE > 1.75 && beam_inst_KE < 1.8) plotUtils.FillHist(AnaIO::hUpStreamELossAfterSmearingAndWeight,UpStreamELoss,1,weight);
+        if(beam_inst_KE > 1.8 && beam_inst_KE < 1.85) plotUtils.FillHist(AnaIO::hUpStreamELossAfterSmearingAndWeight,UpStreamELoss,2,weight);
+        if(beam_inst_KE > 1.85 && beam_inst_KE < 1.9) plotUtils.FillHist(AnaIO::hUpStreamELossAfterSmearingAndWeight,UpStreamELoss,3,weight);
+        if(beam_inst_KE > 1.9 && beam_inst_KE < 1.95) plotUtils.FillHist(AnaIO::hUpStreamELossAfterSmearingAndWeight,UpStreamELoss,4,weight);
+        if(beam_inst_KE > 1.95 && beam_inst_KE < 2.0) plotUtils.FillHist(AnaIO::hUpStreamELossAfterSmearingAndWeight,UpStreamELoss,5,weight);
+        if(beam_inst_KE > 2.0 && beam_inst_KE < 2.05) plotUtils.FillHist(AnaIO::hUpStreamELossAfterSmearingAndWeight,UpStreamELoss,6,weight);
+        if(beam_inst_KE > 2.05 && beam_inst_KE < 2.1) plotUtils.FillHist(AnaIO::hUpStreamELossAfterSmearingAndWeight,UpStreamELoss,7,weight);
         
         plotUtils.FillHist(AnaIO::hUpStreamELossRes, beam_inst_KE*1000, UpStreamELoss/(beam_inst_KE*1000),weight);
         
@@ -1076,6 +1233,8 @@ int main(int argc, char * argv[])
   // Initialise the input file name
   const TString mcfinName = "input/protoDUNE_mc_reco_flattree_prod4a_ntuple.root";
   const TString datafinName  = "input/protoDUNE_data_reco_flattree_prod4_ntuple.root";
+  //const TString mcfinName = "/pnfs/dune/persistent/users/hrazafin/protoDUNE/2GeV_MC_Data/PDSPProd4a_MC_2GeV_reco1_sce_datadriven_ntuple_v09_81_00.root";
+  //const TString datafinName = "/pnfs/dune/persistent/users/hrazafin/protoDUNE/2GeV_MC_Data/PDSPProd4_data_2GeV_reco2_ntuple_v09_42_03_01.root";
 
   // Declare output list
   TList * mclout = 0x0;
@@ -1095,11 +1254,21 @@ int main(int argc, char * argv[])
   Unfold uf(20, 0, 1000);
   // MC Analysis
   double mcBeamWeightedCount = 0;
+  std::cout << "================ START MC ANA ==================================" << std::endl;
+  std::cout << "mcBeamWeightedCount at start = " << mcBeamWeightedCount << std::endl;
   double mcBeamCount = anaRec(mcfinName,mclout,"mc", nEntryToStop, bb, uf, mcBeamWeightedCount);
+  std::cout << "mcBeamCount at end = " << mcBeamCount << std::endl;
+  std::cout << "mcBeamWeightedCount at end = " << mcBeamWeightedCount << std::endl;
+  std::cout << "============= FINISHED MC ANA ==================================" << std::endl;
   // Data Analysis
   double dataBeamWeightedCount = 0;
+  std::cout << "================ START Data ANA ==================================" << std::endl;
+  std::cout << "dataBeamWeightedCount at start = " << dataBeamWeightedCount << std::endl;
   double dataBeamCount = anaRec(datafinName,datalout,"data", nEntryToStop, bb, uf, dataBeamWeightedCount);
-  
+  std::cout << "dataBeamCount at end = " << dataBeamCount << std::endl;
+  std::cout << "dataBeamWeightedCount at end = " << dataBeamWeightedCount << std::endl;
+  std::cout << "================= END Data ANA ===================================" << std::endl;  
+
   // Process histograms
   PlotUtils plotUtils;
   plotUtils.ProcessHist(mclout,true);
@@ -1124,12 +1293,20 @@ int main(int argc, char * argv[])
   fout->Close();
   // Calculate the Data/MC normalisation constant
   double plotScale = dataBeamCount/mcBeamCount;
+  cout << "dataBeamCount = "<<dataBeamCount<< " mcBeamCount = " << mcBeamCount << endl;
+  
+
+  // Force MC weighted to be 1
+  //mcBeamWeightedCount = 1;
+
   double plotScale_wt = dataBeamWeightedCount/mcBeamWeightedCount;
+  cout << "dataBeamWeightedCount = " << dataBeamWeightedCount << " mcBeamWeightedCount = " << mcBeamWeightedCount << endl;
 
   cout << "plotScale: " << plotScale << endl;
   cout << "plotScale_wt: " << plotScale_wt << endl;
 
   // Draw all histograms
+  //plotUtils.DrawHist(mclout,0.003,1,datalout,"output");
   plotUtils.DrawHist(mclout,plotScale,plotScale_wt,datalout,"output");
 
 }

@@ -39,12 +39,13 @@ void PlotUtils::FillHist(TH1 * hh,  double xx, const double yy, const double & w
   // Get X bin size
   const int nbx = hh->GetNbinsX();
   // Get min and max value
-  const double xmin = hh->GetXaxis()->GetBinLowEdge(1);
+  //const double xmin = hh->GetXaxis()->GetBinLowEdge(1);
   const double xmax = hh->GetXaxis()->GetBinUpEdge(nbx);  
   
-  if(xx<xmin){
-    xx = hh->GetXaxis()->GetBinCenter(1);
-  }
+  //Jun 5 2024
+  //if(xx<xmin){
+  //  xx = hh->GetXaxis()->GetBinCenter(1);
+  //}
   if(xx>=xmax){
     xx = hh->GetXaxis()->GetBinCenter(nbx);
   }
@@ -76,12 +77,13 @@ void PlotUtils::FillHist(TH2 * hh,  double xx, const double yy, const double & w
   // Get X bin size
   const int nbx = hh->GetNbinsX();
   // Get min and max value
-  const double xmin = hh->GetXaxis()->GetBinLowEdge(1);
+  //const double xmin = hh->GetXaxis()->GetBinLowEdge(1);
   const double xmax = hh->GetXaxis()->GetBinUpEdge(nbx);  
   
-  if(xx<xmin){
-    xx = hh->GetXaxis()->GetBinCenter(1);
-  }
+  //Jun 5 2024
+  //if(xx<xmin){
+  //  xx = hh->GetXaxis()->GetBinCenter(1);
+  //}
   if(xx>=xmax){
     xx = hh->GetXaxis()->GetBinCenter(nbx);
   }
@@ -143,6 +145,7 @@ void PlotUtils::ProcessHist(TList *lout, const bool kMC)
         // Column normalise each bin to easily see the maximum
         TH1D * hmean = 0x0;
         TH1D * hcdf = 0x0;
+        //TH2D * hnor = NormalHist(htmp, 5, true, hmean, hcdf);
         TH2D * hnor = NormalHist(htmp, 5, true, hmean, hcdf);
         hnor->SetTitle(tag);
         lout->Add(hnor);
@@ -159,6 +162,7 @@ void PlotUtils::ProcessHist(TList *lout, const bool kMC)
         // Column normalise each bin to easily see the maximum
         TH1D * hmean = 0x0;
         TH1D * hcdf = 0x0;
+        //TH2D * hnor = NormalHist(htmp, 5, true, hmean, hcdf);
         TH2D * hnor = NormalHist(htmp, 5, true, hmean, hcdf);
         hnor->SetTitle(tag);
         lout->Add(hnor);
@@ -2891,15 +2895,16 @@ void PlotUtils::DrawHist(TList *lout, const double plotscale, const double plots
           pad1->Draw();
           pad1->cd();
         
-          // Scale the beam cuts related hists data to MC no weight
-          if(tag.Contains("CutPDG") || tag.Contains("BeamPDG")) ScaleStack(hstk, 0.702223); // CutPDG
-          else if(tag.Contains("CutPandora") || tag.Contains("BeamPandora")) ScaleStack(hstk, 0.709511); // CutPandora
-          else if(tag.Contains("CutCaloSize") || tag.Contains("BeamCalo")) ScaleStack(hstk, 0.703488); // CutCaloSize
-          else if(tag.Contains("CutBeamQuality") || tag.Contains("BeamQuality")) ScaleStack(hstk, 0.698653); // CutBeamQuality
-          else if(tag.Contains("CutAPA3") || tag.Contains("BeamAPA3")) ScaleStack(hstk, 0.658395); // CutAPA3
-          else if(tag.Contains("CutMichelScore") || tag.Contains("BeamMichel")) ScaleStack(hstk, 0.65585);  // CutMichelScore
-          else if(tag.Contains("CutChi2DOF") || tag.Contains("BeamChi2")) ScaleStack(hstk, 0.649126); // CutChi2DOF
-          else if(tag.Contains("CutBeamScraper") || tag.Contains("BeamScraper")) ScaleStack(hstk, 0.57804); // CutBeamScraper(final beam scale)
+          // Scale the beam cuts related hists data to MC no weight (Data/MC)
+	  std::cout << "USING NEW CUTTSSS IF IT DOESN'T WORK THEN IT'S YOUR FAULT!!!!" << std::endl;
+          if(tag.Contains("CutPDG") || tag.Contains("BeamPDG")) ScaleStack(hstk, 2.834325348); // CutPDG
+          else if(tag.Contains("CutPandora") || tag.Contains("BeamPandora")) ScaleStack(hstk, 2.738415051); // CutPandora
+          else if(tag.Contains("CutCaloSize") || tag.Contains("BeamCalo")) ScaleStack(hstk, 2.706873661); // CutCaloSize
+          else if(tag.Contains("CutBeamQuality") || tag.Contains("BeamQuality")) ScaleStack(hstk, 2.568909452); // CutBeamQuality
+          else if(tag.Contains("CutAPA3") || tag.Contains("BeamAPA3")) ScaleStack(hstk, 2.417150877); // CutAPA3
+          else if(tag.Contains("CutMichelScore") || tag.Contains("BeamMichel")) ScaleStack(hstk, 2.41828536);  // CutMichelScore
+          else if(tag.Contains("CutChi2DOF") || tag.Contains("BeamChi2")) ScaleStack(hstk, 2.410754206); // CutChi2DOF
+          else if(tag.Contains("CutBeamScraper") || tag.Contains("BeamScraper")) ScaleStack(hstk, 2.424395284); // CutBeamScraper(final beam scale)
           
           else if(tag.Contains("hRecPiPlus") && !tag.Contains("b00")) ScaleStack(hstk, plotscale_wt);
           else if(tag.Contains("i087hRecPiZeroKineticEnergyEvt_COMPOSE_XsEvt")) ScaleStack(hstk, plotscale_wt);
@@ -3141,14 +3146,14 @@ void PlotUtils::DrawHist(TList *lout, const double plotscale, const double plots
           }*/
 
           // Scale the beam cuts related hists data to MC no weight
-          if(tag.Contains("CutPDG") || tag.Contains("BeamPDG")) ScaleStack(hstk, 0.702223); // CutPDG
-          else if(tag.Contains("CutPandora") || tag.Contains("BeamPandora")) ScaleStack(hstk, 0.709511); // CutPandora
-          else if(tag.Contains("CutCaloSize") || tag.Contains("BeamCalo")) ScaleStack(hstk, 0.703488); // CutCaloSize
-          else if(tag.Contains("CutBeamQuality") || tag.Contains("BeamQuality")) ScaleStack(hstk, 0.698653); // CutBeamQuality
-          else if(tag.Contains("CutAPA3") || tag.Contains("BeamAPA3")) ScaleStack(hstk, 0.658395); // CutAPA3
-          else if(tag.Contains("CutMichelScore") || tag.Contains("BeamMichel")) ScaleStack(hstk, 0.65585);  // CutMichelScore
-          else if(tag.Contains("CutChi2DOF") || tag.Contains("BeamChi2")) ScaleStack(hstk, 0.649126); // CutChi2DOF
-          else if(tag.Contains("CutBeamScraper") || tag.Contains("BeamScraper")) ScaleStack(hstk, 0.57804); // CutBeamScraper(final beam scale)
+          if(tag.Contains("CutPDG") || tag.Contains("BeamPDG")) ScaleStack(hstk, 2.834325348); // CutPDG
+          else if(tag.Contains("CutPandora") || tag.Contains("BeamPandora")) ScaleStack(hstk, 2.738415051); // CutPandora
+          else if(tag.Contains("CutCaloSize") || tag.Contains("BeamCalo")) ScaleStack(hstk, 2.706873661); // CutCaloSize
+          else if(tag.Contains("CutBeamQuality") || tag.Contains("BeamQuality")) ScaleStack(hstk, 2.568909452); // CutBeamQuality
+          else if(tag.Contains("CutAPA3") || tag.Contains("BeamAPA3")) ScaleStack(hstk, 2.417150877); // CutAPA3
+          else if(tag.Contains("CutMichelScore") || tag.Contains("BeamMichel")) ScaleStack(hstk, 2.41828536);  // CutMichelScore
+          else if(tag.Contains("CutChi2DOF") || tag.Contains("BeamChi2")) ScaleStack(hstk, 2.410754206); // CutChi2DOF
+          else if(tag.Contains("CutBeamScraper") || tag.Contains("BeamScraper")) ScaleStack(hstk, 2.424395284); // CutBeamScraper(final beam scale)
           
           else if(tag.Contains("hRecPiPlus") && !tag.Contains("b00")) ScaleStack(hstk, plotscale_wt);
           else if(tag.Contains("i087hRecPiZeroKineticEnergyEvt_COMPOSE_XsEvt")) ScaleStack(hstk, plotscale_wt);
@@ -3358,7 +3363,7 @@ void PlotUtils::DrawHist(TList *lout, const double plotscale, const double plots
     if(tag.Contains("i001") && !tag.Contains("_")) tt.DrawLatex(0.165,0.925,"DUNE:ProtoDUNE-SP Simulation");
     else tt.DrawLatex(0.125,0.925,"DUNE:ProtoDUNE-SP Simulation");
     if(tag.Contains("i10")) tt.DrawLatex(0.565,0.925,"True Beam T_{#pi^{+}} = 650 - 800 MeV");
-    else tt.DrawLatex(0.665,0.925,"1GeV/c Pion Beam");
+    else tt.DrawLatex(0.665,0.925,"2GeV/c Pion Beam");
 
     c1->Print(outdir+"/"+tag+".pdf");
     

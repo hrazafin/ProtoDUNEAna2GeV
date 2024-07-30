@@ -206,14 +206,15 @@ int main(int argc, char * argv[])
   f_CrossSection->GetObject("cex_KE",g_cex);
   
 
-  const TString DiffxcesfinName = "../Analysis/input/cross_section_out_withNewVar.root";
+  //const TString DiffxcesfinName = "../Analysis/input/cross_section_out_withNewVar.root";
+  const TString DiffxcesfinName = "input/cross_section_out.root";
   TFile *f_DiffCrossSection = TFile::Open(DiffxcesfinName);
   if(!f_DiffCrossSection->IsOpen()) {
     cout << "Diffxsce file not open" << endl;
     exit(1);
   }
 
-  TH1D * g_cex_775MeV = (TH1D*)f_DiffCrossSection->Get("inel_cex_1dKEpi0775_MeV");
+  TH1D * g_cex_775MeV = (TH1D*)f_DiffCrossSection->Get("inel_cex_1dKEpi01775_MeV");
   const Int_t x0_diff775 = g_cex_775MeV->GetXaxis()->GetFirst();
   const Int_t x1_diff775 = g_cex_775MeV->GetXaxis()->GetLast();
   double x_775[x1_diff775], y_775[x1_diff775];
@@ -257,6 +258,7 @@ int main(int argc, char * argv[])
   // ======== Pi0 KE Histogram (KE PI+ = 650to800 MeV)======= //
   RooUnfoldResponse *response_SliceID_Pi0KE = (RooUnfoldResponse*)file->Get("mc/response_SliceID_Pi0KE");
   TH1D *hpi0KE_truth = (TH1D*) file->Get("mc/i006hTruthDiffCEXInteractingHist_800MeV");
+  //if(IsRange) hpi0KE_truth = (TH1D*) file->Get("mc/i005hTruthDiffCEXInteractingHist_700MeV");
   if(IsRange) hpi0KE_truth = (TH1D*) file->Get("mc/i006hTruthDiffCEXInteractingHist_650to800MeV");
   TH1D *hpi0KE = (TH1D*) file->Get("mc/i030hRecoPi0KEHist");
   TH1D *hpi0KE_data = (TH1D*) file->Get("data/i030hRecoPi0KEHistData");

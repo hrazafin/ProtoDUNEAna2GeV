@@ -2885,7 +2885,9 @@ void AnaUtils::FillXSTrueHistograms(int &true_avaPionBeam, int &true_avaPionCEXe
         //double cos_angle = TMath::Cos(angle);
         
         // Select different pion beam interacting slice for Diff. xsec calculation
-        if(interactingE > 650 && interactingE < 800){
+        // if(interactingE > 650 && interactingE < 800){
+       // if(interactingE > 1650 && interactingE < 1800){
+        if(interactingE > 1650 && interactingE < 1700) {
           true_avaDiffCEXevt++;
           AnaIO::hTruthDiffCEXInteractingHist_650to800MeV->Fill(LeadingPiZeroKE*1000, weight);
           AnaIO::hTruthDiffCEXInteractingHistTheta_650to800MeV->Fill(theta, weight);
@@ -2947,7 +2949,8 @@ void AnaUtils::FillXSTrueHistograms(int &true_avaPionBeam, int &true_avaPionCEXe
           }
 
         }
-        if(interactingE > 650 && interactingE < 700) {
+        //if(interactingE > 650 && interactingE < 700) {
+        if(interactingE > 1650 && interactingE < 1700) {
           // Fill the pi0 KE VS cos theta (intE = 650-700 MeV)
           AnaIO::hTruthOutgoingKEcosTheta_Mid->Fill(LeadingPiZeroKE*1000, LeadingPiZeroPz/LeadingPiZeroP, weight);
           // Fill the pi0 KE spectrum and angular info
@@ -2955,14 +2958,16 @@ void AnaUtils::FillXSTrueHistograms(int &true_avaPionBeam, int &true_avaPionCEXe
           AnaIO::hTruthDiffCEXInteractingHistTheta_700MeV->Fill(theta, weight);
           AnaIO::hTruthDiffCEXInteractingHistCosTheta_700MeV->Fill(costheta, weight);
         }
-        if(interactingE > 750 && interactingE < 800) {
+        //if(interactingE > 750 && interactingE < 800) {
+        if(interactingE > 1750 && interactingE < 1800) {
           // Fill the pi0 KE spectrum and angular info
           AnaIO::hTruthDiffCEXInteractingHist_800MeV->Fill(LeadingPiZeroKE*1000, weight);
           AnaIO::hTruthSingleDiffCEXInteractingHist_800MeV->Fill(LeadingPiZeroKE*1000, weight);
           AnaIO::hTruthDiffCEXInteractingHistTheta_800MeV->Fill(theta, weight);
           AnaIO::hTruthDiffCEXInteractingHistCosTheta_800MeV->Fill(costheta, weight);
         }
-        if(interactingE > 850 && interactingE < 900) {
+        //if(interactingE > 850 && interactingE < 900) {
+        if(interactingE > 1850 && interactingE < 1900) {
           // Fill the pi0 KE VS cos theta (intE = 850-900 MeV)
           AnaIO::hTruthOutgoingKEcosTheta_High->Fill(LeadingPiZeroKE*1000, LeadingPiZeroPz/LeadingPiZeroP, weight);
           // Fill the pi0 KE spectrum and angular info
@@ -2996,17 +3001,21 @@ void AnaUtils::FillXSTrueHistograms(int &true_avaPionBeam, int &true_avaPionCEXe
           }*/
         }
 
-        if(interactingE > 450 && interactingE < 500) {
+        //if(interactingE > 450 && interactingE < 500) {
+        if(interactingE > 950 && interactingE < 1000) {
           AnaIO::hTruthOutgoingKEcosTheta_Low->Fill(LeadingPiZeroKE*1000, LeadingPiZeroPz/LeadingPiZeroP);
           AnaIO::hTruthDiffCEXInteractingHist_500MeV->Fill(LeadingPiZeroKE*1000);
         }
-        if(interactingE > 250 && interactingE < 300) {
+        //if(interactingE > 250 && interactingE < 300) {
+        if(interactingE > 550 && interactingE < 600) {
           AnaIO::hTruthDiffCEXInteractingHist_300MeV->Fill(LeadingPiZeroKE*1000);
         }
-        if(interactingE > 150 && interactingE < 200) {
+        //if(interactingE > 150 && interactingE < 200) {
+        if(interactingE > 350 && interactingE < 400) {
           AnaIO::hTruthDiffCEXInteractingHist_200MeV->Fill(LeadingPiZeroKE*1000);
         }
-        if(interactingE > 50 && interactingE < 100) {
+        //if(interactingE > 50 && interactingE < 100) {
+        if(interactingE > 150 && interactingE < 200) {
           AnaIO::hTruthDiffCEXInteractingHist_100MeV->Fill(LeadingPiZeroKE*1000);
         } 
       }
@@ -3131,14 +3140,23 @@ double AnaUtils::CalWeight(const bool & kMC){
   double weight = 1.;
   //return weight;
   
+  //double mufrac = 1.53;
   double mufrac = 1.53;
+  
   
   double mom_mu0 = 1.00362;//1.0033;
   double mom_sigma0 = 0.0595377;//0.0609;
-  double mom_mu = 1.01604;//1.01818;
+  double mom_mu = 1.01604;
   double mom_sigma = 0.0708354;//0.07192;
-  double wlimit = 3.5;//3; 
+  double wlimit = 3.5;//3;
+
+  /* double mom_mu0 = 2.0;
+  double mom_sigma0 = 0.07;
+  double mom_mu = 2.03208;
+  double mom_sigma = 0.071;//0.07192;
+  double wlimit = 3.5;//3; */
   
+  //cout << "==============================================" << endl;
   if(kMC){
     // momentum reweight (outlier weights are set to 1e-5)
     double deno = exp(-pow((AnaIO::true_beam_startP-mom_mu0)/mom_sigma0,2)/2);
@@ -3147,6 +3165,7 @@ double AnaUtils::CalWeight(const bool & kMC){
     //if (numo < wlimit) numo = wlimit;
     weight *= numo;
     weight /= deno;
+    //cout << "deno = " << deno << " numo = " << numo << " weight = " << weight << endl;
     if (weight>wlimit) weight=wlimit;
     if (weight<1./wlimit) weight=1./wlimit;
     if (AnaIO::true_beam_PDG == -13) weight = 1;
@@ -3551,17 +3570,21 @@ void AnaUtils::FillBeamQualityHist()
   TVector3 DetY(0,1,0);
   TVector3 DetZ(0,0,1);
   // Fill histograms
-  AnaIO::hRecBeamStartX->Fill(AnaIO::reco_beam_calo_startX);
-  AnaIO::hRecBeamStartY->Fill(AnaIO::reco_beam_calo_startY);
-  AnaIO::hRecBeamStartZ->Fill(AnaIO::reco_beam_calo_startZ);
+  if(AnaIO::reco_beam_calo_endX == -999 || AnaIO::reco_beam_calo_endY == -999 || AnaIO::reco_beam_calo_endZ == -999) {
+   std::cout << "Event contains -999" << std::endl;
+  }
+  else {
+    AnaIO::hRecBeamStartX->Fill(AnaIO::reco_beam_calo_startX);
+    AnaIO::hRecBeamStartY->Fill(AnaIO::reco_beam_calo_startY);
+    AnaIO::hRecBeamStartZ->Fill(AnaIO::reco_beam_calo_startZ);
 
-  AnaIO::hRecBeamThetaX->Fill(BeamDir.Angle(DetX)*TMath::RadToDeg());
-  AnaIO::hRecBeamThetaY->Fill(BeamDir.Angle(DetY)*TMath::RadToDeg());
-  AnaIO::hRecBeamThetaZ->Fill(BeamDir.Angle(DetZ)*TMath::RadToDeg());
+    AnaIO::hRecBeamThetaX->Fill(BeamDir.Angle(DetX)*TMath::RadToDeg());
+    AnaIO::hRecBeamThetaY->Fill(BeamDir.Angle(DetY)*TMath::RadToDeg());
+    AnaIO::hRecBeamThetaZ->Fill(BeamDir.Angle(DetZ)*TMath::RadToDeg());
 
-  AnaIO::hRecBeamInstX->Fill(AnaIO::beam_inst_X);
-  AnaIO::hRecBeamInstY->Fill(AnaIO::beam_inst_Y);
-
+    AnaIO::hRecBeamInstX->Fill(AnaIO::beam_inst_X);
+    AnaIO::hRecBeamInstY->Fill(AnaIO::beam_inst_Y);
+  }
 }
 
 void AnaUtils::SetBeamInstKEandFrontFaceKE(double &beam_inst_KE, double &true_ffKE, bool kFill)
@@ -3586,10 +3609,16 @@ void AnaUtils::FillUpStreamEnergyLossHistBeforeCut(double beam_inst_KE, double t
   if(AnaIO::true_beam_PDG == 211) plotUtils.FillHist(AnaIO::hBeamInstVSTruthKEffAfterCuts,beam_inst_KE*1000,true_ffKE);
     
   double UpStreamELoss = beam_inst_KE*1000-true_ffKE; 
-  if(beam_inst_KE > 0.7 && beam_inst_KE < 0.8) AnaIO::hUpStreamELoss700MeV->Fill(UpStreamELoss);
+  /*if(beam_inst_KE > 0.7 && beam_inst_KE < 0.8) AnaIO::hUpStreamELoss700MeV->Fill(UpStreamELoss);
   if(beam_inst_KE > 0.8 && beam_inst_KE < 0.9) AnaIO::hUpStreamELoss800MeV->Fill(UpStreamELoss);
   if(beam_inst_KE > 0.9 && beam_inst_KE < 1.0) AnaIO::hUpStreamELoss900MeV->Fill(UpStreamELoss);
-  if(beam_inst_KE > 1.0 && beam_inst_KE < 1.1) AnaIO::hUpStreamELoss1000MeV->Fill(UpStreamELoss);
+  if(beam_inst_KE > 1.0 && beam_inst_KE < 1.1) AnaIO::hUpStreamELoss1000MeV->Fill(UpStreamELoss);*/
+  
+  //2GeV
+  if(beam_inst_KE > 1.7 && beam_inst_KE < 1.8) AnaIO::hUpStreamELoss700MeV->Fill(UpStreamELoss);
+  if(beam_inst_KE > 1.8 && beam_inst_KE < 1.9) AnaIO::hUpStreamELoss800MeV->Fill(UpStreamELoss);
+  if(beam_inst_KE > 1.9 && beam_inst_KE < 2.0) AnaIO::hUpStreamELoss900MeV->Fill(UpStreamELoss);
+  if(beam_inst_KE > 2.0 && beam_inst_KE < 2.1) AnaIO::hUpStreamELoss1000MeV->Fill(UpStreamELoss);
 
   double beam_inst_X = -999.0, beam_inst_Y = -999.0;
   int start_idx = -1;
@@ -3606,19 +3635,19 @@ void AnaUtils::FillUpStreamEnergyLossHistBeforeCut(double beam_inst_KE, double t
     beam_inst_X = AnaIO::beam_inst_X;
     beam_inst_Y = AnaIO::beam_inst_Y;
 
-    if(beam_inst_KE > 0.7 && beam_inst_KE < 0.8){
+    if(beam_inst_KE > 1.7 && beam_inst_KE < 1.8){
       if(UpStreamELoss < 56.1) plotUtils.FillHist(AnaIO::hBeamInstXVSBeamInstYBeam700MeV,beam_inst_X,beam_inst_Y);
       else plotUtils.FillHist(AnaIO::hBeamInstXVSBeamInstYScraper700MeV,beam_inst_X,beam_inst_Y);
     }
-    if(beam_inst_KE > 0.8 && beam_inst_KE < 0.9){
+    if(beam_inst_KE > 1.8 && beam_inst_KE < 1.9){
       if(UpStreamELoss < 72.5) plotUtils.FillHist(AnaIO::hBeamInstXVSBeamInstYBeam800MeV,beam_inst_X,beam_inst_Y);
       else plotUtils.FillHist(AnaIO::hBeamInstXVSBeamInstYScraper800MeV,beam_inst_X,beam_inst_Y);
     }
-    if(beam_inst_KE > 0.9 && beam_inst_KE < 1.0){
+    if(beam_inst_KE > 1.9 && beam_inst_KE < 2.0){
       if(UpStreamELoss < 88.0) plotUtils.FillHist(AnaIO::hBeamInstXVSBeamInstYBeam900MeV,beam_inst_X,beam_inst_Y);
       else plotUtils.FillHist(AnaIO::hBeamInstXVSBeamInstYScraper900MeV,beam_inst_X,beam_inst_Y);
     }
-    if(beam_inst_KE > 1.0 && beam_inst_KE < 1.1){
+    if(beam_inst_KE > 2.0 && beam_inst_KE < 2.1){
       if(UpStreamELoss < 112.6) plotUtils.FillHist(AnaIO::hBeamInstXVSBeamInstYBeam1000MeV,beam_inst_X,beam_inst_Y);
       else plotUtils.FillHist(AnaIO::hBeamInstXVSBeamInstYScraper1000MeV,beam_inst_X,beam_inst_Y);
     }
@@ -3628,11 +3657,17 @@ void AnaUtils::FillUpStreamEnergyLossHistBeforeCut(double beam_inst_KE, double t
 void AnaUtils::FillUpStreamEnergyLossHistAfterCut(double beam_inst_KE, double true_ffKE)
 {
   if(AnaIO::true_beam_PDG == 211) plotUtils.FillHist(AnaIO::hBeamInstVSTruthKEffAfterScraperCuts,beam_inst_KE*1000,true_ffKE);
-  double UpStreamELoss = beam_inst_KE*1000-true_ffKE; 
-  if(beam_inst_KE > 0.7 && beam_inst_KE < 0.8) AnaIO::hUpStreamELoss700MeVAfterScraperCuts->Fill(UpStreamELoss);
+  double UpStreamELoss = beam_inst_KE*1000-true_ffKE;
+  //1 GeV Cut 
+  /*if(beam_inst_KE > 0.7 && beam_inst_KE < 0.8) AnaIO::hUpStreamELoss700MeVAfterScraperCuts->Fill(UpStreamELoss);
   if(beam_inst_KE > 0.8 && beam_inst_KE < 0.9) AnaIO::hUpStreamELoss800MeVAfterScraperCuts->Fill(UpStreamELoss);
   if(beam_inst_KE > 0.9 && beam_inst_KE < 1.0) AnaIO::hUpStreamELoss900MeVAfterScraperCuts->Fill(UpStreamELoss);
-  if(beam_inst_KE > 1.0 && beam_inst_KE < 1.1) AnaIO::hUpStreamELoss1000MeVAfterScraperCuts->Fill(UpStreamELoss);
+  if(beam_inst_KE > 1.0 && beam_inst_KE < 1.1) AnaIO::hUpStreamELoss1000MeVAfterScraperCuts->Fill(UpStreamELoss);*/
+  
+  if(beam_inst_KE > 1.7 && beam_inst_KE < 1.8) AnaIO::hUpStreamELoss700MeVAfterScraperCuts->Fill(UpStreamELoss);
+  if(beam_inst_KE > 1.8 && beam_inst_KE < 1.9) AnaIO::hUpStreamELoss800MeVAfterScraperCuts->Fill(UpStreamELoss);
+  if(beam_inst_KE > 1.9 && beam_inst_KE < 2.0) AnaIO::hUpStreamELoss900MeVAfterScraperCuts->Fill(UpStreamELoss);
+  if(beam_inst_KE > 2.0 && beam_inst_KE < 2.1) AnaIO::hUpStreamELoss1000MeVAfterScraperCuts->Fill(UpStreamELoss);
 }
 
 void AnaUtils::FillBeamVariablesAfterAllCuts(const bool kMC, int parType, int channelType)

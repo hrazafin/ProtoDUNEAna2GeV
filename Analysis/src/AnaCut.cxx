@@ -5,6 +5,7 @@ bool AnaCut::CutBeamAllInOne(const bool kMC, bool kFill)
   // Standard procedures of protoDUNE-SP pion beam selections
    // Calculate event weight
   double weight = 1.0;//anaUtils.CalWeight(kMC);
+  //double weight = anaUtils.CalWeight(kMC);
 
   // Get the beam particle type/event channel/XS event using the truth level information
   const int parType = kMC ? anaUtils.GetBeamParticleType(AnaIO::reco_beam_true_byHits_PDG) : anaUtils.gkBeamOthers;
@@ -24,7 +25,6 @@ bool AnaCut::CutBeamAllInOne(const bool kMC, bool kFill)
   if(kFill && channelType == anaUtils.gkChargeExchange) AnaIO::hTruthMatchedChannelCEXSample->Fill(beamEndZ, weight);
   if(kFill) plotUtils.FillHist(AnaIO::hBeamEndZ_XsEvt_BeamPDG, beamEndZ, evtXStype, weight);
   if(kFill && evtXStype == anaUtils.gkXSSignal) AnaIO::hTruthMatchedXsEvtCEXSample->Fill(beamEndZ, weight);
-
   
   // Get the beam inst and front-face KE (upstream energy loss study)
   double beam_inst_KE = -999.0, true_ffKE = -999.0;
@@ -53,6 +53,7 @@ bool AnaCut::CutBeamAllInOne(const bool kMC, bool kFill)
 
   // 4. Beam quality cut
   const bool passBeamQuality = CutBeamQuality(kMC,true,kFill);
+  //const bool passBeamQuality = CutBeamQuality(false,true,kFill);
   if(kFill) AnaIO::hCutBeamQualityPass->Fill(passBeamQuality);
   if(!passBeamQuality) return false;
   if(kFill) plotUtils.FillHist(AnaIO::hBeamEndZ_CutBeamQuality, beamEndZ, parType, weight);
@@ -109,7 +110,7 @@ bool AnaCut::CutBeamAllInOne(const bool kMC, bool kFill)
 
   //========= Event Passed All Pion Beam Cuts =======//
   if(kFill) anaUtils.FillBeamVariablesAfterAllCuts(kMC, parType, channelType);
-
+ 
   // Selected beam rec. efficiency 
   if(kFill && parType == anaUtils.gkBeamPiPlus){
     //const TVector3 truthBeamFull = anaUtils.GetTruthBeamFull();
@@ -173,9 +174,30 @@ bool AnaCut::CutBeamQuality(bool kMC, bool DoAngleCut, bool kFill)
 
   //const double cut_beamQuality_TPC_xy_low = -1.;
   const double cut_beamQuality_TPC_xy = 3.;
-  //const double cut_beamQuality_TPC_y = 3.;
+  //const double cut_beamQuality_TPC_y = 0.;
   const double cut_beamQuality_TPC_z = 3.;
   const double cut_beamQuality_TPC_cosTheta = 0.95;
+
+  //Richie parameters
+  /* 
+  for (long unsigned int calo=0; calo<AnaIO::reco_beam_calo_X->size();calo++){
+     if (calo==0)      AnaIO::reco_beam_startZ=AnaIO::reco_beam_calo_Z->at(0);
+     if (AnaIO::reco_beam_calo_Z->at(calo)>40) break;
+     if (abs(AnaIO::reco_beam_startZ-30)<abs(AnaIO::reco_beam_calo_Z->at(calo)-30)) continue;
+     AnaIO::reco_beam_startX=AnaIO::reco_beam_calo_X->at(calo);
+     AnaIO::reco_beam_startY=AnaIO::reco_beam_calo_Y->at(calo);
+     AnaIO::reco_beam_startZ=AnaIO::reco_beam_calo_Z->at(calo);
+  }
+
+  AnaIO::reco_beam_calo_startX = AnaIO::reco_beam_startX;
+  AnaIO::reco_beam_calo_startY = AnaIO::reco_beam_startY;
+  AnaIO::reco_beam_calo_startZ = AnaIO::reco_beam_startZ;
+
+  AnaIO::reco_beam_endX = AnaIO::reco_beam_calo_endX;
+  AnaIO::reco_beam_endY = AnaIO::reco_beam_calo_endY;
+  AnaIO::reco_beam_endZ = AnaIO::reco_beam_calo_endZ;
+  */
+  //end Richie
 
   TVector3 BeamDir(AnaIO::reco_beam_calo_endX-AnaIO::reco_beam_calo_startX,
                   AnaIO::reco_beam_calo_endY-AnaIO::reco_beam_calo_startY,
@@ -203,11 +225,15 @@ bool AnaCut::CutBeamQuality(bool kMC, bool DoAngleCut, bool kFill)
   const double cut_theta = kMC ? cos(thetaX)*cos(MCmeanThetaX)+cos(thetaY)*cos(MCmeanThetaY)+cos(thetaZ)*cos(MCmeanThetaZ)
                                : cos(thetaX)*cos(DATAmeanThetaX)+cos(thetaY)*cos(DATAmeanThetaY)+cos(thetaZ)*cos(DATAmeanThetaZ);
   
+  AnaIO::hBeamDeltaXYSigma->Fill(cut_xy);
+  AnaIO::hxstartystartBeam->Fill(AnaIO::reco_beam_calo_startX, AnaIO::reco_beam_calo_startY);
+  //cout << "======= cut_xy = "<< cut_xy << " cut_z = "<< cut_z << " cut_theta = "<< cut_theta << endl;
   if(kFill) AnaIO::hCutBeamDeltaXYSigma->Fill(cut_xy);
   if(kFill) AnaIO::hCutBeamDeltaZSigma->Fill(cut_z);
   if(kFill) AnaIO::hCutBeamCosTheta->Fill(cut_theta);
 
   const int parType = kMC ? anaUtils.GetBeamParticleType(AnaIO::reco_beam_true_byHits_PDG) : anaUtils.gkBeamOthers;
+  //const int parType = anaUtils.GetBeamParticleType(AnaIO::reco_beam_true_byHits_PDG);
   if(kFill) plotUtils.FillHist(AnaIO::hCutBeamQualityXY, cut_xy , parType);
   if(kFill) plotUtils.FillHist(AnaIO::hCutBeamQualityX, cut_x , parType);
   if(kFill) plotUtils.FillHist(AnaIO::hCutBeamQualityY, cut_y , parType);
@@ -226,7 +252,9 @@ bool AnaCut::CutBeamQuality(bool kMC, bool DoAngleCut, bool kFill)
 
   //if(CutBeamInstQuality(kMC) == false) return false;
 
-  if(AnaIO::beam_inst_P > 1.2 || AnaIO::beam_inst_P < 0.8) return false;
+  if(AnaIO::beam_inst_P > 2.2 || AnaIO::beam_inst_P < 1.8) return false;
+  //Herilala cut
+  if(AnaIO::reco_beam_calo_endX == -999 || AnaIO::reco_beam_calo_endY == -999 || AnaIO::reco_beam_calo_endZ == -999) return false;
 
   return true;
 }
@@ -323,24 +351,31 @@ bool AnaCut::CutBeamScraper(const bool kMC){
   double radious = 0.;
   double N_sigma = 0.;
   if(kMC){
-    center_x = -29.6;
-    center_y = 422.;
-    radious = 4.8;
-    N_sigma = 1.4;
+    center_x = -35.5;
+    center_y = 416.;
+    radious = 6.;
+    //center_x = -29.6;
+    //center_y = 422.;
+    //radious = 4.8;
+    //N_sigma = 1.4;
+    N_sigma = 1.5;
   }
   else{
-    center_x = -32.16;
-    center_y = 422.7;
-    radious = 4.8;
-    N_sigma = 1.2;
-  }
+    center_x = -36;
+    center_y = 415.5;
+    radious = 6.; //10
+    //center_x = -32.16;
+    //center_y = 422.7;
+    //radious = 4.8;
+    //N_sigma = 1.2;
+    N_sigma = 1.5;
+  } 
 
   double this_distance = sqrt( pow(AnaIO::beam_inst_X - center_x , 2.) + pow(AnaIO::beam_inst_Y - center_y, 2.) );
   if(this_distance > radious * N_sigma) return false;
 
   return true;
 }
-
 // --------------------------------- Legacy Cuts (not used anymore) ----------------------- //
 
 bool AnaCut::CutMCBeamPos()
@@ -436,6 +471,7 @@ bool AnaCut::CutTopology(const bool kMC, double & pi0KineticE, double & pi0costh
 { 
   // Calculate event weight
   double weight = 1.0;//anaUtils.CalWeight(kMC);
+  //double weight = anaUtils.CalWeight(kMC);
   
   pi0KineticE = -999;
   pi0costheta = -999;
@@ -553,6 +589,7 @@ void AnaCut::CountPFP(const bool kMC, const bool kFill)
 { 
   // Calculate event weight
   double weight = 1.0;//anaUtils.CalWeight(kMC);
+  //double weight = anaUtils.CalWeight(kMC);
 
   // Get the size of reco final state particles
   const int recsize = AnaIO::reco_daughter_PFP_ID->size();
@@ -952,6 +989,8 @@ bool AnaCut::IsShower(const int ii, const bool kMC, const double weight, const b
     if(startY > 415) plotUtils.FillHist(AnaIO::hCutemScore_R3, emScore, truthParticleType, weight);
     else plotUtils.FillHist(AnaIO::hCutemScore_R4, emScore, truthParticleType, weight);
   }
+  //Herilala Hist
+  AnaIO::hxstartystart->Fill(startX,startY);
   // 2D map positionVSemScore
   if(kFill) plotUtils.FillHist(AnaIO::hAllCutemScoreVSStartX,startX,emScore, weight);
   if(kFill) plotUtils.FillHist(AnaIO::hAllCutemScoreVSStartY,startY,emScore, weight);
