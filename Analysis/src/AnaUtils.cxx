@@ -3271,6 +3271,7 @@ double AnaUtils::CalXSEvtWeight(const bool & kMC, const double & intE, const int
     else weight = 1.;
   }*/
 
+  //Defauft Kang
   // With dep E Loss Apr. (new)
   if (kMC){
     // 0pi0
@@ -3286,7 +3287,7 @@ double AnaUtils::CalXSEvtWeight(const bool & kMC, const double & intE, const int
     // No weight for other bck
     else weight = 1.;
   }
-
+  weight = 1.; //remove weight Herilala
   return weight;
 }
 
@@ -3296,13 +3297,16 @@ double AnaUtils::CalPi0OAWeight(const bool & kMC, const double & OA){
   if(kMC){
     //double IniWeight[] = {27.0/59.0638, 83.0/100.622, 135.0/194.633, 178.0/242.524, 174.0/201.365, 142.0/137.606, 125.0/97.6361, 87.0/87.0227, 79.0/70.1378, 63.0/55.6535, 61.0/46.6166, 53.0/35.1211, 
     //                 42.0/22.1165, 34.0/17.5821, 30.0/19.3663, 19.0/8.79664, 18.0/12.3029, 18.0/11.2505, 9.0/10.8019, 5.0/4.03585};
+    
+    //Defauft Kang
     double IniWeight[] = {27.0/51.0259, 83.0/86.9285, 135.0/168.146, 178.0/209.519, 174.0/173.961, 142.0/118.879, 125.0/84.3489, 87.0/75.1799, 79.0/60.5928, 63.0/48.0797, 61.0/40.2726, 53.0/30.3415, 
                      42.0/19.1067, 34.0/15.1894, 30.0/16.7307, 19.0/7.59951, 18.0/10.6286, 18.0/9.7194, 9.0/9.33184, 5.0/3.48662};
     
     Int_t binx = AnaIO::hRecPi0OA_OVERLAY->GetXaxis()->FindBin(OA);
     weight *= IniWeight[binx-1];
   }
-  
+   
+  weight = 1.;
   return weight;
 }
 
@@ -3327,12 +3331,13 @@ double AnaUtils::CalBeamIniWeight(const double & iniE){
   //                   0.0, 0.858606, 0.870282, 0.882274, 0.887159, 0.892445, 0.894791, 0.889779};
 
   // April 2023 new latest
+  //Defauft Kang
   double IniWeight[] = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 
                      0.0, 0.841146, 0.870546, 0.879581, 0.88791, 0.893029, 0.894007, 0.891124};
 
   Int_t binx = AnaIO::hRecPiPlusInitialEnergy->GetXaxis()->FindBin(iniE);
   weight *= IniWeight[binx-1];
-
+  weight = 1.;
   return weight;
 
 }
@@ -3354,12 +3359,13 @@ double AnaUtils::CalBeamIntWeight(const double & intE){
   //double IntWeight[] = {0.439768, 1.0, 0.0, 0.240104, 0.325475, 0.547874, 0.525402, 0.569011, 0.663258, 0.755661, 0.820706, 0.858978, 
   //                   0.886342, 0.901809, 0.920025, 0.931599, 0.945724, 0.945179, 0.943406, 0.938913};
   // April 2023 new
+  // Kang default
   double IntWeight[] = {0, 1.0, 0.0, 0.200557, 0.372566, 0.586148, 0.553071, 0.6047, 0.67587, 0.770301, 0.831756, 0.867062, 
                      0.891131, 0.907382, 0.923663, 0.934314, 0.946617, 0.947189, 0.947067, 0.938439};
 
   Int_t binx = AnaIO::hRecPiPlusInteractingEnergy->GetXaxis()->FindBin(intE);
   weight *= IntWeight[binx-1];
-
+  weight = 1.;
   return weight;
 }
 
@@ -3379,13 +3385,14 @@ double AnaUtils::CalCEXIntWeight(const double & intE){
   // ==== new bck comp
   //double IntWeight[] = {0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 0.748344, 0.602063, 0.841422, 0.815263, 0.67177, 0.553415, 
   //                  0.596665, 0.544498, 0.703856, 0.690155, 0.731224, 0.720228, 0.704154, 1};
-
+  
+  //Kang default
   double IntWeight[] = {0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 0.69794, 0.818919, 0.775484, 0.800257, 0.53928, 
                     0.719739, 0.530114, 0.753455, 0.752041, 0.76991, 0.74918, 0.743382, 1.0};
     
   Int_t binx = AnaIO::hRecPiPlusInteractingEnergyEvt->GetXaxis()->FindBin(intE);
   weight *= IntWeight[binx-1];
-
+  weight = 1.; 
   return weight;
 }
 
@@ -3394,6 +3401,7 @@ double AnaUtils::CalCEXPi0KEWeight(const double & intE){
 
   double weight = 1.;
 
+  //Kang default
   double IntWeight[] = {0.0, 0.513447, 0.703031, 0.568209, 0.520239, 0.66259, 0.573659, 0.590971, 0.593988, 0.543884, 0.66232, 0.694243, 
                     0.884691, 1.0, 0.771999, 1.0, 1.0, 0.0, 0.0, 0.0};
 
@@ -3402,7 +3410,7 @@ double AnaUtils::CalCEXPi0KEWeight(const double & intE){
 
   Int_t binx = AnaIO::hRecPiZeroSliceKineticEnergyEvt->GetXaxis()->FindBin(intE);
   weight *= IntWeight[binx-1];
-
+  weight = 1.; 
   return weight;
 }
 
