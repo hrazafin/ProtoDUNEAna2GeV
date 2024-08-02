@@ -133,7 +133,7 @@ int main(int argc, char * argv[])
   //WeightBeamData(hini_data, IsRange, "Ini");
 
   RooUnfoldBayes unfold_Ini (response_SliceID_Ini, hini, 4); // Unfold fake data
-  RooUnfoldBayes unfold_Ini_Data (response_SliceID_Ini, hini_data, 4); // Unfold data
+  RooUnfoldBayes unfold_Ini_Data (response_SliceID_Ini, hini_data, 10); // Unfold data
 
   TH1D *hini_uf = (TH1D*)unfold_Ini.Hreco();
   TH1D *hini_uf_data = (TH1D*)unfold_Ini_Data.Hreco();
@@ -1116,7 +1116,7 @@ void DrawDataMCRatio(TH1D * hratio, bool xsec, const TString tag){
 double CalIniWeight(const int & binx, const bool IsRange){
 
   double weight = 1.;
-  if(IsRange){
+  /*if(IsRange){
     double IntWeight[] = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 
                      0.0, 0.801123, 0.859177, 0.86919, 0.880718, 0.886977, 0.889779, 0.887032};
     weight *= IntWeight[binx-1];
@@ -1126,14 +1126,15 @@ double CalIniWeight(const int & binx, const bool IsRange){
     double IntWeight[] = {0.0, 0.0, 0.636412, 0.570768, 0.348301, 0.633125, 0.747292, 0.461547, 0.711167, 0.603851, 0.660517, 
                     0.747348, 0.859409, 1, 0.742225, 1.0, 1,0, 0.0, 0.0, 0.0};
     weight *= IntWeight[binx-1];
-  }
+  }*/
+  weight = 1.;
   return weight;
 }
 
 double CalBeamIntWeight(const int & binx, const bool IsRange){
 
   double weight = 1.;
-  if(IsRange){
+  /*if(IsRange){
     double IntWeight[] = {0.439768, 1.0, 0.0, 0.240104, 0.325475, 0.547874, 0.525402, 0.569011, 0.663258, 0.755661, 0.820706, 0.858978, 
                      0.886342, 0.901809, 0.920025, 0.931599, 0.945724, 0.945179, 0.943406, 0.938913};
     weight *= IntWeight[binx-1];
@@ -1143,14 +1144,15 @@ double CalBeamIntWeight(const int & binx, const bool IsRange){
     double IntWeight[] = {0.0, 0.0, 0.636412, 0.570768, 0.348301, 0.633125, 0.747292, 0.461547, 0.711167, 0.603851, 0.660517, 
                     0.747348, 0.859409, 1, 0.742225, 1.0, 1,0, 0.0, 0.0, 0.0};
     weight *= IntWeight[binx-1];
-  }
+  }*/
+  weight = 1.;
   return weight;
 }
 
 double CalCEXIntWeight(const int & binx, const bool IsRange){
 
   double weight = 1.;
-  if(IsRange){
+  /*if(IsRange){
     //double IntWeight[] = {0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 0.68125, 0.811044, 0.829454, 0.84448, 0.600005, 
     //                0.731605, 0.683442, 0.650626, 0.651113, 0.668391, 0.633431, 0.65286, 1.0};
     // Feb
@@ -1167,7 +1169,8 @@ double CalCEXIntWeight(const int & binx, const bool IsRange){
     double IntWeight[] = {0.0, 0.0, 0.636412, 0.570768, 0.348301, 0.633125, 0.747292, 0.461547, 0.711167, 0.603851, 0.660517, 
                     0.747348, 0.859409, 1, 0.742225, 1.0, 1,0, 0.0, 0.0, 0.0};
     weight *= IntWeight[binx-1];
-  }
+  }*/
+  weight = 1.;
   return weight;
 }
 
@@ -1175,7 +1178,7 @@ double CalCEXIntWeight(const int & binx, const bool IsRange){
 double CalCEXPi0KEWeight(const int & binx, const bool IsRange, const bool IsKF){
 
   double weight = 1.;
-  if(IsRange && IsKF){
+  /*if(IsRange && IsKF){
     //==  small bin beam wt
     //double IntWeight[] = {0.0, 0.409994, 0.357135, 0.382372, 0.465516, 0.597296, 0.672419, 0.564701, 0.61694, 0.571107, 0.791561, 
     //                  0.733454, 0.945928, 0.941008, 0.785822, 1.0, 1,0, 0.0, 0.0, 0.0};
@@ -1210,14 +1213,15 @@ double CalCEXPi0KEWeight(const int & binx, const bool IsRange, const bool IsKF){
     double IntWeight[] = {0.0, 0.369517, 0.409675, 0.415022, 0.373534, 0.348398, 0.459325, 0.422841, 0.481166, 0.426144, 0.680265, 
                     0.633115, 0.933773, 0.909191,0.747696, 0.9244, 0.864349, 0.0, 1.0, 0.402144};
     weight *= IntWeight[binx-1];
-  }
+  }*/
+  weight = 1.;
   return weight;
 }
 // CosTheta
 double CalCEXPi0CosThetaWeight(const int & binx, const bool IsRange, const bool IsKF){
 
   double weight = 1.;
-  if(IsRange && IsKF){
+  /*if(IsRange && IsKF){
     // beam wt
     //double IntWeight[] = {0.367657, 0.577443, 0.446119, 0.738655, 0.459862, 0.467202, 0.518055, 0.435467, 0.522927, 0.702523};
     //double IntWeight[] = {0.367657, 0.577443, 0.596655, 0.738655, 0.459862, 0.467202, 0.547708, 0.513704, 0.586615, 0.732868};
@@ -1246,14 +1250,15 @@ double CalCEXPi0CosThetaWeight(const int & binx, const bool IsRange, const bool 
     double IntWeight[] = {0.0, 0.0, 0.636412, 0.570768, 0.348301, 0.633125, 0.747292, 0.461547, 0.711167, 0.603851, 0.660517, 
                     0.747348, 0.859409, 1, 0.742225, 1.0, 1,0, 0.0, 0.0, 0.0};
     weight *= IntWeight[binx-1];
-  }
+  }*/
+  weight = 1.;
   return weight;
 }
 // Theta
 double CalCEXPi0ThetaWeight(const int & binx, const bool IsRange, const bool IsKF){
 
   double weight = 1.;
-  if(IsRange && IsKF){
+  /*if(IsRange && IsKF){
     // beam wt
     //double IntWeight[] = {0.763616, 0.6884, 0.51305, 0.494907, 0.424725, 0.535193, 0.567364, 0.577443, 0.367657, 0.0};
     //double IntWeight[] = {0.783151, 0.72413, 0.578315, 0.551875, 0.44398, 0.535193, 0.632291, 0.577443, 0.367657, 0.0};
@@ -1282,7 +1287,8 @@ double CalCEXPi0ThetaWeight(const int & binx, const bool IsRange, const bool IsK
     double IntWeight[] = {0.0, 0.0, 0.636412, 0.570768, 0.348301, 0.633125, 0.747292, 0.461547, 0.711167, 0.603851, 0.660517, 
                     0.747348, 0.859409, 1, 0.742225, 1.0, 1,0, 0.0, 0.0, 0.0};
     weight *= IntWeight[binx-1];
-  }
+  }*/
+  weight = 1.;
   return weight;
 }
 

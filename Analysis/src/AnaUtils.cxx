@@ -3579,7 +3579,7 @@ void AnaUtils::FillBeamQualityHist()
   TVector3 DetZ(0,0,1);
   // Fill histograms
   if(AnaIO::reco_beam_calo_endX == -999 || AnaIO::reco_beam_calo_endY == -999 || AnaIO::reco_beam_calo_endZ == -999) {
-   std::cout << "Event contains -999" << std::endl;
+   //std::cout << "Event contains -999" << std::endl;
   }
   else {
     AnaIO::hRecBeamStartX->Fill(AnaIO::reco_beam_calo_startX);

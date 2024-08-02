@@ -2217,7 +2217,7 @@ namespace AnaIO
 
     int xsecmin = 0;
     int xsecmax = 2000;
-    int xsecbin = 40;
+    int xsecbin = 20; //40 not sure
 
     int xsecthetamin = 0;
     int xsecthetamax = 180;

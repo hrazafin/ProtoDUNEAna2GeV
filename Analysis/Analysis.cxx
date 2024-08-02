@@ -928,7 +928,7 @@ int anaRec(const TString finName, TList *lout, const TString tag, const int nEnt
       if(doXS) plotUtils.FillHist(AnaIO::hRecPiPlusInteractingEnergyBckSub, interactingE_reco, anaUtils.gkXSBmBkg, intcexwt);
       AnaIO::hRecoInteractingHistData->Fill(interactingE_reco,intcexwt);
       double pi0KEweight = 1.0; //anaUtils.CalCEXPi0KEWeight(pi0KineticE*1000);
-      if(interactingE_reco > 650 && interactingE_reco < 800) {
+      if(interactingE_reco > 1650 && interactingE_reco < 1800) {
         //if(evtXStype == anaUtils.gkXSSignal && parType == anaUtils.gkBeamPiPlus) 
         AnaIO::hRecoPi0KEHistData->Fill(pi0KineticE*1000, pi0KEweight);
         AnaIO::hRecoPi0CosThetaHistData->Fill(pi0costheta, pi0KEweight);
@@ -965,7 +965,7 @@ int anaRec(const TString finName, TList *lout, const TString tag, const int nEnt
 
     // Fill the pi0 kinetic energy for selected pion int energy regions
     //if(interactingE_reco> 650 && interactingE_reco < 800 && anaCut.GetNPi0() == 1) {
-    if(interactingE_reco> 650 && interactingE_reco < 800) {
+    if(interactingE_reco> 1650 && interactingE_reco < 1800) {
       // ============== Pi0 KE =============//
       // no weight
       plotUtils.FillHist(AnaIO::hRecPiZeroRangeKineticEnergyEvtNoWeight, pi0KineticE*1000, evtXStype, pi0wt);

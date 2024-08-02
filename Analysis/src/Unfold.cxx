@@ -2,9 +2,9 @@
 
 Unfold::Unfold(int nb, double xlo, double xhi)
   : response_SliceID_Int(nb, xlo, xhi,"response_SliceID_Int")
-  , response_SliceID_BeamInt(1000, 0, 1000,"response_SliceID_BeamInt")
+  , response_SliceID_BeamInt(2000, 0, 2000,"response_SliceID_BeamInt")
   , response_SliceID_Inc(nb, xlo, xhi,"response_SliceID_Inc")
-  , response_SliceID_Ini(1000, 0, 1000,"response_SliceID_Ini")
+  , response_SliceID_Ini(2000, 0, 2000,"response_SliceID_Ini")
   , response_SliceID_Pi0KE(nb, xlo, xhi,"response_SliceID_Pi0KE")
   , response_SliceID_Pi0CosTheta(10, -1., 1.,"response_SliceID_Pi0CosTheta") 
   , response_SliceID_Pi0Theta(10, 0., 180.,"response_SliceID_Pi0Theta")
