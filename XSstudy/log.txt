@@ -106,37 +106,35 @@ correction: 1
 correction: 1
 correction: 1
 correction: 1
-ix: 26incE: 21143.5intE: 227.5 ratio: 0meandEdx[ix]: 2.42539e-315
+ix: 26incE: 21143.5intE: 227.5 ratio: 0meandEdx[ix]: 2.40222e-315
 correction: 1
-ix: 27incE: 167678intE: 227.5 ratio: 0meandEdx[ix]: 2.42389e-315
+ix: 27incE: 167678intE: 227.5 ratio: 0meandEdx[ix]: 2.40053e-315
 correction: 1
 ix: 28incE: 363440intE: 227.5 ratio: 0meandEdx[ix]: 2.09834e-317
 correction: 1
-ix: 29incE: 593012intE: 227.5 ratio: 0meandEdx[ix]: 6.95335e-310
+ix: 29incE: 593012intE: 227.5 ratio: 0meandEdx[ix]: 6.95312e-310
 correction: 1
-ix: 30incE: 861070intE: 227.5 ratio: 0meandEdx[ix]: 6.95335e-310
+ix: 30incE: 861070intE: 227.5 ratio: 0meandEdx[ix]: 6.95312e-310
 correction: 1
 ix: 31incE: 1.18218e+06intE: 227.5 ratio: 0meandEdx[ix]: 2.13028e-314
 correction: 1
-ix: 32incE: 1.57867e+06intE: 227.5 ratio: 0meandEdx[ix]: 2.42533e-315
+ix: 32incE: 1.57867e+06intE: 227.5 ratio: 0meandEdx[ix]: 2.40218e-315
 correction: 1
 ix: 33incE: 2.03536e+06intE: 227.5 ratio: 0meandEdx[ix]: 2.122e-314
 correction: 1
-ix: 34incE: 2.46831e+06intE: 227.5 ratio: 0meandEdx[ix]: 1.39612e-309
+ix: 34incE: 2.46831e+06intE: 227.5 ratio: 0meandEdx[ix]: 1.39611e-309
 correction: 1
-ix: 35incE: 2.77648e+06intE: 227.5 ratio: 0meandEdx[ix]: 2.42538e-315
+ix: 35incE: 2.77648e+06intE: 227.5 ratio: 0meandEdx[ix]: 2.40222e-315
 correction: 1
-ix: 36incE: 2.7666e+06intE: 227.5 ratio: 0meandEdx[ix]: 1.15149e-315
+ix: 36incE: 2.7666e+06intE: 227.5 ratio: 0meandEdx[ix]: 1.13233e-315
 correction: 1
-ix: 37incE: 2.44845e+06intE: 227.5 ratio: 0meandEdx[ix]: 1.15151e-315
+ix: 37incE: 2.44845e+06intE: 227.5 ratio: 0meandEdx[ix]: 1.13234e-315
 correction: 1
-ix: 38incE: 1.89976e+06intE: 227.5 ratio: 0meandEdx[ix]: 2.42539e-315
+ix: 38incE: 1.89976e+06intE: 227.5 ratio: 0meandEdx[ix]: 2.40222e-315
 correction: 1
-ix: 39incE: 1.24718e+06intE: 227.5 ratio: 0meandEdx[ix]: 2.42524e-315
+ix: 39incE: 1.24718e+06intE: 227.5 ratio: 0meandEdx[ix]: 2.40208e-315
 correction: 1
-ix: 40incE: 614638intE: 227.5 ratio: 0meandEdx[ix]: 8.69804e-312
-correction: 1
-correction: 1
+ix: 40incE: 614638intE: 227.5 ratio: 0meandEdx[ix]: 1.06388e-311
 correction: 1
 correction: 1
 correction: 1
@@ -152,33 +150,35 @@ correction: 1
 correction: 1
 correction: 1
 correction: 1
-ix: 26incE: 10588.1intE: 0 ratio: 0meandEdx[ix]: 2.42539e-315
 correction: 1
-ix: 27incE: 156111intE: 0 ratio: 0meandEdx[ix]: 2.42389e-315
+correction: 1
+ix: 26incE: 10588.1intE: 0 ratio: 0meandEdx[ix]: 2.40222e-315
+correction: 1
+ix: 27incE: 156111intE: 0 ratio: 0meandEdx[ix]: 2.40053e-315
 correction: 1
 ix: 28incE: 377003intE: 0 ratio: 0meandEdx[ix]: 2.09839e-317
 correction: 1
-ix: 29incE: 622065intE: 0 ratio: 0meandEdx[ix]: 6.95335e-310
+ix: 29incE: 622065intE: 0 ratio: 0meandEdx[ix]: 6.95312e-310
 correction: 1
-ix: 30incE: 909879intE: 0 ratio: 0meandEdx[ix]: 6.95335e-310
+ix: 30incE: 909879intE: 0 ratio: 0meandEdx[ix]: 6.95312e-310
 correction: 1
 ix: 31incE: 1.23712e+06intE: 0 ratio: 0meandEdx[ix]: 2.13028e-314
 correction: 1
-ix: 32incE: 1.64685e+06intE: 0 ratio: 0meandEdx[ix]: 2.42533e-315
+ix: 32incE: 1.64685e+06intE: 0 ratio: 0meandEdx[ix]: 2.40218e-315
 correction: 1
 ix: 33incE: 2.09221e+06intE: 0 ratio: 0meandEdx[ix]: 2.122e-314
 correction: 1
-ix: 34incE: 2.52703e+06intE: 0 ratio: 0meandEdx[ix]: 1.39612e-309
+ix: 34incE: 2.52703e+06intE: 0 ratio: 0meandEdx[ix]: 1.39611e-309
 correction: 1
-ix: 35incE: 2.83183e+06intE: 0 ratio: 0meandEdx[ix]: 2.42538e-315
+ix: 35incE: 2.83183e+06intE: 0 ratio: 0meandEdx[ix]: 2.40222e-315
 correction: 1
-ix: 36incE: 2.84726e+06intE: 0 ratio: 0meandEdx[ix]: 1.15149e-315
+ix: 36incE: 2.84726e+06intE: 0 ratio: 0meandEdx[ix]: 1.13233e-315
 correction: 1
-ix: 37incE: 2.5816e+06intE: 0 ratio: 0meandEdx[ix]: 1.15151e-315
+ix: 37incE: 2.5816e+06intE: 0 ratio: 0meandEdx[ix]: 1.13234e-315
 correction: 1
-ix: 38incE: 2.067e+06intE: 0 ratio: 0meandEdx[ix]: 2.42539e-315
+ix: 38incE: 2.067e+06intE: 0 ratio: 0meandEdx[ix]: 2.40222e-315
 correction: 1
-ix: 39incE: 1.45114e+06intE: 0 ratio: 0meandEdx[ix]: 2.42524e-315
+ix: 39incE: 1.45114e+06intE: 0 ratio: 0meandEdx[ix]: 2.40208e-315
 correction: 1
 correction: 1
 correction: 1
@@ -200,29 +200,27 @@ correction: 1
 correction: 1
 ix: 28incE: 1430.5intE: 0 ratio: 0meandEdx[ix]: 2.09844e-317
 correction: 1
-ix: 29incE: 238810intE: 0 ratio: 0meandEdx[ix]: 6.95335e-310
+ix: 29incE: 238810intE: 0 ratio: 0meandEdx[ix]: 6.95312e-310
 correction: 1
-ix: 30incE: 680520intE: 0 ratio: 0meandEdx[ix]: 6.95335e-310
+ix: 30incE: 680520intE: 0 ratio: 0meandEdx[ix]: 6.95312e-310
 correction: 1
 ix: 31incE: 1.18515e+06intE: 0 ratio: 0meandEdx[ix]: 2.13028e-314
 correction: 1
-ix: 32incE: 1.83047e+06intE: 0 ratio: 0meandEdx[ix]: 2.42533e-315
+ix: 32incE: 1.83047e+06intE: 0 ratio: 0meandEdx[ix]: 2.40218e-315
 correction: 1
 ix: 33incE: 2.46012e+06intE: 0 ratio: 0meandEdx[ix]: 2.122e-314
 correction: 1
-ix: 34incE: 3.1009e+06intE: 0 ratio: 0meandEdx[ix]: 1.39612e-309
+ix: 34incE: 3.1009e+06intE: 0 ratio: 0meandEdx[ix]: 1.39611e-309
 correction: 1
-ix: 35incE: 3.53229e+06intE: 0 ratio: 0meandEdx[ix]: 2.42538e-315
+ix: 35incE: 3.53229e+06intE: 0 ratio: 0meandEdx[ix]: 2.40222e-315
 correction: 1
-ix: 36incE: 3.57979e+06intE: 0 ratio: 0meandEdx[ix]: 1.15149e-315
+ix: 36incE: 3.57979e+06intE: 0 ratio: 0meandEdx[ix]: 1.13233e-315
 correction: 1
-ix: 37incE: 3.47764e+06intE: 0 ratio: 0meandEdx[ix]: 1.15151e-315
+ix: 37incE: 3.47764e+06intE: 0 ratio: 0meandEdx[ix]: 1.13234e-315
 correction: 1
-ix: 38incE: 3.12273e+06intE: 0 ratio: 0meandEdx[ix]: 2.42539e-315
+ix: 38incE: 3.12273e+06intE: 0 ratio: 0meandEdx[ix]: 2.40222e-315
 correction: 1
-ix: 39incE: 2.69286e+06intE: 0 ratio: 0meandEdx[ix]: 2.42524e-315
-correction: 1
-correction: 1
+ix: 39incE: 2.69286e+06intE: 0 ratio: 0meandEdx[ix]: 2.40208e-315
 correction: 1
 correction: 1
 correction: 1
@@ -238,37 +236,37 @@ correction: 1
 correction: 1
 correction: 1
 correction: 1
-ix: 26incE: 21143.5intE: 227.5 ratio: 0meandEdx[ix]: 2.42539e-315
 correction: 1
-ix: 27incE: 167678intE: 227.5 ratio: 0meandEdx[ix]: 2.42389e-315
+correction: 1
+ix: 26incE: 21143.5intE: 227.5 ratio: 0meandEdx[ix]: 2.40222e-315
+correction: 1
+ix: 27incE: 167678intE: 227.5 ratio: 0meandEdx[ix]: 2.40053e-315
 correction: 1
 ix: 28incE: 363440intE: 227.5 ratio: 0meandEdx[ix]: 2.09834e-317
 correction: 1
-ix: 29incE: 593012intE: 227.5 ratio: 0meandEdx[ix]: 6.95335e-310
+ix: 29incE: 593012intE: 227.5 ratio: 0meandEdx[ix]: 6.95312e-310
 correction: 1
-ix: 30incE: 861070intE: 227.5 ratio: 0meandEdx[ix]: 6.95335e-310
+ix: 30incE: 861070intE: 227.5 ratio: 0meandEdx[ix]: 6.95312e-310
 correction: 1
 ix: 31incE: 1.18218e+06intE: 227.5 ratio: 0meandEdx[ix]: 8.28905e-317
 correction: 1
-ix: 32incE: 1.57867e+06intE: 227.5 ratio: 0meandEdx[ix]: 2.42368e-315
+ix: 32incE: 1.57867e+06intE: 227.5 ratio: 0meandEdx[ix]: 2.4041e-315
 correction: 1
 ix: 33incE: 2.03536e+06intE: 227.5 ratio: 0meandEdx[ix]: 4.94066e-324
 correction: 1
 ix: 34incE: 2.46831e+06intE: 227.5 ratio: 0meandEdx[ix]: 7.74682e-304
 correction: 1
-ix: 35incE: 2.77648e+06intE: 227.5 ratio: 0meandEdx[ix]: 2.42538e-315
+ix: 35incE: 2.77648e+06intE: 227.5 ratio: 0meandEdx[ix]: 2.40222e-315
 correction: 1
-ix: 36incE: 2.7666e+06intE: 227.5 ratio: 0meandEdx[ix]: 1.15149e-315
+ix: 36incE: 2.7666e+06intE: 227.5 ratio: 0meandEdx[ix]: 1.13233e-315
 correction: 1
-ix: 37incE: 2.44845e+06intE: 227.5 ratio: 0meandEdx[ix]: 1.15151e-315
+ix: 37incE: 2.44845e+06intE: 227.5 ratio: 0meandEdx[ix]: 1.13234e-315
 correction: 1
-ix: 38incE: 1.89976e+06intE: 227.5 ratio: 0meandEdx[ix]: 2.42539e-315
+ix: 38incE: 1.89976e+06intE: 227.5 ratio: 0meandEdx[ix]: 2.40222e-315
 correction: 1
-ix: 39incE: 1.24718e+06intE: 227.5 ratio: 0meandEdx[ix]: 2.42524e-315
+ix: 39incE: 1.24718e+06intE: 227.5 ratio: 0meandEdx[ix]: 2.40208e-315
 correction: 1
-ix: 40incE: 614638intE: 227.5 ratio: 0meandEdx[ix]: 8.69804e-312
-correction: 1
-correction: 1
+ix: 40incE: 614638intE: 227.5 ratio: 0meandEdx[ix]: 1.06388e-311
 correction: 1
 correction: 1
 correction: 1
@@ -284,33 +282,35 @@ correction: 1
 correction: 1
 correction: 1
 correction: 1
-ix: 26incE: 10588.1intE: 0 ratio: 0meandEdx[ix]: 2.42539e-315
 correction: 1
-ix: 27incE: 156111intE: 0 ratio: 0meandEdx[ix]: 2.42389e-315
+correction: 1
+ix: 26incE: 10588.1intE: 0 ratio: 0meandEdx[ix]: 2.40222e-315
+correction: 1
+ix: 27incE: 156111intE: 0 ratio: 0meandEdx[ix]: 2.40053e-315
 correction: 1
 ix: 28incE: 377003intE: 0 ratio: 0meandEdx[ix]: 2.09839e-317
 correction: 1
-ix: 29incE: 622065intE: 0 ratio: 0meandEdx[ix]: 6.95335e-310
+ix: 29incE: 622065intE: 0 ratio: 0meandEdx[ix]: 6.95312e-310
 correction: 1
-ix: 30incE: 909879intE: 0 ratio: 0meandEdx[ix]: 6.95335e-310
+ix: 30incE: 909879intE: 0 ratio: 0meandEdx[ix]: 6.95312e-310
 correction: 1
 ix: 31incE: 1.23712e+06intE: 0 ratio: 0meandEdx[ix]: 8.28905e-317
 correction: 1
-ix: 32incE: 1.64685e+06intE: 0 ratio: 0meandEdx[ix]: 2.42368e-315
+ix: 32incE: 1.64685e+06intE: 0 ratio: 0meandEdx[ix]: 2.4041e-315
 correction: 1
 ix: 33incE: 2.09221e+06intE: 0 ratio: 0meandEdx[ix]: 4.94066e-324
 correction: 1
 ix: 34incE: 2.52703e+06intE: 0 ratio: 0meandEdx[ix]: 7.74682e-304
 correction: 1
-ix: 35incE: 2.83183e+06intE: 0 ratio: 0meandEdx[ix]: 2.42538e-315
+ix: 35incE: 2.83183e+06intE: 0 ratio: 0meandEdx[ix]: 2.40222e-315
 correction: 1
-ix: 36incE: 2.84726e+06intE: 0 ratio: 0meandEdx[ix]: 1.15149e-315
+ix: 36incE: 2.84726e+06intE: 0 ratio: 0meandEdx[ix]: 1.13233e-315
 correction: 1
-ix: 37incE: 2.5816e+06intE: 0 ratio: 0meandEdx[ix]: 1.15151e-315
+ix: 37incE: 2.5816e+06intE: 0 ratio: 0meandEdx[ix]: 1.13234e-315
 correction: 1
-ix: 38incE: 2.067e+06intE: 0 ratio: 0meandEdx[ix]: 2.42539e-315
+ix: 38incE: 2.067e+06intE: 0 ratio: 0meandEdx[ix]: 2.40222e-315
 correction: 1
-ix: 39incE: 1.45114e+06intE: 0 ratio: 0meandEdx[ix]: 2.42524e-315
+ix: 39incE: 1.45114e+06intE: 0 ratio: 0meandEdx[ix]: 2.40208e-315
 correction: 1
 correction: 1
 correction: 1
@@ -332,29 +332,27 @@ correction: 1
 correction: 1
 ix: 28incE: 1430.5intE: 0 ratio: 0meandEdx[ix]: 2.09844e-317
 correction: 1
-ix: 29incE: 238810intE: 0 ratio: 0meandEdx[ix]: 6.95335e-310
+ix: 29incE: 238810intE: 0 ratio: 0meandEdx[ix]: 6.95312e-310
 correction: 1
-ix: 30incE: 680520intE: 0 ratio: 0meandEdx[ix]: 6.95335e-310
+ix: 30incE: 680520intE: 0 ratio: 0meandEdx[ix]: 6.95312e-310
 correction: 1
 ix: 31incE: 1.18515e+06intE: 0 ratio: 0meandEdx[ix]: 8.28905e-317
 correction: 1
-ix: 32incE: 1.83047e+06intE: 0 ratio: 0meandEdx[ix]: 2.42368e-315
+ix: 32incE: 1.83047e+06intE: 0 ratio: 0meandEdx[ix]: 2.4041e-315
 correction: 1
 ix: 33incE: 2.46012e+06intE: 0 ratio: 0meandEdx[ix]: 4.94066e-324
 correction: 1
 ix: 34incE: 3.1009e+06intE: 0 ratio: 0meandEdx[ix]: 7.74682e-304
 correction: 1
-ix: 35incE: 3.53229e+06intE: 0 ratio: 0meandEdx[ix]: 2.42538e-315
+ix: 35incE: 3.53229e+06intE: 0 ratio: 0meandEdx[ix]: 2.40222e-315
 correction: 1
-ix: 36incE: 3.57979e+06intE: 0 ratio: 0meandEdx[ix]: 1.15149e-315
+ix: 36incE: 3.57979e+06intE: 0 ratio: 0meandEdx[ix]: 1.13233e-315
 correction: 1
-ix: 37incE: 3.47764e+06intE: 0 ratio: 0meandEdx[ix]: 1.15151e-315
+ix: 37incE: 3.47764e+06intE: 0 ratio: 0meandEdx[ix]: 1.13234e-315
 correction: 1
-ix: 38incE: 3.12273e+06intE: 0 ratio: 0meandEdx[ix]: 2.42539e-315
+ix: 38incE: 3.12273e+06intE: 0 ratio: 0meandEdx[ix]: 2.40222e-315
 correction: 1
-ix: 39incE: 2.69286e+06intE: 0 ratio: 0meandEdx[ix]: 2.42524e-315
-correction: 1
-correction: 1
+ix: 39incE: 2.69286e+06intE: 0 ratio: 0meandEdx[ix]: 2.40208e-315
 correction: 1
 correction: 1
 correction: 1
@@ -370,37 +368,37 @@ correction: 1
 correction: 1
 correction: 1
 correction: 1
-ix: 26incE: 21143.5intE: 227.5 ratio: 0meandEdx[ix]: 2.42539e-315
 correction: 1
-ix: 27incE: 167678intE: 227.5 ratio: 0meandEdx[ix]: 2.42389e-315
+correction: 1
+ix: 26incE: 21143.5intE: 227.5 ratio: 0meandEdx[ix]: 2.40222e-315
+correction: 1
+ix: 27incE: 167678intE: 227.5 ratio: 0meandEdx[ix]: 2.40053e-315
 correction: 1
 ix: 28incE: 363440intE: 227.5 ratio: 0meandEdx[ix]: 2.09834e-317
 correction: 1
-ix: 29incE: 593012intE: 227.5 ratio: 0meandEdx[ix]: 6.95335e-310
+ix: 29incE: 593012intE: 227.5 ratio: 0meandEdx[ix]: 6.95312e-310
 correction: 1
-ix: 30incE: 861070intE: 227.5 ratio: 0meandEdx[ix]: 6.95335e-310
+ix: 30incE: 861070intE: 227.5 ratio: 0meandEdx[ix]: 6.95312e-310
 correction: 1
 ix: 31incE: 1.18218e+06intE: 227.5 ratio: 0meandEdx[ix]: 2.13028e-314
 correction: 1
-ix: 32incE: 1.57867e+06intE: 227.5 ratio: 0meandEdx[ix]: 2.42727e-315
+ix: 32incE: 1.57867e+06intE: 227.5 ratio: 0meandEdx[ix]: 2.40402e-315
 correction: 1
 ix: 33incE: 2.03536e+06intE: 227.5 ratio: 0meandEdx[ix]: 0
 correction: 1
 ix: 34incE: 2.46831e+06intE: 227.5 ratio: 0meandEdx[ix]: 2.122e-314
 correction: 1
-ix: 35incE: 2.77648e+06intE: 227.5 ratio: 0meandEdx[ix]: 2.42538e-315
+ix: 35incE: 2.77648e+06intE: 227.5 ratio: 0meandEdx[ix]: 2.40222e-315
 correction: 1
-ix: 36incE: 2.7666e+06intE: 227.5 ratio: 0meandEdx[ix]: 1.15149e-315
+ix: 36incE: 2.7666e+06intE: 227.5 ratio: 0meandEdx[ix]: 1.13233e-315
 correction: 1
-ix: 37incE: 2.44845e+06intE: 227.5 ratio: 0meandEdx[ix]: 1.15151e-315
+ix: 37incE: 2.44845e+06intE: 227.5 ratio: 0meandEdx[ix]: 1.13234e-315
 correction: 1
-ix: 38incE: 1.89976e+06intE: 227.5 ratio: 0meandEdx[ix]: 2.42539e-315
+ix: 38incE: 1.89976e+06intE: 227.5 ratio: 0meandEdx[ix]: 2.40222e-315
 correction: 1
-ix: 39incE: 1.24718e+06intE: 227.5 ratio: 0meandEdx[ix]: 2.42524e-315
+ix: 39incE: 1.24718e+06intE: 227.5 ratio: 0meandEdx[ix]: 2.40208e-315
 correction: 1
-ix: 40incE: 614638intE: 227.5 ratio: 0meandEdx[ix]: 8.69804e-312
-correction: 1
-correction: 1
+ix: 40incE: 614638intE: 227.5 ratio: 0meandEdx[ix]: 1.06388e-311
 correction: 1
 correction: 1
 correction: 1
@@ -416,33 +414,35 @@ correction: 1
 correction: 1
 correction: 1
 correction: 1
-ix: 26incE: 10588.1intE: 0 ratio: 0meandEdx[ix]: 2.42539e-315
 correction: 1
-ix: 27incE: 156111intE: 0 ratio: 0meandEdx[ix]: 2.42389e-315
+correction: 1
+ix: 26incE: 10588.1intE: 0 ratio: 0meandEdx[ix]: 2.40222e-315
+correction: 1
+ix: 27incE: 156111intE: 0 ratio: 0meandEdx[ix]: 2.40053e-315
 correction: 1
 ix: 28incE: 377003intE: 0 ratio: 0meandEdx[ix]: 2.09839e-317
 correction: 1
-ix: 29incE: 622065intE: 0 ratio: 0meandEdx[ix]: 6.95335e-310
+ix: 29incE: 622065intE: 0 ratio: 0meandEdx[ix]: 6.95312e-310
 correction: 1
-ix: 30incE: 909879intE: 0 ratio: 0meandEdx[ix]: 6.95335e-310
+ix: 30incE: 909879intE: 0 ratio: 0meandEdx[ix]: 6.95312e-310
 correction: 1
 ix: 31incE: 1.23712e+06intE: 0 ratio: 0meandEdx[ix]: 2.13028e-314
 correction: 1
-ix: 32incE: 1.64685e+06intE: 0 ratio: 0meandEdx[ix]: 2.42727e-315
+ix: 32incE: 1.64685e+06intE: 0 ratio: 0meandEdx[ix]: 2.40402e-315
 correction: 1
 ix: 33incE: 2.09221e+06intE: 0 ratio: 0meandEdx[ix]: 0
 correction: 1
 ix: 34incE: 2.52703e+06intE: 0 ratio: 0meandEdx[ix]: 2.122e-314
 correction: 1
-ix: 35incE: 2.83183e+06intE: 0 ratio: 0meandEdx[ix]: 2.42538e-315
+ix: 35incE: 2.83183e+06intE: 0 ratio: 0meandEdx[ix]: 2.40222e-315
 correction: 1
-ix: 36incE: 2.84726e+06intE: 0 ratio: 0meandEdx[ix]: 1.15149e-315
+ix: 36incE: 2.84726e+06intE: 0 ratio: 0meandEdx[ix]: 1.13233e-315
 correction: 1
-ix: 37incE: 2.5816e+06intE: 0 ratio: 0meandEdx[ix]: 1.15151e-315
+ix: 37incE: 2.5816e+06intE: 0 ratio: 0meandEdx[ix]: 1.13234e-315
 correction: 1
-ix: 38incE: 2.067e+06intE: 0 ratio: 0meandEdx[ix]: 2.42539e-315
+ix: 38incE: 2.067e+06intE: 0 ratio: 0meandEdx[ix]: 2.40222e-315
 correction: 1
-ix: 39incE: 1.45114e+06intE: 0 ratio: 0meandEdx[ix]: 2.42524e-315
+ix: 39incE: 1.45114e+06intE: 0 ratio: 0meandEdx[ix]: 2.40208e-315
 correction: 1
 correction: 1
 correction: 1
@@ -464,29 +464,27 @@ correction: 1
 correction: 1
 ix: 28incE: 1430.5intE: 0 ratio: 0meandEdx[ix]: 2.09844e-317
 correction: 1
-ix: 29incE: 238810intE: 0 ratio: 0meandEdx[ix]: 6.95335e-310
+ix: 29incE: 238810intE: 0 ratio: 0meandEdx[ix]: 6.95312e-310
 correction: 1
-ix: 30incE: 680520intE: 0 ratio: 0meandEdx[ix]: 6.95335e-310
+ix: 30incE: 680520intE: 0 ratio: 0meandEdx[ix]: 6.95312e-310
 correction: 1
 ix: 31incE: 1.18515e+06intE: 0 ratio: 0meandEdx[ix]: 2.13028e-314
 correction: 1
-ix: 32incE: 1.83047e+06intE: 0 ratio: 0meandEdx[ix]: 2.42727e-315
+ix: 32incE: 1.83047e+06intE: 0 ratio: 0meandEdx[ix]: 2.40402e-315
 correction: 1
 ix: 33incE: 2.46012e+06intE: 0 ratio: 0meandEdx[ix]: 0
 correction: 1
 ix: 34incE: 3.1009e+06intE: 0 ratio: 0meandEdx[ix]: 2.122e-314
 correction: 1
-ix: 35incE: 3.53229e+06intE: 0 ratio: 0meandEdx[ix]: 2.42538e-315
+ix: 35incE: 3.53229e+06intE: 0 ratio: 0meandEdx[ix]: 2.40222e-315
 correction: 1
-ix: 36incE: 3.57979e+06intE: 0 ratio: 0meandEdx[ix]: 1.15149e-315
+ix: 36incE: 3.57979e+06intE: 0 ratio: 0meandEdx[ix]: 1.13233e-315
 correction: 1
-ix: 37incE: 3.47764e+06intE: 0 ratio: 0meandEdx[ix]: 1.15151e-315
+ix: 37incE: 3.47764e+06intE: 0 ratio: 0meandEdx[ix]: 1.13234e-315
 correction: 1
-ix: 38incE: 3.12273e+06intE: 0 ratio: 0meandEdx[ix]: 2.42539e-315
+ix: 38incE: 3.12273e+06intE: 0 ratio: 0meandEdx[ix]: 2.40222e-315
 correction: 1
-ix: 39incE: 2.69286e+06intE: 0 ratio: 0meandEdx[ix]: 2.42524e-315
-correction: 1
-correction: 1
+ix: 39incE: 2.69286e+06intE: 0 ratio: 0meandEdx[ix]: 2.40208e-315
 correction: 1
 correction: 1
 correction: 1
@@ -502,37 +500,37 @@ correction: 1
 correction: 1
 correction: 1
 correction: 1
-ix: 26incE: 21143.5intE: 227.5 ratio: 0meandEdx[ix]: 2.42539e-315
 correction: 1
-ix: 27incE: 167678intE: 227.5 ratio: 0meandEdx[ix]: 2.42389e-315
+correction: 1
+ix: 26incE: 21143.5intE: 227.5 ratio: 0meandEdx[ix]: 2.40222e-315
+correction: 1
+ix: 27incE: 167678intE: 227.5 ratio: 0meandEdx[ix]: 2.40053e-315
 correction: 1
 ix: 28incE: 363440intE: 227.5 ratio: 0meandEdx[ix]: 2.09834e-317
 correction: 1
-ix: 29incE: 593012intE: 227.5 ratio: 0meandEdx[ix]: 6.95335e-310
+ix: 29incE: 593012intE: 227.5 ratio: 0meandEdx[ix]: 6.95312e-310
 correction: 1
-ix: 30incE: 861070intE: 227.5 ratio: 0meandEdx[ix]: 6.95335e-310
+ix: 30incE: 861070intE: 227.5 ratio: 0meandEdx[ix]: 6.95312e-310
 correction: 1
 ix: 31incE: 1.18218e+06intE: 227.5 ratio: 0meandEdx[ix]: 1.4822e-323
 correction: 1
-ix: 32incE: 1.57867e+06intE: 227.5 ratio: 0meandEdx[ix]: 2.42746e-315
+ix: 32incE: 1.57867e+06intE: 227.5 ratio: 0meandEdx[ix]: 2.40429e-315
 correction: 1
 ix: 33incE: 2.03536e+06intE: 227.5 ratio: 0meandEdx[ix]: 2.122e-314
 correction: 1
 ix: 34incE: 2.46831e+06intE: 227.5 ratio: 0meandEdx[ix]: 1.3961e-309
 correction: 1
-ix: 35incE: 2.77648e+06intE: 227.5 ratio: 0meandEdx[ix]: 2.42538e-315
+ix: 35incE: 2.77648e+06intE: 227.5 ratio: 0meandEdx[ix]: 2.40222e-315
 correction: 1
-ix: 36incE: 2.7666e+06intE: 227.5 ratio: 0meandEdx[ix]: 1.15149e-315
+ix: 36incE: 2.7666e+06intE: 227.5 ratio: 0meandEdx[ix]: 1.13233e-315
 correction: 1
-ix: 37incE: 2.44845e+06intE: 227.5 ratio: 0meandEdx[ix]: 1.15151e-315
+ix: 37incE: 2.44845e+06intE: 227.5 ratio: 0meandEdx[ix]: 1.13234e-315
 correction: 1
-ix: 38incE: 1.89976e+06intE: 227.5 ratio: 0meandEdx[ix]: 2.42539e-315
+ix: 38incE: 1.89976e+06intE: 227.5 ratio: 0meandEdx[ix]: 2.40222e-315
 correction: 1
-ix: 39incE: 1.24718e+06intE: 227.5 ratio: 0meandEdx[ix]: 2.42524e-315
+ix: 39incE: 1.24718e+06intE: 227.5 ratio: 0meandEdx[ix]: 2.40208e-315
 correction: 1
-ix: 40incE: 614638intE: 227.5 ratio: 0meandEdx[ix]: 8.69804e-312
-correction: 1
-correction: 1
+ix: 40incE: 614638intE: 227.5 ratio: 0meandEdx[ix]: 1.06388e-311
 correction: 1
 correction: 1
 correction: 1
@@ -548,33 +546,35 @@ correction: 1
 correction: 1
 correction: 1
 correction: 1
-ix: 26incE: 10588.1intE: 0 ratio: 0meandEdx[ix]: 2.42539e-315
 correction: 1
-ix: 27incE: 156111intE: 0 ratio: 0meandEdx[ix]: 2.42389e-315
+correction: 1
+ix: 26incE: 10588.1intE: 0 ratio: 0meandEdx[ix]: 2.40222e-315
+correction: 1
+ix: 27incE: 156111intE: 0 ratio: 0meandEdx[ix]: 2.40053e-315
 correction: 1
 ix: 28incE: 377003intE: 0 ratio: 0meandEdx[ix]: 2.09839e-317
 correction: 1
-ix: 29incE: 622065intE: 0 ratio: 0meandEdx[ix]: 6.95335e-310
+ix: 29incE: 622065intE: 0 ratio: 0meandEdx[ix]: 6.95312e-310
 correction: 1
-ix: 30incE: 909879intE: 0 ratio: 0meandEdx[ix]: 6.95335e-310
+ix: 30incE: 909879intE: 0 ratio: 0meandEdx[ix]: 6.95312e-310
 correction: 1
 ix: 31incE: 1.23712e+06intE: 0 ratio: 0meandEdx[ix]: 1.4822e-323
 correction: 1
-ix: 32incE: 1.64685e+06intE: 0 ratio: 0meandEdx[ix]: 2.42746e-315
+ix: 32incE: 1.64685e+06intE: 0 ratio: 0meandEdx[ix]: 2.40429e-315
 correction: 1
 ix: 33incE: 2.09221e+06intE: 0 ratio: 0meandEdx[ix]: 2.122e-314
 correction: 1
 ix: 34incE: 2.52703e+06intE: 0 ratio: 0meandEdx[ix]: 1.3961e-309
 correction: 1
-ix: 35incE: 2.83183e+06intE: 0 ratio: 0meandEdx[ix]: 2.42538e-315
+ix: 35incE: 2.83183e+06intE: 0 ratio: 0meandEdx[ix]: 2.40222e-315
 correction: 1
-ix: 36incE: 2.84726e+06intE: 0 ratio: 0meandEdx[ix]: 1.15149e-315
+ix: 36incE: 2.84726e+06intE: 0 ratio: 0meandEdx[ix]: 1.13233e-315
 correction: 1
-ix: 37incE: 2.5816e+06intE: 0 ratio: 0meandEdx[ix]: 1.15151e-315
+ix: 37incE: 2.5816e+06intE: 0 ratio: 0meandEdx[ix]: 1.13234e-315
 correction: 1
-ix: 38incE: 2.067e+06intE: 0 ratio: 0meandEdx[ix]: 2.42539e-315
+ix: 38incE: 2.067e+06intE: 0 ratio: 0meandEdx[ix]: 2.40222e-315
 correction: 1
-ix: 39incE: 1.45114e+06intE: 0 ratio: 0meandEdx[ix]: 2.42524e-315
+ix: 39incE: 1.45114e+06intE: 0 ratio: 0meandEdx[ix]: 2.40208e-315
 correction: 1
 correction: 1
 correction: 1
@@ -596,46 +596,46 @@ correction: 1
 correction: 1
 ix: 28incE: 1430.5intE: 0 ratio: 0meandEdx[ix]: 2.09844e-317
 correction: 1
-ix: 29incE: 238810intE: 0 ratio: 0meandEdx[ix]: 6.95335e-310
+ix: 29incE: 238810intE: 0 ratio: 0meandEdx[ix]: 6.95312e-310
 correction: 1
-ix: 30incE: 680520intE: 0 ratio: 0meandEdx[ix]: 6.95335e-310
+ix: 30incE: 680520intE: 0 ratio: 0meandEdx[ix]: 6.95312e-310
 correction: 1
 ix: 31incE: 1.18515e+06intE: 0 ratio: 0meandEdx[ix]: 1.4822e-323
 correction: 1
-ix: 32incE: 1.83047e+06intE: 0 ratio: 0meandEdx[ix]: 2.42746e-315
+ix: 32incE: 1.83047e+06intE: 0 ratio: 0meandEdx[ix]: 2.40429e-315
 correction: 1
 ix: 33incE: 2.46012e+06intE: 0 ratio: 0meandEdx[ix]: 2.122e-314
 correction: 1
 ix: 34incE: 3.1009e+06intE: 0 ratio: 0meandEdx[ix]: 1.3961e-309
 correction: 1
-ix: 35incE: 3.53229e+06intE: 0 ratio: 0meandEdx[ix]: 2.42538e-315
+ix: 35incE: 3.53229e+06intE: 0 ratio: 0meandEdx[ix]: 2.40222e-315
 correction: 1
-ix: 36incE: 3.57979e+06intE: 0 ratio: 0meandEdx[ix]: 1.15149e-315
+ix: 36incE: 3.57979e+06intE: 0 ratio: 0meandEdx[ix]: 1.13233e-315
 correction: 1
-ix: 37incE: 3.47764e+06intE: 0 ratio: 0meandEdx[ix]: 1.15151e-315
+ix: 37incE: 3.47764e+06intE: 0 ratio: 0meandEdx[ix]: 1.13234e-315
 correction: 1
-ix: 38incE: 3.12273e+06intE: 0 ratio: 0meandEdx[ix]: 2.42539e-315
+ix: 38incE: 3.12273e+06intE: 0 ratio: 0meandEdx[ix]: 2.40222e-315
 correction: 1
-ix: 39incE: 2.69286e+06intE: 0 ratio: 0meandEdx[ix]: 2.42524e-315
+ix: 39incE: 2.69286e+06intE: 0 ratio: 0meandEdx[ix]: 2.40208e-315
 Now unfolding...
 Iteration : 0
-Chi^2 of change 2011.68
+Chi^2 of change 847.609
 Iteration : 1
-Chi^2 of change 146.248
+Chi^2 of change 3.60414e-29
 Iteration : 2
-Chi^2 of change 69.8737
+Chi^2 of change 1.16794e-30
 Iteration : 3
-Chi^2 of change 39.7685
+Chi^2 of change 1.16794e-30
 Calculating covariances due to number of measured events
 Now unfolding...
 Iteration : 0
-Chi^2 of change -nan
+Chi^2 of change 2595.38
 Iteration : 1
-Chi^2 of change -nan
+Chi^2 of change 150.515
 Iteration : 2
-Chi^2 of change -nan
+Chi^2 of change 65.243
 Iteration : 3
-Chi^2 of change -nan
+Chi^2 of change 37.2356
 Calculating covariances due to number of measured events
 tag: i006hTruthDiffCEXInteractingHist_650to800MeV
 eff: 0.0714286
@@ -651,13 +651,13 @@ Chi^2 of change 0
 Calculating covariances due to number of measured events
 Now unfolding...
 Iteration : 0
-Chi^2 of change -nan
+Chi^2 of change 1767.8
 Iteration : 1
-Chi^2 of change -nan
+Chi^2 of change 155.102
 Iteration : 2
-Chi^2 of change -nan
+Chi^2 of change 47.1415
 Iteration : 3
-Chi^2 of change -nan
+Chi^2 of change 20.2686
 Calculating covariances due to number of measured events
 tag: i666hTruthDiffCEXInteractingHistCosTheta_650to800MeV
 eff: 0.0714286
@@ -673,13 +673,13 @@ Chi^2 of change 2.33289e-29
 Calculating covariances due to number of measured events
 Now unfolding...
 Iteration : 0
-Chi^2 of change -nan
+Chi^2 of change 742.915
 Iteration : 1
-Chi^2 of change -nan
+Chi^2 of change 127.259
 Iteration : 2
-Chi^2 of change -nan
+Chi^2 of change 49.9429
 Iteration : 3
-Chi^2 of change -nan
+Chi^2 of change 25.7634
 Calculating covariances due to number of measured events
 tag: i066hTruthDiffCEXInteractingHistTheta_650to800MeV
 eff: 0.0714286

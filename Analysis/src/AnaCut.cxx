@@ -569,6 +569,7 @@ bool AnaCut::CutTopology(const bool kMC, double & pi0KineticE, double & pi0costh
   double costheta = PiZeroVec.Pz()/PiZeroVec.P();
   pi0KineticE = pi0KE; 
   pi0costheta = costheta;
+  cout << "------------ pi0KineticE = "<< pi0KineticE << " pi0costheta = "<< pi0costheta << endl;
   //if(pi0costheta < 0. && pi0costheta > -0.2)  cout << "Cut pi0cos: " << pi0costheta << " PiZeroVec.P(): " << PiZeroVec.P() << " PiZeroVec.Pz(): " << PiZeroVec.Pz() << endl; 
   if(kFill) plotUtils.FillHist(AnaIO::hRecPi0Energy_OVERLAY_AfterTOP_EVT, pi0KE, evtXStype, weight);
 

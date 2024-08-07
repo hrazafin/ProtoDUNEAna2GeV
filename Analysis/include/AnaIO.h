@@ -1715,9 +1715,9 @@ namespace AnaIO
     lout->Add(hRecPi0Mass);
     hRecPi0MassRaw = new TH2D("b019hRecPi0Mass_STK_RAW",";#pi^{0} Mass Raw(GeV/c^{2});Candidates", 20, 0, 0.5, 3, -0.5, 3.5);
     lout->Add(hRecPi0MassRaw);
-    hRecPi0Momentum = new TH2D("b020hRecPi0Momentum_STK", ";#pi^{0} Momentum (GeV/c);Candidates", 20, 0, 1, 3, -0.5, 3.5);
+    hRecPi0Momentum = new TH2D("b020hRecPi0Momentum_STK", ";#pi^{0} Momentum (GeV/c);Candidates", 40, 0, 2, 3, -0.5, 3.5);
     lout->Add(hRecPi0Momentum);
-    hRecPi0MomentumRaw = new TH2D("b021hRecPi0Momentum_STK_RAW", ";#pi^{0} Momentum Raw (GeV/c);Candidates", 20, 0, 1, 3, -0.5, 3.5);
+    hRecPi0MomentumRaw = new TH2D("b021hRecPi0Momentum_STK_RAW", ";#pi^{0} Momentum Raw (GeV/c);Candidates", 40, 0, 2, 3, -0.5, 3.5);
     lout->Add(hRecPi0MomentumRaw);
 
     hPi0MassLowE1 = new TH1D("b020hPi0MassLowE1","", 20, 0, 0.5);
@@ -1740,7 +1740,7 @@ namespace AnaIO
     test1hRecPi0Mass_OVERLAY_EVT = new TH2D("test1b022hRecPi0Mass_COMPOSE_EVT",";#pi^{0} Mass (GeV/c^{2});Candidates", 20, 0, 0.5, nevtXSType, evtXSTypemin, evtXSTypemax);
     lout->Add(test1hRecPi0Mass_OVERLAY_EVT);
 
-    hRecPi0Momentum_OVERLAY = new TH2D("b023hRecPi0Momentum_COMPOSE",";#pi^{0} Momentum (GeV/c);Candidates", 20, 0, 1, 3, -0.5, 3.5); 
+    hRecPi0Momentum_OVERLAY = new TH2D("b023hRecPi0Momentum_COMPOSE",";#pi^{0} Momentum (GeV/c);Candidates", 40, 0, 2, 3, -0.5, 3.5); 
     lout->Add(hRecPi0Momentum_OVERLAY);
 
     hRecPi0OA_OVERLAY = new TH2D("b024hRecPi0OA_COMPOSE",";Shower Opening Angle (deg);Candidates", 20, 0, 180, 3, -0.5, 3.5); 
@@ -1751,7 +1751,7 @@ namespace AnaIO
     test1hRecPi0OA_OVERLAY = new TH2D("test1b024hRecPi0OA_COMPOSE",";Shower Opening Angle (deg);Candidates", 20, 0, 180, 3, -0.5, 3.5); 
     lout->Add(test1hRecPi0OA_OVERLAY);
 
-    hRecPi0Energy_OVERLAY = new TH2D("b023hRecPi0Energy_COMPOSE",";#pi^{0} Energy (GeV);Candidates", 20, 0, 1, 3, -0.5, 3.5); 
+    hRecPi0Energy_OVERLAY = new TH2D("b023hRecPi0Energy_COMPOSE",";#pi^{0} Energy (GeV);Candidates", 40, 0, 2, 3, -0.5, 3.5); 
     lout->Add(hRecPi0Energy_OVERLAY);
 
     hRecPi0ShowerSep_OVERLAY = new TH2D("b024hRecPi0ShowerSep_COMPOSE",";Shower Separation (cm);Candidates", 20, 0, 150, 3, -0.5, 3.5);
@@ -1760,7 +1760,7 @@ namespace AnaIO
     hRecPi0MassRaw_OVERLAY = new TH2D("b025hRecPi0MassRaw_COMPOSE",";#pi^{0} Mass (GeV/c^{2});Candidates", 20, 0, 0.5, 3, -0.5, 3.5); 
     lout->Add(hRecPi0MassRaw_OVERLAY);
 
-    hRecPi0MomentumRaw_OVERLAY = new TH2D("b026hRecPi0MomentumRaw_COMPOSE",";#pi^{0} Momentum (GeV/c);Candidates", 20, 0, 1, 3, -0.5, 3.5); 
+    hRecPi0MomentumRaw_OVERLAY = new TH2D("b026hRecPi0MomentumRaw_COMPOSE",";#pi^{0} Momentum (GeV/c);Candidates", 40, 0, 2, 3, -0.5, 3.5); 
     lout->Add(hRecPi0MomentumRaw_OVERLAY);
 
     hRecPi0OARaw_OVERLAY = new TH2D("b024hRecPi0OARaw_COMPOSE",";Shower Opening Angle (deg);Candidates", 20, 0, 180, 3, -0.5, 3.5); 
@@ -1779,40 +1779,40 @@ namespace AnaIO
     lout->Add(hRecPi0PhiRaw_OVERLAY);
 
 
-    hRecPi0Energy_OVERLAY_After = new TH2D("b0233hRecPi0Energy_COMPOSE_After",";#pi^{0} Energy (GeV);Candidates", 20, 0, 1, 3, -0.5, 3.5); 
+    hRecPi0Energy_OVERLAY_After = new TH2D("b0233hRecPi0Energy_COMPOSE_After",";#pi^{0} Energy (GeV);Candidates", 40, 0, 2, 3, -0.5, 3.5); 
     lout->Add(hRecPi0Energy_OVERLAY_After);
     hRecPi0Theta_OVERLAY_After = new TH2D("b0277hRecPi0Theta_COMPOSE_After",";#pi^{0} #theta Angle (deg);Candidates", 20, 0, 180, 3, -0.5, 3.5); 
     lout->Add(hRecPi0Theta_OVERLAY_After);
     hRecPi0Phi_OVERLAY_After = new TH2D("b0277hRecPi0Phi_COMPOSE_After",";#pi^{0} #phi Angle (deg);Candidates", 20, -180, 180, 3, -0.5, 3.5); 
     lout->Add(hRecPi0Phi_OVERLAY_After);
 
-    hRecPi0Energy_OVERLAY_After_Kinetic = new TH2D("b0244hRecPi0Energy_COMPOSE_After_Kinetic",";#pi^{0} Kinetic Energy (GeV);Candidates", 20, 0, 1, 3, -0.5, 3.5); 
+    hRecPi0Energy_OVERLAY_After_Kinetic = new TH2D("b0244hRecPi0Energy_COMPOSE_After_Kinetic",";#pi^{0} Kinetic Energy (GeV);Candidates", 40, 0, 2, 3, -0.5, 3.5); 
     lout->Add(hRecPi0Energy_OVERLAY_After_Kinetic);
 
-    hRecPi0Energy_OVERLAY_After_EVT = new TH2D("b0255hRecPi0KineticEnergy_COMPOSE_After_EVT",";#pi^{0} Kinetic Energy (GeV);Candidates", 20, 0, 1, 7, -0.5, 6.5); 
+    hRecPi0Energy_OVERLAY_After_EVT = new TH2D("b0255hRecPi0KineticEnergy_COMPOSE_After_EVT",";#pi^{0} Kinetic Energy (GeV);Candidates", 40, 0, 2, 7, -0.5, 6.5); 
     lout->Add(hRecPi0Energy_OVERLAY_After_EVT);
 
-    hRecPi0Energy_OVERLAY_AfterTOP_EVT = new TH2D("b0266hRecPi0Energy_COMPOSE_AfterTOP_EVT",";#pi^{0} Kinetic Energy (GeV);Candidates", 20, 0, 1, 7, -0.5, 6.5); 
+    hRecPi0Energy_OVERLAY_AfterTOP_EVT = new TH2D("b0266hRecPi0Energy_COMPOSE_AfterTOP_EVT",";#pi^{0} Kinetic Energy (GeV);Candidates", 40, 0, 4, 7, -0.5, 6.5); 
     lout->Add(hRecPi0Energy_OVERLAY_AfterTOP_EVT);
 
-    hRecPi0Energy_OVERLAY_After_EVT_High = new TH2D("b0277hRecPi0Energy_COMPOSE_After_EVT_High",";#pi^{0} Kinetic Energy (GeV);Candidates", 20, 0, 1000, 7, -0.5, 6.5); 
+    hRecPi0Energy_OVERLAY_After_EVT_High = new TH2D("b0277hRecPi0Energy_COMPOSE_After_EVT_High",";#pi^{0} Kinetic Energy (GeV);Candidates", 40, 0, 2000, 7, -0.5, 6.5); 
     lout->Add(hRecPi0Energy_OVERLAY_After_EVT_High);
-    hRecPi0Energy_OVERLAY_After_EVT_Medium = new TH2D("b0288hRecPi0Energy_COMPOSE_After_EVT_Medium",";#pi^{0} Kinetic Energy (GeV);Candidates", 20, 0, 1000, 7, -0.5, 6.5); 
+    hRecPi0Energy_OVERLAY_After_EVT_Medium = new TH2D("b0288hRecPi0Energy_COMPOSE_After_EVT_Medium",";#pi^{0} Kinetic Energy (GeV);Candidates", 40, 0, 2000, 7, -0.5, 6.5); 
     lout->Add(hRecPi0Energy_OVERLAY_After_EVT_Medium);
-    hRecPi0Energy_OVERLAY_After_EVT_Low = new TH2D("b0299hRecPi0Energy_COMPOSE_After_EVT_Low",";#pi^{0} Kinetic Energy (GeV);Candidates", 20, 0, 1000, 7, -0.5, 6.5); 
+    hRecPi0Energy_OVERLAY_After_EVT_Low = new TH2D("b0299hRecPi0Energy_COMPOSE_After_EVT_Low",";#pi^{0} Kinetic Energy (GeV);Candidates", 40, 0, 2000, 7, -0.5, 6.5); 
     lout->Add(hRecPi0Energy_OVERLAY_After_EVT_Low);
 
-    hRecPi0TotalE_Default = new TH2D("test001hpi0TotalE_Default_COMPOSE_EVT",";Total E;Candidates", 20, 0, 1, 7, -0.5, 6.5); 
+    hRecPi0TotalE_Default = new TH2D("test001hpi0TotalE_Default_COMPOSE_EVT",";Total E;Candidates", 40, 0, 2, 7, -0.5, 6.5); 
     lout->Add(hRecPi0TotalE_Default);
-    hRecPi0TotalE_Fitted = new TH2D("test002hpi0TotalE_Fitted_COMPOSE_EVT",";Total E;Candidates", 20, 0, 1, 7, -0.5, 6.5); 
+    hRecPi0TotalE_Fitted = new TH2D("test002hpi0TotalE_Fitted_COMPOSE_EVT",";Total E;Candidates", 40, 0, 2, 7, -0.5, 6.5); 
     lout->Add(hRecPi0TotalE_Fitted);
 
-    hRecPi0TotalEafterSel_Default = new TH2D("test003hpi0TotalEafterSel_Default_COMPOSE_EVT",";Total E;Candidates", 20, 0, 1, 7, -0.5, 6.5); 
+    hRecPi0TotalEafterSel_Default = new TH2D("test003hpi0TotalEafterSel_Default_COMPOSE_EVT",";Total E;Candidates", 40, 0, 2, 7, -0.5, 6.5); 
     lout->Add(hRecPi0TotalEafterSel_Default);
-    hRecPi0TotalEafterSel_Fitted = new TH2D("test004hpi0TotalEafterSel_Fitted_COMPOSE_EVT",";Total E;Candidates", 20, 0, 1, 7, -0.5, 6.5); 
+    hRecPi0TotalEafterSel_Fitted = new TH2D("test004hpi0TotalEafterSel_Fitted_COMPOSE_EVT",";Total E;Candidates", 40, 0, 2, 7, -0.5, 6.5); 
     lout->Add(hRecPi0TotalEafterSel_Fitted);
 
-    hRecPi0KineticEnergyVSPi0Mass = new TH2D("b099hRecPi0KineticEnergyVSPi0Mass",";Kinetic Energy (GeV);Mass (GeV/c^{2})", 50, 0, 1, 50, 0, 0.5); 
+    hRecPi0KineticEnergyVSPi0Mass = new TH2D("b099hRecPi0KineticEnergyVSPi0Mass",";Kinetic Energy (GeV);Mass (GeV/c^{2})", 100, 0, 2, 50, 0, 0.5); 
     lout->Add(hRecPi0KineticEnergyVSPi0Mass);
 
     // Class C - event topoplogy cut related

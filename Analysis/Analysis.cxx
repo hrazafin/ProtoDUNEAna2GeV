@@ -928,13 +928,13 @@ int anaRec(const TString finName, TList *lout, const TString tag, const int nEnt
       if(doXS) plotUtils.FillHist(AnaIO::hRecPiPlusInteractingEnergyBckSub, interactingE_reco, anaUtils.gkXSBmBkg, intcexwt);
       AnaIO::hRecoInteractingHistData->Fill(interactingE_reco,intcexwt);
       double pi0KEweight = 1.0; //anaUtils.CalCEXPi0KEWeight(pi0KineticE*1000);
-      if(interactingE_reco > 1650 && interactingE_reco < 1800) {
+      //if(interactingE_reco > 1650 && interactingE_reco < 1800) {
         //if(evtXStype == anaUtils.gkXSSignal && parType == anaUtils.gkBeamPiPlus) 
-        AnaIO::hRecoPi0KEHistData->Fill(pi0KineticE*1000, pi0KEweight);
+        AnaIO::hRecoPi0KEHistData->Fill(pi0KineticE*1000, pi0KEweight); //2GeV setting
         AnaIO::hRecoPi0CosThetaHistData->Fill(pi0costheta, pi0KEweight);
         double pi0theta = TMath::RadToDeg() * TMath::ACos(pi0costheta);
         AnaIO::hRecoPi0ThetaHistData->Fill(pi0theta, pi0KEweight);
-      }
+      //}
     }
 
     // Fill signal only MC beam int 
@@ -942,7 +942,7 @@ int anaRec(const TString finName, TList *lout, const TString tag, const int nEnt
     // Fill bck substracted data beam int
     if(!kMC) plotUtils.FillHist(AnaIO::hRecPiPlusInteractingEnergyBckSubCheck, interactingE_reco, evtXStype, intcexwt);
     // Fill the pi0 kinetic energy for all pion beams
-    plotUtils.FillHist(AnaIO::hRecPiZeroKineticEnergyEvtNoWeight, pi0KineticE*1000, evtXStype, 1.0);
+    plotUtils.FillHist(AnaIO::hRecPiZeroKineticEnergyEvtNoWeight, pi0KineticE*1000, evtXStype, 1.0); //2 Gev setting
     plotUtils.FillHist(AnaIO::hRecPiZeroKineticEnergyEvt, pi0KineticE*1000, evtXStype, XSevtweight*weight);
 
     //weight = weight*anaUtils.Pi0weight;
