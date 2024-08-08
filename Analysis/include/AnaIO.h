@@ -2113,7 +2113,7 @@ namespace AnaIO
     lout->Add(hRecPi0Energy_OVERLAY_After_EVTXS);
 
 
-    hRecPiPlusInteractingEnergy = new TH2D("i050hRecPiPlusInteractingEnergy_STK",";#pi^{+} Beam Interacting Energy (MeV);Candidates", 20, 0, 1000, nbeamType, beamTypemin, beamTypemax); 
+    hRecPiPlusInteractingEnergy = new TH2D("i050hRecPiPlusInteractingEnergy_STK",";#pi^{+} Beam Interacting Energy (MeV);Candidates", 40, 0, 2000, nbeamType, beamTypemin, beamTypemax); 
     lout->Add(hRecPiPlusInteractingEnergy);
     hRecPiPlusInstMomentum = new TH2D("i051hRecPiPlusInstMomentum_STK",";#pi^{+} Inst. Momentum (MeV);Candidates", 60, 600, 1200, nbeamType, beamTypemin, beamTypemax); 
     lout->Add(hRecPiPlusInstMomentum);
@@ -2123,17 +2123,17 @@ namespace AnaIO
     lout->Add(hRecPiPlusIncidentEnergy);
     //hRecPiPlusInitialEnergy = new TH2D("i054hRecPiPlusInitialEnergy_STK",";#pi^{+} Initial Energy (MeV);Candidates", 70, 500, 1200, nbeamType, beamTypemin, beamTypemax); 
     //lout->Add(hRecPiPlusInitialEnergy);
-    hRecPiPlusInitialEnergy = new TH2D("i054hRecPiPlusInitialEnergy_STK",";#pi^{+} Initial Energy (MeV);Candidates", 20, 0, 1000, nbeamType, beamTypemin, beamTypemax); 
+    hRecPiPlusInitialEnergy = new TH2D("i054hRecPiPlusInitialEnergy_STK",";#pi^{+} Initial Energy (MeV);Candidates", 40, 0, 2000, nbeamType, beamTypemin, beamTypemax); 
     lout->Add(hRecPiPlusInitialEnergy);
-    hRecPiPlusInitialEnergyPosZCut = new TH2D("i054hRecPiPlusInitialEnergyPosZCut_STK",";#pi^{+} Initial Energy (MeV);Candidates", 20, 0, 1000, nbeamType, beamTypemin, beamTypemax); 
+    hRecPiPlusInitialEnergyPosZCut = new TH2D("i054hRecPiPlusInitialEnergyPosZCut_STK",";#pi^{+} Initial Energy (MeV);Candidates", 40, 0, 2000, nbeamType, beamTypemin, beamTypemax); 
     lout->Add(hRecPiPlusInitialEnergyPosZCut);
-    hRecPiPlusIncidentEnergyNew = new TH2D("i055hRecPiPlusIncidentEnergyNew_STK",";#pi^{+} Incident Energy (MeV);Candidates", 100, 0, 1000, nbeamType, beamTypemin, beamTypemax); 
+    hRecPiPlusIncidentEnergyNew = new TH2D("i055hRecPiPlusIncidentEnergyNew_STK",";#pi^{+} Incident Energy (MeV);Candidates", 200, 0, 2000, nbeamType, beamTypemin, beamTypemax); 
     lout->Add(hRecPiPlusIncidentEnergyNew);
-    hRecPiPlusInteractingEnergyPar  = new TH2D("i056hRecPiPlusInteractingEnergyPar_STK",";#pi^{+} Interacting Energy (MeV);Candidates", 20, 0, 1000, nbeamType, beamTypemin, beamTypemax); 
+    hRecPiPlusInteractingEnergyPar  = new TH2D("i056hRecPiPlusInteractingEnergyPar_STK",";#pi^{+} Interacting Energy (MeV);Candidates", 40, 0, 2000, nbeamType, beamTypemin, beamTypemax); 
     lout->Add(hRecPiPlusInteractingEnergyPar);
-    hRecPiPlusInstMomentumNoSmearing = new TH2D("i057hRecPiPlusInstMomentumNoSmearing_STK",";#pi^{+} Inst. Momentum (MeV);Candidates", 60, 600, 1200, nbeamType, beamTypemin, beamTypemax); 
+    hRecPiPlusInstMomentumNoSmearing = new TH2D("i057hRecPiPlusInstMomentumNoSmearing_STK",";#pi^{+} Inst. Momentum (MeV);Candidates", 60, 1600, 2200, nbeamType, beamTypemin, beamTypemax); 
     lout->Add(hRecPiPlusInstMomentumNoSmearing);
-    hRecPiPlusInstEnergyNoSmearing = new TH2D("i058hRecPiPlusInstEnergyNoSmearing_STK",";#pi^{+} Inst. Energy (MeV);Candidates", 60, 600, 1200, nbeamType, beamTypemin, beamTypemax); 
+    hRecPiPlusInstEnergyNoSmearing = new TH2D("i058hRecPiPlusInstEnergyNoSmearing_STK",";#pi^{+} Inst. Energy (MeV);Candidates", 60, 1600, 2200, nbeamType, beamTypemin, beamTypemax); 
     lout->Add(hRecPiPlusInstEnergyNoSmearing);
     
     // Raw 

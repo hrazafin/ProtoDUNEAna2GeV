@@ -564,7 +564,8 @@ int anaRec(const TString finName, TList *lout, const TString tag, const int nEnt
                   */
                   //if(anaCut.CutTopology(kMC, pi0KineticE) && evtXStype == anaUtils.gkXSSignal){
                     // ?? Indenpent of fake data use full MC to fill diff. XS unfolding matrix
-                    if(/*!isFakeData && */interactingE > 1650 && interactingE < 1800) {
+                    //if(/*!isFakeData && */interactingE > 1650 && interactingE < 1800) { // default cut used for 2 GeV
+                    if(interactingE_reco > 1350 && interactingE_reco < 1500) {  
                     //if(/*!isFakeData && */interactingE > 650 && interactingE < 800) {
 
                       if(isFakeData) {recoMatch_avaDiffCEXevt++; reco_selectedDiffCEXevt++;}
@@ -928,13 +929,14 @@ int anaRec(const TString finName, TList *lout, const TString tag, const int nEnt
       if(doXS) plotUtils.FillHist(AnaIO::hRecPiPlusInteractingEnergyBckSub, interactingE_reco, anaUtils.gkXSBmBkg, intcexwt);
       AnaIO::hRecoInteractingHistData->Fill(interactingE_reco,intcexwt);
       double pi0KEweight = 1.0; //anaUtils.CalCEXPi0KEWeight(pi0KineticE*1000);
-      //if(interactingE_reco > 1650 && interactingE_reco < 1800) {
+      if(interactingE_reco > 1350 && interactingE_reco < 1500) {
+      //if(interactingE_reco > 1650 && interactingE_reco < 1800) { //My default cut for 2GeV
         //if(evtXStype == anaUtils.gkXSSignal && parType == anaUtils.gkBeamPiPlus)
         AnaIO::hRecoPi0KEHistData->Fill(pi0KineticE*1000, pi0KEweight); //2GeV setting
         AnaIO::hRecoPi0CosThetaHistData->Fill(pi0costheta, pi0KEweight);
         double pi0theta = TMath::RadToDeg() * TMath::ACos(pi0costheta);
         AnaIO::hRecoPi0ThetaHistData->Fill(pi0theta, pi0KEweight);
-      //}
+      }
     }
 
     // Fill signal only MC beam int

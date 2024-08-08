@@ -103,14 +103,14 @@ const bool IsRange = true;
 const bool IsKF = true;
 
 int main(int argc, char * argv[])
-{ 
+{
   gStyle->SetOptStat(0);
 
   //TString finName = "input/outana_trkLenhigh.root";
   //TString finName = "input/outana_April_last_DataTree_final.root";
   //TString finName = "input/outana_MCXSnorminal.root";
   //TString finName = "input/outana_withThresholdnew.root";
-  TString finName = "input/outana.root"; 
+  TString finName = "input/outana.root";
   if(IsRange && !IsKF) finName = "input/outana_noKF.root";
 
   //if(IsRange && IsKF) finName = "input/outana.root";
@@ -133,7 +133,7 @@ int main(int argc, char * argv[])
   //WeightBeamData(hini_data, IsRange, "Ini");
 
   RooUnfoldBayes unfold_Ini (response_SliceID_Ini, hini, 4); // Unfold fake data
-  RooUnfoldBayes unfold_Ini_Data (response_SliceID_Ini, hini_data, 10); // Unfold data
+  RooUnfoldBayes unfold_Ini_Data (response_SliceID_Ini, hini_data, 4); // Unfold data
 
   TH1D *hini_uf = (TH1D*)unfold_Ini.Hreco();
   TH1D *hini_uf_data = (TH1D*)unfold_Ini_Data.Hreco();
@@ -181,7 +181,7 @@ int main(int argc, char * argv[])
 
   // Data bck sub
   WeightBeamData(hint_data, IsRange, "CEXInt");
-  
+
   RooUnfoldBayes unfold_Int (response_SliceID_Int, hint, 4);
   RooUnfoldBayes unfold_Int_Data (response_SliceID_Int, hint_data, 4);
 
@@ -204,7 +204,7 @@ int main(int argc, char * argv[])
   TGraph *g_cex;
 
   f_CrossSection->GetObject("cex_KE",g_cex);
-  
+
 
   //const TString DiffxcesfinName = "../Analysis/input/cross_section_out_withNewVar.root";
   const TString DiffxcesfinName = "input/cross_section_out.root";
@@ -241,7 +241,7 @@ int main(int argc, char * argv[])
     // Declare output list
   TList * datalout = 0x0;
   datalout = new TList;
-  
+
   // ======== Draw Total CEX XS plots ======== //
   double totalCEXXS_800_truth = 0, totalCEXXS_800_reco = 0, totalCEXXS_800_data = 0;
   double totalCEXXS_800_truth_error = 0, totalCEXXS_800_reco_error = 0, totalCEXXS_800_data_error = 0;
@@ -312,9 +312,9 @@ int main(int argc, char * argv[])
   const Int_t x1_diff650to800 = g_cex_650to800MeV->GetXaxis()->GetLast();
   double x_650to800[x1_diff650to800], y_650to800[x1_diff650to800];
   for(Int_t ix=x0_diff650to800; ix<=x1_diff650to800; ix++){
-    //cout << "Bin 650to800: "  << ix << " " << g_cex_650to800MeV->GetBinContent(ix) << endl;
     x_650to800[ix] = g_cex_650to800MeV->GetBinCenter(ix);
     y_650to800[ix] = g_cex_650to800MeV->GetBinContent(ix);
+    //cout << "******* x_650to800 center = "<< g_cex_650to800MeV->GetBinCenter(ix) << " y_650to800 content " << g_cex_650to800MeV->GetBinContent(ix) << endl;
   }
 
   TGraph *g_650to800 = new TGraph(40,x_650to800,y_650to800);
@@ -402,7 +402,7 @@ int main(int argc, char * argv[])
   }
 
   TGraph *g_650to800_Theta = new TGraph(40,x_650to800_Theta,y_650to800_Theta);
-  
+
   // overlay
   if(IsRange) DrawDiffXSPlots(datalout,hpi0Theta_truth,hpi0Theta_uf,hpi0Theta_uf_data,g_650to800_Theta,Int_800_truth,Int_800err_truth, Int_800_reco, Int_800err_reco, Int_800_data, Int_800err_data, totalCEXXS_800_truth, totalCEXXS_800_reco, totalCEXXS_800_data, totalCEXXS_800_truth_error, totalCEXXS_800_reco_error, totalCEXXS_800_data_error, "650to800Theta");
   // truth
@@ -412,7 +412,7 @@ int main(int argc, char * argv[])
   // data
   if(IsRange) DrawDiffXSPlots(datalout,hpi0Theta_truth,hpi0Theta_uf,hpi0Theta_uf_data,g_650to800_Theta,Int_800_truth,Int_800err_truth, Int_800_reco, Int_800err_reco, Int_800_data, Int_800err_data, totalCEXXS_800_truth, totalCEXXS_800_reco, totalCEXXS_800_data, totalCEXXS_800_truth_error, totalCEXXS_800_reco_error, totalCEXXS_800_data_error, "650to800Theta",false,false,true);
 
-  
+
   // Declare output root file
   TFile * fout = new TFile("output/outXShists.root","recreate");
   // Create data subdirectory
@@ -437,7 +437,7 @@ int main(int argc, char * argv[])
 void DrawHistOutput(TH1D *h_truth, TH1D *h_reco, TH1D *h_data, TH1D *h_unfold, TH1D *h_unfold_data, const bool &rebin){
   // Rebin the histogram
   if(rebin){
-    h_truth->Rebin(50); h_reco->Rebin(50); h_data->Rebin(50); h_unfold->Rebin(50); h_unfold_data->Rebin(50); 
+    h_truth->Rebin(50); h_reco->Rebin(50); h_data->Rebin(50); h_unfold->Rebin(50); h_unfold_data->Rebin(50);
   }
   TString tag = h_truth->GetName();
 
@@ -445,7 +445,7 @@ void DrawHistOutput(TH1D *h_truth, TH1D *h_reco, TH1D *h_data, TH1D *h_unfold, T
   tt.SetNDC();
 
   TCanvas * c1 = new TCanvas(Form("c1_%s",tag.Data()), "", 1200, 800);
-  
+
   SetTitleFormat(h_truth);
 
   h_truth->SetLineColor(kRed);
@@ -482,7 +482,7 @@ void DrawHistOutput(TH1D *h_truth, TH1D *h_reco, TH1D *h_data, TH1D *h_unfold, T
   cout << "tag: " << tag << endl;
   if(tag.Contains("i000") || tag.Contains("i002")) cout << "eff: " << h_reco->Integral(0,10000)/h_truth->Integral(0,10000) << endl;
   else cout << "eff: " << h_reco->Integral(0,10000)/2/h_truth->Integral(0,10000) << endl;
-  
+
 /*
   h_unfold->SetMarkerStyle(23);
   h_unfold->SetMarkerSize(1.5);
@@ -529,14 +529,14 @@ void DrawTotalXSPlots(TList *lout, TH1D *hbeamint_truth, TH1D *hinc_truth, TH1D 
 
   TLatex tt;
   tt.SetNDC();
-  TString label = "overlay"; TString name = "Total"; 
+  TString label = "overlay"; TString name = "Total";
   if(doTruth && !doReco && !doData) label = "truth";
   if(!doTruth && doReco && !doData) label = "reco";
   if(!doTruth && !doReco && doData) label = "data";
 
 
   TCanvas * c1 = new TCanvas(Form("c1_%s_%s",name.Data(),label.Data()), Form("c1_%s_%s",name.Data(),label.Data()), 1200, 800);
-  
+
   // Truth
   TH1D * hcex_truth = TotalCEXXSCal(lout,hbeamint_truth,hinc_truth,hint_truth,true,false,false,"truth");
   // Reco
@@ -547,7 +547,7 @@ void DrawTotalXSPlots(TList *lout, TH1D *hbeamint_truth, TH1D *hinc_truth, TH1D 
   totalCEXXS_800_truth = (hcex_truth->GetBinContent(14) + hcex_truth->GetBinContent(15) + hcex_truth->GetBinContent(16))/3.0;
   totalCEXXS_800_reco = (hcex_reco->GetBinContent(14) + hcex_reco->GetBinContent(15) + hcex_reco->GetBinContent(16))/3.0;
   totalCEXXS_800_data = (hcex_data->GetBinContent(14) + hcex_data->GetBinContent(15) + hcex_data->GetBinContent(16))/3.0;
- 
+
   totalCEXXS_800_truth_error = sqrt(pow(hcex_truth->GetBinError(14),2)+pow(hcex_truth->GetBinError(15),2)+pow(hcex_truth->GetBinError(16),2))/3.0;
   totalCEXXS_800_reco_error = sqrt(pow(hcex_reco->GetBinError(14),2)+pow(hcex_reco->GetBinError(15),2)+pow(hcex_reco->GetBinError(16),2))/3.0;
   totalCEXXS_800_data_error = sqrt(pow(hcex_data->GetBinError(14),2)+pow(hcex_data->GetBinError(15),2)+pow(hcex_data->GetBinError(16),2))/3.0;
@@ -631,7 +631,7 @@ void DrawTotalXSPlots(TList *lout, TH1D *hbeamint_truth, TH1D *hinc_truth, TH1D 
 
   // ======= pad2 =======//
   TPad *pad2 = new TPad("pad2", "pad2", 0, 0, 1, 0.2);
-    
+
   pad2->SetTopMargin(0.03);
   pad2->SetBottomMargin(0.42);
   pad2->SetGridx();
@@ -651,9 +651,9 @@ void DrawTotalXSPlots(TList *lout, TH1D *hbeamint_truth, TH1D *hinc_truth, TH1D 
 
   for(Int_t ix=x0_x; ix<=x1_x; ix++){
     double bin_center = hcex_data->GetBinCenter(ix);
-    
+
     double MC = g_cex->Eval(bin_center);
-    
+
     double data = hcex_data->GetBinContent(ix);
     double edata = hcex_data->GetBinError(ix);
 
@@ -681,12 +681,12 @@ void DrawTotalXSPlots(TList *lout, TH1D *hbeamint_truth, TH1D *hinc_truth, TH1D 
 
   if(doTruth && !doReco && !doData) c1->Print("output/truth_TotalCEXXS.pdf");
   if(!doTruth && doReco && !doData) c1->Print("output/reco_TotalCEXXS.pdf");
-   
+
   if(!doTruth && !doReco && doData) c1->Print("output/data_TotalCEXXS.pdf");
 
   if(doTruth && doReco && doData) c1->Print("output/overlay_TotalCEXXS.pdf");
 
-  
+
 }
 
 
@@ -701,7 +701,7 @@ void DrawDiffXSPlots(TList *lout, TH1D *hpi0KE_truth, TH1D *hpi0KE_reco, TH1D *h
   if(!doTruth && !doReco && doData) label = "data";
 
   TCanvas * c2 = new TCanvas(Form("c2_%s_%s",name.Data(),label.Data()), Form("c2_%s_%s",name.Data(),label.Data()), 1200, 800);
-  
+
   double scale_bin = 100.0;
   if(name.Contains("CosTheta")) scale_bin = 0.2;
   if(name.Contains("Theta") && !name.Contains("Cos")) scale_bin = 18.0;
@@ -722,11 +722,11 @@ void DrawDiffXSPlots(TList *lout, TH1D *hpi0KE_truth, TH1D *hpi0KE_reco, TH1D *h
     hdiffcex_reco->Rebin(2);
     hdiffcex_data->Rebin(2);
   }
-  
+
   hdiffcex_truth->GetYaxis()->SetTitle("d#sigma/dT_{#pi^{0}} (mb/MeV)");
   if(name.Contains("CosTheta")) hdiffcex_truth->GetYaxis()->SetTitle("d#sigma/dcos#theta_{#pi^{0}} (mb)");
   if(name.Contains("Theta") && !name.Contains("Cos")) hdiffcex_truth->GetYaxis()->SetTitle("d#sigma/d#theta_{#pi^{0}} (mb/deg.)");
-  
+
   SetTitleFormat(hdiffcex_truth);
   SetTitleFormat(hdiffcex_reco);
   SetTitleFormat(hdiffcex_data);
@@ -756,7 +756,7 @@ void DrawDiffXSPlots(TList *lout, TH1D *hpi0KE_truth, TH1D *hpi0KE_reco, TH1D *h
   hdiffcex_reco->GetYaxis()->SetTitle("d#sigma/dT_{#pi^{0}} (mb/MeV)");
   if(name.Contains("CosTheta")) hdiffcex_reco->GetYaxis()->SetTitle("d#sigma/dcos#theta_{#pi^{0}} (mb)");
   if(name.Contains("Theta") && !name.Contains("Cos")) hdiffcex_reco->GetYaxis()->SetTitle("d#sigma/d#theta_{#pi^{0}} (mb/deg.)");
-  
+
 
   hdiffcex_reco->SetMarkerStyle(23);
   hdiffcex_reco->SetMarkerSize(1.5);
@@ -773,7 +773,7 @@ void DrawDiffXSPlots(TList *lout, TH1D *hpi0KE_truth, TH1D *hpi0KE_reco, TH1D *h
   hdiffcex_data->GetYaxis()->SetTitle("d#sigma/dT_{#pi^{0}} (mb/MeV)");
   if(name.Contains("CosTheta")) hdiffcex_data->GetYaxis()->SetTitle("d#sigma/dcos#theta_{#pi^{0}} (mb)");
   if(name.Contains("Theta") && !name.Contains("Cos")) hdiffcex_data->GetYaxis()->SetTitle("d#sigma/d#theta_{#pi^{0}} (mb/deg.)");
-  
+
 
 
   hdiffcex_data->SetMarkerStyle(8);
@@ -822,7 +822,7 @@ void DrawDiffXSPlots(TList *lout, TH1D *hpi0KE_truth, TH1D *hpi0KE_reco, TH1D *h
 
   // ======= pad2 =======//
   TPad *pad2 = new TPad("pad2", "pad2", 0, 0, 1, 0.2);
-    
+
   pad2->SetTopMargin(0.03);
   pad2->SetBottomMargin(0.42);
   pad2->SetGridx();
@@ -835,7 +835,7 @@ void DrawDiffXSPlots(TList *lout, TH1D *hpi0KE_truth, TH1D *hpi0KE_reco, TH1D *h
   if(doTruth && !doReco && !doData) hratio = (TH1D*)hdiffcex_truth->Clone("hdiffcex_truth");
   if(!doTruth && doReco && !doData) hratio = (TH1D*)hdiffcex_reco->Clone("hdiffcex_reco");
 
-  
+
   const Int_t x0_x = hdiffcex_data->GetXaxis()->GetFirst();
   const Int_t x1_x = hdiffcex_data->GetXaxis()->GetLast();
 
@@ -844,7 +844,7 @@ void DrawDiffXSPlots(TList *lout, TH1D *hpi0KE_truth, TH1D *hpi0KE_reco, TH1D *h
   for(Int_t ix=x0_x; ix<=x1_x; ix++){
     double bin_center = hdiffcex_data->GetBinCenter(ix);
     double MC = g_775->Eval(bin_center);
-    
+
     double data = hdiffcex_data->GetBinContent(ix);
     double edata = hdiffcex_data->GetBinError(ix);
 
@@ -867,7 +867,7 @@ void DrawDiffXSPlots(TList *lout, TH1D *hpi0KE_truth, TH1D *hpi0KE_reco, TH1D *h
   tt.DrawLatex(0.600,0.925,"Beam T_{#pi^{+}} = 650 - 800 MeV Data");
   if(!name.Contains("CosTheta")) tt.DrawLatex(0.22,0.825,"#bf{#it{Preliminary}}");
   if(name.Contains("CosTheta")) tt.DrawLatex(0.605,0.825,"#bf{#it{Preliminary}}");
-  
+
   if(!name.Contains("CosTheta")) tt.DrawLatex(0.22,0.775,"#bf{#it{(Stats. Error Only)}}");
   if(name.Contains("CosTheta")) tt.DrawLatex(0.605,0.775,"#bf{#it{(Stats. Error Only)}}");
 
@@ -875,7 +875,7 @@ void DrawDiffXSPlots(TList *lout, TH1D *hpi0KE_truth, TH1D *hpi0KE_reco, TH1D *h
 
   if(doTruth && !doReco && !doData) c2->Print("output/truth_Diff"+name+"CEXXS.pdf");
   if(!doTruth && doReco && !doData) c2->Print("output/reco_Diff"+name+"CEXXS.pdf");
-   
+
   if(!doTruth && !doReco && doData) c2->Print("output/data_Diff"+name+"CEXXS.pdf");
 
   if(doTruth && doReco && doData) c2->Print("output/overlay_Diff"+name+"CEXXS.pdf");
@@ -936,7 +936,7 @@ TH1D * TotalCEXXSCal(TList *lout, TH1D * hbeamint, TH1D * hh, TH1D * Interacting
 
     if(incE != 0) cout << "ix: "<< ix << "incE: " << incE << "intE: " << intE << " ratio: " << ratio << "meandEdx[ix]: " << meandEdx[ix-1] << endl;
 
-    // Simple ratio form 
+    // Simple ratio form
     //double ratio = intE/incE;
 
     // If the incE entry is not zero set the bin content
@@ -955,12 +955,12 @@ TH1D * TotalCEXXSCal(TList *lout, TH1D * hbeamint, TH1D * hh, TH1D * Interacting
 
     // If the ratio is not zero set the error
     if(ratio != 0 ) xsec->SetBinError(ix,error);
-    
+
   }
   // The xsec histogram entry is now set
   if(!Eslice) xsec->Scale(sigma_factor*1e27);
   xsec->SetMaximum(300);
-  
+
   xsec->SetMinimum(0);
    /*for(Int_t ix=x0; ix<=x1; ix++){
     cout << "ix: "<< ix << "bin content: " << xsec->GetBinContent(ix) << endl;
@@ -968,7 +968,7 @@ TH1D * TotalCEXXSCal(TList *lout, TH1D * hbeamint, TH1D * hh, TH1D * Interacting
   if(tag.Contains("data")){
     xsec->SetName("data_TotalCEXxsec");
     lout->Add(xsec);
-  } 
+  }
   if(tag.Contains("reco")){
     xsec->SetName("reco_TotalCEXxsec");
     lout->Add(xsec);
@@ -976,7 +976,7 @@ TH1D * TotalCEXXSCal(TList *lout, TH1D * hbeamint, TH1D * hh, TH1D * Interacting
   if(tag.Contains("truth")){
     xsec->SetName("truth_TotalCEXxsec");
     lout->Add(xsec);
-  }  
+  }
   return xsec;
 }
 
@@ -1085,12 +1085,12 @@ TH1D * GetIncidentHist(TH1D * InitialHist, TH1D * InteractingHist)
 
 
 void DrawDataMCRatio(TH1D * hratio, bool xsec, const TString tag){
-  
+
   hratio->GetYaxis()->SetTitle("Data/MC");
   if(xsec) hratio->GetXaxis()->SetTitle("T_{#pi^{+}} (MeV)");
   if(!xsec && tag.Contains("CosTheta")) hratio->GetXaxis()->SetTitle("cos#theta_{#pi^{0}}");
   if(!xsec && tag.Contains("Theta") && !tag.Contains("Cos")) hratio->GetXaxis()->SetTitle("#theta_{#pi^{0}} (deg.)");
-  
+
   hratio->GetXaxis()->SetLabelSize(0.15);
   hratio->GetXaxis()->SetTitleSize(0.15);
   hratio->GetXaxis()->SetTitleOffset(1.);
@@ -1117,13 +1117,13 @@ double CalIniWeight(const int & binx, const bool IsRange){
 
   double weight = 1.;
   /*if(IsRange){
-    double IntWeight[] = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 
+    double IntWeight[] = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
                      0.0, 0.801123, 0.859177, 0.86919, 0.880718, 0.886977, 0.889779, 0.887032};
     weight *= IntWeight[binx-1];
   }
 
   else{
-    double IntWeight[] = {0.0, 0.0, 0.636412, 0.570768, 0.348301, 0.633125, 0.747292, 0.461547, 0.711167, 0.603851, 0.660517, 
+    double IntWeight[] = {0.0, 0.0, 0.636412, 0.570768, 0.348301, 0.633125, 0.747292, 0.461547, 0.711167, 0.603851, 0.660517,
                     0.747348, 0.859409, 1, 0.742225, 1.0, 1,0, 0.0, 0.0, 0.0};
     weight *= IntWeight[binx-1];
   }*/
@@ -1135,13 +1135,13 @@ double CalBeamIntWeight(const int & binx, const bool IsRange){
 
   double weight = 1.;
   /*if(IsRange){
-    double IntWeight[] = {0.439768, 1.0, 0.0, 0.240104, 0.325475, 0.547874, 0.525402, 0.569011, 0.663258, 0.755661, 0.820706, 0.858978, 
+    double IntWeight[] = {0.439768, 1.0, 0.0, 0.240104, 0.325475, 0.547874, 0.525402, 0.569011, 0.663258, 0.755661, 0.820706, 0.858978,
                      0.886342, 0.901809, 0.920025, 0.931599, 0.945724, 0.945179, 0.943406, 0.938913};
     weight *= IntWeight[binx-1];
   }
 
   else{
-    double IntWeight[] = {0.0, 0.0, 0.636412, 0.570768, 0.348301, 0.633125, 0.747292, 0.461547, 0.711167, 0.603851, 0.660517, 
+    double IntWeight[] = {0.0, 0.0, 0.636412, 0.570768, 0.348301, 0.633125, 0.747292, 0.461547, 0.711167, 0.603851, 0.660517,
                     0.747348, 0.859409, 1, 0.742225, 1.0, 1,0, 0.0, 0.0, 0.0};
     weight *= IntWeight[binx-1];
   }*/
@@ -1153,20 +1153,20 @@ double CalCEXIntWeight(const int & binx, const bool IsRange){
 
   double weight = 1.;
   /*if(IsRange){
-    //double IntWeight[] = {0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 0.68125, 0.811044, 0.829454, 0.84448, 0.600005, 
+    //double IntWeight[] = {0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 0.68125, 0.811044, 0.829454, 0.84448, 0.600005,
     //                0.731605, 0.683442, 0.650626, 0.651113, 0.668391, 0.633431, 0.65286, 1.0};
     // Feb
-    //double IntWeight[] = {0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 0.681394, 0.811332, 0.768364, 0.771537, 0.483201, 
+    //double IntWeight[] = {0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 0.681394, 0.811332, 0.768364, 0.771537, 0.483201,
     //                0.597788, 0.496897, 0.699494, 0.705544, 0.718769, 0.687874, 0.693459, 1.0};
     // April
-    double IntWeight[] = {0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 0.69794, 0.818919, 0.775483, 0.800256, 0.49334, 
+    double IntWeight[] = {0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 0.69794, 0.818919, 0.775483, 0.800256, 0.49334,
                     0.653571, 0.504115, 0.740037, 0.727999, 0.725943, 0.717317, 0.742088, 1.0};
-    
+
     weight *= IntWeight[binx-1];
   }
 
   else{
-    double IntWeight[] = {0.0, 0.0, 0.636412, 0.570768, 0.348301, 0.633125, 0.747292, 0.461547, 0.711167, 0.603851, 0.660517, 
+    double IntWeight[] = {0.0, 0.0, 0.636412, 0.570768, 0.348301, 0.633125, 0.747292, 0.461547, 0.711167, 0.603851, 0.660517,
                     0.747348, 0.859409, 1, 0.742225, 1.0, 1,0, 0.0, 0.0, 0.0};
     weight *= IntWeight[binx-1];
   }*/
@@ -1180,37 +1180,37 @@ double CalCEXPi0KEWeight(const int & binx, const bool IsRange, const bool IsKF){
   double weight = 1.;
   /*if(IsRange && IsKF){
     //==  small bin beam wt
-    //double IntWeight[] = {0.0, 0.409994, 0.357135, 0.382372, 0.465516, 0.597296, 0.672419, 0.564701, 0.61694, 0.571107, 0.791561, 
+    //double IntWeight[] = {0.0, 0.409994, 0.357135, 0.382372, 0.465516, 0.597296, 0.672419, 0.564701, 0.61694, 0.571107, 0.791561,
     //                  0.733454, 0.945928, 0.941008, 0.785822, 1.0, 1,0, 0.0, 0.0, 0.0};
-    //double IntWeight[] = {0.0, 0.539643, 0.378196, 0.398281, 0.504129, 0.658985, 0.715681, 0.638402, 0.66754, 0.70573, 0.791561, 
+    //double IntWeight[] = {0.0, 0.539643, 0.378196, 0.398281, 0.504129, 0.658985, 0.715681, 0.638402, 0.66754, 0.70573, 0.791561,
     //                  0.733454, 0.945928, 0.941008, 0.785822, 1.0, 1,0, 0.0, 0.0, 0.0};
     // no wt
-    //double IntWeight[] = {0.0, 0.627507, 0.429589, 0.45521, 0.562079, 0.702244, 0.776978, 0.695155, 0.6979, 0.763299, 0.812858, 
+    //double IntWeight[] = {0.0, 0.627507, 0.429589, 0.45521, 0.562079, 0.702244, 0.776978, 0.695155, 0.6979, 0.763299, 0.812858,
     //                  0.780085, 0.950007, 0.946627, 0.863655, 1.0, 1,0, 0.0, 0.0, 0.0};
     // beam wt
-    //double IntWeight[] = {0.0, 0.585378, 0.422816, 0.443579, 0.550453, 0.699467, 0.75336, 0.681768, 0.709005, 0.744256, 0.82169, 
+    //double IntWeight[] = {0.0, 0.585378, 0.422816, 0.443579, 0.550453, 0.699467, 0.75336, 0.681768, 0.709005, 0.744256, 0.82169,
     //                  0.769536, 0.955012, 0.950875, 0.816588, 1.0, 1,0, 0.0, 0.0, 0.0};
-   
-    double IntWeight[] = {0.0, 0.586469, 0.388012, 0.412948, 0.519354, 0.665045, 0.740563, 0.651374, 0.654317, 0.72544, 0.780647, 
+
+    double IntWeight[] = {0.0, 0.586469, 0.388012, 0.412948, 0.519354, 0.665045, 0.740563, 0.651374, 0.654317, 0.72544, 0.780647,
                       0.74401, 0.93965, 0.935617, 0.838449, 1.0, 1,0, 0.0, 0.0, 0.0};
 
 
     weight *= IntWeight[binx-1];
   }
   else if(IsRange && !IsKF){
-    
+
     // no weight
-    double IntWeight[] = {0.0, 0.0, 0.559718, 0.528286, 0.422081, 0.487519, 0.666412, 0.544518, 0.627939, 0.604775, 0.780329, 
+    double IntWeight[] = {0.0, 0.0, 0.559718, 0.528286, 0.422081, 0.487519, 0.666412, 0.544518, 0.627939, 0.604775, 0.780329,
                     0.621141, 0.934835, 0.934835, 0.836084, 1.0, 1.0, 0.0, 0.0, 0.0};
     // beam weight
-    //double IntWeight[] = {0.0, 0.0, 0.616256, 0.51759, 0.375281, 0.435319, 0.50785, 0.531448, 0.597912, 0.536377, 0.797653, 
+    //double IntWeight[] = {0.0, 0.0, 0.616256, 0.51759, 0.375281, 0.435319, 0.50785, 0.531448, 0.597912, 0.536377, 0.797653,
     //                0.642434, 0.949061, 0.955738, 0.803652, 1.0, 1.0, 0.0, 0.0, 0.0};
 
     weight *= IntWeight[binx-1];
 
   }
   else{
-    double IntWeight[] = {0.0, 0.369517, 0.409675, 0.415022, 0.373534, 0.348398, 0.459325, 0.422841, 0.481166, 0.426144, 0.680265, 
+    double IntWeight[] = {0.0, 0.369517, 0.409675, 0.415022, 0.373534, 0.348398, 0.459325, 0.422841, 0.481166, 0.426144, 0.680265,
                     0.633115, 0.933773, 0.909191,0.747696, 0.9244, 0.864349, 0.0, 1.0, 0.402144};
     weight *= IntWeight[binx-1];
   }*/
@@ -1229,7 +1229,7 @@ double CalCEXPi0CosThetaWeight(const int & binx, const bool IsRange, const bool 
     //double IntWeight[] = {0.402573, 0.57405, 0.627507, 0.787512, 0.528985, 0.519493, 0.639224, 0.597047, 0.627748, 0.773835};
     // beam wt
     //double IntWeight[] = {0.411856, 0.622053, 0.640499, 0.772938, 0.506272, 0.513948, 0.593623, 0.560292, 0.631538, 0.768512};
-    
+
     // pi0 wt 0410
     double IntWeight[] = {0.361952, 0.531519, 0.586469, 0.757284, 0.485984, 0.475453, 0.597117, 0.553845, 0.58418, 0.739109};
     // no weight
@@ -1247,7 +1247,7 @@ double CalCEXPi0CosThetaWeight(const int & binx, const bool IsRange, const bool 
 
   }
   else{
-    double IntWeight[] = {0.0, 0.0, 0.636412, 0.570768, 0.348301, 0.633125, 0.747292, 0.461547, 0.711167, 0.603851, 0.660517, 
+    double IntWeight[] = {0.0, 0.0, 0.636412, 0.570768, 0.348301, 0.633125, 0.747292, 0.461547, 0.711167, 0.603851, 0.660517,
                     0.747348, 0.859409, 1, 0.742225, 1.0, 1,0, 0.0, 0.0, 0.0};
     weight *= IntWeight[binx-1];
   }*/
@@ -1279,12 +1279,12 @@ double CalCEXPi0ThetaWeight(const int & binx, const bool IsRange, const bool IsK
     double IntWeight[] = {0.720196, 0.714559, 0.549956, 0.647322, 0.560627, 0.743115, 0.657209, 0.765056, 0.0};
     // No KF both weight
     //double IntWeight[] = {0.753768, 0.69482, 0.570662, 0.584574, 0.553642, 0.769505, 0.523964, 0.7708, 0.0};
-    
+
     weight *= IntWeight[binx-1];
 
   }
   else{
-    double IntWeight[] = {0.0, 0.0, 0.636412, 0.570768, 0.348301, 0.633125, 0.747292, 0.461547, 0.711167, 0.603851, 0.660517, 
+    double IntWeight[] = {0.0, 0.0, 0.636412, 0.570768, 0.348301, 0.633125, 0.747292, 0.461547, 0.711167, 0.603851, 0.660517,
                     0.747348, 0.859409, 1, 0.742225, 1.0, 1,0, 0.0, 0.0, 0.0};
     weight *= IntWeight[binx-1];
   }*/
@@ -1299,6 +1299,7 @@ void WeightBeamData(TH1D * hbeam_data, const bool IsRange, const TString name){
   for(Int_t ix=x0; ix<=x1; ix++){
     double ientry = hbeam_data->GetBinContent(ix);
     double weight = -999;
+    //double weight = 1;
     if(name.Contains("Ini")) weight = CalIniWeight(ix,IsRange);
     if(name.Contains("BeamInt")) weight = CalBeamIntWeight(ix,IsRange);
     if(name.Contains("CEXInt")) weight = CalCEXIntWeight(ix,IsRange);
@@ -1314,6 +1315,7 @@ void WeightPi0Data(TH1D * hpi0_data, const bool IsRange, const bool IsKF,const T
   for(Int_t ix=x0; ix<=x1; ix++){
     double ientry = hpi0_data->GetBinContent(ix);
     double weight = -999;
+    //double weight = 1;
     if(name.Contains("KE")) weight = CalCEXPi0KEWeight(ix,IsRange,IsKF);
     if(name.Contains("CosTheta")) weight = CalCEXPi0CosThetaWeight(ix,IsRange,IsKF);
     if(name.Contains("Theta") && !name.Contains("Cos")) weight = CalCEXPi0ThetaWeight(ix,IsRange,IsKF);
@@ -1373,6 +1375,3 @@ TH1D * RebinThetaHist(TH1D * hist){
 
   return rebinHist;
 }
-
-
-
