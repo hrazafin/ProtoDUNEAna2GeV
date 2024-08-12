@@ -565,7 +565,7 @@ int anaRec(const TString finName, TList *lout, const TString tag, const int nEnt
                   //if(anaCut.CutTopology(kMC, pi0KineticE) && evtXStype == anaUtils.gkXSSignal){
                     // ?? Indenpent of fake data use full MC to fill diff. XS unfolding matrix
                     //if(/*!isFakeData && */interactingE > 1650 && interactingE < 1800) { // default cut used for 2 GeV
-                    if(interactingE_reco > 1350 && interactingE_reco < 1500) {  
+                    if(interactingE_reco > 1350 && interactingE_reco < 1500) {
                     //if(/*!isFakeData && */interactingE > 650 && interactingE < 800) {
 
                       if(isFakeData) {recoMatch_avaDiffCEXevt++; reco_selectedDiffCEXevt++;}
@@ -1253,7 +1253,7 @@ int main(int argc, char * argv[])
   if(argc!=1) nEntryToStop = atoi(argv[1]);
   // bb and uf
   BetheBloch bb(211);
-  Unfold uf(20, 0, 1000);
+  Unfold uf(20, 0, 2000); //2GeV
   // MC Analysis
   double mcBeamWeightedCount = 0;
   std::cout << "================ START MC ANA ==================================" << std::endl;

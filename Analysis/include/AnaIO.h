@@ -174,6 +174,14 @@ namespace AnaIO
   TH1D * hrendX = 0x0;
   TH1D * hrendY = 0x0;
   TH1D * hrendZ = 0x0;
+  
+  
+  // Hist get weight Herilala
+  TH1D * getWeight_hRecPiPlusInitialEnergy = 0x0;
+  TH1D * getWeight_hRecPiPlusInteractingEnergy = 0x0;
+  TH1D * getWeight_hRecPiPlusInteractingEnergyEvt = 0x0;
+  TH1D * getWeight_hRecPiZeroSliceKineticEnergyEvt = 0x0;
+  
 
   // Class A - beam cut related
   TH1I * hCutBeamPDGPass = 0x0;
@@ -1532,6 +1540,16 @@ namespace AnaIO
     lout->Add(hreco_beam_trackDirY);
     hreco_beam_trackDirZ = new TH1D("hreco_beam_trackDirZ"," ",200, -4, 4);
     lout->Add(hreco_beam_trackDirZ);
+    
+    getWeight_hRecPiPlusInitialEnergy = new TH1D("getWeight_hRecPiPlusInitialEnergy"," ", 30, -1, 2);
+    lout->Add(getWeight_hRecPiPlusInitialEnergy);
+    getWeight_hRecPiPlusInteractingEnergy = new TH1D("getWeight_hRecPiPlusInteractingEnergy"," ", 30, -1, 2);
+    lout->Add(getWeight_hRecPiPlusInteractingEnergy);
+    getWeight_hRecPiPlusInteractingEnergyEvt = new TH1D("getWeight_hRecPiPlusInteractingEnergyEvt", " ", 30, -1, 2);
+    lout->Add(getWeight_hRecPiPlusInteractingEnergyEvt);
+    getWeight_hRecPiZeroSliceKineticEnergyEvt = new TH1D("getWeight_hRecPiZeroSliceKineticEnergyEvt", " ", 30, -1, 2);
+    lout->Add(getWeight_hRecPiZeroSliceKineticEnergyEvt);
+    
     //====================== Reco (MC and Data)======================//
 
     // Class A - beam cut related
