@@ -2,7 +2,7 @@
 
 Find your favourite base directory and clone this repository
 ```
-git clone https://github.com/GitKangaroo/protoDUNEAnalysis.git
+https://github.com/hrazafin/ProtoDUNEAna2GeV.git
 ```
 Set up the environment 
 ```
