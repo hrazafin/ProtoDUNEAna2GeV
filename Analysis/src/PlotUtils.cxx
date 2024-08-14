@@ -39,12 +39,13 @@ void PlotUtils::FillHist(TH1 * hh,  double xx, const double yy, const double & w
   // Get X bin size
   const int nbx = hh->GetNbinsX();
   // Get min and max value
-  const double xmin = hh->GetXaxis()->GetBinLowEdge(1);
+  //const double xmin = hh->GetXaxis()->GetBinLowEdge(1);
   const double xmax = hh->GetXaxis()->GetBinUpEdge(nbx);
 
-  if(xx<xmin){
-    xx = hh->GetXaxis()->GetBinCenter(1);
-  }
+  //Jun 5 2024
+  //if(xx<xmin){
+  //  xx = hh->GetXaxis()->GetBinCenter(1);
+  //}
   if(xx>=xmax){
     xx = hh->GetXaxis()->GetBinCenter(nbx);
   }
@@ -76,12 +77,14 @@ void PlotUtils::FillHist(TH2 * hh,  double xx, const double yy, const double & w
   // Get X bin size
   const int nbx = hh->GetNbinsX();
   // Get min and max value
-  const double xmin = hh->GetXaxis()->GetBinLowEdge(1);
+  //const double xmin = hh->GetXaxis()->GetBinLowEdge(1);
   const double xmax = hh->GetXaxis()->GetBinUpEdge(nbx);
 
-  if(xx<xmin){
-    xx = hh->GetXaxis()->GetBinCenter(1);
-  }
+  //Jun 5 2024
+  //if(xx<xmin){
+  //  xx = hh->GetXaxis()->GetBinCenter(1);
+  //}
+
   if(xx>=xmax){
     xx = hh->GetXaxis()->GetBinCenter(nbx);
   }
@@ -2893,15 +2896,16 @@ void PlotUtils::DrawHist(TList *lout, const double plotscale, const double plots
           pad1->Draw();
           pad1->cd();
 
-          // Scale the beam cuts related hists data to MC no weight
-          if(tag.Contains("CutPDG") || tag.Contains("BeamPDG")) ScaleStack(hstk, 0.702223); // CutPDG
-          else if(tag.Contains("CutPandora") || tag.Contains("BeamPandora")) ScaleStack(hstk, 0.709511); // CutPandora
-          else if(tag.Contains("CutCaloSize") || tag.Contains("BeamCalo")) ScaleStack(hstk, 0.703488); // CutCaloSize
-          else if(tag.Contains("CutBeamQuality") || tag.Contains("BeamQuality")) ScaleStack(hstk, 0.698653); // CutBeamQuality
-          else if(tag.Contains("CutAPA3") || tag.Contains("BeamAPA3")) ScaleStack(hstk, 0.658395); // CutAPA3
-          else if(tag.Contains("CutMichelScore") || tag.Contains("BeamMichel")) ScaleStack(hstk, 0.65585);  // CutMichelScore
-          else if(tag.Contains("CutChi2DOF") || tag.Contains("BeamChi2")) ScaleStack(hstk, 0.649126); // CutChi2DOF
-          else if(tag.Contains("CutBeamScraper") || tag.Contains("BeamScraper")) ScaleStack(hstk, 0.57804); // CutBeamScraper(final beam scale)
+          // Scale the beam cuts related hists data to MC no weight (Data/MC)
+          std::cout << "USING NEW CUTTSSS IF IT DOESN'T WORK THEN IT'S YOUR FAULT!!!!" << std::endl;
+          if(tag.Contains("CutPDG") || tag.Contains("BeamPDG")) ScaleStack(hstk, 2.834325348); // CutPDG
+          else if(tag.Contains("CutPandora") || tag.Contains("BeamPandora")) ScaleStack(hstk, 2.738415051); // CutPandora
+          else if(tag.Contains("CutCaloSize") || tag.Contains("BeamCalo")) ScaleStack(hstk, 2.706873661); // CutCaloSize
+          else if(tag.Contains("CutBeamQuality") || tag.Contains("BeamQuality")) ScaleStack(hstk, 2.568909452); // CutBeamQuality
+          else if(tag.Contains("CutAPA3") || tag.Contains("BeamAPA3")) ScaleStack(hstk, 2.417150877); // CutAPA3
+          else if(tag.Contains("CutMichelScore") || tag.Contains("BeamMichel")) ScaleStack(hstk, 2.41828536);  // CutMichelScore
+          else if(tag.Contains("CutChi2DOF") || tag.Contains("BeamChi2")) ScaleStack(hstk, 2.410754206); // CutChi2DOF
+          else if(tag.Contains("CutBeamScraper") || tag.Contains("BeamScraper")) ScaleStack(hstk, 2.424395284); // CutBeamScraper(final beam scale)
 
           else if(tag.Contains("hRecPiPlus") && !tag.Contains("b00")) ScaleStack(hstk, plotscale_wt);
           else if(tag.Contains("i087hRecPiZeroKineticEnergyEvt_COMPOSE_XsEvt")) ScaleStack(hstk, plotscale_wt);
@@ -3143,17 +3147,14 @@ void PlotUtils::DrawHist(TList *lout, const double plotscale, const double plots
           }*/
 
           // Scale the beam cuts related hists data to MC no weight
-          if(tag.Contains("CutPDG") || tag.Contains("BeamPDG")) ScaleStack(hstk, 0.702223); // CutPDG
-          else if(tag.Contains("CutPandora") || tag.Contains("BeamPandora")) ScaleStack(hstk, 0.709511); // CutPandora
-          else if(tag.Contains("CutCaloSize") || tag.Contains("BeamCalo")) ScaleStack(hstk, 0.703488); // CutCaloSize
-          else if(tag.Contains("CutBeamQuality") || tag.Contains("BeamQuality")) ScaleStack(hstk, 0.698653); // CutBeamQuality
-          else if(tag.Contains("CutAPA3") || tag.Contains("BeamAPA3")) ScaleStack(hstk, 0.658395); // CutAPA3
-          else if(tag.Contains("CutMichelScore") || tag.Contains("BeamMichel")) ScaleStack(hstk, 0.65585);  // CutMichelScore
-          else if(tag.Contains("CutChi2DOF") || tag.Contains("BeamChi2")) ScaleStack(hstk, 0.649126); // CutChi2DOF
-          else if(tag.Contains("CutBeamScraper") || tag.Contains("BeamScraper")) ScaleStack(hstk, 0.57804); // CutBeamScraper(final beam scale)
-
-          else if(tag.Contains("hRecPiPlus") && !tag.Contains("b00")) ScaleStack(hstk, plotscale_wt);
-          else if(tag.Contains("i087hRecPiZeroKineticEnergyEvt_COMPOSE_XsEvt")) ScaleStack(hstk, plotscale_wt);
+          if(tag.Contains("CutPDG") || tag.Contains("BeamPDG")) ScaleStack(hstk, 2.834325348); // CutPDG
+          else if(tag.Contains("CutPandora") || tag.Contains("BeamPandora")) ScaleStack(hstk, 2.738415051); // CutPandora
+          else if(tag.Contains("CutCaloSize") || tag.Contains("BeamCalo")) ScaleStack(hstk, 2.706873661); // CutCaloSize
+          else if(tag.Contains("CutBeamQuality") || tag.Contains("BeamQuality")) ScaleStack(hstk, 2.568909452); // CutBeamQuality
+          else if(tag.Contains("CutAPA3") || tag.Contains("BeamAPA3")) ScaleStack(hstk, 2.417150877); // CutAPA3
+          else if(tag.Contains("CutMichelScore") || tag.Contains("BeamMichel")) ScaleStack(hstk, 2.41828536);  // CutMichelScore
+          else if(tag.Contains("CutChi2DOF") || tag.Contains("BeamChi2")) ScaleStack(hstk, 2.410754206); // CutChi2DOF
+          else if(tag.Contains("CutBeamScraper") || tag.Contains("BeamScraper")) ScaleStack(hstk, 2.424395284); // CutBeamScraper(final beam scale)
 
           // Scale data to MC
           else ScaleStack(hstk, plotscale);
@@ -3632,6 +3633,20 @@ THStack * PlotUtils::NormalizeStack(THStack * hstk)
       }
 
       if(tag.Contains("i300hRecPiZeroRangeKineticEnergyEvtNoWeight_COMPOSE_XsEvt") && ii == 0){
+        cout << "hRecPiZeroRangeKineticEnergyEvtNoWeight" << endl;
+        const Int_t x0 = htmp->GetXaxis()->GetFirst();
+        const Int_t x1 = htmp->GetXaxis()->GetLast();
+        for(Int_t ix=x0; ix<=x1; ix++){
+          //cout << "ix: " << ix << "ratio : " << htmp->GetBinContent(ix) << endl;
+          cout << htmp->GetBinContent(ix) <<", ";
+          //AnaIO::getWeight_hRecPiZeroSliceKineticEnergyEvt->Fill(htmp->GetBinContent(ix));
+        }
+        cout<<"  "<< endl;
+        cout<< "****************************" << endl;
+      }
+
+      //Empty histogram
+      if(tag.Contains("i088hRecPiZeroSliceKineticEnergyEvt_COMPOSE_XsEvt")){
         cout << "getWeight_hRecPiZeroSliceKineticEnergyEvt" << endl;
         const Int_t x0 = htmp->GetXaxis()->GetFirst();
         const Int_t x1 = htmp->GetXaxis()->GetLast();
@@ -3643,13 +3658,14 @@ THStack * PlotUtils::NormalizeStack(THStack * hstk)
         cout<<"  "<< endl;
         cout<< "****************************" << endl;
       }
+
       // ============ Pi0 KE =========== //
       if(tag.Contains("i30") && ii == 0){
         cout << tag << endl;
         const Int_t x0 = htmp->GetXaxis()->GetFirst();
         const Int_t x1 = htmp->GetXaxis()->GetLast();
         for(Int_t ix=x0; ix<=x1; ix++){
-          //cout << "ix: " << ix << "ratio : " << htmp->GetBinContent(ix) << endl;
+          cout << "ix: " << ix << "ratio : " << htmp->GetBinContent(ix) << endl;
         }
       }
       // ============ Pi0 Costheta =========== //
